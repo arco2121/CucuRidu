@@ -1,0 +1,25 @@
+{
+  "name": "cucuridu",
+  "version": "1.0.0",
+  "description": "Rework of CucuRidu, made to resolve some tecnical bugs",
+  "keywords": [
+    "js",
+    "cucuridu",
+    "cards"
+  ],
+  "homepage": "https://github.com/arco2121/CucuRidu#readme",
+  "bugs": {
+    "url": "https://github.com/arco2121/CucuRidu/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arco2121/CucuRidu.git"
+  },
+  "license": "ISC",
+  "author": "arco2121, GianlucaGrammatica",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js"
+  }
+}
