@@ -4,7 +4,7 @@
 
 Un gioco di carte online assolutamente demenziale dove riempi gli spazi vuoti con le risposte più assurde, inappropriate o esilaranti possibili. Tipo Cards Against Humanity ma fatto in cantina con la grappa della nonna.
 
-[![Live Demo](https://img.shields.io/badge/Gioca-Ora-ff69b4?style=for-the-badge)](https://cucuridu.web.app)
+[![Live Demo](https://img.shields.io/badge/Gioca-Ora-ff69b4?style=for-the-badge)](https://cucuridu.onrender.com)
 
 ## 🎭 Ma che roba è?
 
