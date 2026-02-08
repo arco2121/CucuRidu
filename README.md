@@ -92,7 +92,7 @@ Modifica gli array in `Server/api/Room.js`:
 
 I colori sono scelti random dall'array `colors` nel JavaScript client-side. Modificalo per matchare la tua estetica (o mancanza di essa).
 
-### !Non ancora implementato
+### ! Non ancora implementato
 
 ## ⚠️ Bug Conosciuti
 
