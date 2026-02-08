@@ -1,4 +1,4 @@
-# 🎴 Cucu Ridu ✨
+# Cucu Ridu ✨
 
 **America Ya (Hallo Hallo Hallo) 👋**
 
