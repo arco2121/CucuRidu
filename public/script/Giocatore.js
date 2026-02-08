@@ -1,0 +1,3 @@
+class Giocatore {
+    //todo implementa
+}
