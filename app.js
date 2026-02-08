@@ -1,11 +1,10 @@
 //Initialize vars
-const Express = require("express");
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const express = require("express");
 
 //Configuration
-const app = Express();
+const app = express();
 const serverConfig = createServer(app);
 const port = process.env.PORT || 3000;
 const server = new Server(serverConfig, {
@@ -16,7 +15,10 @@ const server = new Server(serverConfig, {
     pingInterval: 10000,
     pingTimeout: 8000
 });
-app.use(express.static("public")); //Puoi cambiare in base a come strutturi
+app.use(express.static("public"));
+app.set("view engine", "ejs");
+app.use(express.urlencoded({extended : true}))
+app.use(express.json())
 
 //Endpoints
 app.get("/", (req, res) => {
