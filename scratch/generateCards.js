@@ -11,12 +11,11 @@ const generateJSON = (group, files) => {
             let array = [];
             for (const line of lines) {
                 const string = line[0]?.toUpperCase() + line.slice(1);
-                const completamento = (line.match(/_/g) || []).length;
-                array.push([
+                const completamenti = (line.match(/_/g) || []).length;
+                array.push(completamenti > 0 ? [
                     string,
-                    completamento,
-                    completamento === 0 ? "completamento" : "frase"
-                ])
+                    completamenti
+                ] : string)
             }
             fs.mkdirSync(join(__dirname, "../public/include/cards/" + group + "/"), {
                 recursive: true,

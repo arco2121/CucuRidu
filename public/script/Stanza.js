@@ -7,13 +7,14 @@ const StatoStanza = Object.freeze({
 });
 const { Giocatore } = require('Giocatore');
 const { Mazzo, TipoMazzo } = require('Mazzo');
+const { generateId } = require('generazione');
 
 class Stanza {
 
     constructor(pack) {
         this.id = generateId(7);
         this.pack = pack || "standard";
-        this.giocatori = Array.of(Giocatore);
+        this.giocatori = [];
         this.stato = StatoStanza.WAIT;
         this.master = new Giocatore();
         this.master.aggiungiMano()
@@ -43,7 +44,7 @@ class Stanza {
         if(this.stato !== StatoStanza.WAIT)
             return false;
         const giocatore = new Giocatore();
-        giocatore.aggiungiMano(this.mazzoCompletamenti.mazzo.prendiCarte())
+        giocatore.aggiungiMano(this.mazzoCompletamenti.mazzo.prendiCarte(12))
         this.giocatori.push(giocatore);
         return giocatore;
     }
