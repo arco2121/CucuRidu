@@ -5,6 +5,7 @@ const StatoStanza = Object.freeze({
     WINNER: 4,
     CHOOSING_CARDS: 2
 });
+const { Giocatore } = require('./Giocatore');
 
 /**
  * Classe della stanza, le risposte ai turni hanno la seguente struttura :
@@ -16,11 +17,11 @@ const StatoStanza = Object.freeze({
  */
 class Stanza {
 
-    constructor(masterId) {
-        this.id = "" //todo generazione
+    constructor() {
+        this.id = generateId(7);
         this.giocatori = Array.of(Giocatore);
         this.stato = StatoStanza.WAIT;
-        this.master = new Giocatore(masterId);
+        this.master = new Giocatore();
         //todo aggiunta carte al master
         this.giocatori.push(this.master);
         this.round = {
