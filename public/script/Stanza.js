@@ -11,14 +11,12 @@ const { generateId } = require('generazione');
 
 class Stanza {
 
-    constructor(pack) {
+    constructor(pack, username) {
         this.id = generateId(7);
         this.pack = pack || "standard";
         this.giocatori = [];
         this.stato = StatoStanza.WAIT;
-        this.master = new Giocatore();
-        this.master.aggiungiMano()
-        this.giocatori.push(this.master);
+        this.master = new Giocatore(username);
         this.mazzoCompletamenti = {
             mazzo: new Mazzo({
                 pack: pack,
@@ -33,28 +31,30 @@ class Stanza {
             }),
             scarto: new Mazzo(TipoMazzo.FRASI)
         }
+        let maxOccorrenze = 0;
+        this.mazzoFrasi.mazzo.carte.map(carta => carta[1]).forEach(occorrenza => maxOccorrenze += occorrenza);
         this.round = {
             domanda: this.mazzoFrasi.mazzo.prendiCarte(1),
             risposte: [],
-            chiStaInterrogando: this.master
+            chiStaInterrogando: this.master.id
         }
+        this.master.aggiungiMano(this.mazzoCompletamenti.mazzo.prendiCarte(12));
+        this.giocatori.push(this.master);
+        this.numeroRound = [1, maxOccorrenze * this.giocatori.length];
     }
 
-    aggiungiGiocatore() {
+    aggiungiGiocatore(username) {
         if(this.stato !== StatoStanza.WAIT)
             return false;
-        const giocatore = new Giocatore();
+        const giocatore = new Giocatore(username);
         giocatore.aggiungiMano(this.mazzoCompletamenti.mazzo.prendiCarte(12))
+        this.numeroRound = [this.numeroRound[0], (this.numeroRound[1] / this.giocatori.length) * (this.giocatori.length + 1)];
         this.giocatori.push(giocatore);
         return giocatore;
     }
 
     eliminaGiocatore() {
         //todo logica con cambio ruoli
-    }
-
-    numeroGiocatori() {
-        return this.giocatori.length;
     }
 
     terminaPartita() {
@@ -65,11 +65,22 @@ class Stanza {
         return false;
     }
 
-    aggiungiRisposta(carta, giocatoreId) {
-        if(this.stato === StatoStanza.CHOOSING_CARDS) {
+    iniziaTurno(chiStaChidedendo) {
+        if(this.numeroRound[0] === this.numeroRound[1])
+            return this.terminaPartita();
+        if(this.stato === StatoStanza.WAIT && chiStaChidedendo === this.round.chiStaInterrogando) {
+            this.stato = StatoStanza.CHOOSING_CARDS;
+            return this.round.chiStaInterrogando;
+        }
+        return false;
+    }
+
+    aggiungiRisposta(giocatoreId, ... indexCarte) {
+        if(this.stato === StatoStanza.CHOOSING_CARDS && this.giocatori.find(giocatore => giocatore.id === giocatoreId)
+            && !this.round.risposte.find(risposta => risposta.chi === giocatoreId)) {
             this.round.risposte.push({
-                carta: carta,
-                chi: this.giocatori.find(giocatore => giocatore.id === giocatoreId)
+                carte: this.giocatori[giocatoreId].prendiMano(indexCarte),
+                chi: giocatoreId
             });
             if(this.round.risposte.length === (this.giocatori.length - 1)) return true;
         }
@@ -80,6 +91,18 @@ class Stanza {
         if(this.stato !== StatoStanza.CHOOSING_WINNER ||
             this.round.risposte.length !== (this.giocatori.length - 1) || chiStaChiedendo !== this.round.chiStaInterrogando) return false;
         this.stato = StatoStanza.WAIT;
-        return this.round.risposte[indiceRisposta] || false;
+        const vincitoreRound = this.giocatori.findIndex(giocatore => giocatore.id === this.round.risposte[indiceRisposta].chi);
+        this.giocatori[vincitoreRound].punti++;
+        this.mazzoCompletamenti.scarto.aggiungiCarte(this.round.risposte.map(risposta => risposta.carta))
+        this.mazzoFrasi.scarto.aggiungiCarte(this.round.domanda);
+        this.round = {
+            domanda: this.mazzoFrasi.mazzo.prendiCarte(1),
+            risposte: [],
+            chiStaInterrogando: this.giocatori[vincitoreRound].id
+        }
+        this.numeroRound[0]++;
+        return [this.round.risposte[indiceRisposta], this.giocatori[vincitoreRound].username] || false;
     }
 }
+
+module.exports = { Stanza };
