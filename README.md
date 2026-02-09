@@ -29,16 +29,8 @@ Vai semplicemente su [cucuridu.web.app](https://cucuridu.web.app) e crea una sta
 
 ### Run in Locale (Per i Coraggiosi)
 
-**Client:**
-```bash
-cd Release
-firebase serve
-# oppure apri Release/public/index.html nel browser
-```
-
 **Server:**
 ```bash
-cd Server
 npm install
 npm start
 # Il server gira su http://localhost:3000
@@ -60,33 +52,6 @@ npm start
 - **Hosting:** Firebase Hosting
 - **Database:** Nessuno! Tutto vive nella gloriosa RAM
 - **Styling:** CSS (con più colori di un unicorno in acido)
-
-## 📁 Struttura del Progetto
-```
-CucuRidu/
-├── Release/              # Client-side (quello che vedono gli utenti)
-│   ├── public/
-│   │   ├── script/      # Logica del gioco
-│   │   ├── style/       # Caos CSS
-│   │   ├── audio/       # Effetti sonori
-│   │   └── img/         # Loghi e avatar random
-│   └── firebase.json    # Config Firebase
-│
-├── Server/              # Backend delirante
-│   ├── api/            # Logica del gioco (Room, User, Deck)
-│   ├── Server.js       # Server Socket.io
-│   └── public/         # Pagina lobby
-│
-└── Scratch/            # Database domande/risposte
-```
-
-## 🎨 Personalizzazione
-
-### Aggiungi le Tue Carte
-
-Modifica gli array in `Server/api/Room.js`:
-- `QuestionsArr` - Aggiungi carte domanda con spazi vuoti (usa `_` per gli spazi)
-- `AnswerArr` - Aggiungi carte risposta
 
 ### Cambia il Vibe
 
