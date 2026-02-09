@@ -19,3 +19,5 @@ const generateId = (length) => {
     memory.add(code);
     return code;
 }
+
+module.exports = { generateId };

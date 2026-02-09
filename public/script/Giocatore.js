@@ -8,4 +8,14 @@ class Giocatore {
         this.punti = 0;
         this.mazzo = new Mazzo(tipologiaMazzo);
     }
+
+    aggiungiMano(...carte) {
+        this.mazzo.aggiungiCarte(carte);
+    }
+
+    prendiMano(numeroCarte) {
+        this.mazzo.prendiCarte(numeroCarte);
+    }
 }
+
+module.exports = { Giocatore };

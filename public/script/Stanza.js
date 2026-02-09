@@ -5,29 +5,35 @@ const StatoStanza = Object.freeze({
     WINNER: 4,
     CHOOSING_CARDS: 2
 });
-const { Giocatore } = require('./Giocatore');
+const { Giocatore } = require('Giocatore');
+const { Mazzo, TipoMazzo } = require('Mazzo');
 
-/**
- * Classe della stanza, le risposte ai turni hanno la seguente struttura :
- *
- * {
- *     risposta: Carta,
- *     chi: Giocatore
- * }
- */
 class Stanza {
 
-    constructor() {
+    constructor(pack) {
         this.id = generateId(7);
+        this.pack = pack || "standard";
         this.giocatori = Array.of(Giocatore);
         this.stato = StatoStanza.WAIT;
         this.master = new Giocatore();
-        //todo aggiunta carte al master
+        this.master.aggiungiMano()
         this.giocatori.push(this.master);
+        this.mazzoCompletamenti = {
+            mazzo: new Mazzo({
+                pack: pack,
+                tipoMazzo: TipoMazzo.COMPLETAMENTI
+            }),
+            scarto: new Mazzo(TipoMazzo.COMPLETAMENTI)
+        }
+        this.mazzoFrasi = {
+            mazzo: new Mazzo({
+                pack: pack,
+                tipoMazzo: TipoMazzo.FRASI
+            }),
+            scarto: new Mazzo(TipoMazzo.FRASI)
+        }
         this.round = {
-            mazzo: [], //todo mazzo;
-            scarto: [],
-            domanda: "", //todo carta
+            domanda: this.mazzoFrasi.mazzo.prendiCarte(1),
             risposte: [],
             chiStaInterrogando: this.master
         }
@@ -37,7 +43,7 @@ class Stanza {
         if(this.stato !== StatoStanza.WAIT)
             return false;
         const giocatore = new Giocatore();
-        giocatore.aggiungiMano(this.round.mazzo.prendiMano())
+        giocatore.aggiungiMano(this.mazzoCompletamenti.mazzo.prendiCarte())
         this.giocatori.push(giocatore);
         return giocatore;
     }
@@ -53,7 +59,7 @@ class Stanza {
     terminaPartita() {
         if(this.stato !== StatoStanza.END) {
             this.stato = StatoStanza.END;
-            return this.giocatori.toSorted((a, b) => a.punti - b.punti > 0);
+            return this.giocatori.toSorted((a, b) => a.punti - b.punti);
         }
         return false;
     }

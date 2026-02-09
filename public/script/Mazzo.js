@@ -20,4 +20,21 @@ class Mazzo {
             this.carte = JSON.parse(carte);
         }
     }
+
+    aggiungiCarte(... carte) {
+        for(const carta of carte) this.carte.push(carta);
+    }
+
+    shuffle() {
+        this.carte.sort(() => Math.random() - 0.5);
+    }
+
+    prendiCarte(numeroCarte) {
+        const temp = [];
+        numeroCarte = Math.min(numeroCarte, this.carte.length);
+        for(let i = 0; i < numeroCarte; i++) temp.push(this.carte.shift());
+        return temp;
+    }
 }
+
+module.exports = { Mazzo, TipoMazzo };
