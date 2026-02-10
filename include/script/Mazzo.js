@@ -11,7 +11,7 @@ class Mazzo {
         this.carte = [];
         if (data) {
             const pack = data["pack"] || "standard";
-            if (!data["tipoMazzo"] instanceof TipoMazzo) throw new Error("Non è un tipo di mazzo");
+            if (!data["tipoMazzo"] instanceof TipoMazzo) throw new Error("Non è un tipo di mazzo. Pirla");
             const carte = fs.readFileSync(path.join(__dirname, "../include/cards/" + pack + "/" + data["tipoMazzo"] === TipoMazzo.COMPLETAMENTI ? "completamenti.json" : "frasi.json"), "utf-8");
             this.aggiungiCarte(...JSON.parse(carte));
         }

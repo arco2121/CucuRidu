@@ -75,7 +75,7 @@ server.on("connection", (user) => {
             });
         } catch {
             user.emit("errore", {
-                message: "Impossibile creare la stanza"
+                message: "Impossibile creare la stanza, non va niente quel porco di un bastardo maledetto del dio cristo impalato su uno spiedino di sushi marcito come l'utero della madonna troia"
             });
         }
     });
@@ -85,7 +85,7 @@ server.on("connection", (user) => {
             user.data.referenceUtente = Stanze[stanzaId].aggiungiGiocatore(data["username"], generationMemory);
             if(user.data.referenceUtente === false) {
                 user.emit("impossibileAggiungersi", {
-                    message: "Impossibile aggiungersi alla stanza"
+                    message: "Impossibile aggiungersi alla stanza, le regole giustamente non ammettono schifi umani"
                 });
                 return;
             }
@@ -139,12 +139,12 @@ server.on("connection", (user) => {
                });
            } else if(result) {
                user.emit("rispostaRegistrata", {
-                  message: "Risposta registrata"
+                  message: "Risposta registrata, contento?"
                });
            }
            else {
                user.emit("giaRegistrata", {
-                   message: "Non puoi rispondere 2 volte"
+                   message: "Non puoi rispondere 2 volte dio coltivatore di carote in un campo di reclusione ucraino"
                });
            }
        } catch (e) {
@@ -173,7 +173,7 @@ server.on("connection", (user) => {
                 });
             } else {
                 user.emit("errore", {
-                    message: "Aspetta che tutti quanti rispondano"
+                    message: "Aspetta e spera che tutti quanti rispondano (tanto ti ghostano perchè gli stai sul cazzo)"
                 });
             }
         } catch (e) {
