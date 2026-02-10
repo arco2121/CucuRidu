@@ -137,18 +137,6 @@ R: Questa è una carta del gioco, non una domanda vera... giusto? ...Giusto?
 
 ---
 
-## 🏆 Achievement Sbloccabili
-
-- **"Silly ✨"** - Inizia il tuo primo gioco
-- **"Germano Mosconi Approves"** - Vinci con una bestemmia
-- **"Friendship Over"** - Fai ragequittare qualcuno
-- **"Too Far"** - Tutti ti guardano in silenzio dopo la tua risposta
-- **"Cultura"** - Vinci citando Leopardi o Dante (somehow)
-- **"Chad"** - Vinci 5 round di fila
-- **"Il Duce del Gioco"** - Crea una stanza e dominala come un tiranno
-- **"Peppa Pig alla Griglia"** - Gioca la carta più cursed possibile
-
----
 
 ## 🎨 Galleria del Dolore
 
