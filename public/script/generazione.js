@@ -1,7 +1,7 @@
 const alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm@#!£$%&/";
-const memory = new Set();
 
-const generateId = (length) => {
+const generateId = (length, memory) => {
+    if(!memory) return;
     let code = "";
     const utilize = length < 7 ? alphabet.slice(0, alphabet.indexOf("0")) : alphabet;
     length = length > utilize.length ? utilize.length : length;

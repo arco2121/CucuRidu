@@ -1,10 +1,10 @@
-const { generateId } = require("generazione");
-const { Mazzo, TipoMazzo } = require("Mazzo");
+const { generateId } = require("public/script/generazione");
+const { Mazzo, TipoMazzo } = require("include/script/Mazzo");
 
 class Giocatore {
 
-    constructor(username) {
-        this.id = generateId(32);
+    constructor(username, memory) {
+        this.id = generateId(32, memory);
         this.username = username;
         this.punti = 0;
         this.mazzo = new Mazzo(TipoMazzo.COMPLETAMENTI);

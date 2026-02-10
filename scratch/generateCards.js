@@ -15,12 +15,12 @@ const generateJSON = (group, files) => {
                 array.push(completamenti > 0 ? [
                     string,
                     completamenti
-                ] : string)
+                ] : [string]);
             }
-            fs.mkdirSync(join(__dirname, "../public/include/cards/" + group + "/"), {
+            fs.mkdirSync(join(__dirname, "../include/cards/" + group + "/"), {
                 recursive: true,
             });
-            fs.writeFileSync(join(__dirname, "../public/include/cards/" + group + "/" + file.replace(".txt", ".json")), JSON.stringify(array));
+            fs.writeFileSync(join(__dirname, "../include/cards/" + group + "/" + file.replace(".txt", ".json")), JSON.stringify(array));
         }
         return true;
     } catch (error) {

@@ -1,18 +1,17 @@
 const StatoStanza = Object.freeze({
     WAIT: 1,
-    END: 5,
+    END: 4,
     CHOOSING_WINNER: 3,
-    WINNER: 4,
     CHOOSING_CARDS: 2
 });
-const { Giocatore } = require('Giocatore');
-const { Mazzo, TipoMazzo } = require('Mazzo');
-const { generateId } = require('generazione');
+const { Giocatore } = require('include/script/Giocatore');
+const { Mazzo, TipoMazzo } = require('include/script/Mazzo');
+const { generateId } = require('public/script/generazione');
 
 class Stanza {
 
-    constructor(pack, username) {
-        this.id = generateId(7);
+    constructor(pack, username, memory) {
+        this.id = generateId(7, memory);
         this.pack = pack || "standard";
         this.giocatori = [];
         this.stato = StatoStanza.WAIT;
@@ -43,10 +42,10 @@ class Stanza {
         this.numeroRound = [1, maxOccorrenze * this.giocatori.length];
     }
 
-    aggiungiGiocatore(username) {
+    aggiungiGiocatore(username, memory) {
         if(this.stato !== StatoStanza.WAIT)
             return false;
-        const giocatore = new Giocatore(username);
+        const giocatore = new Giocatore(username, memory);
         giocatore.aggiungiMano(this.mazzoCompletamenti.mazzo.prendiCarte(12))
         this.numeroRound = [this.numeroRound[0], (this.numeroRound[1] / this.giocatori.length) * (this.giocatori.length + 1)];
         this.giocatori.push(giocatore);
@@ -54,7 +53,7 @@ class Stanza {
     }
 
     eliminaGiocatore() {
-        //todo logica con cambio ruoli
+        //TODO logica con cambio ruoli
     }
 
     terminaPartita() {
@@ -70,7 +69,7 @@ class Stanza {
             return this.terminaPartita();
         if(this.stato === StatoStanza.WAIT && chiStaChidedendo === this.round.chiStaInterrogando) {
             this.stato = StatoStanza.CHOOSING_CARDS;
-            return this.round.chiStaInterrogando;
+            return this.round;
         }
         return false;
     }
@@ -79,10 +78,18 @@ class Stanza {
         if(this.stato === StatoStanza.CHOOSING_CARDS && this.giocatori.find(giocatore => giocatore.id === giocatoreId)
             && !this.round.risposte.find(risposta => risposta.chi === giocatoreId)) {
             this.round.risposte.push({
-                carte: this.giocatori[giocatoreId].prendiMano(indexCarte),
+                carte: this.giocatori[giocatoreId].prendiMano(...indexCarte),
                 chi: giocatoreId
             });
-            if(this.round.risposte.length === (this.giocatori.length - 1)) return true;
+            if(this.round.risposte.length === (this.giocatori.length - 1)) {
+                this.stato = StatoStanza.CHOOSING_WINNER;
+                return [
+                    this.round.domanda,
+                    this.round.risposte.map(risposta => [risposta, this.giocatori.find(giocatori => giocatori.id === risposta.chi).username]),
+                    this.round.chiStaInterrogando
+                ];
+            }
+            return true;
         }
         return false;
     }
@@ -93,15 +100,18 @@ class Stanza {
         this.stato = StatoStanza.WAIT;
         const vincitoreRound = this.giocatori.findIndex(giocatore => giocatore.id === this.round.risposte[indiceRisposta].chi);
         this.giocatori[vincitoreRound].punti++;
-        this.mazzoCompletamenti.scarto.aggiungiCarte(this.round.risposte.map(risposta => risposta.carta))
-        this.mazzoFrasi.scarto.aggiungiCarte(this.round.domanda);
+        for (const giocatore of this.giocatori) this.giocatori[this.giocatori.indexOf(giocatore)].aggiungiMano(this.mazzoFrasi.prendiCarte(1));
+        this.mazzoCompletamenti.scarto.aggiungiCarte(... this.round.risposte.map(risposta => risposta.carte).flat())
+        this.mazzoFrasi.scarto.aggiungiCarte(...this.round.domanda);
+        const risposte = this.round.risposte[indiceRisposta];
+        const domanda = this.round.domanda
         this.round = {
             domanda: this.mazzoFrasi.mazzo.prendiCarte(1),
             risposte: [],
             chiStaInterrogando: this.giocatori[vincitoreRound].id
         }
         this.numeroRound[0]++;
-        return [this.round.risposte[indiceRisposta], this.giocatori[vincitoreRound].username] || false;
+        return [this.giocatori[vincitoreRound].id, this.giocatori[vincitoreRound].username, domanda, risposte] || false;
     }
 }
 
