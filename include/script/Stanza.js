@@ -10,25 +10,25 @@ const { generateId } = require('public/script/generazione');
 
 class Stanza {
 
-    constructor(pack, username, memory) {
+    constructor(packs, username, memory) {
         this.id = generateId(7, memory);
-        this.pack = pack || "standard";
+        this.packs = packs || ["standard"];
         this.giocatori = [];
         this.stato = StatoStanza.WAIT;
         this.master = new Giocatore(username);
         this.mazzoCompletamenti = {
-            mazzo: new Mazzo({
+            mazzo: Mazzo.unisciMazzi(...this.packs.map(pack => new Mazzo({
                 pack: pack,
                 tipoMazzo: TipoMazzo.COMPLETAMENTI
-            }),
-            scarto: new Mazzo(TipoMazzo.COMPLETAMENTI)
+            }))),
+            scarto: new Mazzo()
         }
         this.mazzoFrasi = {
-            mazzo: new Mazzo({
+            mazzo: Mazzo.unisciMazzi(...this.packs.map(pack => new Mazzo({
                 pack: pack,
                 tipoMazzo: TipoMazzo.FRASI
-            }),
-            scarto: new Mazzo(TipoMazzo.FRASI)
+            }))),
+            scarto: new Mazzo()
         }
         let maxOccorrenze = 0;
         this.mazzoFrasi.mazzo.carte.map(carta => carta[1]).forEach(occorrenza => maxOccorrenze += occorrenza);

@@ -65,7 +65,8 @@ app.get(['/home', '/index'], (req, res) => res.redirect('/'));
 server.on("connection", (user) => {
     user.on("creaStanza", (data) => {
         try {
-            const stanza = new Stanza("standard", data.username, generationMemory);
+            const { username, packs } = data;
+            const stanza = new Stanza(packs, username, generationMemory);
             Stanze[stanza.id] = stanza;
             user.join(stanza.id);
             user.data.referenceUtente = stanza.master;
