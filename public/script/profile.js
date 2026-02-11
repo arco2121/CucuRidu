@@ -44,5 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
     getNewInfos();
 
     btn_randomize.addEventListener("click", getNewInfos);
+    //TODO
+    btn_confirm.addEventListener("click", () => window.location.href = "/enterRoom");
 
 });
