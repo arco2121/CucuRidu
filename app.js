@@ -160,7 +160,7 @@ server.on("connection", (user) => {
             if(result) {
                 server.in(stanzaId).fetchSockets().then(sockets => {
                     for(const socket of sockets) {
-                        socket.data.referenceUtente = Stanza[stanzaId].giocatori.find(giocatore => giocatore.id === socket.data.referenceUtente.id);
+                        socket.data.referenceUtente = Stanze[stanzaId].giocatori.find(giocatore => giocatore.id === socket.data.referenceUtente.id);
                         socket.emit("fineTurno", {
                             vincitore: result[0],
                             usernameVincitore: result[1],

@@ -79,7 +79,7 @@ class Stanza {
         if(this.stato === StatoStanza.CHOOSING_CARDS && this.giocatori.find(giocatore => giocatore.id === giocatoreId)
             && !this.round.risposte.find(risposta => risposta.chi === giocatoreId)) {
             this.round.risposte.push({
-                carte: this.giocatori[giocatoreId].prendiMano(...indexCarte),
+                carte: this.giocatori.find(giocatore => giocatore.id === giocatoreId).prendiMano(...indexCarte),
                 chi: giocatoreId
             });
             if(this.round.risposte.length === (this.giocatori.length - 1)) {
@@ -101,7 +101,7 @@ class Stanza {
         this.stato = StatoStanza.WAIT;
         const vincitoreRound = this.giocatori.findIndex(giocatore => giocatore.id === this.round.risposte[indiceRisposta].chi);
         this.giocatori[vincitoreRound].punti++;
-        for (const giocatore of this.giocatori) this.giocatori[this.giocatori.indexOf(giocatore)].aggiungiMano(this.mazzoFrasi.prendiCarte(1));
+        for (const giocatore of this.giocatori) this.giocatori[this.giocatori.indexOf(giocatore)].aggiungiMano(this.mazzoCompletamenti.mazzo.prendiCarte(this.round.domanda[1]));
         this.mazzoCompletamenti.scarto.aggiungiCarte(... this.round.risposte.map(risposta => risposta.carte).flat())
         this.mazzoFrasi.scarto.aggiungiCarte(...this.round.domanda);
         const risposte = this.round.risposte[indiceRisposta];
