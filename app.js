@@ -4,6 +4,7 @@ const path = require("path");
 const { Server } = require("socket.io");
 const express = require("express");
 const { Stanza, StatoStanza } = require(path.join(__dirname, "include/script/Stanza"));
+const { getIcon } = require(path.join(__dirname, "include/script/generazione"));
 
 //Configuration
 const app = express();
@@ -60,7 +61,7 @@ app.get("/", (req, res) => {
     res.render("view", {
         page: "index",
         params: {
-            icon: String("/assets/icon_imgs/" + Math.floor(Math.random() * (7 - 1) + 1) + ".png")
+            icon: getIcon()
         }
     });
 });
@@ -209,8 +210,9 @@ server.on("connection", (user) => {
 });
 
 //Listening
-app.use((req, res) => res.status(104).render("error", {
+app.use((req, res) => res.render("error", {
     error: 104,
+    icon: getIcon(),
     message: "Questa pagina non esiste, brutta sottospecie di spermatozoo di elefante con la disfunzione erettile"
 }));
 
