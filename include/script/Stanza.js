@@ -4,9 +4,10 @@ const StatoStanza = Object.freeze({
     CHOOSING_WINNER: 3,
     CHOOSING_CARDS: 2
 });
-const { Giocatore } = require('include/script/Giocatore');
-const { Mazzo, TipoMazzo } = require('include/script/Mazzo');
-const { generateId } = require('public/script/generazione');
+const path = require('path');
+const { Giocatore } = require(path.join(__dirname, "/Giocatore"));
+const { Mazzo, TipoMazzo } = require(path.join(__dirname, "/Mazzo"));
+const { generateId } = require(path.join(__dirname, '/generazione'));
 
 class Stanza {
 

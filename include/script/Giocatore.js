@@ -1,5 +1,6 @@
-const { generateId } = require("public/script/generazione");
-const { Mazzo, TipoMazzo } = require("include/script/Mazzo");
+const path = require("path");
+const { generateId } = require(path.join(__dirname, '/generazione'));
+const { Mazzo, TipoMazzo } = require((path.join(__dirname, '/Mazzo')));
 
 class Giocatore {
 

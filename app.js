@@ -1,8 +1,9 @@
 //Import
 const { createServer } = require("node:http");
+const path = require("path");
 const { Server } = require("socket.io");
 const express = require("express");
-const { Stanza, StatoStanza } = require("include/script/Stanza");
+const { Stanza, StatoStanza } = require(path.join(__dirname, "include/script/Stanza"));
 
 //Configuration
 const app = express();
@@ -56,9 +57,7 @@ server.use((socket, next) => {
 
 //Endpoints
 app.get("/", (req, res) => {
-    res.render("index", {
-        token: process.env.APP_KEY
-    });
+    res.render("index");
 });
 app.get(['/home', '/index'], (req, res) => res.redirect('/'));
 
