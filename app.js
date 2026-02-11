@@ -4,7 +4,7 @@ const path = require("path");
 const { Server } = require("socket.io");
 const express = require("express");
 const { Stanza, StatoStanza } = require(path.join(__dirname, "include/script/Stanza"));
-const { getIcon } = require(path.join(__dirname, "include/script/generazione"));
+const { getIcon, generateName, generatePfp } = require(path.join(__dirname, "include/script/generazione"));
 
 //Configuration
 const app = express();
@@ -66,6 +66,12 @@ app.get("/", (req, res) => {
     });
 });
 app.get(['/home', '/index'], (req, res) => res.redirect('/'));
+
+app.get("/profile", (req, res) => res.render("profile"));
+
+app.post("/generateInfo", (req, res) => {
+    res.status(200).json({ nome: generateName(), pfp: generatePfp() });
+})
 
 server.on("connection", (user) => {
     user.on("creaStanza", (data) => {
