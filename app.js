@@ -23,7 +23,7 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({extended : true}));
 app.use(express.json());
 server.use((socket, next) => {
-    const { token, stanza, userId } = socket.handshake.auth.token;
+    const { token, stanza, userId } = socket.handshake.auth;
     if(token !== process.env.APP_KEY) return next(new Error("Chiave non valida"));
     if(!Stanze[stanza] || Stanze[stanza].stato === StatoStanza.END) return next();
     const exist = Stanze[stanza].giocatori.find(giocatore => giocatore.id === userId).length;
@@ -57,7 +57,12 @@ server.use((socket, next) => {
 
 //Endpoints
 app.get("/", (req, res) => {
-    res.render("index");
+    res.render("view", {
+        page: "index",
+        params: {
+            icon: String("/assets/icon_imgs/" + Math.floor(Math.random() * (7 - 1) + 1) + ".png")
+        }
+    });
 });
 app.get(['/home', '/index'], (req, res) => res.redirect('/'));
 

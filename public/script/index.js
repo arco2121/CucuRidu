@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    document.dispatchEvent(unloadCall)
+    document.dispatchEvent(unloadCall);
     const joinRoom = document.getElementById('joinRoom');
     const createRoom = document.getElementById('createRoom');
 

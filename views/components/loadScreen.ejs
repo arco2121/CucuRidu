@@ -1,0 +1,24 @@
+<div class="loadscreen">
+    <div class="row">
+        <img class="loadimg" src="/assets/loading.gif" alt="loadingScreen">
+        <h5 id="textLoading">Caricando</h5>
+    </div>
+</div>
+
+<script>
+    const unloadCall = new Event("loadScreenEnd");
+    (() => {
+        const element = document.querySelector(".loadscreen");
+        const update = setInterval(() => {
+            if (document.getElementById("textLoading").textContent === "Caricando...")
+                document.getElementById("textLoading").textContent = "Caricando";
+            else
+                document.getElementById("textLoading").textContent += '.';
+        }, 333)
+        document.addEventListener("loadScreenEnd", () => {
+            clearInterval(update);
+            element.style.animation = "disappear 0.2s ease-out forwards";
+            setTimeout(() => document.body.removeChild(element), 200);
+        });
+    })();
+</script>

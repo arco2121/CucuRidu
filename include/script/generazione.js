@@ -21,9 +21,6 @@ const generateId = (length, memory) => {
     return code;
 }
 
-module.exports = { generateId };
-
-
 // Generazione Nome Casuale
 const generateName = () => {
     const fs = require('node:fs');
@@ -57,3 +54,5 @@ const generatePfp = () => {
     let rdmNumber = Math.floor(Math.random() * (pfpNumber + 1));
     return pfpPath + rdmNumber + "jpg";
 }
+
+module.exports = { generateId, generatePfp, generateName };
