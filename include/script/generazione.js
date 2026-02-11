@@ -49,10 +49,10 @@ const generateName = () => {
 // Generazione Foto Profilo
 const generatePfp = () => {
     const pfpNumber = 37;
-    const pfpPath = path.join('./assets/pfps/');
+    const pfpPath = '/assets/pfps/';
 
     let rdmNumber = Math.floor(Math.random() * (pfpNumber + 1));
-    return pfpPath + rdmNumber + "jpg";
+    return pfpPath + rdmNumber + ".jpg";
 }
 
 const getIcon = () => String("/assets/icon_imgs/" + Math.floor(Math.random() * (7 - 1) + 1) + ".png");
