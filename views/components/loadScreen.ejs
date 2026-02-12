@@ -6,20 +6,27 @@
 </div>
 
 <script>
-    const unloadCall = new Event("loadScreenEnd");
+    const unloadScreen = new Event("loadScreenEnd");
+    const loadScreen = new Event("loadScreenStart");
     (() => {
         const timing = 300;
         const element = document.querySelector(".loadscreen");
-        const update = setInterval(() => {
+        const update = () => {
             if (document.getElementById("textLoading").textContent === "Caricando...")
                 document.getElementById("textLoading").textContent = "Caricando";
             else
                 document.getElementById("textLoading").textContent += '.';
-        }, 333)
+        };
+        let intervalId = setInterval(update, timing);
         document.addEventListener("loadScreenEnd", () => {
-            clearInterval(update);
+            clearInterval(intervalId);
             element.style.animation = "disappear " + timing + "ms ease-out forwards";
             setTimeout(() => document.body.removeChild(element), timing);
+        });
+        document.addEventListener("loadScreenStart", () => {
+            intervalId = setInterval(update, timing);
+            element.style.animation = "appear " + timing + "ms ease-in forwards";
+            setTimeout(() => document.body.appendChild(element), timing);
         });
     })();
 </script>

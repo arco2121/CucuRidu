@@ -5,6 +5,11 @@ const { Server } = require("socket.io");
 const express = require("express");
 const { Stanza, StatoStanza } = require(path.join(__dirname, "include/script/Stanza"));
 const { getIcon, generateName, generatePfp } = require(path.join(__dirname, "include/script/generazione"));
+const renderPage = (res, page, params = {}) => res.render("components/header", {
+    params: params,
+    page: "../" + page,
+    headerIcon: getIcon(true)
+});
 
 //Configuration
 const app = express();
@@ -57,17 +62,31 @@ server.use((socket, next) => {
 });
 
 //Endpoints
-app.get("/", (req, res) => {
-    res.render("view", {
-        page: "index",
-        params: {
-            icon: getIcon()
-        }
-    });
-});
+app.get("/", (req, res) => renderPage(res, "index", {
+    icon: getIcon()
+}));
 app.get(['/home', '/index'], (req, res) => res.redirect('/'));
 
-app.get("/profile", (req, res) => res.render("profile"));
+app.get("/partecipaStanza", (req, res) => {
+    const { nome, pfp, stanza } = req.query;
+    if(nome && pfp && stanza) renderPage(res, "lobby", {
+        nome: nome,
+        pfp: pfp,
+        stanzaId: stanza,
+        action: "partecipa"
+    }); else if(stanza) renderPage(res, "profile", {
+        stanza: stanza
+    }); else renderPage(res, "room");
+});
+
+app.get("/creaStanza", (req, res) => {
+    const { nome, pfp } = req.query;
+    if(nome && pfp) renderPage(res, "lobby", {
+        nome: nome,
+        pfp: pfp,
+        action: "crea"
+    }); else renderPage(res, "profile");
+});
 
 app.post("/generateInfo", (req, res) => {
     res.status(200).json({ nome: generateName(), pfp: generatePfp() });
@@ -216,7 +235,7 @@ server.on("connection", (user) => {
 });
 
 //Listening
-app.use((req, res) => res.render("error", {
+app.use((req, res) => renderPage(res, "error", {
     error: 104,
     icon: getIcon(),
     message: "Questa pagina non esiste, brutta sottospecie di spermatozoo di elefante con la disfunzione erettile"
