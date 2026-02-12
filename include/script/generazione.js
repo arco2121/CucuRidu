@@ -50,11 +50,10 @@ const generateName = () => {
 const generatePfp = () => {
     const pfpNumber = 37;
     const pfpPath = '/assets/pfps/';
-
     let rdmNumber = Math.floor(Math.random() * (pfpNumber + 1));
     return pfpPath + rdmNumber + ".jpg";
 }
 
-const getIcon = () => String("/assets/icon_imgs/" + Math.floor(Math.random() * (7 - 1) + 1) + ".png");
+const getIcon = (defaultIcon) => String("/assets/icon_imgs/" + (defaultIcon ? 1 : Math.floor(Math.random() * (7 - 1) + 1)) + ".png");
 
 module.exports = { generateId, generatePfp, generateName, getIcon };

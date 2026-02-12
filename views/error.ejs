@@ -1,20 +1,8 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Errore <%= error %> - Cucu Ridu</title>
-</head>
-<body>
-    <div class="section">
-        <div class="column">
-            <img class="indexIcon" src="<%= icon %>">
-            <h1>Errore <% error %></h1>
-            <h3><%= message %></h3>
-        </div>
-        <button onclick="window.location.href = '/'">Torna alla home</button>
+<div class="section">
+    <div class="column">
+        <img class="indexIcon" alt="cucuridu" src="<%= icon %>">
+        <h1>Errore <%= error %></h1>
+        <h3><%= message %></h3>
     </div>
-</body>
-</html>
+    <button onclick="window.location.href = '/'">Torna alla home</button>
+</div>
