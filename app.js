@@ -90,6 +90,12 @@ app.get("/creaStanza", (req, res) => {
 
 app.post("/generateInfo", (req, res) => {
     res.status(200).json({ nome: generateName(), pfp: generatePfp() });
+});
+
+app.post("/doRoomExists", (req, res) => {
+    const { roomId } = req.body;
+    const stato = Boolean(Stanze[roomId] && Stanza[roomId].stato !== StatoStanza.END);
+    res.status(200).json({ result: stato });
 })
 
 server.on("connection", (user) => {

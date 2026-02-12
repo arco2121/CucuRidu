@@ -1,1 +1,35 @@
-// TODO
+const doRoomExists = async (room) => {
+    try {
+        const response = await fetch('/doRoomExists', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: {
+                roomId: room
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Errore nella richiesta: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(`Oop, qualcosa è andato storto: ${error.message}`);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.dispatchEvent(unloadScreen);
+    const sendStanza = document.getElementById("sendStanza");
+
+    sendStanza.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        document.dispatchEvent(loadScreen);
+        const stanzaId = new FormData(sendStanza).get("stanza");
+        const { result } = await doRoomExists(stanzaId);
+        document.dispatchEvent(unloadScreen);
+        if(result === true)  sendStanza.submit();
+        else alert("") //TODO Messaggio silly di non riuscita ad entrare
+    })
+})
