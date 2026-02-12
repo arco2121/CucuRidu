@@ -1,0 +1,15 @@
+<script>
+    document.documentElement.style.overscrollBehaviorX = "none";
+    history.pushState({ confirmed: false }, null, window.location.pathname);
+
+    window.addEventListener('popstate', (e) => {
+        const conferma = confirm("");//TODO
+        if (conferma) window.location.href = "/";
+        else history.pushState({ confirmed: false }, null, window.location.pathname);
+    });
+
+    window.addEventListener('beforeunload', (e) => {
+        e.preventDefault();
+        e.returnValue = "";
+    });
+</script>

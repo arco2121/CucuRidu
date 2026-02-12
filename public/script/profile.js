@@ -45,9 +45,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     await getNewInfos();
 
     btn_randomize.addEventListener("click", getNewInfos);
-    //TODO
     btn_confirm.addEventListener("click", () => possibleStanzaId !== "" ?
-        window.location.href = "/partecipaStanza?pfp=" + encodeURIComponent(displayPfp.src) + "nome=" + encodeURIComponent(displayName.textContent) + "stanza=" + encodeURIComponent(possibleStanzaId) :
-        window.location.href = "/creaStanza?pfp=" + encodeURIComponent(displayPfp.src) + "nome=" + encodeURIComponent(displayName.textContent));
+        window.location.href = "/partecipaStanza?pfp=" + encodeURIComponent(displayPfp.src) + "&nome=" + encodeURIComponent(displayName.textContent) + "&stanza=" + encodeURIComponent(possibleStanzaId) :
+        window.location.href = "/creaStanza?pfp=" + encodeURIComponent(displayPfp.src) + "&nome=" + encodeURIComponent(displayName.textContent));
 
 });
