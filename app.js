@@ -76,7 +76,7 @@ app.get("/partecipaStanza", (req, res) => {
         action: "partecipa"
     }); else if(stanza) renderPage(res, "profile", {
         stanza: stanza
-    }); else renderPage(res, "room");
+    }); else renderPage(res, "join");
 });
 
 app.get("/creaStanza", (req, res) => {
