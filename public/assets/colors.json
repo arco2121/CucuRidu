@@ -11,5 +11,9 @@
   "texts": {
     "normal": "#161616",
     "ligth": "#3a3a3a"
+  },
+  "staticColors": {
+    "confirm": "#aaff75",
+    "critical": "ff758e"
   }
 }
