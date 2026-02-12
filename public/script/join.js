@@ -30,6 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const { result } = await doRoomExists(stanzaId);
         document.dispatchEvent(unloadScreen);
         if(result === true)  sendStanza.submit();
-        else alert("") //TODO Messaggio silly di non riuscita ad entrare
+        else alert("Non può entrare... Entraa? Non Entra! Entraaa? Non Entra! ENTRAAA? NON PENSO PROPRIO!1!")
     })
 })
