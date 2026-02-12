@@ -5,8 +5,8 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="dataFromBackEnd" content="<%= JSON.stringify(params) %>">
     <link rel="icon" href="<%= headerIcon %>">
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap');
     </style>
@@ -16,8 +16,8 @@
     <link rel="stylesheet" href="/style/global.css">
     <title>Cucu Ridu</title>
 </head>
+    <script src="/script/globalConfig.js"></script>
     <body>
-        <script> const fromBackEnd = JSON.parse(JSON.stringify("<%= params %>")); </script>
         <%- include(page, params) %>
     </body>
 </html>

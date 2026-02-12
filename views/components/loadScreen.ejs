@@ -24,9 +24,11 @@
             setTimeout(() => document.body.removeChild(element), timing);
         });
         document.addEventListener("loadScreenStart", () => {
-            intervalId = setInterval(update, timing);
             element.style.animation = "appear " + timing + "ms ease-in forwards";
-            setTimeout(() => document.body.appendChild(element), timing);
+            setTimeout(() => {
+                document.body.appendChild(element);
+                intervalId = setInterval(update, timing);
+            }, timing);
         });
     })();
 </script>
