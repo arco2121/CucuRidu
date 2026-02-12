@@ -1,13 +1,26 @@
-<%- include("components/loadScreen") %>
-<div class="section">
-    <div class="column">
-        <img class="profilePfp" src="" alt="pfp" id="displayPfp">
-        <h3>Scegli un nome</h3>
-        <h4 id="displayName">Nomino Porchino</h4>
-        <div class="row_mobileColumn">
-            <button id="randomize" class="profileButtons btn_style_2">Random</button>
-            <button id="confirm" class="profileButtons btn_style_1">Conferma</button>
+<!doctype html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cucu Ridu</title>
+</head>
+<body>
+    <%- include("components/loadScreen") %>
+    <input type="hidden" value="<%= if(stanza) stanza %>" id="possibleStanzaId">
+    <div class="section">
+        <div class="column">
+            <img class="profilePfp" src="" alt="pfp" id="displayPfp">
+            <h3>Scegli un nome</h3>
+            <h4 id="displayName">Nomino Porchino</h4>
+            <div class="row_mobileColumn">
+                <button id="randomize" class="profileButtons btn_style_2">Random</button>
+                <button id="confirm" class="profileButtons btn_style_1">Conferma</button>
+            </div>
         </div>
     </div>
-</div>
-<script src="/script/profile.js"></script>
+    <script src="/script/profile.js"></script>
+</body>
+</html>

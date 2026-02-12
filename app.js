@@ -67,7 +67,28 @@ app.get("/", (req, res) => {
 });
 app.get(['/home', '/index'], (req, res) => res.redirect('/'));
 
-app.get("/profile", (req, res) => res.render("profile"));
+app.get("/partecipaStanza", (req, res) => {
+    const { nome, pfp, stanza } = req.query;
+    if(nome && pfp && stanza) res.render("lobby", {
+        nome: nome,
+        pfp: pfp,
+        stanzaId: stanza,
+        action: "partecipa"
+    });
+    else if(stanza) res.render("profile", {
+        stanza: stanza
+    });
+    else res.render("room");
+});
+
+app.get("/creaStanza", (req, res) => {
+    const { nome, pfp } = req.query;
+    if(nome && pfp) res.render("lobby", {
+        nome: nome,
+        pfp: pfp,
+        action: "crea"
+    }); else res.render("profile");
+});
 
 app.post("/generateInfo", (req, res) => {
     res.status(200).json({ nome: generateName(), pfp: generatePfp() });

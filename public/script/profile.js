@@ -22,8 +22,9 @@ const getInfo = async () => {
     }
 };
 
-document.addEventListener("DOMContentLoaded", () => {
-    document.dispatchEvent(unloadCall);
+document.addEventListener("DOMContentLoaded", async () => {
+    document.dispatchEvent(unloadScreen);
+    const possibleStanzaId = document.getElementById("possibleStanzaId").value;
     const displayPfp = document.getElementById("displayPfp");
     const displayName = document.getElementById("displayName");
 
@@ -37,14 +38,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (infos) {
             displayPfp.src = infos.pfp;
-            displayName.innerHTML = infos.nome;
+            displayName.innerText = infos.nome;
         }
     }
 
-    getNewInfos();
+    await getNewInfos();
 
     btn_randomize.addEventListener("click", getNewInfos);
     //TODO
-    btn_confirm.addEventListener("click", () => window.location.href = "/enterRoom");
+    btn_confirm.addEventListener("click", () => possibleStanzaId !== "" ?
+        window.location.href = "/partecipaStanza?pfp=" + encodeURIComponent(displayPfp.src) + "nome=" + encodeURIComponent(displayName.textContent) + "stanza=" + encodeURIComponent(possibleStanzaId) :
+        window.location.href = "/creaStanza?pfp=" + encodeURIComponent(displayPfp.src) + "nome=" + encodeURIComponent(displayName.textContent));
 
 });
