@@ -8,7 +8,8 @@
     <link rel="icon" href="<%= headerIcon %>">
     <title>Cucu Ridu</title>
 </head>
-<body>
-    <%- include(page, params) %>
-</body>
+    <body>
+        <script> const fromBackEnd = JSON.parse(JSON.stringify("<%= params %>")); </script>
+        <%- include(page, params) %>
+    </body>
 </html>

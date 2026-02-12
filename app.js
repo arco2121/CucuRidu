@@ -5,7 +5,7 @@ const { Server } = require("socket.io");
 const express = require("express");
 const { Stanza, StatoStanza } = require(path.join(__dirname, "include/script/Stanza"));
 const { getIcon, generateName, generatePfp } = require(path.join(__dirname, "include/script/generazione"));
-const renderPage = (res, page, params) => res.render("components/header", {
+const renderPage = (res, page, params = {}) => res.render("components/header", {
     params: params,
     page: "../" + page,
     headerIcon: getIcon(true)

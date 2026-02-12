@@ -1,5 +1,5 @@
 <script>
-    document.documentElement.style.overscrollBehaviorX = "none";
+    document.body.style.overscrollBehaviorX = "none";
     history.pushState({ confirmed: false }, null, window.location.pathname);
 
     window.addEventListener('popstate', (e) => {
