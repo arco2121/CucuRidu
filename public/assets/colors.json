@@ -1,0 +1,15 @@
+{
+  "colors":   [
+    "#fed6e2",
+    "#ffd2c1",
+    "#fff5b3",
+    "#e9ffc1",
+    "#c1fff0",
+    "#d6ebfe",
+    "#dec1ff"
+  ],
+  "texts": {
+    "normal": "#161616",
+    "ligth": "#3a3a3a"
+  }
+}
