@@ -38,9 +38,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     await getNewInfos();
 
     btn_randomize.addEventListener("click", async () => {
-        document.dispatchEvent(loadScreen);
+        if(!isLoadScreen()) document.dispatchEvent(loadScreen);
         await getNewInfos();
-        document.dispatchEvent(unloadScreen);
+        if(isLoadScreen()) document.dispatchEvent(unloadScreen);
     });
     btn_confirm.addEventListener("click", () => possibleStanzaId !== "" ?
         window.location.href = "/partecipaStanza?pfp=" + encodeURIComponent(displayPfp.src) + "&nome=" + encodeURIComponent(displayName.textContent) + "&stanza=" + encodeURIComponent(possibleStanzaId) :

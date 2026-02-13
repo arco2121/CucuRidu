@@ -18,6 +18,14 @@ class Giocatore {
     prendiMano(...indexCarte) {
         return this.mazzo.prendiCarteByIndex(indexCarte);
     }
+
+    adaptToClient() {
+        return {
+            id: this.id,
+            username: this.username,
+            mazzo: this.mazzo.toArray()
+        }
+    }
 }
 
 module.exports = { Giocatore };

@@ -43,6 +43,10 @@ class Mazzo {
         for (const mazzo of mazzi) temp.aggiungiCarte(...mazzo.prendiCarte(mazzo.carte.length));
         return temp;
     }
+
+    toArray() {
+        return [...this.carte];
+    }
 }
 
 module.exports = { Mazzo, TipoMazzo };

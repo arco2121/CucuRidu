@@ -53,15 +53,15 @@ server.use((socket, next) => {
     socket.data.referenceUtente = exist;
     switch (Stanze[stanza].stato) {
         case StatoStanza.WAIT : {
-            socket.emit("confermaPartecipazione", {
-                reference: socket.data.referenceUtente
+            socket.emit("confermaStanza", {
+                reference: socket.data.referenceUtente.adaptToClient()
             });
             return next();
         }
         case StatoStanza.CHOOSING_CARDS : {
             socket.emit("roundIniziato", {
                 round: Stanze[stanza].round,
-                reference: socket.data.referenceUtente
+                reference: socket.data.referenceUtente.adaptToClient()
             });
             return next();
         }
@@ -70,7 +70,7 @@ server.use((socket, next) => {
                 risposte: Stanze[stanza].round.risposte.map(risposta => [risposta, Stanze[stanza].giocatori.find(giocatori => giocatori.id === risposta.chi).username]),
                 domanda: Stanze[stanza].round.domanda,
                 chiInterroga: Stanze[stanza].round.chiStaInterrogando,
-                reference: socket.data.referenceUtente
+                reference: socket.data.referenceUtente.adaptToClient()
             });
             return next();
         }
@@ -140,13 +140,13 @@ app.post("/doRoomExists", (req, res) => {
     res.status(200).json({ result: stato });
 })
 
-app.post("/saveToSession", (req) => {
+app.post("/saveGameReference", (req) => {
    const { userId, stanza } = req.body;
-   req.session.storeData = {
+   if(userId && stanza) req.session.storeData = {
        ...req.session.storeData,
        userId: userId,
        stanza: stanza
-   }
+   };
 });
 
 server.on("connection", (user) => {
@@ -157,8 +157,8 @@ server.on("connection", (user) => {
             Stanze[stanza.id] = stanza;
             user.join(stanza.id);
             user.data.referenceUtente = stanza.master;
-            user.emit("stanzaCreata", {
-                reference: user.data.referenceUtente
+            user.emit("confermaStanza", {
+                reference: user.data.referenceUtente.adaptToClient()
             });
         } catch {
             user.emit("errore", {
@@ -177,8 +177,8 @@ server.on("connection", (user) => {
                 return;
             }
             user.join(stanzaId);
-            user.emit("confermaPartecipazione", {
-                reference: user.data.referenceUtente
+            user.emit("confermaStanza", {
+                reference: user.data.referenceUtente.adaptToClient()
             });
         } catch (e) {
             user.emit("errore", {
@@ -254,7 +254,7 @@ server.on("connection", (user) => {
                             usernameVincitore: result[1],
                             domanda: result[2],
                             risposte: result[3],
-                            reference: socket.data.referenceUtente
+                            reference: socket.data.referenceUtente.adaptToClient()
                         });
                     }
                 });

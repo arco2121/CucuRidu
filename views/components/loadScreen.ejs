@@ -8,6 +8,7 @@
 <script>
     const unloadScreen = new Event("loadScreenEnd");
     const loadScreen = new Event("loadScreenStart");
+    const isLoadScreen = () => document.body.querySelector(".loadscreen") != null;
     (() => {
         const timing = 300;
         const element = document.querySelector(".loadscreen");

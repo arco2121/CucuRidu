@@ -25,10 +25,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     sendStanza.addEventListener("submit", async (e) => {
         e.preventDefault();
-        document.dispatchEvent(loadScreen);
+        if(!isLoadScreen()) document.dispatchEvent(loadScreen);
         const stanzaId = new FormData(sendStanza).get("stanza");
         const { result } = await doRoomExists(stanzaId);
-        document.dispatchEvent(unloadScreen);
+        if(isLoadScreen()) document.dispatchEvent(unloadScreen);
         if(result === true)  sendStanza.submit();
         else alert("Non può entrare... Entraa? Non Entra! Entraaa? Non Entra! ENTRAAA? NON PENSO PROPRIO!1!")
     })

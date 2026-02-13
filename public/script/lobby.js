@@ -8,6 +8,7 @@ const socket = io({
 const base = document.getElementById("landpoint");
 const fragmentsCache = {};
 const renderFragment = async (page, params = {}) => {
+    if(!isLoadScreen()) document.dispatchEvent(loadScreen);
     try {
         if(!fragmentsCache[page]) {
             const input = await fetch("/fragments/" + page + ".ejs");
@@ -18,9 +19,9 @@ const renderFragment = async (page, params = {}) => {
     } catch (e) {
         console.error(e);
     }
+    if(isLoadScreen()) document.dispatchEvent(unloadScreen);
 }
 let referenceGiocatore;
-
 switch (fromBackEnd["action"]) {
     case "Crea": {
         socket.emit("creaStanza", {
@@ -36,3 +37,20 @@ switch (fromBackEnd["action"]) {
         });
     }
 }
+
+socket.on("confermaStanza", (data) => {
+    const { reference } = data;
+    referenceGiocatore = new GiocatoriAdapt(reference);
+    fetch("/saveGameReference", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: {
+            userId: referenceGiocatore.id,
+            stanzaId: fromBackEnd["stanzaId"]
+        }
+    }).then(async () => {
+        base.innerHTML = await renderFragment("wait");
+    });
+});
