@@ -10,7 +10,9 @@
   ],
   "texts": {
     "normal": "#161616",
-    "ligth": "#3a3a3a"
+    "ligth": "#3a3a3a",
+    "dark": "#080808",
+    "link": "#1f65e5"
   },
   "staticColors": {
     "confirm": "#aaff75",
