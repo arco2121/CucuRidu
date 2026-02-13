@@ -1,4 +1,8 @@
-const fromBackEnd = JSON.parse(document.querySelector("meta[name='dataFromBackEnd']").getAttribute("content"));
+const fromBackEnd = (() => {
+    const data = document.querySelector("meta[name='dataFromBackEnd']").getAttribute("content");
+    document.querySelector("meta[name='dataFromBackEnd']").remove();
+    return JSON.parse(data);
+})();
 const cssVars = (fileName) => {
     const variableNames = new Set();
     const sheets = fileName

@@ -3,13 +3,19 @@ const { createServer } = require("node:http");
 const path = require("path");
 const { Server } = require("socket.io");
 const express = require("express");
+const session = require('express-session');
 const { Stanza, StatoStanza } = require(path.join(__dirname, "include/script/Stanza"));
-const { getIcon, generateName, generatePfp } = require(path.join(__dirname, "include/script/generazione"));
+const { getIcon, generateName, generatePfp, generateId } = require(path.join(__dirname, "include/script/generazione"));
 const renderPage = (res, page, params = {}) => res.render("components/header", {
     params: params,
     page: "../" + page,
     headerIcon: getIcon(true)
 });
+const resumeGame = (req, res, next) => {
+    const userId = (req.session.storeData || {})["userId"];
+    if(userId) return res.redirect("/play");
+    next();
+};
 
 //Configuration
 const app = express();
@@ -17,6 +23,7 @@ const serverConfig = createServer(app);
 const port = process.env.PORT || 3000;
 const Stanze = {};
 const generationMemory = new Set();
+const TEMPORARY_TOKEN = generateId(64, generationMemory);
 const server = new Server(serverConfig, {
     cors: {
         methods: ["GET", "POST"]
@@ -28,9 +35,18 @@ app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.use(express.urlencoded({extended : true}));
 app.use(express.json());
+app.use(session({
+    secret: generateId(64, generationMemory),
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        secure: false,
+        maxAge: 3600000
+    }
+}));
 server.use((socket, next) => {
     const { token, stanza, userId } = socket.handshake.auth;
-    if(token !== process.env.APP_KEY) return next(new Error("Chiave non valida"));
+    if(token !== TEMPORARY_TOKEN) return next(new Error("Chiave non valida"));
     if(!Stanze[stanza] || Stanze[stanza].stato === StatoStanza.END) return next();
     const exist = Stanze[stanza].giocatori.find(giocatore => giocatore.id === userId).length;
     if(!exist) return next();
@@ -62,31 +78,54 @@ server.use((socket, next) => {
 });
 
 //Endpoints
-app.get("/", (req, res) => renderPage(res, "index", {
+app.get("/", resumeGame, (req, res) => renderPage(res, "index", {
     icon: getIcon()
 }));
-app.get(['/home', '/index'], (req, res) => res.redirect('/'));
+app.get(['/home', '/index'], resumeGame, (req, res) => res.redirect('/'));
 
-app.get("/partecipaStanza", (req, res) => {
+app.get("/partecipaStanza", resumeGame, (req, res) => {
     const { nome, pfp, stanza } = req.query;
-    if(nome && pfp && stanza) renderPage(res, "lobby", {
-        nome: nome,
-        pfp: pfp,
-        stanzaId: stanza,
-        action: "partecipa"
-    }); else if(stanza) renderPage(res, "profile", {
+    if(nome && pfp && stanza) {
+        req.session.storeData = {
+            ...req.session.storeData,
+            nome: nome,
+            pfp: pfp,
+            stanza: stanza
+        };
+        res.redirect("/play");
+    } else if(stanza) renderPage(res, "profile", {
         stanza: stanza
     }); else renderPage(res, "join");
 });
 
-app.get("/creaStanza", (req, res) => {
+app.get("/creaStanza", resumeGame, (req, res) => {
     const { nome, pfp } = req.query;
-    if(nome && pfp) renderPage(res, "lobby", {
+    if(nome && pfp) {
+        req.session.storeData = {
+            ...req.session.storeData,
+            nome: nome,
+            pfp: pfp
+        };
+        res.redirect("/play");
+    } else renderPage(res, "profile");
+});
+
+app.get("/play", (req, res) => {
+    const { nome, pfp, stanza, userId } = req.session.storeData || {};
+    if(userId && stanza) renderPage(res, "lobby", {
+        userId: userId,
+        stanzaId: stanza,
+        token: TEMPORARY_TOKEN,
+    });
+    else if(nome && pfp) renderPage(res, "lobby", {
         nome: nome,
         pfp: pfp,
-        action: "crea"
-    }); else renderPage(res, "profile");
-});
+        stanzaId: stanza,
+        token: TEMPORARY_TOKEN,
+        createRoom: Boolean(stanza)
+    });
+    else res.redirect("/");
+})
 
 app.post("/generateInfo", (req, res) => {
     res.status(200).json({ nome: generateName(), pfp: generatePfp() });
@@ -97,6 +136,15 @@ app.post("/doRoomExists", (req, res) => {
     const stato = Boolean(Stanze[roomId] && Stanza[roomId].stato !== StatoStanza.END);
     res.status(200).json({ result: stato });
 })
+
+app.post("/saveToSession", (req, res) => {
+   const { userId, stanza } = req.body;
+   req.session.storeData = {
+       ...req.session.storeData,
+       userId: userId,
+       stanza: stanza
+   }
+});
 
 server.on("connection", (user) => {
     user.on("creaStanza", (data) => {
@@ -247,7 +295,7 @@ app.use((req, res) => renderPage(res, "error", {
     message: "Questa pagina non esiste, brutta sottospecie di spermatozoo di elefante con la disfunzione erettile"
 }));
 
-app.listen(port, (error) => {
+serverConfig.listen(port, (error) => {
     console.log(`Server started on port ${port}`);
     if (error) {
         console.log(error.message);
