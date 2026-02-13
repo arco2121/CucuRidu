@@ -47,14 +47,15 @@ app.use(session({
 server.use((socket, next) => {
     const { token, stanza, userId } = socket.handshake.auth;
     if(token !== TEMPORARY_TOKEN) return next(new Error("Chiave non valida"));
-    if(!Stanze[stanza] || Stanze[stanza].stato === StatoStanza.END) return next();
+    if(!stanza || !Stanze[stanza] || Stanze[stanza].stato === StatoStanza.END) return next();
     const exist = Stanze[stanza].giocatori.find(giocatore => giocatore.id === userId);
     if(!exist) return next();
     socket.data.referenceUtente = exist;
     switch (Stanze[stanza].stato) {
         case StatoStanza.WAIT : {
             socket.emit("confermaStanza", {
-                reference: socket.data.referenceUtente.adaptToClient()
+                reference: socket.data.referenceUtente.adaptToClient(),
+                stanza: Stanze[stanza].id
             });
             return next();
         }
@@ -141,13 +142,17 @@ app.post("/doRoomExists", (req, res) => {
     res.status(200).json({ result: stato });
 })
 
-app.post("/saveGameReference", (req) => {
-   const { userId, stanza } = req.body;
-   if(userId && stanza) req.session.storeData = {
-       ...req.session.storeData,
-       userId: userId,
-       stanza: stanza
-   };
+app.post("/saveGameReference", (req, res) => {
+   const { userId, stanzaId } = req.body || {};
+   if(userId && stanzaId) {
+       req.session.storeData = {
+           ...req.session.storeData,
+           userId: userId,
+           stanza: stanzaId
+       };
+       return res.status(200).json({ result: true });
+   }
+   res.status(406).json({ result: false });
 });
 
 server.on("connection", (user) => {
@@ -159,7 +164,8 @@ server.on("connection", (user) => {
             user.join(stanza.id);
             user.data.referenceUtente = stanza.master;
             user.emit("confermaStanza", {
-                reference: user.data.referenceUtente.adaptToClient()
+                reference: user.data.referenceUtente.adaptToClient(),
+                stanzaId: stanza.id
             });
         } catch {
             user.emit("errore", {

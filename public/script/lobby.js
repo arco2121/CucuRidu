@@ -42,7 +42,7 @@ socket.on("connect", () => {
 });
 
 socket.on("confermaStanza", (data) => {
-    const { reference } = data;
+    const { reference, stanzaId } = data;
     referenceGiocatore = new GiocatoriAdapt(reference);
     fetch("/saveGameReference", {
         method: 'POST',
@@ -51,10 +51,11 @@ socket.on("confermaStanza", (data) => {
         },
         body: JSON.stringify({
             userId: referenceGiocatore.id,
-            stanzaId: fromBackEnd["stanzaId"]
+            stanzaId: stanzaId
         })
-    }).then(async () => {
-        base.innerHTML = await renderFragment("wait");
+    }).then(async (response) => {
+        if(response === true)
+            base.innerHTML = await renderFragment("wait");
     });
 });
 

@@ -41,9 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     btn_randomize.addEventListener("click", async () => {
         if(doing) return;
         doing = true;
-        if(!isLoadScreen()) document.dispatchEvent(loadScreen);
         await getNewInfos();
-        if(isLoadScreen()) document.dispatchEvent(unloadScreen);
         doing = false;
     });
     btn_confirm.addEventListener("click", () => possibleStanzaId !== "" ?

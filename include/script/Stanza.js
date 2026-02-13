@@ -16,7 +16,7 @@ class Stanza {
         this.packs = packs || ["standard"];
         this.giocatori = [];
         this.stato = StatoStanza.WAIT;
-        this.master = new Giocatore(username);
+        this.master = new Giocatore(username, memory);
         this.mazzoCompletamenti = {
             mazzo: Mazzo.unisciMazzi(...this.packs.map(pack => new Mazzo({
                 pack: pack,
@@ -116,4 +116,4 @@ class Stanza {
     }
 }
 
-module.exports = { Stanza };
+module.exports = { Stanza, StatoStanza };
