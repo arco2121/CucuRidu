@@ -33,10 +33,4 @@
             history.back();
         } else history.pushState({ page: 1 }, null, window.location.pathname);
     });
-    window.addEventListener('beforeunload', (e) => {
-        if(!oneConfirm) {
-            e.preventDefault();
-            e.returnValue = '';
-        }
-    });
 </script>

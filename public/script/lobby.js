@@ -62,4 +62,9 @@ socket.on("confermaStanza", (data) => {
 socket.on("errore", (data) => {
     alert(data.message);
     window.location.reload();
-})
+});
+
+window.addEventListener('beforeunload', (e) => {
+    e.preventDefault();
+    e.returnValue = '';
+});

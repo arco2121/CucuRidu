@@ -181,7 +181,7 @@ a {
  >>> LAYOUT
 --------------------------------------------------- */
 .loadscreen {
-    position: absolute;
+    position: fixed;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -193,6 +193,7 @@ a {
     transform: translate(-50%, -50%);
     transform-origin: top left;
     background-color: var(--background);
+    z-index: 1000;
 }
 
 .section {
