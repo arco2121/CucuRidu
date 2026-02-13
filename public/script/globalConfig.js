@@ -41,8 +41,16 @@ const cssVars = (fileName) => {
                 color = textColors["normal"];
                 break;
             }
-            case "--text-color-ligth": {
+            case "--text-color-light": {
                 color = textColors["light"];
+                break;
+            }
+            case "--text-color-link": {
+                color = textColors["link"];
+                break;
+            }
+            case "--text-color-dark": {
+                color = textColors["dark"];
                 break;
             }
             case "--accent-color-confirm": {

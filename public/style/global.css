@@ -22,14 +22,9 @@ time, mark, audio, video {
     vertical-align: baseline;
 }
 
-/* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
     display: block;
-}
-
-body {
-    line-height: 1;
 }
 
 ol, ul {
@@ -54,9 +49,8 @@ table {
 
 
 /* ---------------------------------------------------
- >>> COLORS
+ >>> VARIABLES
 --------------------------------------------------- */
-
 :root {
     /* Dynamic Colors */
     --background: #fed6e2;
@@ -65,20 +59,48 @@ table {
     --accent-color-2: #e9ffc1;
     --accent-color-3: #c1fff0;
 
-    /* Static colors */
+    /* Static Colors */
     --accent-color-confirm: #aaff75;
     --accent-color-critical: #ff758e;
     --text-color-normal: #161616;
     --text-color-dark: #080808;
-    --text-color-ligth: #3a3a3a;
+    --text-color-light: #3a3a3a;
+    --text-color-link: #1f65e5;
 }
 
 
 
 /* ---------------------------------------------------
- >>> FONTS
+ >>> BASE STYLES
 --------------------------------------------------- */
+* {
+    user-select: none;
+    -webkit-user-drag: none;
+    transition: all ease 0.1s;
+}
 
+:focus {
+    outline: none;
+}
+
+body {
+    background-color: var(--background);
+    line-height: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+a {
+    text-decoration: none;
+    color: var(--text-color-link);
+}
+
+
+
+/* ---------------------------------------------------
+ >>> FONTS AND TEXTS
+--------------------------------------------------- */
 .nunito_regular {
     font-family: "Nunito", sans-serif;
     font-optical-sizing: auto;
@@ -93,7 +115,7 @@ table {
     font-style: normal;
 }
 
-.sour-gummy-regular {
+.sour_gummy_regular {
     font-family: "Sour Gummy", sans-serif;
     font-optical-sizing: auto;
     font-weight: 400;
@@ -101,7 +123,15 @@ table {
     font-variation-settings: "wdth" 100;
 }
 
-.sour-gummy-bold {
+.sour_gummy_regular_italic {
+    font-family: "Sour Gummy", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: italic;
+    font-variation-settings: "wdth" 100;
+}
+
+.sour_gummy_bold {
     font-family: "Sour Gummy", sans-serif;
     font-optical-sizing: auto;
     font-weight: 700;
@@ -109,10 +139,157 @@ table {
     font-variation-settings: "wdth" 100;
 }
 
-.sour-gummy-ligth {
+.sour_gummy_bold_italic {
+    font-family: "Sour Gummy", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: italic;
+    font-variation-settings: "wdth" 100;
+}
+
+.sour_gummy_extra {
+    font-family: "Sour Gummy", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 800;
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
+}
+
+.sour_gummy_ligth {
     font-family: "Sour Gummy", sans-serif;
     font-optical-sizing: auto;
     font-weight: 300;
     font-style: normal;
     font-variation-settings: "wdth" 100;
+}
+
+/* Text Colors */
+.text_color_normal {
+    color: var(--text-color-normal);
+}
+
+.text_color_dark {
+    color: var(--text-color-dark);
+}
+
+.text_color_light {
+    color: var(--text-color-light);
+}
+
+
+
+/* ---------------------------------------------------
+ >>> LAYOUT
+--------------------------------------------------- */
+.section {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: top left;
+}
+
+.section_column {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+    gap: 20px;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.row_mobileColumn {
+    display: flex;
+    flex-direction: row;
+}
+
+/* Gaps */
+.flex_gap_15 {
+    gap: 15px;
+}
+
+.flex_gap_10 {
+    gap: 10px;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .row_mobileColumn {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+
+
+/* ---------------------------------------------------
+ >>> BUTTONS
+--------------------------------------------------- */
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    width: 180px;
+    border-radius: 30px;
+    height: 60px;
+    margin: 10px;
+    font-size: 20px;
+    font-family: inherit;
+    transition: all 150ms ease;
+}
+
+.button:active {
+    scale: 0.9;
+    filter: brightness(70%);
+}
+
+.btn_style_1 {
+    border: solid 6px var(--text-color-dark);
+    background: var(--accent-color-1);
+}
+
+.btn_style_2 {
+    border: solid 6px var(--text-color-dark);
+    background: var(--accent-color-2);
+}
+
+
+
+/* ---------------------------------------------------
+ >>> COMPONENTS
+--------------------------------------------------- */
+.img_round {
+    border-radius: 100%;
+    padding: 20px;
+    border: solid var(--text-color-dark) 10px;
+    background: var(--background-variant);
+}
+
+
+
+/* ---------------------------------------------------
+ >>> OTHER
+--------------------------------------------------- */
+.shrinks_on_active_for_no_reason:active {
+    scale: 0.9;
+    filter: brightness(90%);
 }
