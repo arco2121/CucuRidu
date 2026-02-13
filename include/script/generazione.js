@@ -48,7 +48,7 @@ const generateName = () => {
 
 // Generazione Foto Profilo
 const generatePfp = () => {
-    const pfpNumber = 37;
+    const pfpNumber = 50;
     const pfpPath = '/assets/pfps/';
     let rdmNumber = Math.floor(Math.random() * (pfpNumber + 1));
     return pfpPath + rdmNumber + ".jpg";
