@@ -1,10 +1,9 @@
-const path = require("node:path");
 const alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm@#!£$%&/";
 
 const generateId = (length, memory) => {
     if(!memory) return;
     let code = "";
-    const utilize = length < 7 ? alphabet.slice(0, alphabet.indexOf("0")) : alphabet;
+    const utilize = length <= 7 ? alphabet.slice(0, alphabet.indexOf("0")) : alphabet;
     length = length > utilize.length ? utilize.length : length;
     do {
         code = "";
@@ -31,16 +30,11 @@ const generateName = () => {
         const rawData = fs.readFileSync(filePath, 'utf-8');
         const data = JSON.parse(rawData);
 
-        //console.log(data.names);
-        //console.log(data.adjectives);
-
         // Scelta random
         let name = data.names[Math.floor(Math.random()*data.names.length)];
         let adjective = data.adjectives[Math.floor(Math.random()*data.adjectives.length)];
 
-        let finalName = name + " " + adjective;
-        console.log(finalName);
-        return finalName;
+        return name + " " + adjective;
     } catch (error) {
         console.error('Errore durante la lettura del file JSON:', error);
     }

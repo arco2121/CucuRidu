@@ -36,11 +36,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     await getNewInfos();
+    let doing = false;
 
     btn_randomize.addEventListener("click", async () => {
+        if(doing) return;
+        doing = true;
         if(!isLoadScreen()) document.dispatchEvent(loadScreen);
         await getNewInfos();
         if(isLoadScreen()) document.dispatchEvent(unloadScreen);
+        doing = false;
     });
     btn_confirm.addEventListener("click", () => possibleStanzaId !== "" ?
         window.location.href = "/partecipaStanza?pfp=" + encodeURIComponent(displayPfp.src) + "&nome=" + encodeURIComponent(displayName.textContent) + "&stanza=" + encodeURIComponent(possibleStanzaId) :

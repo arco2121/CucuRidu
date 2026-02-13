@@ -8,21 +8,28 @@
 <script>
     const unloadScreen = new Event("loadScreenEnd");
     const loadScreen = new Event("loadScreenStart");
-    const isLoadScreen = () => document.body.querySelector(".loadscreen") != null;
+    const isLoadScreen = () => Boolean(document.body.querySelector(".loadscreen"));
     (() => {
         const timing = 300;
         const element = document.querySelector(".loadscreen");
         const update = () => {
-            if (document.getElementById("textLoading").textContent === "Caricando...")
-                document.getElementById("textLoading").textContent = "Caricando";
-            else
-                document.getElementById("textLoading").textContent += '.';
+            try {
+                if (document.getElementById("textLoading").textContent === "Caricando...")
+                    document.getElementById("textLoading").textContent = "Caricando";
+                else
+                    document.getElementById("textLoading").textContent += '.';
+            } catch {
+                clearInterval(intervalId);
+            }
         };
         let intervalId = setInterval(update, timing);
         document.addEventListener("loadScreenEnd", () => {
             clearInterval(intervalId);
             element.style.animation = "disappear " + timing + "ms ease-out forwards";
-            setTimeout(() => document.body.removeChild(element), timing);
+            setTimeout(() => {
+                try { document.body.removeChild(element); }
+                catch { clearInterval(intervalId); }
+            }, timing);
         });
         document.addEventListener("loadScreenStart", () => {
             element.style.animation = "appear " + timing + "ms ease-in forwards";

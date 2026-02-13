@@ -12,7 +12,7 @@ const renderPage = (res, page, params = {}) => res.render("components/header", {
     headerIcon: getIcon(true)
 });
 const resumeGame = (req, res, next) => {
-    const { userId, stanzaId } = req.session.storeData || {};
+    const { userId } = req.session.storeData || {};
     if(userId) return res.redirect("/game");
     next();
 };
@@ -48,7 +48,7 @@ server.use((socket, next) => {
     const { token, stanza, userId } = socket.handshake.auth;
     if(token !== TEMPORARY_TOKEN) return next(new Error("Chiave non valida"));
     if(!Stanze[stanza] || Stanze[stanza].stato === StatoStanza.END) return next();
-    const exist = Stanze[stanza].giocatori.find(giocatore => giocatore.id === userId).length;
+    const exist = Stanze[stanza].giocatori.find(giocatore => giocatore.id === userId);
     if(!exist) return next();
     socket.data.referenceUtente = exist;
     switch (Stanze[stanza].stato) {
@@ -75,6 +75,7 @@ server.use((socket, next) => {
             return next();
         }
     }
+    next();
 });
 
 //Endpoints
@@ -125,7 +126,7 @@ app.get("/game", (req, res) => {
         action: !stanza ? "Crea" : "Partecipa"
     });
     else {
-        req.session.close();
+        req.session.destroy();
         res.redirect("/");
     }
 })
@@ -136,7 +137,7 @@ app.post("/generateInfo", (req, res) => {
 
 app.post("/doRoomExists", (req, res) => {
     const { roomId } = req.body;
-    const stato = Boolean(Stanze[roomId] && Stanza[roomId].stato !== StatoStanza.END);
+    const stato = Boolean(Stanze[roomId] && Stanze[roomId].stato !== StatoStanza.END);
     res.status(200).json({ result: stato });
 })
 
