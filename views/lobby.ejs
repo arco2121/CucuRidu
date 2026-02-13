@@ -1,15 +1,6 @@
 <%- include("components/loadScreen") %>
 <div class="section" id="landpoint"></div>
 
-<script src="/script/ejs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ejs@4.0.1/ejs.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
-<script>
-    const fromLobby = io({
-        auth: {
-            token: fromBackEnd["token"],
-            stanza: fromBackEnd["stanzaId"],
-            userId: fromBackEnd["userId"]
-        }
-    });
-</script>
 <script src="/script/lobby.js"></script>

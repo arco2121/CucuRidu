@@ -1,6 +1,7 @@
 <script>
     document.body.style.overscrollBehaviorX = "none";
-    history.pushState({ confirmed: false }, null, window.location.pathname);
+    history.pushState({ page: 1 }, null, window.location.pathname);
+    let oneConfirm = false;
 
     const confirmMessgaes = [
         "Vuoi davvero abbandonare il gioco in questa balorda maniera?",
@@ -24,13 +25,12 @@
     ]
 
     window.addEventListener('popstate', (e) => {
-        const conferma = confirm(confirmMessgaes[Math.floor(Math.random()*confirmMessgaes.length)]);
-        if (conferma) window.location.href = "/";
-        else history.pushState({ confirmed: false }, null, window.location.pathname);
-    });
-
-    window.addEventListener('beforeunload', (e) => {
         e.preventDefault();
-        e.returnValue = "";
+        if(oneConfirm) return;
+        const conferma = confirm(confirmMessgaes[Math.floor(Math.random()*confirmMessgaes.length)]);
+        if (conferma) {
+            oneConfirm = !oneConfirm;
+            history.back();
+        } else history.pushState({ page: 1 }, null, window.location.pathname);
     });
 </script>

@@ -12,8 +12,8 @@ const renderPage = (res, page, params = {}) => res.render("components/header", {
     headerIcon: getIcon(true)
 });
 const resumeGame = (req, res, next) => {
-    const userId = (req.session.storeData || {})["userId"];
-    if(userId) return res.redirect("/play");
+    const { userId, stanzaId } = req.session.storeData || {};
+    if(userId) return res.redirect("/game");
     next();
 };
 
@@ -92,7 +92,7 @@ app.get("/partecipaStanza", resumeGame, (req, res) => {
             pfp: pfp,
             stanza: stanza
         };
-        res.redirect("/play");
+        res.redirect("/game");
     } else if(stanza) renderPage(res, "profile", {
         stanza: stanza
     }); else renderPage(res, "join");
@@ -106,11 +106,11 @@ app.get("/creaStanza", resumeGame, (req, res) => {
             nome: nome,
             pfp: pfp
         };
-        res.redirect("/play");
+        res.redirect("/game");
     } else renderPage(res, "profile");
 });
 
-app.get("/play", (req, res) => {
+app.get("/game", (req, res) => {
     const { nome, pfp, stanza, userId } = req.session.storeData || {};
     if(userId && stanza) renderPage(res, "lobby", {
         userId: userId,
@@ -122,9 +122,12 @@ app.get("/play", (req, res) => {
         pfp: pfp,
         stanzaId: stanza,
         token: TEMPORARY_TOKEN,
-        createRoom: Boolean(stanza)
+        action: !stanza ? "Crea" : "Partecipa"
     });
-    else res.redirect("/");
+    else {
+        req.session.close();
+        res.redirect("/");
+    }
 })
 
 app.post("/generateInfo", (req, res) => {
@@ -137,7 +140,7 @@ app.post("/doRoomExists", (req, res) => {
     res.status(200).json({ result: stato });
 })
 
-app.post("/saveToSession", (req, res) => {
+app.post("/saveToSession", (req) => {
    const { userId, stanza } = req.body;
    req.session.storeData = {
        ...req.session.storeData,
