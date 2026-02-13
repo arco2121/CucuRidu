@@ -22,21 +22,24 @@ const renderFragment = async (page, params = {}) => {
     if(isLoadScreen()) document.dispatchEvent(unloadScreen);
 }
 let referenceGiocatore;
-switch (fromBackEnd["action"]) {
-    case "Crea": {
-        socket.emit("creaStanza", {
-            username: fromBackEnd["nome"],
-            packs: fromBackEnd["packages"]
-        });
-        break;
+
+socket.on("connect", () => {
+    switch (fromBackEnd["action"]) {
+        case "Crea": {
+            socket.emit("creaStanza", {
+                username: fromBackEnd["nome"],
+                packs: fromBackEnd["packages"]
+            });
+            break;
+        }
+        case "Partecipa": {
+            socket.emit("partecipaStanza", {
+                username: fromBackEnd["nome"],
+                id: fromBackEnd["stanzaId"]
+            });
+        }
     }
-    case "Partecipa": {
-        socket.emit("creaStanza", {
-            username: fromBackEnd["nome"],
-            id: fromBackEnd["stanzaId"]
-        });
-    }
-}
+});
 
 socket.on("confermaStanza", (data) => {
     const { reference } = data;
@@ -46,11 +49,16 @@ socket.on("confermaStanza", (data) => {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: {
+        body: JSON.stringify({
             userId: referenceGiocatore.id,
             stanzaId: fromBackEnd["stanzaId"]
-        }
+        })
     }).then(async () => {
         base.innerHTML = await renderFragment("wait");
     });
 });
+
+socket.on("errore", (data) => {
+    alert(data.message);
+    window.location.reload();
+})
