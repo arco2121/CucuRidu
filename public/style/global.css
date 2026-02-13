@@ -219,6 +219,16 @@ a {
     gap: 20px;
 }
 
+.section_row_column {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+    gap: 20px;
+}
+
 .column {
     display: flex;
     flex-direction: column;
@@ -249,6 +259,19 @@ a {
     .row_mobileColumn {
         flex-direction: column;
         align-items: center;
+    }
+}
+
+/* PC */
+@media (min-width: 600px) {
+    .section_row_column {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        align-items: center;
+        flex: 1;
+        justify-content: center;
+        gap: 60px;
     }
 }
 
