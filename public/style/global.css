@@ -92,7 +92,6 @@ body {
 }
 
 a {
-    text-decoration: none;
     color: var(--text-color-link);
 }
 
@@ -181,6 +180,21 @@ a {
 /* ---------------------------------------------------
  >>> LAYOUT
 --------------------------------------------------- */
+.loadscreen {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: top left;
+    background-color: var(--background);
+}
+
 .section {
     position: absolute;
     display: flex;
@@ -282,6 +296,19 @@ a {
     padding: 20px;
     border: solid var(--text-color-dark) 10px;
     background: var(--background-variant);
+}
+
+.loading_img {
+    border-radius: 100%;
+    padding: 5px;
+    border: solid var(--text-color-dark) 10px;
+    background: var(--background-variant);
+    width: 70%;
+}
+
+.loading_text {
+    margin-top: 20px;
+    font-size: 1.7rem;
 }
 
 

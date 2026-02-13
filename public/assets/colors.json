@@ -1,16 +1,18 @@
 {
-  "colors":   [
-    "#fed6e2",
-    "#ffd2c1",
-    "#fff5b3",
-    "#e9ffc1",
-    "#c1fff0",
-    "#d6ebfe",
-    "#dec1ff"
+  "colors": [
+    "#FED6E2",
+    "#FFAFCC",
+    "#FFD187",
+    "#FFF29F",
+    "#E9FFC1",
+    "#A0FFA9",
+    "#C1FFF0",
+    "#A2D2FF",
+    "#DEC1FF"
   ],
   "texts": {
     "normal": "#161616",
-    "ligth": "#3a3a3a",
+    "light": "#3a3a3a",
     "dark": "#080808",
     "link": "#1f65e5"
   },
