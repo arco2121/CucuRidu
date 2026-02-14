@@ -53,11 +53,32 @@ table {
 --------------------------------------------------- */
 :root {
     /* Dynamic Colors */
-    --background: #fed6e2;
-    --background-variant: #ffd2c1;
-    --accent-color-1: #fff5b3;
-    --accent-color-2: #e9ffc1;
-    --accent-color-3: #c1fff0;
+
+    /* Background 1 */
+    --background: #FFEA8F;
+    --background-dark: #FFDB57;
+
+    /* Background 2 */
+    --background-variant: #A0FFA9;
+    --background-variant-dark: #7ED286;
+
+    /* Accent Color 1 */
+    --accent-color-1: #ADFF7D;
+    --accent-color-1-dark: #86FF57;
+    --accent-color-1-text: #59C840;
+    --accent-color-1-outline: #438E30;
+
+    /* Accent Color 2 */
+    --accent-color-2: #FFEA8F;
+    --accent-color-2-dark: #FFDB57;
+    --accent-color-2-text: #D1B543;
+    --accent-color-2-outline: #9A8433;
+
+    /* Accent Color 3 */
+    --accent-color-3: #DEC1FF;
+    --accent-color-3-dark: #B68EE1;
+    --accent-color-3-text: #9F7BC9;
+    --accent-color-3-outline: #886AA9;
 
     /* Static Colors */
     --accent-color-confirm: #aaff75;
@@ -65,7 +86,6 @@ table {
     --text-color-normal: #161616;
     --text-color-dark: #080808;
     --text-color-light: #3a3a3a;
-    --text-color-link: #1f65e5;
 }
 
 
@@ -92,7 +112,7 @@ body {
 }
 
 a {
-    color: var(--text-color-link);
+    color: var(--accent-color-3-text);
 }
 
 
