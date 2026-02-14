@@ -30,39 +30,39 @@ const cssVars = (fileName) => {
 
 (async () => {
     const colors = await (await fetch('/assets/colors.json')).json();
-    const randomColor = () => colors['colors'][Math.floor(Math.random() * colors['colors'].length)];
+    const temporaryMemory = new Set();
+    const randomColor = () => {
+        let color;
+        do color = colors['colors'][Math.floor(Math.random() * colors['colors'].length)];
+        while(temporaryMemory.has(color));
+        temporaryMemory.add(color);
+        return color;
+    }
     const textColors = colors['texts'];
     const staticColors = colors['staticColors'];
     const vars = cssVars("global.css");
-    vars.forEach(variable => {
-        let color;
-        switch (variable) {
-            case "--text-color-normal": {
-                color = textColors["normal"];
-                break;
-            }
-            case "--text-color-light": {
-                color = textColors["light"];
-                break;
-            }
-            case "--text-color-link": {
-                color = textColors["link"];
-                break;
-            }
-            case "--text-color-dark": {
-                color = textColors["dark"];
-                break;
-            }
-            case "--accent-color-confirm": {
-                color = staticColors["confirm"];
-                break;
-            }
-            case "--accent-color-critical": {
-                color = textColors["critical"];
-                break;
-            }
-            default : color = randomColor();
-        }
-        document.documentElement.style.setProperty(variable, color);
-    });
+    let colorRandom = randomColor();
+    vars.filter(colore => colore === '--background' || colore === '--background-dark')
+        .forEach(color => document.documentElement.style.setProperty(color, color.includes("-dark") ? colorRandom["dark"] : colorRandom["normal"]))
+    colorRandom = randomColor();
+    vars.filter(colore => colore === '--background-variant' || colore === '--background-variant-dark')
+        .forEach(color => document.documentElement.style.setProperty(color, color.includes("-dark") ? colorRandom["dark"] : colorRandom["normal"]));
+    for(let i = 1; i <= 3; i++) {
+        colorRandom = randomColor();
+        vars.filter(colore => colore.includes("--accent-color-" + i)).forEach(color => {
+            let variante = "normal";
+            if(color.includes("-dark")) variante = "dark";
+            else if(color.includes("-outline")) variante = "outline";
+            else if(color.includes("-text")) variante = "text";
+            document.documentElement.style.setProperty(color, colorRandom[variante]);
+        });
+    }
+    vars.filter(colore => colore.includes("--text-color")).forEach((color, index) => {
+        let variante = "normal";
+        if(color.includes("-dark")) variante = "dark";
+        else if(color.includes("-light")) variante = "light";
+        document.documentElement.style.setProperty(color, textColors[variante]);
+    })
+    vars.filter(colore => colore.includes("--accent-color"))
+        .forEach(color => document.documentElement.style.setProperty(color, color.includes("confirm") ? staticColors["confirm"] : staticColors["critical"]));
 })();

@@ -51,7 +51,7 @@ socket.on("confermaStanza", (data) => {
         },
         body: JSON.stringify({
             userId: referenceGiocatore.id,
-            stanzaId: stanzaId
+            stanzaId: stanzaId || fromBackEnd["stanzaId"]
         })
     }).then(async (response) => {
         if(response === true)

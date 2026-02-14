@@ -31,7 +31,7 @@ const generateName = () => {
         const data = JSON.parse(rawData);
 
         // Scelta random
-        let name = data.names[Math.floor(Math.random()*data.names.length)];
+        let name = data.names[Math.floor(Math.random()*(data.names.length))];
         let adjective = data.adjectives[Math.floor(Math.random()*data.adjectives.length)];
 
         return name + " " + adjective;
@@ -44,7 +44,7 @@ const generateName = () => {
 const generatePfp = () => {
     const pfpNumber = 80;
     const pfpPath = '/assets/pfps/';
-    let rdmNumber = Math.floor(Math.random() * (pfpNumber + 1));
+    let rdmNumber = Math.floor(Math.random() * (pfpNumber - 1) + 1);
     return pfpPath + rdmNumber + ".jpg";
 }
 
