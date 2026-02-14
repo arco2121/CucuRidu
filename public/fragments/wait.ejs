@@ -1,0 +1,47 @@
+<div class="column">
+    <h4>Codice Stanza: <%= stanzaId %></h4>
+    <h4 id="attesa">Wait (✋theydontloveulikeiloveu)</h4>
+    <h6 id="numeroGiocatori">Giocatori presenti: 0</h6>
+    <button id="shareButton">Condividi</button>
+</div>
+<script>
+    const numeroGiocatoriCount = document.getElementById("numeroGiocatori");
+    const attesaView = document.getElementById("attesa");
+    const shareButton = document.getElementById("shareButton");
+    const idStanza = "<%= stanzaId %>";
+
+    if(socket) {
+        socket.on("aggiornamentoNumeroGiocatori", (data) => {
+            const { numeroGiocatori } = data || {};
+            numeroGiocatoriCount.textContent = numeroGiocatoriCount.textContent.split(":")[0] + ": " + numeroGiocatori;
+        });
+        socket.emit("aggiornaNumeroGiocatori", {
+            stanzaId: idStanza
+        });
+    }
+
+    let idAttesaInterval;
+    try {
+        const initialText = attesaView.textContent;
+        idAttesaInterval = setInterval(() => {
+            try {
+                const check = attesaView.textContent.split(")")[1].trim();
+                if(check === "...") attesaView.textContent = initialText + " ";
+                else attesaView.textContent += ".";
+            } catch { clearInterval(idAttesaInterval); }
+        }, 300);
+    } catch { clearInterval(idAttesaInterval); }
+
+    shareButton.addEventListener("click", async () => {
+        const shareText = "";//TODO MESSAGGIO SILLY PER CONDIVISIONE
+        const shareData = {
+            title: "Cucu Ridu",
+            text: shareText,
+            url: window.location.hostname + "/partecipaStanza/" + idStanza
+        };
+        try {
+            if(navigator.canShare(shareData)) await navigator.share(shareData);
+            else await navigator.clipboard.writeText(idStanza).then(() => alert(shareText));
+        } catch (e) { console.error(e); }
+    });
+</script>

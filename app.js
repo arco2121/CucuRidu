@@ -6,6 +6,7 @@ const express = require("express");
 const session = require('express-session');
 const { Stanza, StatoStanza } = require(path.join(__dirname, "include/script/Stanza"));
 const { getIcon, generateName, generatePfp, generateId } = require(path.join(__dirname, "include/script/generazione"));
+const {use} = require("express/lib/application");
 const renderPage = (res, page, params = {}) => res.render("components/header", {
     params: params,
     page: "../" + page,
@@ -84,6 +85,14 @@ app.get("/", resumeGame, (req, res) => renderPage(res, "index", {
     icon: getIcon()
 }));
 app.get(['/home', '/index'], resumeGame, (req, res) => res.redirect('/'));
+
+app.get("/partecipaStanza/:codiceStanza", resumeGame, (req, res) => {
+    const stanza = req.params["codiceStanza"];
+    if(stanza) renderPage(res, "profile", {
+        stanza: stanza
+    });
+    else res.redirect("/");
+});
 
 app.get("/partecipaStanza", resumeGame, (req, res) => {
     const { nome, pfp, stanza } = req.query;
@@ -167,6 +176,9 @@ server.on("connection", (user) => {
                 reference: user.data.referenceUtente.adaptToClient(),
                 stanzaId: stanza.id
             });
+            server.to(stanza.id).emit("aggiornamentoNumeroGiocatori", {
+                numeroGiocatori: Stanze[stanza.id].giocatori.length
+            });
         } catch {
             user.emit("errore", {
                 message: "Impossibile creare la stanza, non va niente quel porco di un bastardo maledetto del dio cristo impalato su uno spiedino di sushi marcito come l'utero della madonna troia"
@@ -186,6 +198,9 @@ server.on("connection", (user) => {
             user.join(stanzaId);
             user.emit("confermaStanza", {
                 reference: user.data.referenceUtente.adaptToClient()
+            });
+            server.to(stanzaId).emit("aggiornamentoNumeroGiocatori", {
+                numeroGiocatori: Stanze[stanzaId].giocatori.length
             });
         } catch (e) {
             user.emit("errore", {
@@ -295,7 +310,10 @@ server.on("connection", (user) => {
                 message: e
             });
         }
-    })
+    });
+    user.on("aggiornaNumeroGiocatori", (data) => server.to(data["stanzaId"]).emit("aggiornamentoNumeroGiocatori", {
+        numeroGiocatori: Stanze[data["stanzaId"]].giocatori.length
+    }));
 });
 
 //Listening

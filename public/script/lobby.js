@@ -55,7 +55,10 @@ socket.on("confermaStanza", (data) => {
         })
     }).then(async (response) => {
         if(response === true)
-            base.innerHTML = await renderFragment("wait");
+            base.innerHTML = await renderFragment("wait", {
+                stanzaId: stanzaId
+            });
+        else window.location.href = "/";
     });
 });
 
