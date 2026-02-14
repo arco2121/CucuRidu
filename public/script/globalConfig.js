@@ -30,12 +30,12 @@ const cssVars = (fileName) => {
 
 (async () => {
     const colors = await (await fetch('/assets/colors.json')).json();
-    const temporaryMemory = new Set();
+    const usedColorNames = new Set();
     const randomColor = () => {
-        let color;
-        do color = colors['colors'][Math.floor(Math.random() * colors['colors'].length)];
-        while(temporaryMemory.has(color));
-        temporaryMemory.add(color);
+        const available = colors['colors'].filter(c => !usedColorNames.has(c.name));
+        if (available.length === 0) return colors['colors'][0];
+        const color = available[Math.floor(Math.random() * available.length)];
+        usedColorNames.add(color.name);
         return color;
     }
     const textColors = colors['texts'];
