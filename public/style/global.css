@@ -81,6 +81,13 @@ table {
     --accent-color-3-text: #59C840;
     --accent-color-3-outline: #886AA9;
 
+    /* Loading Screen */
+    --loadingScreen-background: #A6A3FF;
+    --loadingScreen-background-dark: #7976D2;
+    --loadingScreen-accent: #A0FFA9;
+    --loadingScreen-accent-outline: #3C9B45;
+
+
     /* Static Colors */
     --accent-color-confirm: #aaff75;
     --accent-color-critical: #ff758e;
@@ -375,8 +382,8 @@ a {
     transform: translate(-50%, -50%);
     transform-origin: top left;
     z-index: 1000;
-    background-color: var(--background-variant-dark);
-    background-image: linear-gradient(to right top, var(--background-variant-dark), var(--background-variant));
+    background-color: var(--loadingScreen-background-dark);
+    background-image: linear-gradient(to right top, var(--loadingScreen-background-dark), var(--loadingScreen-background));
     line-height: 1;
     overflow-x: hidden;
 }
@@ -410,8 +417,8 @@ a {
 
 .loading_img {
     border-radius: 100%;
-    border: solid var(--accent-color-3-outline) 6px;
-    background: var(--accent-color-3);
+    border: solid var(--loadingScreen-accent-outline) 6px;
+    background: var(--loadingScreen-accent);
     height: 5rem;
     box-shadow: 0 0 0 3px white;
 }
