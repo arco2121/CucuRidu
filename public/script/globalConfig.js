@@ -55,6 +55,7 @@ const cssVars = (fileName) => {
             else if(color.includes("-outline")) variante = "outline";
             else if(color.includes("-text")) variante = "text";
             document.documentElement.style.setProperty(color, colorRandom[variante]);
+            vars.splice(vars.indexOf(color), 1);
         });
     }
     vars.filter(colore => colore.includes("--text-color")).forEach((color, index) => {

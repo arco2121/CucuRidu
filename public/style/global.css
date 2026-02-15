@@ -264,6 +264,11 @@ a {
     flex-direction: row;
 }
 
+.hidden {
+    display: none;
+    pointer-events: none;
+}
+
 /* Gaps */
 .flex_gap_15 {
     gap: 15px;

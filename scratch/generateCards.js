@@ -3,11 +3,10 @@
 */
 const fs = require('node:fs');
 const {join} = require("node:path");
-const generateCards = async (files) => {
+const generateCards = (files) => {
     try {
-        let result = [];
         for (const file of files) {
-            const lines = (file instanceof File ? await file.text() : fs.readFileSync(join(__dirname, "/raw/cards/" + file), "utf-8"))
+            const lines = fs.readFileSync(join(__dirname, "/raw/cards/" + file), "utf-8")
                 .split("\n").map(line => line.trim());
             let array = [];
             for (const line of lines) {
@@ -18,17 +17,11 @@ const generateCards = async (files) => {
                     completamenti
                 ] : string);
             }
-            if(file instanceof File) result.push(new File(JSON.stringify(array), file.name.replace(".txt", ".json"), {
-                type: "application/json"
-            }));
-            else {
-                fs.mkdirSync(join(__dirname, "../include/cards/"), {
-                    recursive: true,
-                });
-                fs.writeFileSync(join(__dirname, "../include/cards/" + file.replace(".txt", ".json")), JSON.stringify(array));
-            }
+            fs.mkdirSync(join(__dirname, "../include/cards/"), {
+                recursive: true,
+            });
+            fs.writeFileSync(join(__dirname, "../include/cards/" + file.replace(".txt", ".json")), JSON.stringify(array));
         }
-        if(result.length !== 0) return result;
         return true;
     } catch(e) {
         console.error(e)
@@ -43,9 +36,5 @@ process.argv.slice(2).forEach(val => {
 });
 const files = [data[0] || "frasi.txt", data[1] || "completamenti.txt"];
 
-(async () => {
-    const result = await generateCards(files);
-    console.log("Result => " + result);
-})();
-
-module.exports = { generateCards };
+const result = generateCards(files);
+console.log("Result => " + result);
