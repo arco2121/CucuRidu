@@ -3,10 +3,11 @@
 */
 const fs = require('node:fs');
 const {join} = require("node:path");
-const generateJSON = (group, files) => {
+const generateCards = async (files) => {
     try {
+        let result = [];
         for (const file of files) {
-            const lines = fs.readFileSync(join(__dirname, "/raw/" + group + "/" + file), "utf-8")
+            const lines = (file instanceof File ? await file.text() : fs.readFileSync(join(__dirname, "/raw/cards/" + file), "utf-8"))
                 .split("\n").map(line => line.trim());
             let array = [];
             for (const line of lines) {
@@ -15,26 +16,36 @@ const generateJSON = (group, files) => {
                 array.push(completamenti > 0 ? [
                     string,
                     completamenti
-                ] : [string]);
+                ] : string);
             }
-            fs.mkdirSync(join(__dirname, "../include/cards/" + group + "/"), {
-                recursive: true,
-            });
-            fs.writeFileSync(join(__dirname, "../include/cards/" + group + "/" + file.replace(".txt", ".json")), JSON.stringify(array));
+            if(file instanceof File) result.push(new File(JSON.stringify(array), file.name.replace(".txt", ".json"), {
+                type: "application/json"
+            }));
+            else {
+                fs.mkdirSync(join(__dirname, "../include/cards/"), {
+                    recursive: true,
+                });
+                fs.writeFileSync(join(__dirname, "../include/cards/" + file.replace(".txt", ".json")), JSON.stringify(array));
+            }
         }
+        if(result.length !== 0) return result;
         return true;
-    } catch (error) {
-        return error;
+    } catch(e) {
+        console.error(e)
+        return false;
     }
 };
 
 const data = [];
-process.argv.slice(2).forEach((val, index) => {
-    const input =  index === 0 ? (val || null) : (val.includes(".txt") ? val : null);
+process.argv.slice(2).forEach(val => {
+    const input =  val.includes(".txt") ? val : null;
     data.push(input);
 });
-const groupName = data[0] || "standard";
-const files = [data[1] || "frasi.txt", data[2] || "completamenti.txt"];
+const files = [data[0] || "frasi.txt", data[1] || "completamenti.txt"];
 
-const result = generateJSON(groupName, files);
-console.log("Result => " + result);
+(async () => {
+    const result = await generateCards(files);
+    console.log("Result => " + result);
+})();
+
+module.exports = { generateCards };

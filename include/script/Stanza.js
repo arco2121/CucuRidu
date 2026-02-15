@@ -13,7 +13,7 @@ class Stanza {
 
     constructor(packs, username, memory) {
         this.id = generateId(7, memory);
-        this.packs = packs || ["standard"];
+        this.packs = packs || ["cards"];
         this.giocatori = [];
         this.stato = StatoStanza.WAIT;
         this.master = new Giocatore(username, memory);
