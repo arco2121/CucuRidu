@@ -60,6 +60,7 @@ const cssVars = (fileName) => {
             if(color.includes("-dark")) variante = "dark";
             else if(color.includes("-outline")) variante = "outline";
             else if(color.includes("-text")) variante = "text";
+            else if(color.includes("-middle")) variante = "middle";
             document.documentElement.style.setProperty(color, colorRandom[variante]);
             vars.splice(vars.indexOf(color), 1);
         });
