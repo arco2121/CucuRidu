@@ -13,6 +13,25 @@ footer {
 /* ---------------------------------------------------
  >>> COMPONENTS
 --------------------------------------------------- */
+.index_container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+}
+
+@media (min-width: 600px) {
+    .index_container {
+        width: 40%;
+    }
+}
+
 .index_game_title {
     font-size: 3rem;
+}
+
+.index_logo {
+    width: 100%;
 }

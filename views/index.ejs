@@ -1,14 +1,17 @@
 <%- include("components/loadScreen") %>
 <%- include("components/preventBack") %>
-<div class="section_row_column sour_gummy_regular text_color_normal">
+<div class="index_container sour_gummy_regular text_color_normal">
         <div class="column flex_gap_15">
-            <img class="indexIcon img_round shrinks_on_active_for_no_reason" src="<%= icon %>" alt="cucuridu">
+
+            <img class="index_logo shrinks_on_active_for_no_reason" src="<%= icon %>" alt="cucuridu">
+            <!--
             <h1 class="index_game_title sour_gummy_extra">Cucu Ridu</h1>
             <h3 class="sour_gummy_regular_italic">America Ya (Hallo Hallo Hallo) 👋</h3>
+            -->
         </div>
         <div class="column">
-            <button id="createRoom" class="indexButtons button btn_style_1">Crea Stanza</button>
-            <button id="joinRoom" class="indexButtons button btn_style_2">Unisciti</button>
+            <button id="createRoom" class="indexButtons button btn_style_1 btn_doubleBorder sour_gummy_medium">Crea Stanza</button>
+            <button id="joinRoom" class="indexButtons button btn_style_2 btn_doubleBorder sour_gummy_medium">Unisciti</button>
         </div>
 </div>
 <footer>

@@ -1,5 +1,5 @@
-<div class="loadscreen">
-    <div class="column">
+<div class="loadingscreen">
+    <div class="loading_container">
         <img class="loading_img" src="/assets/loading.webp" alt="loadingScreen">
         <h5 class="sour_gummy_bold_italic text_color_dark loading_text" id="textLoading">Caricando...</h5>
     </div>
@@ -8,7 +8,7 @@
 <script>
     const unloadScreen = new Event("loadScreenEnd");
     const loadScreen = new Event("loadScreenStart");
-    const loadingScreen = document.querySelector(".loadscreen");
+    const loadingScreen = document.querySelector(".loadingscreen");
     const isLoadScreen = () => document.body.contains(loadingScreen);
     (() => {
         const timing = 300;

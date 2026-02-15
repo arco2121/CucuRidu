@@ -63,19 +63,22 @@ table {
     /* Accent Color 1 */
     --accent-color-1: #ADFF7D;
     --accent-color-1-dark: #86FF57;
+    --accent-color-1-middle: #59C840;
     --accent-color-1-text: #59C840;
     --accent-color-1-outline: #438E30;
 
     /* Accent Color 2 */
     --accent-color-2: #FFEA8F;
     --accent-color-2-dark: #FFDB57;
-    --accent-color-2-text: #D1B543;
+    --accent-color-2-middle: #D1B543;
+    --accent-color-2-text: #59C840;
     --accent-color-2-outline: #9A8433;
 
     /* Accent Color 3 */
     --accent-color-3: #DEC1FF;
     --accent-color-3-dark: #B68EE1;
-    --accent-color-3-text: #9F7BC9;
+    --accent-color-3-middle: #9F7BC9;
+    --accent-color-3-text: #59C840;
     --accent-color-3-outline: #886AA9;
 
     /* Static Colors */
@@ -102,17 +105,48 @@ table {
 }
 
 body {
-    background-color: var(--background);
+    background-color: var(--background-dark);
+    background-image: linear-gradient(to bottom, var(--background), var(--background-dark));
     line-height: 1;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
 }
 
-a {
-    color: var(--accent-color-3-text);
+
+
+/* ---------------------------------------------------
+ >>> BACKGROUND PARALLAX
+--------------------------------------------------- */
+@keyframes floatingDots {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: 50px 50px;
+    }
 }
 
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.1;
+
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='5' fill='%23ffffff'/%3E%3C/svg%3E");
+    background-size: 50px 50px;
+
+    will-change: background-position;
+
+    animation: floatingDots 10s linear infinite;
+}
 
 
 /* ---------------------------------------------------
@@ -145,6 +179,14 @@ a {
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: italic;
+    font-variation-settings: "wdth" 100;
+}
+
+.sour_gummy_medium {
+    font-family: "Sour Gummy", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 550;
+    font-style: normal;
     font-variation-settings: "wdth" 100;
 }
 
@@ -193,26 +235,15 @@ a {
     color: var(--text-color-light);
 }
 
+a {
+    color: var(--text-color-light);
+}
+
 
 
 /* ---------------------------------------------------
  >>> LAYOUT
 --------------------------------------------------- */
-.loadscreen {
-    position: fixed;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    transform-origin: top left;
-    background-color: var(--background);
-    z-index: 1000;
-}
 
 .section {
     position: absolute;
@@ -226,26 +257,6 @@ a {
     left: 50%;
     transform: translate(-50%, -50%);
     transform-origin: top left;
-}
-
-.section_column {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    align-items: center;
-    flex: 1;
-    justify-content: center;
-    gap: 20px;
-}
-
-.section_row_column {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    align-items: center;
-    flex: 1;
-    justify-content: center;
-    gap: 20px;
 }
 
 .column {
@@ -309,11 +320,11 @@ a {
     justify-content: center;
     align-items: center;
     padding: 10px;
-    width: 180px;
-    border-radius: 30px;
-    height: 60px;
+    width: 200px;
+    border-radius: 50px;
+    height: 65px;
     margin: 10px;
-    font-size: 20px;
+    font-size: 23px;
     font-family: inherit;
     transition: all 150ms ease;
 }
@@ -324,15 +335,126 @@ a {
 }
 
 .btn_style_1 {
-    border: solid 6px var(--text-color-dark);
+    border: solid 6px var(--accent-color-1-outline);
     background: var(--accent-color-1);
+    background-image: linear-gradient(to bottom, var(--accent-color-1), var(--accent-color-1-middle));
+    color: var(--accent-color-1-outline);
 }
 
 .btn_style_2 {
-    border: solid 6px var(--text-color-dark);
+    border: solid 6px var(--accent-color-2-outline);
     background: var(--accent-color-2);
+    background-image: linear-gradient(to bottom, var(--accent-color-2), var(--accent-color-2-middle));
+    color: var(--accent-color-2-outline);
 }
 
+.btn_style_3 {
+    border: solid 6px var(--accent-color-3-outline);
+    background: var(--accent-color-3);
+    background-image: linear-gradient(to bottom, var(--accent-color-3), var(--accent-color-3-dark));
+    color: var(--accent-color-3-outline);
+}
+
+.btn_doubleBorder {
+    box-shadow: 0 0 0 3px white;
+}
+
+
+/* ---------------------------------------------------
+ >>> LOADING SCREEN
+--------------------------------------------------- */
+.loadingscreen {
+    position: fixed;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    width: 100%;
+    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: top left;
+    z-index: 1000;
+    background-color: var(--background-variant-dark);
+    background-image: linear-gradient(to right top, var(--background-variant-dark), var(--background-variant));
+    line-height: 1;
+    overflow-x: hidden;
+}
+.loadingscreen::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.1;
+
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='5' fill='%23ffffff'/%3E%3C/svg%3E");
+    background-size: 50px 50px;
+
+    will-change: background-position;
+
+    animation: floatingDots 10s linear infinite;
+}
+
+.loading_container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    margin: 25px;
+}
+
+.loading_img {
+    border-radius: 100%;
+    border: solid var(--accent-color-3-outline) 6px;
+    background: var(--accent-color-3);
+    height: 5rem;
+    box-shadow: 0 0 0 3px white;
+}
+
+.loading_text {
+    margin-left: 20px;
+    font-size: 1.7rem;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .loading_container {
+        margin: 10px;
+    }
+
+    .loading_text {
+        margin-left: 10px;
+        font-size: 1.2rem;
+    }
+
+    .loading_img {
+        height: 3.5rem;
+        box-shadow: 0 0 0 3px white;
+    }
+}
+
+@keyframes disappear {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
 
 
 /* ---------------------------------------------------
@@ -345,18 +467,7 @@ a {
     background: var(--background-variant);
 }
 
-.loading_img {
-    border-radius: 100%;
-    padding: 5px;
-    border: solid var(--text-color-dark) 10px;
-    background: var(--background-variant);
-    width: 70%;
-}
 
-.loading_text {
-    margin-top: 20px;
-    font-size: 1.7rem;
-}
 
 
 
