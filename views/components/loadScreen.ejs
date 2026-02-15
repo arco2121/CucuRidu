@@ -1,6 +1,6 @@
 <div class="loadingscreen">
     <div class="loading_container">
-        <img class="loading_img" src="/assets/loading.webp" alt="loadingScreen">
+        <img loading="eager" fetchpriority="high" class="loading_img" src="/assets/loading.webp" alt="loadingScreen">
         <h5 class="sour_gummy_bold_italic text_color_dark loading_text" id="textLoading">Caricando...</h5>
     </div>
 </div>
@@ -10,6 +10,9 @@
     const loadScreen = new Event("loadScreenStart");
     const loadingScreen = document.querySelector(".loadingscreen");
     const isLoadScreen = () => document.body.contains(loadingScreen);
+    window.addEventListener("pageshow", (event) => {
+        if(event.persisted) document.dispatchEvent(unloadScreen);
+    });
     (() => {
         const timing = 300;
         const update = () => {
