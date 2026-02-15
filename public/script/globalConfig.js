@@ -43,10 +43,16 @@ const cssVars = (fileName) => {
     const vars = cssVars("global.css");
     let colorRandom = randomColor();
     vars.filter(colore => colore === '--background' || colore === '--background-dark')
-        .forEach(color => document.documentElement.style.setProperty(color, color.includes("-dark") ? colorRandom["dark"] : colorRandom["normal"]))
+        .forEach(color => {
+            document.documentElement.style.setProperty(color, color.includes("-dark") ? colorRandom["dark"] : colorRandom["normal"]);
+            vars.splice(vars.indexOf(color), 1);
+        });
     colorRandom = randomColor();
     vars.filter(colore => colore === '--background-variant' || colore === '--background-variant-dark')
-        .forEach(color => document.documentElement.style.setProperty(color, color.includes("-dark") ? colorRandom["dark"] : colorRandom["normal"]));
+        .forEach(color => {
+            document.documentElement.style.setProperty(color, color.includes("-dark") ? colorRandom["dark"] : colorRandom["normal"]);
+            vars.splice(vars.indexOf(color), 1);
+        });
     for(let i = 1; i <= 3; i++) {
         colorRandom = randomColor();
         vars.filter(colore => colore.includes("--accent-color-" + i)).forEach(color => {
@@ -58,11 +64,12 @@ const cssVars = (fileName) => {
             vars.splice(vars.indexOf(color), 1);
         });
     }
-    vars.filter(colore => colore.includes("--text-color")).forEach((color, index) => {
+    vars.filter(colore => colore.includes("--text-color")).forEach(color => {
         let variante = "normal";
         if(color.includes("-dark")) variante = "dark";
         else if(color.includes("-light")) variante = "light";
         document.documentElement.style.setProperty(color, textColors[variante]);
+        vars.splice(vars.indexOf(color), 1);
     })
     vars.filter(colore => colore.includes("--accent-color"))
         .forEach(color => document.documentElement.style.setProperty(color, color.includes("confirm") ? staticColors["confirm"] : staticColors["critical"]));
