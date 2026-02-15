@@ -371,6 +371,7 @@ a {
  >>> LOADING SCREEN
 --------------------------------------------------- */
 .loadingscreen {
+    content-visibility: visible !important;
     position: fixed;
     display: flex;
     flex-direction: row;

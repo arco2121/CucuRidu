@@ -8,13 +8,15 @@
 <script>
     const unloadScreen = new Event("loadScreenEnd");
     const loadScreen = new Event("loadScreenStart");
+    const loadScreenPersistent = new Event("loadScreenPersistent")
     const loadingScreen = document.querySelector(".loadingscreen");
     const isLoadScreen = () => document.body.contains(loadingScreen);
-    window.addEventListener("pageshow", (event) => {
-        if(event.persisted) document.dispatchEvent(unloadScreen);
-    });
     (() => {
         const timing = 300;
+        window.addEventListener("pagehide", () => document.dispatchEvent(loadScreenPersistent));
+        window.addEventListener("pageshow", (event) => {
+            if(event.persisted) setTimeout(() => document.dispatchEvent(unloadScreen), timing*2);
+        });
         const update = () => {
             try {
                 if (document.getElementById("textLoading").textContent === "Caricando...")
@@ -36,10 +38,13 @@
         });
         document.addEventListener("loadScreenStart", () => {
             loadingScreen.style.animation = "appear " + timing + "ms ease-in forwards";
-            setTimeout(() => {
-                document.body.appendChild(loadingScreen);
-                intervalId = setInterval(update, timing);
-            }, timing);
+            document.body.appendChild(loadingScreen);
+            intervalId = setInterval(update, timing);
+        });
+        document.addEventListener("loadScreenPersistent", () => {
+            loadingScreen.style.animation = "";
+            document.body.appendChild(loadingScreen);
+            intervalId = setInterval(update, timing);
         });
     })();
 </script>

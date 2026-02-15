@@ -42,17 +42,31 @@ const cssVars = (fileName) => {
     const staticColors = colors['staticColors'];
     const vars = cssVars("global.css");
     let colorRandom = randomColor();
-    vars.filter(colore => colore === '--background' || colore === '--background-dark')
+    vars.filter(colore => colore.includes('--background-variant'))
         .forEach(color => {
             document.documentElement.style.setProperty(color, color.includes("-dark") ? colorRandom["dark"] : colorRandom["normal"]);
             vars.splice(vars.indexOf(color), 1);
         });
     colorRandom = randomColor();
-    vars.filter(colore => colore === '--background-variant' || colore === '--background-variant-dark')
+    vars.filter(colore => colore.includes('--background'))
         .forEach(color => {
             document.documentElement.style.setProperty(color, color.includes("-dark") ? colorRandom["dark"] : colorRandom["normal"]);
             vars.splice(vars.indexOf(color), 1);
         });
+    colorRandom = JSON.parse(localStorage.getItem("cucuRiduLodingColorBack")) || randomColor();
+    vars.filter(colore => colore.includes('--loadingScreen-background'))
+        .forEach(color => {
+            document.documentElement.style.setProperty(color, color.includes("-dark") ? colorRandom["dark"] : colorRandom["normal"]);
+            vars.splice(vars.indexOf(color), 1);
+        });
+    localStorage.setItem("cucuRiduLodingColorBack", JSON.stringify(colorRandom));
+    colorRandom = JSON.parse(localStorage.getItem("cucuRiduLodingColorAccent")) || randomColor();
+    vars.filter(colore => colore.includes('--loadingScreen-accent'))
+        .forEach(color => {
+            document.documentElement.style.setProperty(color, color.includes("-outline") ? colorRandom["outline"] : colorRandom["normal"]);
+            vars.splice(vars.indexOf(color), 1);
+        });
+    localStorage.setItem("cucuRiduLodingColorAccent", JSON.stringify(colorRandom));
     for(let i = 1; i <= 3; i++) {
         colorRandom = randomColor();
         vars.filter(colore => colore.includes("--accent-color-" + i)).forEach(color => {
