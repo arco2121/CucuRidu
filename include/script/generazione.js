@@ -1,7 +1,7 @@
 const alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm@#!£$%&/";
 
 const generateId = (length, memory) => {
-    if(!memory) return;
+    if (!memory) return;
     let code = "";
     const utilize = length <= 7 ? alphabet.slice(0, alphabet.indexOf("0")) : alphabet;
     length = length > utilize.length ? utilize.length : length;
@@ -31,8 +31,8 @@ const generateName = () => {
         const data = JSON.parse(rawData);
 
         // Scelta random
-        let name = data.names[Math.floor(Math.random()*(data.names.length))];
-        let adjective = data.adjectives[Math.floor(Math.random()*data.adjectives.length)];
+        let name = data.names[Math.floor(Math.random() * (data.names.length))];
+        let adjective = data.adjectives[Math.floor(Math.random() * data.adjectives.length)];
 
         return name + " " + adjective;
     } catch (error) {
@@ -48,6 +48,6 @@ const generatePfp = () => {
     return pfpPath + rdmNumber + ".jpg";
 }
 
-const getIcon = (defaultIcon) => String("/assets/icon_imgs/" + (defaultIcon ? 1 : Math.floor(Math.random() * (10 - 1) + 1)) + ".png");
+const getIcon = (defaultIcon) => String("/assets/icon_imgs/" + (defaultIcon ? 1 : Math.floor(Math.random() * (11 - 1) + 1)) + ".png");
 
-module.exports = { generateId, generatePfp, generateName, getIcon };
+module.exports = {generateId, generatePfp, generateName, getIcon};
