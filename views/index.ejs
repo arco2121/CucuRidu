@@ -1,5 +1,6 @@
 <%- include("components/preventBack") %>
-<div class="index_container sour_gummy_regular text_color_normal">
+<div class="section visible" id="sectionToHide">
+    <div class="index_container sour_gummy_regular text_color_normal" >
         <div class="column flex_gap_15">
 
             <img class="index_logo shrinks_on_active_for_no_reason" src="<%= icon %>" alt="cucuridu">
@@ -11,12 +12,15 @@
         <div class="column">
             <button id="createRoom" class="indexButtons button btn_bigText btn_style_1 btn_doubleBorder sour_gummy_medium">Crea Stanza</button>
             <button id="joinRoom" class="indexButtons button btn_bigText btn_style_2 btn_doubleBorder sour_gummy_medium">Unisciti</button>
+            <button id="optionsBtn" class="indexButtons button btn_smallText btn_style_3 btn_doubleBorder sour_gummy_medium">Opzioni</button>
         </div>
-</div>
-<footer>
-    <div class="row_mobileColumn nunito_bold text_color_dark flex_gap_10">
-        <h5>Made with 🩷 by</h5>
-        <h6><a target="_blank" href="https://github.com/arco2121/">arco2121 🍂</a> & <a target="_blank" href="https://github.com/Abcia2/">Abcia2 ✨</a></h6>
     </div>
-</footer>
+    <footer>
+        <div class="row_mobileColumn nunito_bold text_color_dark flex_gap_10">
+            <h5>Made with 🩷 by</h5>
+            <h6><a target="_blank" href="https://github.com/arco2121/">arco2121 🍂</a> & <a target="_blank" href="https://github.com/Abcia2/">Abcia2 ✨</a></h6>
+        </div>
+    </footer>
+</div>
+
 <script src="/script/index.js"></script>
