@@ -38,56 +38,57 @@
 </div>
 
 <script>
-    const optionsPanel = document.getElementById('settings');
-    const musicBtn = document.getElementById("musicbtn");
-    const soundBtn = document.getElementById("soundbtn");
-    const exitBtn = document.getElementById("exitBtn");
+    const showOptions = new Event("showOptionsPanel");
+    const hideOptions = new Event("hideOptionsPanel");
+    document.addEventListener("DOMContentLoaded", () => {
+        const timing = 200;
+        const optionsPanel = document.getElementById('settings');
+        const musicBtn = document.getElementById("musicbtn");
+        const soundBtn = document.getElementById("soundbtn");
+        const exitBtn = document.getElementById("exitBtn");
+        const sectionToHide = document.querySelector('.sectionToHide');
 
-    const updateButtonUI = (btn, isOn) => {
-        btn.textContent = isOn ? "On" : "Off";
+        const updateButtonUI = (btn, isOn) => {
+            btn.textContent = isOn ? "On" : "Off";
+            if(isOn) {
+                btn.classList.add("btn_style_confirm");
+                btn.classList.remove("btn_style_critical");
+            } else {
+                btn.classList.add("btn_style_critical");
+                btn.classList.remove("btn_style_confirm");
+            }
+        };
 
-        if (isOn) {
-            btn.classList.add("btn_style_confirm");
-            btn.classList.remove("btn_style_critical");
-        } else {
-            btn.classList.add("btn_style_critical");
-            btn.classList.remove("btn_style_confirm");
+        const toggleSetting = (event, property) => {
+            const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
+            settings[property] = !settings[property];
+            localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
+            updateButtonUI(event.currentTarget, settings[property]);
+        };
+
+        const initSettingsUI = () => {
+            const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
+            updateButtonUI(musicBtn, !!settings["music"]);
+            updateButtonUI(soundBtn, !!settings["sound"]);
+        };
+
+        initSettingsUI();
+
+        // Event Listeners
+        musicBtn.addEventListener("click", (e) => toggleSetting(e, "music"));
+        soundBtn.addEventListener("click", (e) => toggleSetting(e, "sound"));
+        exitBtn.addEventListener("click", () => document.dispatchEvent(hideOptions));
+
+        // Gestione Pannello Options
+        if(sectionToHide) {
+            document.addEventListener('showOptionsPanel', () => {
+                sectionToHide.classList.replace('visible', 'hidden');
+                setTimeout(() => optionsPanel.classList.replace('hidden', 'visible'), timing);
+            });
+            document.addEventListener("hideOptionsPanel", () => {
+                optionsPanel.classList.replace('visible', 'hidden');
+                setTimeout(() => sectionToHide.classList.replace('hidden', 'visible'), timing);
+            });
         }
-    };
-
-    const toggleSetting = (event, property) => {
-        const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
-        settings[property] = !settings[property];
-        localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
-        updateButtonUI(event.currentTarget, settings[property]);
-    };
-
-    const initSettingsUI = () => {
-        const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
-
-        updateButtonUI(musicBtn, !!settings.music);
-        updateButtonUI(soundBtn, !!settings.sound);
-    };
-
-    initSettingsUI();
-
-    // Event Listeners
-    musicBtn.addEventListener("click", (e) => toggleSetting(e, "music"));
-    soundBtn.addEventListener("click", (e) => toggleSetting(e, "sound"));
-
-    // Gestione Pannello Options
-    const sectionToHide = document.getElementById('sectionToHide');
-    const optionsTogglebutton = document.getElementById('optionsBtn');
-
-    if (sectionToHide && optionsTogglebutton) {
-        optionsTogglebutton.addEventListener('click', () => {
-            optionsPanel.classList.replace('hidden', 'visible');
-            sectionToHide.classList.replace('visible', 'hidden');
-        });
-
-        exitBtn.addEventListener("click", () => {
-            sectionToHide.classList.replace('hidden', 'visible');
-            optionsPanel.classList.replace('visible', 'hidden');
-        });
-    }
+    })
 </script>
