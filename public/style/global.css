@@ -246,6 +246,14 @@ a {
     color: var(--text-color-light);
 }
 
+.title {
+    font-size: 3rem;
+}
+
+.subTitle {
+    font-size: 2rem;
+}
+
 
 
 /* ---------------------------------------------------
@@ -296,6 +304,10 @@ a {
     gap: 10px;
 }
 
+.flex_gap_30 {
+    gap: 30px;
+}
+
 /* Mobile */
 @media (max-width: 600px) {
     .row_mobileColumn {
@@ -326,12 +338,7 @@ a {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 10px;
-    width: 200px;
     border-radius: 50px;
-    height: 65px;
-    margin: 10px;
-    font-size: 23px;
     font-family: inherit;
     transition: all 150ms ease;
 }
@@ -339,6 +346,22 @@ a {
 .button:active {
     scale: 0.9;
     filter: brightness(70%);
+}
+
+.btn_bigText {
+    font-size: 23px;
+    padding: 10px;
+    width: 200px;
+    height: 65px;
+    margin: 10px;
+}
+
+.btn_smallText {
+    font-size: 15px;
+    padding: 5px;
+    width: 100px;
+    height: 40px;
+    margin: 5px;
 }
 
 .btn_style_1 {
@@ -358,14 +381,41 @@ a {
 .btn_style_3 {
     border: solid 6px var(--accent-color-3-outline);
     background: var(--accent-color-3);
-    background-image: linear-gradient(to bottom, var(--accent-color-3), var(--accent-color-3-dark));
+    background-image: linear-gradient(to bottom, var(--accent-color-3), var(--accent-color-3-middle));
     color: var(--accent-color-3-outline);
+}
+
+.input {
+    border-radius: 50px;
+    font-family: inherit;
+    padding: 8px 7px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.input:focus {
+    scale: 1.1;
+}
+
+input:active {
+    background: var(--accent-color-3);
+    background-image: linear-gradient(to bottom, var(--accent-color-3), var(--accent-color-3-middle));
+}
+
+.input_style_1 {
+    border: solid 6px var(--accent-color-3-outline);
+    background: var(--accent-color-3);
+    background-image: linear-gradient(to bottom, var(--accent-color-3), var(--accent-color-3-middle));
+    color: var(--accent-color-3-outline);
+}
+
+.input_style_1::placeholder {
+    color: var(--accent-color-3-text);
 }
 
 .btn_doubleBorder {
     box-shadow: 0 0 0 3px white;
 }
-
 
 /* ---------------------------------------------------
  >>> LOADING SCREEN

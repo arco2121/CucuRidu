@@ -42,7 +42,7 @@ const renderFragment = async (root, page, params = {}) => {
         console.error(e);
     }
 }
-
+/*
 (async () => {
     const colors = await (await fetch('/assets/colors.json')).json();
     const usedColorNames = new Set();
@@ -114,4 +114,83 @@ const renderFragment = async (root, page, params = {}) => {
     })
     vars.filter(colore => colore.includes("--accent-color"))
         .forEach(color => document.documentElement.style.setProperty(color, color.includes("confirm") ? staticColors["confirm"] : staticColors["critical"]));
+})();
+*/
+
+(async () => {
+    // --- SETUP DATI ---
+    const colorsData = await (await fetch('/assets/colors.json')).json();
+    const colorsList = colorsData['colors'];
+    const textColors = colorsData['texts'];
+    const staticColors = colorsData['staticColors'];
+
+    const usedColorNames = new Set();
+
+    // Funzione helper
+    const getRandomUniqueColor = () => {
+        const available = colorsList.filter(c => !usedColorNames.has(c.name));
+        if (available.length === 0) return colorsList[0];
+        const color = available[Math.floor(Math.random() * available.length)];
+        usedColorNames.add(color.name);
+        return color;
+    }
+
+    // --- 1. GESTIONE LOADING SCREEN ---
+    const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
+
+    const loadingBack = savedSettings["loadingColorBack"] || getRandomUniqueColor();
+    const loadingAccent = savedSettings["loadingColorAccent"] || getRandomUniqueColor();
+
+    if (savedSettings["loadingColorBack"]) usedColorNames.add(loadingBack.name);
+    if (savedSettings["loadingColorAccent"]) usedColorNames.add(loadingAccent.name);
+
+    localStorage.setItem("cucuRiduSettings", JSON.stringify({
+        ...savedSettings,
+        loadingColorBack: loadingBack,
+        loadingColorAccent: loadingAccent
+    }));
+
+    // --- 2. CASTING ALTRI COLORI ---
+    const bgMain = getRandomUniqueColor();
+    const bgVariant = getRandomUniqueColor();
+    const accentsMap = {
+        1: getRandomUniqueColor(),
+        2: getRandomUniqueColor(),
+        3: getRandomUniqueColor()
+    };
+
+    // --- 3. ASSIGNMENT ---
+    const setCSS = (name, value) => document.documentElement.style.setProperty(name, value);
+
+    // > LOADING SCREEN
+    setCSS('--loadingScreen-background', loadingBack.normal);
+    setCSS('--loadingScreen-background-dark', loadingBack.dark);
+    setCSS('--loadingScreen-accent', loadingAccent.normal);
+    setCSS('--loadingScreen-accent-outline', loadingAccent.outline);
+
+    // > BACKGROUNDS
+    setCSS('--background', bgMain.normal);
+    setCSS('--background-dark', bgMain.dark);
+
+    setCSS('--background-variant', bgVariant.normal);
+    setCSS('--background-variant-dark', bgVariant.dark);
+
+    // > ACCENT COLORS 1, 2, 3
+    [1, 2, 3].forEach(i => {
+        const palette = accentsMap[i];
+        setCSS(`--accent-color-${i}`, palette.normal);
+        setCSS(`--accent-color-${i}-dark`, palette.dark);
+        setCSS(`--accent-color-${i}-middle`, palette.middle);
+        setCSS(`--accent-color-${i}-text`, palette.text);
+        setCSS(`--accent-color-${i}-outline`, palette.outline);
+    });
+
+    // > STATIC COLORS & TEXTS
+    setCSS('--accent-color-confirm', staticColors.confirm);
+    setCSS('--accent-color-critical', staticColors.critical);
+
+    setCSS('--text-color-normal', textColors.normal);
+    setCSS('--text-color-dark', textColors.dark);
+    setCSS('--text-color-light', textColors.light);
+
 })();
