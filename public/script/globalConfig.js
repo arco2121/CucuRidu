@@ -202,3 +202,9 @@ const renderFragment = async (root, page, params = {}) => {
     setCSS('--text-color-light', textColors.light);
 
 })();
+
+document.addEventListener("DOMContentLoaded", () => {
+    [...document.querySelectorAll("button"), ...document.querySelectorAll("a"), ...document.querySelectorAll("img")].forEach(button => {
+        button.addEventListener("click", () => navigator.vibrate([10, 5, 10]));
+    });
+});

@@ -22,15 +22,15 @@ const doRoomExists = async (room) => {
 document.addEventListener("DOMContentLoaded", () => {
     document.dispatchEvent(unloadScreen);
     const sendStanza = document.getElementById("sendStanza");
+    const inputStanza = document.getElementById("inputCode");
     let doing = false;
 
-    sendStanza.addEventListener("submit", async (e) => {
-        e.preventDefault();
+    sendStanza.addEventListener("click", async () => {
         if(doing) return;
         doing = true;
-        const stanzaId = new FormData(sendStanza).get("stanza");
+        const stanzaId = inputStanza.value;
         const { result } = await doRoomExists(stanzaId);
-        if(result === true)  navigateWithLoading(() => sendStanza.submit());
+        if(result === true)  navigateWithLoading("/partecipaStanza?stanza=" + stanzaId);
         else alert("Non può entrare... Entraa? Non Entra! Entraaa? Non Entra! ENTRAAA? NON PENSO PROPRIO!1!");
         doing = false;
     })
