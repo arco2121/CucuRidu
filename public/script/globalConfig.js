@@ -27,6 +27,21 @@ const cssVars = (fileName) => {
     });
     return Array.from(variableNames);
 };
+const fragmentsCache = {};
+const renderFragment = async (root, page, params = {}) => {
+    try {
+        if(!fragmentsCache[page]) {
+            const input = await fetch("/fragments/" + page + ".ejs");
+            if(!input.ok) throw new Error("fragment not found");
+            fragmentsCache[page] = await input.text();
+        }
+        const rendering = ejs.render(fragmentsCache[page], params);
+        root.innerHTML = rendering;
+        return rendering;
+    } catch (e) {
+        console.error(e);
+    }
+}
 
 (async () => {
     const colors = await (await fetch('/assets/colors.json')).json();
@@ -47,26 +62,36 @@ const cssVars = (fileName) => {
             document.documentElement.style.setProperty(color, color.includes("-dark") ? colorRandom["dark"] : colorRandom["normal"]);
             vars.splice(vars.indexOf(color), 1);
         });
+
     colorRandom = randomColor();
     vars.filter(colore => colore.includes('--background'))
         .forEach(color => {
             document.documentElement.style.setProperty(color, color.includes("-dark") ? colorRandom["dark"] : colorRandom["normal"]);
             vars.splice(vars.indexOf(color), 1);
         });
-    colorRandom = JSON.parse(localStorage.getItem("cucuRiduLodingColorBack")) || randomColor();
+
+    colorRandom = JSON.parse(localStorage.getItem("cucuRiduSettings"))["loadingColorBack"] || randomColor();
     vars.filter(colore => colore.includes('--loadingScreen-background'))
         .forEach(color => {
             document.documentElement.style.setProperty(color, color.includes("-dark") ? colorRandom["dark"] : colorRandom["normal"]);
             vars.splice(vars.indexOf(color), 1);
         });
-    localStorage.setItem("cucuRiduLodingColorBack", JSON.stringify(colorRandom));
-    colorRandom = JSON.parse(localStorage.getItem("cucuRiduLodingColorAccent")) || randomColor();
+    localStorage.setItem("cucuRiduSettings", JSON.stringify({
+        ...JSON.parse(localStorage.getItem("cucuRiduLoding")),
+        loadingColorBack: colorRandom
+    }));
+
+    colorRandom = JSON.parse(localStorage.getItem("cucuRiduSettings"))["loadingColorAccent"] || randomColor();
     vars.filter(colore => colore.includes('--loadingScreen-accent'))
         .forEach(color => {
             document.documentElement.style.setProperty(color, color.includes("-outline") ? colorRandom["outline"] : colorRandom["normal"]);
             vars.splice(vars.indexOf(color), 1);
         });
-    localStorage.setItem("cucuRiduLodingColorAccent", JSON.stringify(colorRandom));
+    localStorage.setItem("cucuRiduSettings", JSON.stringify({
+        ...JSON.parse(localStorage.getItem("cucuRiduSettings")),
+        loadingColorAccent: colorRandom
+    }));
+
     for(let i = 1; i <= 3; i++) {
         colorRandom = randomColor();
         vars.filter(colore => colore.includes("--accent-color-" + i)).forEach(color => {
@@ -79,6 +104,7 @@ const cssVars = (fileName) => {
             vars.splice(vars.indexOf(color), 1);
         });
     }
+
     vars.filter(colore => colore.includes("--text-color")).forEach(color => {
         let variante = "normal";
         if(color.includes("-dark")) variante = "dark";

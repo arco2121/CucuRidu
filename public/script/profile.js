@@ -45,8 +45,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         doing = false;
     });
     btn_confirm.addEventListener("click", () => possibleStanzaId !== "" ?
-        window.location.href = "/partecipaStanza?pfp=" + encodeURIComponent(displayPfp.src) + "&nome=" + encodeURIComponent(displayName.textContent) + "&stanza=" + encodeURIComponent(possibleStanzaId) :
-        window.location.href = "/creaStanza?pfp=" + encodeURIComponent(displayPfp.src) + "&nome=" + encodeURIComponent(displayName.textContent));
+        navigateWithLoading("/partecipaStanza?pfp=" + encodeURIComponent(displayPfp.src) + "&nome=" + encodeURIComponent(displayName.textContent) + "&stanza=" + encodeURIComponent(possibleStanzaId)) :
+        navigateWithLoading("/creaStanza?pfp=" + encodeURIComponent(displayPfp.src) + "&nome=" + encodeURIComponent(displayName.textContent)));
 
     document.dispatchEvent(unloadScreen);
 });

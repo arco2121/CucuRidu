@@ -6,12 +6,29 @@
 </div>
 
 <script>
+    const timing = 300;
     const unloadScreen = new Event("loadScreenEnd");
     const loadScreen = new Event("loadScreenStart");
     const loadingScreen = document.querySelector(".loadingscreen");
+    const hideRendering = new Event("hideRenderingStart", {
+        bubbles: true
+    });
+    const unhideRendering = new Event("hideRenderingEnd", {
+        bubbles: true
+    });
     const isLoadScreen = () => document.body.contains(loadingScreen);
+    const isHideRendering = (container) => container.classList.contains("hideRendering");
+    const navigateWithLoading = (url) => {
+        document.dispatchEvent(loadScreen);
+
+        setTimeout(() => {
+            if(typeof url === "function")
+                return url();
+            else
+                window.location.href = url;
+        }, timing);
+    };
     (() => {
-        const timing = 300;
         window.addEventListener("beforeunload", () => {
             if (!isLoadScreen()) {
                 loadingScreen.style.animation = "none";
@@ -51,6 +68,14 @@
             loadingScreen.style.animation = "appear " + timing + "ms ease-in forwards";
             document.body.appendChild(loadingScreen);
             intervalId = setInterval(update, timing);
+        });
+        document.addEventListener("hideRenderingStart", (e) => {
+            const container = e.target;
+            container.classList.add("hideRendering");
+        });
+        document.addEventListener("hideRenderingEnd", (e) => {
+            const container = e.target;
+            container.classList.remove("hideRendering");
         });
     })();
 </script>

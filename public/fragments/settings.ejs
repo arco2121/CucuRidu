@@ -1,0 +1,34 @@
+<div class="floatSection column" id="settings">
+    <div class="row end upper">
+        <img class="cancelBtn" src="/assets/cancel.png" id="exitBtn">
+    </div>
+    <div class="row">
+        <label for="musicbtn">Musica:</label>
+        <button id="musicbtn">On</button>
+    </div>
+    <div class="row">
+        <label for="soundbtn">Suoni:</label>
+        <button id="soundbtn">On</button>
+    </div>
+    <div class="row">
+        <a target="_blank" href="https://github.com/arco2121/CucuRidu/wiki">Contatti</a>
+        <a target="_blank" href="https://github.com/arco2121/CucuRidu">Contatti</a>
+    </div>
+</div>
+<script>
+    const musicBtn = document.getElementById("musicbtn");
+    const soundBtn = document.getElementById("soundbtn");
+    const exitBtn = document.getElementById("exitBtn");
+    const toggleSetting = (event, property) => {
+        const before = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
+        before[property] = !before[property];
+        localStorage.setItem("cucuRiduSettings", JSON.stringify(before));
+        event.currentTarget.textContent = before[property] ? "On" : "Off";
+    }
+
+    musicBtn.addEventListener("click", (e) => toggleSetting(e, "music"));
+    soundBtn.addEventListener("click", (e) => toggleSetting(e, "sound"));
+    exitBtn.addEventListener("click", () => {
+        //TODO come capperi la fai sparire come popUp
+    });
+</script>

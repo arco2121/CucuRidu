@@ -6,21 +6,6 @@ const socket = io({
     }
 });
 const base = document.getElementById("landpoint");
-const fragmentsCache = {};
-const renderFragment = async (page, params = {}) => {
-    if(!isLoadScreen()) document.dispatchEvent(loadScreen);
-    try {
-        if(!fragmentsCache[page]) {
-            const input = await fetch("/fragments/" + page + ".ejs");
-            if(!input.ok) throw new Error("fragment not found");
-            fragmentsCache[page] = await input.text();
-        }
-        return ejs.render(fragmentsCache[page], params);
-    } catch (e) {
-        console.error(e);
-    }
-    if(isLoadScreen()) document.dispatchEvent(unloadScreen);
-}
 let referenceGiocatore;
 
 socket.on("connect", () => {
@@ -56,16 +41,16 @@ socket.on("confermaStanza", (data) => {
     }).then(async (response) => {
         const result = (await response.json())["result"];
         if(result === true)
-            base.innerHTML = await renderFragment("wait", {
+            await renderFragment(base, "wait", {
                 stanzaId: stanzaId
             });
-        else window.location.href = "/";
+        else navigateWithLoading("/");
     });
 });
 
 socket.on("errore", (data) => {
     alert(data.message);
-    window.location.reload();
+    navigateWithLoading("/");
 });
 
 window.addEventListener('beforeunload', (e) => {

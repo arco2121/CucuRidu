@@ -429,6 +429,12 @@ a {
     font-size: 1.7rem;
 }
 
+.hideRendering {
+    filter: blur(16px);
+    transition: all 0.3s ease;
+    opacity: 0.6;
+    pointer-events: none;
+}
 /* Mobile */
 @media (max-width: 600px) {
     .loading_container {
@@ -461,6 +467,15 @@ a {
     }
     to {
         opacity: 1;
+    }
+}
+
+@keyframes bubbleBlur {
+    from {
+        filter: blur(0px);
+    }
+    to {
+        filter: blur(16px);
     }
 }
 
