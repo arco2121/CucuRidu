@@ -28,7 +28,7 @@ socket.on("connect", () => {
         case "Crea": {
             socket.emit("creaStanza", {
                 username: fromBackEnd["nome"],
-                packs: fromBackEnd["packages"]
+                packs: fromBackEnd["packs"]
             });
             break;
         }
@@ -54,7 +54,8 @@ socket.on("confermaStanza", (data) => {
             stanzaId: stanzaId || fromBackEnd["stanzaId"]
         })
     }).then(async (response) => {
-        if(response === true)
+        const result = (await response.json())["result"];
+        if(result === true)
             base.innerHTML = await renderFragment("wait", {
                 stanzaId: stanzaId
             });

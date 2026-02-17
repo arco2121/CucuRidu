@@ -6,7 +6,6 @@ const express = require("express");
 const session = require('express-session');
 const { Stanza, StatoStanza } = require(path.join(__dirname, "include/script/Stanza"));
 const { getIcon, generateName, generatePfp, generateId } = require(path.join(__dirname, "include/script/generazione"));
-const {use} = require("express/lib/application");
 const renderPage = (res, page, params = {}) => res.render("components/header", {
     params: params,
     page: "../" + page,
@@ -110,7 +109,7 @@ app.get("/partecipaStanza", resumeGame, (req, res) => {
 });
 
 app.get("/creaStanza", resumeGame, (req, res) => {
-    const { nome, pfp } = req.query;
+    const { nome, pfp, packs } = req.query;
     if(nome && pfp) {
         req.session.storeData = {
             ...req.session.storeData,
@@ -118,23 +117,32 @@ app.get("/creaStanza", resumeGame, (req, res) => {
             pfp: pfp
         };
         res.redirect("/game");
-    } else renderPage(res, "profile");
+    } else if(packs) {
+        req.session.storeData = {
+            packs: packs
+        };
+        renderPage(res, "profile");
+    }
+    else renderPage(res, "select");
 });
 
 app.get("/game", (req, res) => {
-    const { nome, pfp, stanza, userId } = req.session.storeData || {};
+    const { nome, pfp, stanza, userId, packs } = req.session.storeData || {};
     if(userId && stanza) renderPage(res, "lobby", {
         userId: userId,
         stanzaId: stanza,
         token: TEMPORARY_TOKEN,
     });
-    else if(nome && pfp) renderPage(res, "lobby", {
-        nome: nome,
-        pfp: pfp,
-        stanzaId: stanza,
-        token: TEMPORARY_TOKEN,
-        action: !stanza ? "Crea" : "Partecipa"
-    });
+    else if(nome && pfp) {
+        renderPage(res, "lobby", {
+            nome: nome,
+            pfp: pfp,
+            stanzaId: stanza,
+            token: TEMPORARY_TOKEN,
+            packs: packs,
+            action: !stanza ? "Crea" : "Partecipa"
+        });
+    }
     else {
         req.session.destroy();
         res.redirect("/");
@@ -155,12 +163,12 @@ app.post("/saveGameReference", (req, res) => {
    const { userId, stanzaId } = req.body || {};
    if(userId && stanzaId) {
        req.session.storeData = {
-           ...req.session.storeData,
            userId: userId,
            stanza: stanzaId
        };
        return res.status(200).json({ result: true });
    }
+   req.session.destroy();
    res.status(406).json({ result: false });
 });
 
@@ -168,7 +176,8 @@ server.on("connection", (user) => {
     user.on("creaStanza", (data) => {
         try {
             const { username, packs } = data;
-            const stanza = new Stanza(packs, username, generationMemory);
+            const pacchi = JSON.parse(packs)
+            const stanza = new Stanza(pacchi, username, generationMemory);
             Stanze[stanza.id] = stanza;
             user.join(stanza.id);
             user.data.referenceUtente = stanza.master;

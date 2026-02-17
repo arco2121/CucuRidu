@@ -13,19 +13,18 @@ class Stanza {
 
     constructor(packs, username, memory) {
         this.id = generateId(7, memory);
-        this.packs = packs || ["cards"];
         this.giocatori = [];
         this.stato = StatoStanza.WAIT;
         this.master = new Giocatore(username, memory);
         this.mazzoCompletamenti = {
-            mazzo: Mazzo.unisciMazzi(...this.packs.map(pack => new Mazzo({
+            mazzo: Mazzo.unisciMazzi(...packs.map(pack => new Mazzo({
                 pack: pack,
                 tipoMazzo: TipoMazzo.COMPLETAMENTI
             }))),
             scarto: new Mazzo()
         }
         this.mazzoFrasi = {
-            mazzo: Mazzo.unisciMazzi(...this.packs.map(pack => new Mazzo({
+            mazzo: Mazzo.unisciMazzi(...packs.map(pack => new Mazzo({
                 pack: pack,
                 tipoMazzo: TipoMazzo.FRASI
             }))),

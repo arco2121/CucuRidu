@@ -15,7 +15,7 @@
         const timing = 300;
         window.addEventListener("pagehide", () => document.dispatchEvent(loadScreenPersistent));
         window.addEventListener("pageshow", (event) => {
-            if(event.persisted) setTimeout(() => document.dispatchEvent(unloadScreen), timing*2);
+            if(event.persisted) document.dispatchEvent(unloadScreen);
         });
         const update = () => {
             try {
@@ -29,11 +29,13 @@
         };
         let intervalId = setInterval(update, timing);
         document.addEventListener("loadScreenEnd", () => {
-            clearInterval(intervalId);
-            loadingScreen.style.animation = "disappear " + timing + "ms ease-out forwards";
             setTimeout(() => {
-                try { document.body.removeChild(loadingScreen); }
-                catch { clearInterval(intervalId); }
+                clearInterval(intervalId);
+                loadingScreen.style.animation = "disappear " + timing + "ms ease-out forwards";
+                setTimeout(() => {
+                    try { document.body.removeChild(loadingScreen); }
+                    catch { clearInterval(intervalId); }
+                }, timing);
             }, timing);
         });
         document.addEventListener("loadScreenStart", () => {

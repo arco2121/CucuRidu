@@ -10,9 +10,14 @@ class Mazzo {
     constructor(data) {
         this.carte = [];
         if (data) {
-            const pack = data["pack"] || "cards";
-            const carte = fs.readFileSync(path.join(__dirname, "../cards/" + pack + "/", data["tipoMazzo"] === TipoMazzo.COMPLETAMENTI ? "completamenti.json" : "frasi.json"), "utf-8");
-            this.aggiungiCarte(...JSON.parse(carte));
+            if(typeof data["pack"] === "boolean" && data["pack"] === true) {
+                const carte = fs.readFileSync(path.join(__dirname, "../cards/", data["tipoMazzo"] === TipoMazzo.COMPLETAMENTI ? "completamenti.json" : "frasi.json"), "utf-8");
+                this.aggiungiCarte(...JSON.parse(carte));
+            }
+            if(typeof data["pack"] === "object") {
+                const type = data["tipoMazzo"] === TipoMazzo.COMPLETAMENTI ? "completamenti" : "frasi";
+                this.aggiungiCarte(...data["pack"][type]);
+            }
         }
     }
 
