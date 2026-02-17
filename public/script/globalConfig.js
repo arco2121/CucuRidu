@@ -171,9 +171,13 @@ const renderFragment = async (root, page, params = {}) => {
     // > BACKGROUNDS
     setCSS('--background', bgMain.normal);
     setCSS('--background-dark', bgMain.dark);
+    setCSS('--background-middle', bgMain.middle);
+    setCSS('--background-outline', bgMain.outline);
 
     setCSS('--background-variant', bgVariant.normal);
+    setCSS('--background-variant-middle', bgVariant.middle);
     setCSS('--background-variant-dark', bgVariant.dark);
+    setCSS('--background-variant-outline', bgVariant.outline);
 
     // > ACCENT COLORS 1, 2, 3
     [1, 2, 3].forEach(i => {
@@ -187,7 +191,11 @@ const renderFragment = async (root, page, params = {}) => {
 
     // > STATIC COLORS & TEXTS
     setCSS('--accent-color-confirm', staticColors.confirm);
+    setCSS('--accent-color-confirm-middle', staticColors.confirm_middle);
+    setCSS('--accent-color-confirm-outline', staticColors.confirm_outline);
     setCSS('--accent-color-critical', staticColors.critical);
+    setCSS('--accent-color-critical-middle', staticColors.critical_middle);
+    setCSS('--accent-color-critical-outline', staticColors.critical_outline);
 
     setCSS('--text-color-normal', textColors.normal);
     setCSS('--text-color-dark', textColors.dark);
