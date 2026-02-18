@@ -111,7 +111,13 @@ table {
 * {
     user-select: none;
     -webkit-user-drag: none;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
     transition: all ease 0.1s;
+}
+
+*::-webkit-scrollbar {
+    display: none;
 }
 
 :focus {
@@ -126,8 +132,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /*overflow-x: hidden;*/
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 
@@ -637,6 +642,7 @@ input:active {
     width: 70%;
     align-items: center;
     justify-content: space-between;
+    overflow-y: scroll;
 }
 
 .options_exit_btn {

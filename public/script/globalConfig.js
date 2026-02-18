@@ -3,6 +3,23 @@ const fromBackEnd = (() => {
     document.querySelector("meta[name='dataFromBackEnd']").remove();
     return JSON.parse(data);
 })();
+const fragmentsCache = {};
+const renderFragment = async (root, page, params = {}) => {
+    try {
+        if(!fragmentsCache[page]) {
+            const input = await fetch("/fragments/" + page + ".ejs");
+            if(!input.ok) throw new Error("fragment not found");
+            fragmentsCache[page] = await input.text();
+        }
+        const rendering = ejs.render(fragmentsCache[page], params);
+        root.innerHTML = rendering;
+        return rendering;
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+//COLORS
 const cssVars = (fileName) => {
     const variableNames = new Set();
     const sheets = fileName
@@ -27,99 +44,7 @@ const cssVars = (fileName) => {
     });
     return Array.from(variableNames);
 };
-const fragmentsCache = {};
-const renderFragment = async (root, page, params = {}) => {
-    try {
-        if(!fragmentsCache[page]) {
-            const input = await fetch("/fragments/" + page + ".ejs");
-            if(!input.ok) throw new Error("fragment not found");
-            fragmentsCache[page] = await input.text();
-        }
-        const rendering = ejs.render(fragmentsCache[page], params);
-        root.innerHTML = rendering;
-        return rendering;
-    } catch (e) {
-        console.error(e);
-    }
-}
-
-/*
 (async () => {
-    const colors = await (await fetch('/assets/colors.json')).json();
-    const usedColorNames = new Set();
-    const randomColor = () => {
-        const available = colors['colors'].filter(c => !usedColorNames.has(c.name));
-        if (available.length === 0) return colors['colors'][0];
-        const color = available[Math.floor(Math.random() * available.length)];
-        usedColorNames.add(color.name);
-        return color;
-    }
-    const textColors = colors['texts'];
-    const staticColors = colors['staticColors'];
-    const vars = cssVars("global.css");
-    let colorRandom = randomColor();
-    vars.filter(colore => colore.includes('--background-variant'))
-        .forEach(color => {
-            document.documentElement.style.setProperty(color, color.includes("-dark") ? colorRandom["dark"] : colorRandom["normal"]);
-            vars.splice(vars.indexOf(color), 1);
-        });
-
-    colorRandom = randomColor();
-    vars.filter(colore => colore.includes('--background'))
-        .forEach(color => {
-            document.documentElement.style.setProperty(color, color.includes("-dark") ? colorRandom["dark"] : colorRandom["normal"]);
-            vars.splice(vars.indexOf(color), 1);
-        });
-
-    colorRandom = JSON.parse(localStorage.getItem("cucuRiduSettings"))["loadingColorBack"] || randomColor();
-    vars.filter(colore => colore.includes('--loadingScreen-background'))
-        .forEach(color => {
-            document.documentElement.style.setProperty(color, color.includes("-dark") ? colorRandom["dark"] : colorRandom["normal"]);
-            vars.splice(vars.indexOf(color), 1);
-        });
-    localStorage.setItem("cucuRiduSettings", JSON.stringify({
-        ...JSON.parse(localStorage.getItem("cucuRiduLoding")),
-        loadingColorBack: colorRandom
-    }));
-
-    colorRandom = JSON.parse(localStorage.getItem("cucuRiduSettings"))["loadingColorAccent"] || randomColor();
-    vars.filter(colore => colore.includes('--loadingScreen-accent'))
-        .forEach(color => {
-            document.documentElement.style.setProperty(color, color.includes("-outline") ? colorRandom["outline"] : colorRandom["normal"]);
-            vars.splice(vars.indexOf(color), 1);
-        });
-    localStorage.setItem("cucuRiduSettings", JSON.stringify({
-        ...JSON.parse(localStorage.getItem("cucuRiduSettings")),
-        loadingColorAccent: colorRandom
-    }));
-
-    for(let i = 1; i <= 3; i++) {
-        colorRandom = randomColor();
-        vars.filter(colore => colore.includes("--accent-color-" + i)).forEach(color => {
-            let variante = "normal";
-            if(color.includes("-dark")) variante = "dark";
-            else if(color.includes("-outline")) variante = "outline";
-            else if(color.includes("-text")) variante = "text";
-            else if(color.includes("-middle")) variante = "middle";
-            document.documentElement.style.setProperty(color, colorRandom[variante]);
-            vars.splice(vars.indexOf(color), 1);
-        });
-    }
-
-    vars.filter(colore => colore.includes("--text-color")).forEach(color => {
-        let variante = "normal";
-        if(color.includes("-dark")) variante = "dark";
-        else if(color.includes("-light")) variante = "light";
-        document.documentElement.style.setProperty(color, textColors[variante]);
-        vars.splice(vars.indexOf(color), 1);
-    })
-    vars.filter(colore => colore.includes("--accent-color"))
-        .forEach(color => document.documentElement.style.setProperty(color, color.includes("confirm") ? staticColors["confirm"] : staticColors["critical"]));
-})();
-*/
-
-(async () => {
-    // --- SETUP DATI ---
     const colorsData = await (await fetch('/assets/colors.json')).json();
     const colorsList = colorsData['colors'];
     const textColors = colorsData['texts'];
@@ -127,7 +52,6 @@ const renderFragment = async (root, page, params = {}) => {
 
     const usedColorNames = new Set();
 
-    // Funzione helper
     const getRandomUniqueColor = () => {
         const available = colorsList.filter(c => !usedColorNames.has(c.name));
         if (available.length === 0) return colorsList[0];
@@ -136,7 +60,6 @@ const renderFragment = async (root, page, params = {}) => {
         return color;
     }
 
-    // --- 1. GESTIONE LOADING SCREEN ---
     const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
 
     const loadingBack = savedSettings["loadingColorBack"] || getRandomUniqueColor();
@@ -151,7 +74,6 @@ const renderFragment = async (root, page, params = {}) => {
         loadingColorAccent: loadingAccent
     }));
 
-    // --- 2. CASTING ALTRI COLORI ---
     const bgMain = getRandomUniqueColor();
     const bgVariant = getRandomUniqueColor();
     const accentsMap = {

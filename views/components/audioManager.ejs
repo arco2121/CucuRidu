@@ -1,17 +1,27 @@
-<audio loop id="musicAudio" class="hidden"></audio>
-<audio id="soundAudio" class="hidden"></audio>
+<audio preload="auto" loop id="musicAudio" src="/music/backgrounds/<%= page %>.mp3" class="hidden"></audio>
+<audio preload="auto" id="soundAudio" class="hidden"></audio>
 
 <script>
     const musicPlayer = document.getElementById("musicAudio");
     const soundPlayer = document.getElementById("soundAudio");
-    const checkSettings = new Event("checkSettings");
-    const vibrationPattern = [15, 5, 10];
+    const audiosCache = {};
+    const vibrationPattern = [10, 5, 10];
     (() => {
-        let permissions = JSON.parse(localStorage.getItem("cucuRiduSettings"));
-        const playAudio = (elementToPlay, checkValue = "sound") => {
+        const randomSound = () => Math.floor(Math.random() * (2 - 1) + 1);
+        const playAudio = async (elementToPlay, checkValue = "sound") => {
+            const permissions = JSON.parse(localStorage.getItem("cucuRiduSettings"));
             switch (checkValue) {
                 case "sound": {
-                    if(permissions[checkValue]) elementToPlay.play();
+                    const sound = randomSound();
+                    if(permissions[checkValue]) {
+                        if(!audiosCache[sound]) {
+                            const result = await fetch("/music/sounds/" + sound + ".mp3");
+                            if(!result.ok) throw new Error("fragment not found");
+                            audiosCache[sound] = await result.blob();
+                        }
+                        elementToPlay.src = URL.createObjectURL(audiosCache[sound]);
+                        elementToPlay.play();
+                    }
                     break;
                 }
                 case "music": {
@@ -22,20 +32,18 @@
         };
 
         document.addEventListener("DOMContentLoaded", () => {
-            [...document.querySelectorAll("button"), ...document.querySelectorAll("a"), ...document.querySelectorAll("img")].forEach(button => {
-                button.addEventListener("click", () => {
+            [...document.querySelectorAll("button"),
+                ...[...document.querySelectorAll("body *")].filter(element =>
+                    [element.classList].filter(classe => classe.toString().toLowerCase().includes("btn")).length > 0 || element.id.toLowerCase().includes("btn"))
+            ].forEach(button => {
+                button.addEventListener("click", async () => {
                     navigator.vibrate(vibrationPattern);
-                    playAudio(soundPlayer)
+                    await playAudio(soundPlayer);
                 });
             });
         });
 
-        document.addEventListener("checkSettings", () => {
-            permissions = JSON.parse(localStorage.getItem("cucuRiduSettings"));
-            playAudio(musicPlayer, permissions["music"]);
-        });
-
-        document.addEventListener("click", () => document.dispatchEvent(checkSettings), {
+        document.addEventListener("click", () => playAudio(musicPlayer, "music"), {
             once: true
         });
     })();
