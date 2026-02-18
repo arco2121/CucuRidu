@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="dataFromBackEnd" content="<%= JSON.stringify(params) %>">
     <link rel="stylesheet" href="/style/global.css">
-    <link rel="stylesheet" href="/style/<%- page.substring(3) %>.css">
+    <link rel="stylesheet" href="/style/<%= page.substring(3) %>.css">
     <link rel="icon" href="/assets/icon.png">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap');
@@ -20,6 +20,7 @@
 <body>
     <%- include("loadScreen") %>
     <script src="/script/globalConfig.js"></script>
+    <%- include("audioManager") %>
     <%- include(page, params) %>
 </body>
 </html>

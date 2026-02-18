@@ -46,7 +46,7 @@
         const musicBtn = document.getElementById("musicbtn");
         const soundBtn = document.getElementById("soundbtn");
         const exitBtn = document.getElementById("exitBtn");
-        const sectionToHide = document.querySelector('.sectionToHide');
+        const sectionToHide = document.querySelectorAll('.sectionToHide');
 
         const updateButtonUI = (btn, isOn) => {
             btn.textContent = isOn ? "On" : "Off";
@@ -75,19 +75,22 @@
         initSettingsUI();
 
         // Event Listeners
-        musicBtn.addEventListener("click", (e) => toggleSetting(e, "music"));
+        musicBtn.addEventListener("click", (e) => {
+            toggleSetting(e, "music");
+            document.dispatchEvent(checkSettings);
+        });
         soundBtn.addEventListener("click", (e) => toggleSetting(e, "sound"));
         exitBtn.addEventListener("click", () => document.dispatchEvent(hideOptions));
 
         // Gestione Pannello Options
         if(sectionToHide) {
             document.addEventListener('showOptionsPanel', () => {
-                sectionToHide.classList.replace('visible', 'hidden');
+                sectionToHide.forEach(section => section.classList.replace('visible', 'hidden'));
                 setTimeout(() => optionsPanel.classList.replace('hidden', 'visible'), timing);
             });
             document.addEventListener("hideOptionsPanel", () => {
                 optionsPanel.classList.replace('visible', 'hidden');
-                setTimeout(() => sectionToHide.classList.replace('hidden', 'visible'), timing);
+                setTimeout(() => sectionToHide.forEach(section => section.classList.replace('hidden', 'visible')), timing);
             });
         }
     })
