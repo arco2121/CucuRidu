@@ -6,35 +6,37 @@
     const soundPlayer = document.getElementById("soundAudio");
     const checkSettings = new Event("checkSettings");
     const vibrationPattern = [15, 5, 10];
-    let permissions = JSON.parse(localStorage.getItem("cucuRiduSettings"));
-    const playAudio = (elementToPlay, checkValue = "sound") => {
-        switch (checkValue) {
-            case "sound": {
-                if(permissions[checkValue]) elementToPlay.play();
-                break;
+    (() => {
+        let permissions = JSON.parse(localStorage.getItem("cucuRiduSettings"));
+        const playAudio = (elementToPlay, checkValue = "sound") => {
+            switch (checkValue) {
+                case "sound": {
+                    if(permissions[checkValue]) elementToPlay.play();
+                    break;
+                }
+                case "music": {
+                    if(permissions[checkValue]) elementToPlay.play();
+                    else elementToPlay.pause();
+                }
             }
-            case "music": {
-                if(permissions[checkValue]) elementToPlay.play();
-                else elementToPlay.pause();
-            }
-        }
-    };
+        };
 
-    document.addEventListener("DOMContentLoaded", () => {
-        [...document.querySelectorAll("button"), ...document.querySelectorAll("a"), ...document.querySelectorAll("img")].forEach(button => {
-            button.addEventListener("click", () => {
-                navigator.vibrate(vibrationPattern);
-                playAudio(soundPlayer)
+        document.addEventListener("DOMContentLoaded", () => {
+            [...document.querySelectorAll("button"), ...document.querySelectorAll("a"), ...document.querySelectorAll("img")].forEach(button => {
+                button.addEventListener("click", () => {
+                    navigator.vibrate(vibrationPattern);
+                    playAudio(soundPlayer)
+                });
             });
         });
-    });
 
-    document.addEventListener("checkSettings", () => {
-        permissions = JSON.parse(localStorage.getItem("cucuRiduSettings"));
-        playAudio(musicPlayer, permissions["music"]);
-    });
+        document.addEventListener("checkSettings", () => {
+            permissions = JSON.parse(localStorage.getItem("cucuRiduSettings"));
+            playAudio(musicPlayer, permissions["music"]);
+        });
 
-    document.addEventListener("click", () => document.dispatchEvent(checkSettings), {
-        once: true
-    });
+        document.addEventListener("click", () => document.dispatchEvent(checkSettings), {
+            once: true
+        });
+    })();
 </script>
