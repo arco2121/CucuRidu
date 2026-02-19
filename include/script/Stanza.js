@@ -18,14 +18,14 @@ class Stanza {
         this.master = new Giocatore(username, memory);
         this.mazzoCompletamenti = {
             mazzo: new Mazzo({
-                pack: true,
+                pack: "standard",
                 tipoMazzo: TipoMazzo.COMPLETAMENTI
             }),
             scarto: new Mazzo()
         }
         this.mazzoFrasi = {
             mazzo: new Mazzo({
-                pack: true,
+                pack: "standard",
                 tipoMazzo: TipoMazzo.FRASI
             }),
             scarto: new Mazzo()

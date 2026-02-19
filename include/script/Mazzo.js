@@ -10,8 +10,8 @@ class Mazzo {
     constructor(data) {
         this.carte = [];
         if (data) {
-            if(typeof data["pack"] === "boolean" && data["pack"] === true) {
-                const carte = fs.readFileSync(path.join(__dirname, "../cards/", data["tipoMazzo"] === TipoMazzo.COMPLETAMENTI ? "completamenti.json" : "frasi.json"), "utf-8");
+            if(typeof data["pack"] === "string") {
+                const carte = fs.readFileSync(path.join(__dirname, "../cards/", data["pack"], data["tipoMazzo"] === TipoMazzo.COMPLETAMENTI ? "/completamenti.json" : "/frasi.json"), "utf-8");
                 this.aggiungiCarte(...JSON.parse(carte));
             }
             if(typeof data["pack"] === "object") {
