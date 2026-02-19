@@ -1,10 +1,10 @@
 <div class="section">
-    <div class="column">
-        <img class="indexIcon" alt="cucuridu" src="<%= icon %>">
-        <h1>Errore <%= error %></h1>
-        <h3><%= message %></h3>
+    <div class="error_container flex_gap_10">
+        <img class="error_img" alt="cucuridu" src="assets/error_icon.png">
+        <h1 class="title sour_gummy_bold">Errore <%= error %></h1>
+        <h3 class="nunito_bold"><%= message %></h3>
     </div>
-    <button onclick="window.location.href = '/'">Torna alla home</button>
+    <button class="button btn_mediumText btn_style_3 sour_gummy_bold" onclick="window.location.href = '/'">Torna alla home</button>
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", () => {

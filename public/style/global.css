@@ -363,7 +363,6 @@ a {
     justify-content: center;
     align-items: center;
     border-radius: 50px;
-    font-family: inherit;
     transition: all 150ms ease;
 }
 
@@ -378,6 +377,14 @@ a {
     width: 200px;
     height: 65px;
     margin: 10px;
+}
+
+.btn_mediumText {
+    font-size: 18px;
+    padding: 8px;
+    width: 180px;
+    height: 50px;
+    margin: 5px;
 }
 
 .btn_smallText {
@@ -723,5 +730,16 @@ input:active {
     filter: brightness(90%);
 }
 
+.error_container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 80%;
+    margin-top: 50%;
+}
 
-
+.error_img {
+    width: 35%;
+    margin-bottom: 10px;
+}
