@@ -40,10 +40,12 @@ socket.on("confermaStanza", (data) => {
         })
     }).then(async (response) => {
         const result = (await response.json())["result"];
-        if(result === true)
+        if(result === true) {
             await renderFragment(base, "wait", {
                 stanzaId: stanzaId
             });
+            document.dispatchEvent(unloadScreen);
+        }
         else navigateWithLoading("/");
     });
 });
