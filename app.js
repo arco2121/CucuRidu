@@ -51,6 +51,7 @@ server.use((socket, next) => {
     const exist = Stanze[stanza].trovaGiocatore(userId);
     if(!exist) return next();
     socket.data.referenceUtente = exist;
+    socket.join(stanza);
     switch (Stanze[stanza].stato) {
         case StatoStanza.WAIT : {
             socket.emit("confermaStanza", {

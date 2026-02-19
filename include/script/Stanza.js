@@ -34,11 +34,10 @@ class Stanza {
         this.numeroRound = [1, this.giocatori.length];
     }
 
-    aggiungiGiocatore(username, memory) {
+    aggiungiGiocatore(username, pfp, memory) {
         if(this.stato !== StatoStanza.WAIT)
             return false;
-        const giocatore = new Giocatore(username, memory);
-
+        const giocatore = new Giocatore(username, pfp, memory);
         this.numeroRound = [this.numeroRound[0], (this.numeroRound[1] / this.giocatori.length) * (this.giocatori.length + 1)];
         this.giocatori.push(giocatore);
         return giocatore;
