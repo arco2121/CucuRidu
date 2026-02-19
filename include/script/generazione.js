@@ -54,6 +54,6 @@ const getAllPfp = () => {
     return Array.from({ length: pfpNumber }, (empty, number) => pfpPath + number + ".jpg");
 }
 
-const getIcon = (defaultIcon) => String("/assets/icon_imgs/" + (defaultIcon ? 1 : Math.floor(Math.random() * (11 - 1) + 1)) + ".png");
+const getIcon = (defaultIcon) => String("/assets/icon_imgs/" + (defaultIcon ? 1 : Math.floor(Math.random() * (12 - 1) + 1)) + ".png");
 
 module.exports = { generateId, generatePfp, generateName, getIcon, getAllPfp };
