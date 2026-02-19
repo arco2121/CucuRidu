@@ -9,6 +9,7 @@ class Giocatore {
         this.username = username;
         this.punti = 0;
         this.pfp = pfp;
+        this.online = true;
         this.mazzo = new Mazzo(TipoMazzo.COMPLETAMENTI);
     }
 
@@ -18,6 +19,10 @@ class Giocatore {
 
     prendiMano(...indexCarte) {
         return this.mazzo.prendiCarteByIndex(indexCarte);
+    }
+
+    prendiTuttaLaMano() {
+        return this.mazzo.prendiCarte(this.mazzo.carte.length);
     }
 
     adaptToClient() {

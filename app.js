@@ -12,8 +12,42 @@ const renderPage = (res, page, params = {}) => res.render("header", {
     headerIcon: getIcon(true)
 });
 const resumeGame = (req, res, next) => {
-    const { userId } = req.session.storeData || {};
-    if(userId) return res.redirect("/game");
+    const { userId, stanzaId } = req.session.storeData || {};
+    if(userId && Stanze[stanzaId] && Stanze[stanzaId].trovaGiocatore(userId)) return res.redirect("/game");
+    next();
+};
+const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
+    switch (Stanze[stanzaId].stato) {
+        case StatoStanza.WAIT : {
+            socket.emit("confermaStanza", {
+                reference: socket.data.referenceGiocatore.adaptToClient(),
+                stanza: Stanze[stanzaId].id
+            });
+            return next();
+        }
+        case StatoStanza.END : {
+            socket.emit("stanzaChiusa");
+            socket.data.referenceGiocatore = null;
+            socket.leave(stanzaId);
+            return next();
+        }
+        case StatoStanza.CHOOSING_CARDS : {
+            socket.emit("roundIniziato", {
+                round: Stanze[stanzaId].round,
+                reference: socket.data.referenceGiocatore.adaptToClient()
+            });
+            return next();
+        }
+        case StatoStanza.CHOOSING_WINNER : {
+            socket.emit("sceltaVincitore", {
+                risposte: Stanze[stanzaId].round.risposte.map(risposta => [risposta, Stanze[stanzaId].giocatori.find(giocatori => giocatori.id === risposta.chi).username]),
+                domanda: Stanze[stanzaId].round.domanda,
+                chiInterroga: Stanze[stanzaId].round.chiStaInterrogando,
+                reference: socket.data.referenceGiocatore.adaptToClient()
+            });
+            return next();
+        }
+    }
     next();
 };
 
@@ -24,6 +58,7 @@ const port = process.env.PORT || 3000;
 const Stanze = {};
 const generationMemory = new Set();
 const TEMPORARY_TOKEN = generateId(64, generationMemory);
+const timeout = 30000;
 const server = new Server(serverConfig, {
     cors: {
         methods: ["GET", "POST"]
@@ -46,38 +81,14 @@ app.use(session({
 }));
 server.use((socket, next) => {
     const { token, stanza, userId } = socket.handshake.auth;
-    if(token !== TEMPORARY_TOKEN) return next(new Error("Chiave non valida"));
-    if(!stanza || !Stanze[stanza] || Stanze[stanza].stato === StatoStanza.END) return next();
+    if(token !== TEMPORARY_TOKEN) return next(new Error("INVALID_KEY"));
+    if(!stanza || !Stanze[stanza]) return next();
     const exist = Stanze[stanza].trovaGiocatore(userId);
-    if(!exist) return next();
-    socket.data.referenceUtente = exist;
+    if(!exist) return next(new Error("SESSION_EXPIRED"));
+    exist.online = true;
+    socket.data.referenceGiocatore = exist;
     socket.join(stanza);
-    switch (Stanze[stanza].stato) {
-        case StatoStanza.WAIT : {
-            socket.emit("confermaStanza", {
-                reference: socket.data.referenceUtente.adaptToClient(),
-                stanza: Stanze[stanza].id
-            });
-            return next();
-        }
-        case StatoStanza.CHOOSING_CARDS : {
-            socket.emit("roundIniziato", {
-                round: Stanze[stanza].round,
-                reference: socket.data.referenceUtente.adaptToClient()
-            });
-            return next();
-        }
-        case StatoStanza.CHOOSING_WINNER : {
-            socket.emit("sceltaVincitore", {
-                risposte: Stanze[stanza].round.risposte.map(risposta => [risposta, Stanze[stanza].giocatori.find(giocatori => giocatori.id === risposta.chi).username]),
-                domanda: Stanze[stanza].round.domanda,
-                chiInterroga: Stanze[stanza].round.chiStaInterrogando,
-                reference: socket.data.referenceUtente.adaptToClient()
-            });
-            return next();
-        }
-    }
-    next();
+    emitStatoStanza(stanza, socket, next);
 });
 
 //Endpoints
@@ -117,7 +128,7 @@ app.get("/partecipaStanza", resumeGame, (req, res) => {
 });
 
 app.get("/creaStanza", resumeGame, (req, res) => {
-    const { nome, pfp, packs } = req.query;
+    const { nome, pfp } = req.query;
     if(nome && pfp) {
         req.session.storeData = {
             ...req.session.storeData,
@@ -133,10 +144,10 @@ app.get("/creaStanza", resumeGame, (req, res) => {
 });
 
 app.get("/game", (req, res) => {
-    const { nome, pfp, stanza, userId } = req.session.storeData || {};
-    if(userId && stanza) renderPage(res, "lobby", {
+    const { nome, pfp, stanzaId, userId } = req.session.storeData || {};
+    if(userId && stanzaId && Stanze[stanzaId] && Stanze[stanzaId]?.trovaGiocatore(userId)) renderPage(res, "lobby", {
         userId: userId,
-        stanzaId: stanza,
+        stanzaId: stanzaId,
         token: TEMPORARY_TOKEN,
         bgm: "GameMusic-Candy_Bazaar"
     });
@@ -144,9 +155,9 @@ app.get("/game", (req, res) => {
         renderPage(res, "lobby", {
             nome: nome,
             pfp: pfp,
-            stanzaId: stanza,
+            stanzaId: stanzaId,
             token: TEMPORARY_TOKEN,
-            action: !stanza ? "Crea" : "Partecipa",
+            action: !stanzaId ? "Crea" : "Partecipa",
             bgm: "GameMusic-Candy_Bazaar"
         });
     }
@@ -171,7 +182,7 @@ app.post("/saveGameReference", (req, res) => {
    if(userId && stanzaId) {
        req.session.storeData = {
            userId: userId,
-           stanza: stanzaId
+           stanzaId: stanzaId
        };
        return res.status(200).json({ result: true });
    }
@@ -179,6 +190,12 @@ app.post("/saveGameReference", (req, res) => {
    res.status(406).json({ result: false });
 });
 
+app.post("/deleteGameReference", (req, res) => {
+    req.session.destroy();
+    res.status(200).json({ result: true });
+});
+
+//Socket Endpoints
 server.on("connection", (user) => {
     user.on("creaStanza", (data) => {
         try {
@@ -186,10 +203,10 @@ server.on("connection", (user) => {
             const stanza = new Stanza(username, pfp, generationMemory);
             Stanze[stanza.id] = stanza;
             user.join(stanza.id);
-            user.data.referenceUtente = stanza.master;
+            user.data.referenceGiocatore = stanza.master;
             user.emit("confermaStanza", {
                 stanzaId: stanza.id,
-                reference: user.data.referenceUtente.adaptToClient()
+                reference: user.data.referenceGiocatore.adaptToClient()
             });
             server.to(stanza.id).emit("aggiornamentoNumeroGiocatori", {
                 numeroGiocatori: Stanze[stanza.id].giocatori.length
@@ -203,8 +220,8 @@ server.on("connection", (user) => {
     user.on("partecipaStanza", (data) => {
         try {
             const stanzaId = data["id"];
-            user.data.referenceUtente = Stanze[stanzaId].aggiungiGiocatore(data["username"], data["pfp"], generationMemory);
-            if(user.data.referenceUtente === false) {
+            user.data.referenceGiocatore = Stanze[stanzaId].aggiungiGiocatore(data["username"], data["pfp"], generationMemory);
+            if(user.data.referenceGiocatore === false) {
                 user.emit("impossibileAggiungersi", {
                     message: "Impossibile aggiungersi alla stanza, le regole giustamente non ammettono schifi umani"
                 });
@@ -212,7 +229,7 @@ server.on("connection", (user) => {
             }
             user.join(stanzaId);
             user.emit("confermaStanza", {
-                reference: user.data.referenceUtente.adaptToClient()
+                reference: user.data.referenceGiocatore.adaptToClient()
             });
             server.to(stanzaId).emit("aggiornamentoNumeroGiocatori", {
                 numeroGiocatori: Stanze[stanzaId].giocatori.length
@@ -226,7 +243,7 @@ server.on("connection", (user) => {
     user.on("iniziaTurno", (data) => {
         try {
             const stanzaId = data["id"];
-            const result = Stanze[stanzaId].iniziaTurno(user.data.referenceUtente.id);
+            const result = Stanze[stanzaId].iniziaTurno(user.data.referenceGiocatore.id);
             if(typeof result === "object") {
                 server.to(stanzaId).emit("partitaTerminata", {
                     classifica: result
@@ -236,13 +253,17 @@ server.on("connection", (user) => {
             }
             else if(result)
                 server.in(stanzaId).fetchSockets().then((sockets) => {
+                    const round = Stanze[stanzaId].round;
                     for(const socket of sockets) {
-                        socket.data.referenceUtente = Stanze[stanzaId].trovaGiocatore(socket.data.referenceUtente.id);
+                        socket.data.referenceGiocatore = Stanze[stanzaId].trovaGiocatore(socket.data.referenceGiocatore.id);
                         socket.emit("roundIniziato", {
-                            round: result,
-                            reference: socket.data.referenceUtente.adaptToClient()
+                            round: round,
+                            reference: socket.data.referenceGiocatore.adaptToClient()
                         });
                     }
+                });
+            else user.emit("aspettaAltri", {
+                    message: "Aspetta altri giocatori" //TODO Messaggio silly per aspettare almeno 3 giocatori
                 });
         } catch (e) {
             user.emit("errore", {
@@ -254,15 +275,12 @@ server.on("connection", (user) => {
        try {
            const stanzaId = data["id"];
            const carte = data["indexCarta"];
-           const result = Stanze[stanzaId].aggiungiRisposta(user.data.referenceUtente.id, ...carte);
+           const result = Stanze[stanzaId].aggiungiRisposta(user.data.referenceGiocatore.id, ...carte);
            if(typeof result === "object") {
-               server.in(stanzaId).fetchSockets().then(sockets => {
-                   for(const socket of sockets)
-                       socket.emit("sceltaVincitore", {
-                           domanda: result[0],
-                           risposte: result[1],
-                           chiInterroga: result[2]
-                       });
+               server.to(stanzaId).emit("sceltaVincitore", {
+                   domanda: result[0],
+                   risposte: result[1],
+                   chiInterroga: result[2]
                });
            } else if(result) {
                user.emit("rispostaRegistrata", {
@@ -284,17 +302,17 @@ server.on("connection", (user) => {
         try {
             const stanzaId = data["id"];
             const vincitore = data["rispostaIndex"];
-            const result = Stanze[stanzaId].scegliVincitore(user.data.referenceUtente.id, vincitore);
+            const result = Stanze[stanzaId].scegliVincitore(user.data.referenceGiocatore.id, vincitore);
             if(result) {
                 server.in(stanzaId).fetchSockets().then(sockets => {
                     for(const socket of sockets) {
-                        socket.data.referenceUtente = Stanze[stanzaId].giocatori.find(giocatore => giocatore.id === socket.data.referenceUtente.id);
+                        socket.data.referenceGiocatore = Stanze[stanzaId].trovaGiocatore(socket.data.referenceGiocatore.id);
                         socket.emit("fineTurno", {
                             vincitore: result[0],
                             usernameVincitore: result[1],
                             domanda: result[2],
                             risposte: result[3],
-                            reference: socket.data.referenceUtente.adaptToClient()
+                            reference: socket.data.referenceGiocatore.adaptToClient()
                         });
                     }
                 });
@@ -312,13 +330,10 @@ server.on("connection", (user) => {
     user.on("terminaPartita", (data) => {
         try {
             const stanzaId = data["id"];
-            const result = Stanze[stanzaId].terminaPartita();
+            const result = Stanze[stanzaId].terminaPartita(user.data.referenceGiocatore.id);
             if(result) {
-                server.in(stanzaId).fetchSockets().then(sockets => {
-                    for (const socket of sockets)
-                        socket.emit("partitaTerminata", {
-                            classifica: result
-                        });
+                server.to(stanzaId).emit("partitaTerminata", {
+                    classifica: result
                 });
                 delete Stanze[stanzaId];
                 server.socketsLeave(stanzaId);
@@ -332,6 +347,42 @@ server.on("connection", (user) => {
     user.on("aggiornaNumeroGiocatori", (data) => server.to(data["stanzaId"]).emit("aggiornamentoNumeroGiocatori", {
         numeroGiocatori: Stanze[data["stanzaId"]]?.giocatori.length
     }));
+    user.on("lasciaStanza", (data) => {
+        try {
+            const stanzaId = data["id"];
+            Stanze[stanzaId].eliminaGiocatore(user.data.referenceGiocatore.id);
+            if(Stanze[stanzaId].giocatori.length < Stanze[stanzaId].minimoGiocatori) {
+                server.to(stanzaId).emit("stanzaChiusa");
+                delete Stanze[stanzaId];
+                server.socketsLeave(stanzaId);
+                return;
+            }
+            server.in(stanzaId).fetchSockets().then(sockets => {
+                for(const socket of sockets)
+                    emitStatoStanza(stanzaId, socket);
+            });
+        } catch (e) {
+            user.emit("errore", {
+                message: e
+            });
+        }
+    });
+    user.on("disconnect", () => {
+        const stanzaId = Stanza.trovaDaGiocatore(user.data.referenceGiocatore?.id, ...Object.values(Stanze));
+        const giocatore = Stanze[stanzaId].trovaGiocatore(user.data.referenceGiocatore?.id);
+        if (giocatore && stanzaId) {
+            giocatore.online = false;
+            setTimeout(() => {
+                if (Stanze[stanzaId] && !giocatore.online && Stanze[stanzaId].trovaGiocatore(giocatore.id)) {
+                    Stanze[stanzaId].eliminaGiocatore(giocatore.id);
+                    server.in(stanzaId).fetchSockets().then(sockets => {
+                        for(const socket of sockets)
+                            emitStatoStanza(stanzaId, socket);
+                    });
+                }
+            }, timeout);
+        }
+    });
 });
 
 //Listening

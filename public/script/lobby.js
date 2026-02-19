@@ -52,12 +52,20 @@ socket.on("confermaStanza", (data) => {
     });
 });
 
-socket.on("errore", (data) => {
-    alert(data.message);
+socket.on("errore", (error) => {
+    alert(error.message);
     navigateWithLoading("/");
 });
 
-window.addEventListener('beforeunload', (e) => {
-    e.preventDefault();
-    e.returnValue = '';
+socket.on("connect_error", (err) => {
+    switch(err.message) {
+        case "SESSION_EXPIRED" : {
+            alert("La tua sessione è scaduta o la stanza è stata chiusa."); //TODO Messaggio silly per la sessione che non vale più
+            return navigateWithLoading("/");
+        }
+        case "INVALID_KEY" : {
+            alert("La chiave dal server è sbagliata");
+            return navigateWithLoading("/");
+        }
+    }
 });
