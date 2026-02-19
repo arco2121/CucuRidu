@@ -1,4 +1,4 @@
-<audio preload="auto" loop id="musicAudio" src="/audio/background/<%= page %>.mp3" class="hidden"></audio>
+<audio preload="auto" loop id="musicAudio" src="/audio/background/<%= bgm %>.ogg" class="hidden"></audio>
 <audio preload="none" id="soundAudio" class="hidden"></audio>
 
 <script>
@@ -7,8 +7,11 @@
     const audiosCache = {};
     const vibrationPattern = [10, 5, 10];
     const randomSound = () => Math.floor(Math.random() * (2 - 1) + 1);
+
     const playAudio = async (elementToPlay, checkValue = "sound") => {
-        const permissions = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
+        const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
+        const permissions = { audio: true, sound: true, ...savedSettings };
+
         switch (checkValue) {
             case "sound": {
                 const sound = randomSound();
@@ -29,7 +32,12 @@
             }
         }
     };
+
     (() => {
+        const initMusic = async () => {
+            try { await playAudio(musicPlayer, "audio") } catch {}
+        };
+
         document.addEventListener("DOMContentLoaded", () => {
             [...document.querySelectorAll("button"),
                 ...[...document.querySelectorAll("body *")].filter(element =>
@@ -42,10 +50,13 @@
             });
         });
 
-        document.addEventListener("click", async () => {
-            try { await playAudio(musicPlayer, "audio") } catch {}
-        }, {
-            once: true
+        document.addEventListener("click", initMusic, { once: true });
+
+        window.addEventListener("pageshow", (event) => {
+            if (event.persisted) {
+                initMusic();
+                document.addEventListener("click", initMusic, { once: true });
+            }
         });
     })();
 </script>
