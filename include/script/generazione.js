@@ -3,7 +3,7 @@ const alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm
 const generateId = (length, memory) => {
     if (!memory) return;
     let code = "";
-    const utilize = length <= 6 ? alphabet.slice(0, alphabet.indexOf("0")) : alphabet;
+    const utilize = length <= 7 ? alphabet.slice(0, alphabet.indexOf("0")) : alphabet;
     length = length > utilize.length ? utilize.length : length;
     do {
         code = "";
@@ -54,6 +54,6 @@ const getAllPfp = () => {
     return Array.from({ length: pfpNumber }, (empty, number) => pfpPath + number + ".jpg");
 }
 
-const getIcon = (defaultIcon) => String("/assets/icon_imgs/" + (defaultIcon ? 1 : Math.floor(Math.random() * (12 - 1) + 1)) + ".png");
+const getIcon = (defaultIcon) => String("/assets/icon_imgs/" + (defaultIcon ? 1 : Math.floor(Math.random() * (11 - 1) + 1)) + ".png");
 
 module.exports = { generateId, generatePfp, generateName, getIcon, getAllPfp };
