@@ -11,8 +11,17 @@ const renderFragment = async (root, page, params = {}) => {
             if(!input.ok) throw new Error("fragment not found");
             fragmentsCache[page] = await input.text();
         }
-        const rendering = ejs.render(fragmentsCache[page], params);
+        const rendering = ejs.render(fragmentsCache[page], {
+            ...params
+        });
         root.innerHTML = rendering;
+        const scripts = root.querySelectorAll("script");
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement("script");
+            newScript.textContent = oldScript.textContent;
+            document.body.appendChild(newScript);
+            newScript.remove();
+        });
         return rendering;
     } catch (e) {
         console.error(e);

@@ -4,10 +4,11 @@ const { Mazzo, TipoMazzo } = require((path.join(__dirname, '/Mazzo')));
 
 class Giocatore {
 
-    constructor(username, memory) {
+    constructor(username, pfp, memory) {
         this.id = generateId(32, memory);
         this.username = username;
         this.punti = 0;
+        this.pfp = pfp;
         this.mazzo = new Mazzo(TipoMazzo.COMPLETAMENTI);
     }
 
@@ -23,7 +24,8 @@ class Giocatore {
         return {
             identificativo: this.id,
             username: this.username,
-            mazzo: this.mazzo.toArray()
+            mazzo: this.mazzo.toArray(),
+            pfp: this.pfp
         }
     }
 }

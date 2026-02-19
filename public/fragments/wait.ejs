@@ -33,11 +33,11 @@
     } catch { clearInterval(idAttesaInterval); }
 
     shareButton.addEventListener("click", async () => {
-        const shareText = "";//TODO MESSAGGIO SILLY PER CONDIVISIONE
+        const shareText = "DIOTRENO";//TODO MESSAGGIO SILLY PER CONDIVISIONE
         const shareData = {
             title: "Cucu Ridu",
             text: shareText,
-            url: window.location.hostname + "/partecipaStanza/" + idStanza
+            url: "/partecipaStanza/" + idStanza
         };
         try {
             if(navigator.canShare(shareData)) await navigator.share(shareData);

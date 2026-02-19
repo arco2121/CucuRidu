@@ -51,7 +51,6 @@ const generatePfp = () => {
 const getAllPfp = () => {
     const pfpNumber = 80;
     const pfpPath = '/assets/pfps/';
-    [...80].map(number => pfpPath + number + ".jpg");
     return Array.from({ length: pfpNumber }, (empty, number) => pfpPath + number + ".jpg");
 }
 

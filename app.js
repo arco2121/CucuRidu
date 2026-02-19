@@ -48,7 +48,7 @@ server.use((socket, next) => {
     const { token, stanza, userId } = socket.handshake.auth;
     if(token !== TEMPORARY_TOKEN) return next(new Error("Chiave non valida"));
     if(!stanza || !Stanze[stanza] || Stanze[stanza].stato === StatoStanza.END) return next();
-    const exist = Stanze[stanza].giocatori.find(giocatore => giocatore.id === userId);
+    const exist = Stanze[stanza].trovaGiocatore(userId);
     if(!exist) return next();
     socket.data.referenceUtente = exist;
     switch (Stanze[stanza].stato) {
@@ -171,14 +171,14 @@ app.post("/saveGameReference", (req, res) => {
 server.on("connection", (user) => {
     user.on("creaStanza", (data) => {
         try {
-            const { username } = data;
-            const stanza = new Stanza(username, generationMemory);
+            const { username, pfp } = data;
+            const stanza = new Stanza(username, pfp, generationMemory);
             Stanze[stanza.id] = stanza;
             user.join(stanza.id);
             user.data.referenceUtente = stanza.master;
             user.emit("confermaStanza", {
-                reference: user.data.referenceUtente.adaptToClient(),
-                stanzaId: stanza.id
+                stanzaId: stanza.id,
+                reference: user.data.referenceUtente.adaptToClient()
             });
             server.to(stanza.id).emit("aggiornamentoNumeroGiocatori", {
                 numeroGiocatori: Stanze[stanza.id].giocatori.length
@@ -192,7 +192,7 @@ server.on("connection", (user) => {
     user.on("partecipaStanza", (data) => {
         try {
             const stanzaId = data["id"];
-            user.data.referenceUtente = Stanze[stanzaId].aggiungiGiocatore(data["username"], generationMemory);
+            user.data.referenceUtente = Stanze[stanzaId].aggiungiGiocatore(data["username"], data["pfp"], generationMemory);
             if(user.data.referenceUtente === false) {
                 user.emit("impossibileAggiungersi", {
                     message: "Impossibile aggiungersi alla stanza, le regole giustamente non ammettono schifi umani"
@@ -225,10 +225,13 @@ server.on("connection", (user) => {
             }
             else if(result)
                 server.in(stanzaId).fetchSockets().then((sockets) => {
-                    for(const socket of sockets)
+                    for(const socket of sockets) {
+                        socket.data.referenceUtente = Stanze[stanzaId].trovaGiocatore(socket.data.referenceUtente.id);
                         socket.emit("roundIniziato", {
-                            round: result
+                            round: result,
+                            reference: socket.data.referenceUtente.adaptToClient()
                         });
+                    }
                 });
         } catch (e) {
             user.emit("errore", {
@@ -316,7 +319,7 @@ server.on("connection", (user) => {
         }
     });
     user.on("aggiornaNumeroGiocatori", (data) => server.to(data["stanzaId"]).emit("aggiornamentoNumeroGiocatori", {
-        numeroGiocatori: Stanze[data["stanzaId"]].giocatori.length
+        numeroGiocatori: Stanze[data["stanzaId"]]?.giocatori.length
     }));
 });
 
