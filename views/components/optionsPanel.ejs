@@ -1,4 +1,4 @@
-<div class="section hidden" id="settings">
+<div class="section hidden sectionToPanel" id="settings">
     <div class="floatSection optionsSection flex_gap_30 btn_doubleBorder">
         <div class="options_exit_btn upper sour_gummy_extra" >
             <h1 class="panel_title sour_gummy_bold">Opzioni</h1>
@@ -38,15 +38,10 @@
 </div>
 
 <script>
-    const showOptions = new Event("showOptionsPanel");
-    const hideOptions = new Event("hideOptionsPanel");
     document.addEventListener("DOMContentLoaded", () => {
-        const timing = 200;
-        const optionsPanel = document.getElementById('settings');
         const musicBtn = document.getElementById("musicbtn");
         const soundBtn = document.getElementById("soundbtn");
         const exitBtn = document.getElementById("exitBtn");
-        const sectionToHide = document.querySelectorAll('.sectionToHide');
 
         const updateButtonUI = (btn, isOn) => {
             btn.textContent = isOn ? "On" : "Off";
@@ -68,7 +63,7 @@
 
         const initSettingsUI = () => {
             const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
-            updateButtonUI(musicBtn, !!settings["music"]);
+            updateButtonUI(musicBtn, !!settings["audio"]);
             updateButtonUI(soundBtn, !!settings["sound"]);
         };
 
@@ -76,22 +71,10 @@
 
         // Event Listeners
         musicBtn.addEventListener("click", (e) => {
-            toggleSetting(e, "music");
-            document.dispatchEvent(checkSettings);
+            toggleSetting(e, "audio");
+            playAudio(musicPlayer, "music");
         });
         soundBtn.addEventListener("click", (e) => toggleSetting(e, "sound"));
-        exitBtn.addEventListener("click", () => document.dispatchEvent(hideOptions));
-
-        // Gestione Pannello Options
-        if(sectionToHide) {
-            document.addEventListener('showOptionsPanel', () => {
-                sectionToHide.forEach(section => section.classList.replace('visible', 'hidden'));
-                setTimeout(() => optionsPanel.classList.replace('hidden', 'visible'), timing);
-            });
-            document.addEventListener("hideOptionsPanel", () => {
-                optionsPanel.classList.replace('visible', 'hidden');
-                setTimeout(() => sectionToHide.forEach(section => section.classList.replace('hidden', 'visible')), timing);
-            });
-        }
+        exitBtn.addEventListener("click", () => document.dispatchEvent(hidePanel));
     })
 </script>

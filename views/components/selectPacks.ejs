@@ -1,0 +1,101 @@
+<div class="sectionToPanel" id="selectPacks">
+    <div class="floatSection">
+        <div class="options_exit_btn upper sour_gummy_extra" >
+            <h1 class="panel_title sour_gummy_bold">Seleziona Mazzo</h1>
+            <h1 id="exitBtn">X</h1>
+        </div>
+        <div class="options_content column nunito_bold flex_gap_30">
+            <div class="row_mobileColumn">
+                <div class="tile">
+                    <h4>Standard</h4>
+                </div>
+                <div id="customPack" class="tile">
+                    <h4>Personalizzati</h4>
+                    <input type="file" id="inputFile" class="hidden" accept="application/json,.cucuridupack" multiple/>
+                </div>
+            </div>
+            <button id="confirmPacks">Seleziona</button>
+        </div>
+        <div class="options_row options_footer">
+            <h6><a href="/creaMazzo" target="_blank" class="shrinks_on_active_for_no_reason">Scopri come creare un mazzo</a></h6>
+        </div>
+    </div>
+</div>
+<script>
+    const readText = async (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(new Error("Errore durante la lettura del file"));
+            reader.readAsText(file);
+        });
+    };
+    const tiles = document.querySelectorAll(".tile");
+    const confirmPacks = document.getElementById("confirmPacks");
+    const customTile = document.getElementById("customPack");
+    const inputFile = document.getElementById("inputFile");
+    const exitBtn = document.getElementById("exitBtn");
+    const packs = [];
+    let standardPack = false;
+
+    tiles.forEach((tile) => {
+        tile.addEventListener("click", () => {
+            if(tile.classList.contains("selectedPack")) {
+                if(tile.id !== customTile.id) standardPack = false;
+                tile.classList.remove("selectedPack");
+            } else {
+                if(tile.id !== customTile.id) standardPack = true;
+                tile.classList.remove("selectedPack");
+            }
+        });
+    });
+
+    customTile.addEventListener("click", () => {
+        if(customTile.classList.contains("selectedPack")) {
+            packs.slice(0, packs.length);
+        } else {
+            inputFile.click();
+        }
+    })
+
+    inputFile.addEventListener("cancel", () => {
+        packs.slice(0, packs.length);
+        customTile.classList.remove("selectedPack");
+    });
+
+    inputFile.addEventListener("change", async () => {
+        const files = Array.from(inputFile.files);
+        if(files.length === 0) {
+            packs.slice(0, packs.length);
+            customTile.classList.remove("selectedPack");
+            return;
+        }
+        try {
+            const mazzi = files.map(async (file) => {
+                return { name: file.name, content: await readText(file) };
+            });
+            const risultatiMazzi = await Promise.all(mazzi);
+            for (const mazzo of risultatiMazzi) {
+                const check = (mazzo.name.includes(".cucuridupack") || mazzo.name.includes(".json"))
+                    && (JSON.parse(mazzo.content)["frasi"] !== null && JSON.parse(mazzo.content)["completamenti"] !== null);
+                if(check)
+                    packs.push(JSON.parse(mazzo.content));
+                else
+                    throw new Error(`${mazzo.name} non è un mazzo valido`) //TODO Messaggio silly per errore nell'inserimento di un mazzo;
+            }
+        } catch (error) {
+            alert(error);
+            packs.slice(0, packs.length);
+            customTile.classList.remove("selectedPack");
+        }
+    });
+
+    confirmPacks.addEventListener("click", () => {
+        if(!standardPack && packs.length === 0)
+            alert("") //TODO messaggio silly per non aver selezionato un cazzo
+        else
+            navigateWithLoading("/creaStanza?packs=" + JSON.stringify([standardPack, ...packs]));
+    });
+
+    exitBtn.addEventListener("click", () => document.dispatchEvent(hidePanel));
+</script>

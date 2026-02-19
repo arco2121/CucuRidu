@@ -19,6 +19,23 @@ const renderFragment = async (root, page, params = {}) => {
     }
 }
 
+//PANELS
+const timing = 200;
+const panel = document.querySelectorAll('.sectionToPanel');
+const sectionToHide = document.querySelectorAll('.sectionToHide');
+const showPanel = new Event("showPanel");
+const hidePanel = new Event("hidePanel");
+if(sectionToHide) {
+    document.addEventListener('showPanel', (e) => {
+        sectionToHide.forEach(section => section.classList.replace('visible', 'hidden'));
+        setTimeout(() => panel.forEach(pannello => pannello.classList.replace('hidden', 'visible')), timing);
+    });
+    document.addEventListener("hidePanel", (e) => {
+        panel.forEach(pnnello => pannello.classList.replace('visible', 'hidden'));
+        setTimeout(() => sectionToHide.forEach(section => section.classList.replace('hidden', 'visible')), timing);
+    });
+}
+
 //COLORS
 const cssVars = (fileName) => {
     const variableNames = new Set();
