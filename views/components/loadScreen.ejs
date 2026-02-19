@@ -6,14 +6,20 @@
 </div>
 
 <script>
-    const timing = 300;
-    const unloadScreen = new Event("loadScreenEnd");
-    const loadScreen = new Event("loadScreenStart");
+    const timing = 200;
+    const unloadScreen = new CustomEvent("loadScreenEnd");
+    const loadScreen = new CustomEvent("loadScreenStart");
     const loadingScreen = document.querySelector(".loadingscreen");
-    const hideRendering = new Event("hideRenderingStart", {
+    const hideRendering = new CustomEvent("hideRenderingStart", {
         bubbles: true
     });
-    const unhideRendering = new Event("hideRenderingEnd", {
+    const unhideRendering = new CustomEvent("hideRenderingEnd", {
+        bubbles: true
+    });
+    const showPanel = new CustomEvent("showPanel", {
+        bubbles: true
+    });
+    const hidePanel = new CustomEvent("hidePanel", {
         bubbles: true
     });
     const isLoadScreen = () => document.body.contains(loadingScreen);
@@ -76,6 +82,14 @@
         document.addEventListener("hideRenderingEnd", (e) => {
             const container = e.target;
             container.classList.remove("hideRendering");
+        });
+        document.addEventListener('hidePanel', (e) => {
+            const section = e.target;
+            section.classList.replace('visible', 'hidden');
+        });
+        document.addEventListener("showPanel", (e) => {
+            const panel = e.target;
+            setTimeout(() => panel.classList.replace('hidden', 'visible'), timing);
         });
     })();
 </script>

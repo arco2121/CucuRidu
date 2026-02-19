@@ -8,24 +8,24 @@
     const vibrationPattern = [10, 5, 10];
     const randomSound = () => Math.floor(Math.random() * (2 - 1) + 1);
     const playAudio = async (elementToPlay, checkValue = "sound") => {
-        const permissions = JSON.parse(localStorage.getItem("cucuRiduSettings"));
+        const permissions = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
         switch (checkValue) {
             case "sound": {
                 const sound = randomSound();
                 if(permissions[checkValue]) {
                     if(!audiosCache[sound]) {
                         const result = await fetch("/audio/sound/" + sound + ".mp3");
-                        if(!result.ok) throw new Error("fragment not found");
-                        audiosCache[sound] = await result.blob();
+                        if(!result.ok) throw new Error("audio not found");
+                        audiosCache[sound] = URL.createObjectURL(await result.blob());
                     }
-                    elementToPlay.src = URL.createObjectURL(audiosCache[sound]);
-                    elementToPlay.play();
+                    elementToPlay.src = audiosCache[sound];
+                    await elementToPlay.play().catch(() => null);
                 }
                 break;
             }
             case "audio": {
-                if(permissions[checkValue]) elementToPlay.play();
-                else elementToPlay.pause();
+                if(permissions[checkValue]) await elementToPlay.play().catch(() => null);
+                else await elementToPlay.pause();
             }
         }
     };
@@ -42,7 +42,9 @@
             });
         });
 
-        document.addEventListener("click", () => playAudio(musicPlayer, "audio"), {
+        document.addEventListener("click", async () => {
+            try { await playAudio(musicPlayer, "audio") } catch {}
+        }, {
             once: true
         });
     })();

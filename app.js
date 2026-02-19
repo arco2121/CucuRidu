@@ -117,17 +117,11 @@ app.get("/creaStanza", resumeGame, (req, res) => {
             pfp: pfp
         };
         res.redirect("/game");
-    } else if(packs) {
-        req.session.storeData = {
-            packs: packs
-        };
-        renderPage(res, "profile");
-    }
-    else renderPage(res, "select");
+    } else renderPage(res, "profile");
 });
 
 app.get("/game", (req, res) => {
-    const { nome, pfp, stanza, userId, packs } = req.session.storeData || {};
+    const { nome, pfp, stanza, userId } = req.session.storeData || {};
     if(userId && stanza) renderPage(res, "lobby", {
         userId: userId,
         stanzaId: stanza,
@@ -139,7 +133,6 @@ app.get("/game", (req, res) => {
             pfp: pfp,
             stanzaId: stanza,
             token: TEMPORARY_TOKEN,
-            packs: packs,
             action: !stanza ? "Crea" : "Partecipa"
         });
     }
@@ -175,9 +168,8 @@ app.post("/saveGameReference", (req, res) => {
 server.on("connection", (user) => {
     user.on("creaStanza", (data) => {
         try {
-            const { username, packs } = data;
-            const pacchi = JSON.parse(packs)
-            const stanza = new Stanza(pacchi, username, generationMemory);
+            const { username } = data;
+            const stanza = new Stanza(username, generationMemory);
             Stanze[stanza.id] = stanza;
             user.join(stanza.id);
             user.data.referenceUtente = stanza.master;

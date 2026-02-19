@@ -11,23 +11,23 @@ const { generateId } = require(path.join(__dirname, '/generazione'));
 
 class Stanza {
 
-    constructor(packs, username, memory) {
+    constructor(username, memory) {
         this.id = generateId(7, memory);
         this.giocatori = [];
         this.stato = StatoStanza.WAIT;
         this.master = new Giocatore(username, memory);
         this.mazzoCompletamenti = {
-            mazzo: Mazzo.unisciMazzi(...packs.map(pack => new Mazzo({
-                pack: pack,
+            mazzo: new Mazzo({
+                pack: true,
                 tipoMazzo: TipoMazzo.COMPLETAMENTI
-            }))),
+            }),
             scarto: new Mazzo()
         }
         this.mazzoFrasi = {
-            mazzo: Mazzo.unisciMazzi(...packs.map(pack => new Mazzo({
-                pack: pack,
+            mazzo: new Mazzo({
+                pack: true,
                 tipoMazzo: TipoMazzo.FRASI
-            }))),
+            }),
             scarto: new Mazzo()
         }
         let maxOccorrenze = 0;
