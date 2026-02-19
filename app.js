@@ -51,6 +51,7 @@ server.use((socket, next) => {
     const exist = Stanze[stanza].trovaGiocatore(userId);
     if(!exist) return next();
     socket.data.referenceUtente = exist;
+    socket.join(stanza);
     switch (Stanze[stanza].stato) {
         case StatoStanza.WAIT : {
             socket.emit("confermaStanza", {
@@ -88,7 +89,8 @@ app.get(['/home', '/index'], resumeGame, (req, res) => res.redirect('/'));
 app.get("/partecipaStanza/:codiceStanza", resumeGame, (req, res) => {
     const stanza = req.params["codiceStanza"];
     if(stanza) renderPage(res, "profile", {
-        stanza: stanza
+        stanza: stanza,
+        setOfPfp: getAllPfp()
     });
     else res.redirect("/");
 });

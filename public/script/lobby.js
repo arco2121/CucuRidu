@@ -13,21 +13,23 @@ socket.on("connect", () => {
         case "Crea": {
             socket.emit("creaStanza", {
                 username: fromBackEnd["nome"],
-                packs: fromBackEnd["packs"]
+                pfp: fromBackEnd["pfp"]
             });
             break;
         }
         case "Partecipa": {
             socket.emit("partecipaStanza", {
                 username: fromBackEnd["nome"],
-                id: fromBackEnd["stanzaId"]
+                id: fromBackEnd["stanzaId"],
+                pfp: fromBackEnd["pfp"]
             });
         }
     }
 });
 
 socket.on("confermaStanza", (data) => {
-    const { reference, stanzaId } = data;
+    const { reference } = data;
+    const stanzaId = data["stanzaId"] || fromBackEnd["stanzaId"];
     referenceGiocatore = new GiocatoriAdapt(reference);
     fetch("/saveGameReference", {
         method: 'POST',
@@ -36,7 +38,7 @@ socket.on("confermaStanza", (data) => {
         },
         body: JSON.stringify({
             userId: referenceGiocatore.id,
-            stanzaId: stanzaId || fromBackEnd["stanzaId"]
+            stanzaId: stanzaId
         })
     }).then(async (response) => {
         const result = (await response.json())["result"];
