@@ -81,14 +81,16 @@ server.use((socket, next) => {
 
 //Endpoints
 app.get("/", resumeGame, (req, res) => renderPage(res, "index", {
-    icon: getIcon()
+    icon: getIcon(),
+    bgm: "MainMenu-City_Stroll"
 }));
 app.get(['/home', '/index'], resumeGame, (req, res) => res.redirect('/'));
 
 app.get("/partecipaStanza/:codiceStanza", resumeGame, (req, res) => {
     const stanza = req.params["codiceStanza"];
     if(stanza) renderPage(res, "profile", {
-        stanza: stanza
+        stanza: stanza,
+        bgm: "Choosing_Menu-Feeling_Good"
     });
     else res.redirect("/");
 });
@@ -100,13 +102,17 @@ app.get("/partecipaStanza", resumeGame, (req, res) => {
             ...req.session.storeData,
             nome: nome,
             pfp: pfp,
-            stanza: stanza
+            stanza: stanza,
+            bgm: "Choosing_Menu-Feeling_Good"
         };
         res.redirect("/game");
     } else if(stanza) renderPage(res, "profile", {
         stanza: stanza,
-        setOfPfp: getAllPfp()
-    }); else renderPage(res, "join");
+        setOfPfp: getAllPfp(),
+        bgm: "Choosing_Menu-Feeling_Good"
+    }); else renderPage(res, "join", {
+        bgm: "Choosing_Menu-Feeling_Good"
+    });
 });
 
 app.get("/creaStanza", resumeGame, (req, res) => {
@@ -115,11 +121,13 @@ app.get("/creaStanza", resumeGame, (req, res) => {
         req.session.storeData = {
             ...req.session.storeData,
             nome: nome,
-            pfp: pfp
+            pfp: pfp,
+            bgm: "Choosing_Menu-Feeling_Good"
         };
         res.redirect("/game");
     } else renderPage(res, "profile", {
-        setOfPfp: getAllPfp()
+        setOfPfp: getAllPfp(),
+        bgm: "Choosing_Menu-Feeling_Good"
     });
 });
 
@@ -129,6 +137,7 @@ app.get("/game", (req, res) => {
         userId: userId,
         stanzaId: stanza,
         token: TEMPORARY_TOKEN,
+        bgm: "GameMusic-Candy_Bazaar"
     });
     else if(nome && pfp) {
         renderPage(res, "lobby", {
@@ -136,7 +145,8 @@ app.get("/game", (req, res) => {
             pfp: pfp,
             stanzaId: stanza,
             token: TEMPORARY_TOKEN,
-            action: !stanza ? "Crea" : "Partecipa"
+            action: !stanza ? "Crea" : "Partecipa",
+            bgm: "GameMusic-Candy_Bazaar"
         });
     }
     else {
@@ -327,7 +337,8 @@ server.on("connection", (user) => {
 app.use((req, res) => renderPage(res, "error", {
     error: 104,
     icon: getIcon(),
-    message: "Questa pagina non esiste, brutta sottospecie di spermatozoo di elefante con la disfunzione erettile"
+    message: "Questa pagina non esiste, brutta sottospecie di spermatozoo di elefante con la disfunzione erettile",
+    bgm: "Error-Tough_Decisions"
 }));
 
 serverConfig.listen(port, (error) => {

@@ -12,7 +12,7 @@ const { generateId } = require(path.join(__dirname, '/generazione'));
 class Stanza {
 
     constructor(username, pfp, memory) {
-        this.id = generateId(7, memory);
+        this.id = generateId(6, memory);
         this.giocatori = [];
         this.stato = StatoStanza.WAIT;
         this.master = new Giocatore(username, pfp, memory);

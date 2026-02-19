@@ -3,7 +3,7 @@ const alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm
 const generateId = (length, memory) => {
     if (!memory) return;
     let code = "";
-    const utilize = length <= 7 ? alphabet.slice(0, alphabet.indexOf("0")) : alphabet;
+    const utilize = length <= 6 ? alphabet.slice(0, alphabet.indexOf("0")) : alphabet;
     length = length > utilize.length ? utilize.length : length;
     do {
         code = "";

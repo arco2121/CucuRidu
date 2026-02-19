@@ -64,6 +64,11 @@
 
         const initSettingsUI = () => {
             const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
+
+            if (settings.audio === undefined) settings.audio = true;
+            if (settings.sound === undefined) settings.sound = true;
+            localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
+
             updateButtonUI(musicBtn, !!settings["audio"]);
             updateButtonUI(soundBtn, !!settings["sound"]);
         };

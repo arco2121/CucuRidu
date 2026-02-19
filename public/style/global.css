@@ -736,10 +736,21 @@ input:active {
     align-items: flex-start;
     justify-content: flex-start;
     width: 80%;
-    margin-top: 50%;
+}
+
+@media (max-width: 500px) {
+    .error_container {
+        margin-top: 45%;
+    }
 }
 
 .error_img {
     width: 35%;
     margin-bottom: 10px;
+}
+
+@media (min-width: 800px) {
+    .error_img {
+        width: 25%;
+    }
 }
