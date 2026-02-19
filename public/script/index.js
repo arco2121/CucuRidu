@@ -10,6 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
     createRoom.addEventListener("click", () => navigateWithLoading("/creaStanza"));
     optionsBtn.addEventListener("click", () => {
         sectionDefault.dispatchEvent(hidePanel);
-        optionPanel.dispatchEvent(showPanel);
+        pfpPanel.dispatchEvent(showPanel);
     });
 });

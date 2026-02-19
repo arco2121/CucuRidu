@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const btn_randomize = document.getElementById("randomize");
     const btn_confirm = document.getElementById("confirm");
+    const sectionToHide = document.querySelector(".sectionToHide");
 
 
 
@@ -37,6 +38,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await getNewInfos();
     let doing = false;
+
+    displayPfp.addEventListener("click", () => {
+       sectionToHide.dispatchEvent(hidePanel);
+       pfpPanel.dispatchEvent(showPanel);
+    });
 
     btn_randomize.addEventListener("click", async () => {
         if(doing) return;

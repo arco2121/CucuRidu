@@ -1,0 +1,38 @@
+<div class="section hidden" id="selectPfp">
+    <div class="floatSection optionsSection flex_gap_30 btn_doubleBorder">
+        <div class="options_exit_btn upper sour_gummy_extra" >
+            <h2 class="panel_title sour_gummy_bold">Seleziona Pfp</h2>
+            <h1 id="exitBtn">X</h1>
+        </div>
+        <div class="options_content column nunito_bold flex_gap_30">
+            <% setOfPfp.forEach(pfp => { %>
+                <img src="<%= pfp %>" class="pfp_selection" alt="pfp">
+            <% }); %>
+        </div>
+        <div class="options_row options_footer">
+            <button id="randomImg">Random</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const pfpPanel = document.getElementById("selectPfp");
+    document.addEventListener("DOMContentLoaded", () => {
+        const displayPfp = document.getElementById("displayPfp");
+        const pfpSelections = document.querySelectorAll(".pfp_selection");
+        const sectionToHide = document.querySelector(".sectionToHide");
+        const randomImg = document.getElementById("randomImg");
+        pfpSelections.forEach(pfp => {
+            pfp.addEventListener("click", () => {
+                displayPfp.src = pfp.src;
+                pfpPanel.dispatchEvent(hidePanel);
+                sectionToHide.dispatchEvent(showPanel);
+            });
+        });
+        randomImg.addEventListener("click", async () => {
+            displayPfp.src = (await getInfo())["pfp"];
+            pfpPanel.dispatchEvent(hidePanel);
+            sectionToHide.dispatchEvent(showPanel);
+        })
+    })
+</script>

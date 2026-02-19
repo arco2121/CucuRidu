@@ -5,10 +5,10 @@ const { Server } = require("socket.io");
 const express = require("express");
 const session = require('express-session');
 const { Stanza, StatoStanza } = require(path.join(__dirname, "include/script/Stanza"));
-const { getIcon, generateName, generatePfp, generateId } = require(path.join(__dirname, "include/script/generazione"));
-const renderPage = (res, page, params = {}) => res.render("components/header", {
+const { getIcon, generateName, generatePfp, generateId, getAllPfp } = require(path.join(__dirname, "include/script/generazione"));
+const renderPage = (res, page, params = {}) => res.render("header", {
     params: params,
-    page: "../" + page,
+    page: page,
     headerIcon: getIcon(true)
 });
 const resumeGame = (req, res, next) => {
@@ -104,7 +104,8 @@ app.get("/partecipaStanza", resumeGame, (req, res) => {
         };
         res.redirect("/game");
     } else if(stanza) renderPage(res, "profile", {
-        stanza: stanza
+        stanza: stanza,
+        setOfPfp: getAllPfp()
     }); else renderPage(res, "join");
 });
 
@@ -117,7 +118,9 @@ app.get("/creaStanza", resumeGame, (req, res) => {
             pfp: pfp
         };
         res.redirect("/game");
-    } else renderPage(res, "profile");
+    } else renderPage(res, "profile", {
+        setOfPfp: getAllPfp()
+    });
 });
 
 app.get("/game", (req, res) => {

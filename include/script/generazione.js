@@ -48,6 +48,13 @@ const generatePfp = () => {
     return pfpPath + rdmNumber + ".jpg";
 }
 
+const getAllPfp = () => {
+    const pfpNumber = 80;
+    const pfpPath = '/assets/pfps/';
+    [...80].map(number => pfpPath + number + ".jpg");
+    return Array.from({ length: pfpNumber }, (empty, number) => pfpPath + number + ".jpg");
+}
+
 const getIcon = (defaultIcon) => String("/assets/icon_imgs/" + (defaultIcon ? 1 : Math.floor(Math.random() * (11 - 1) + 1)) + ".png");
 
-module.exports = {generateId, generatePfp, generateName, getIcon};
+module.exports = { generateId, generatePfp, generateName, getIcon, getAllPfp };

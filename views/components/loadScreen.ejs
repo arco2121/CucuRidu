@@ -7,33 +7,8 @@
 
 <script>
     const timing = 200;
-    const unloadScreen = new CustomEvent("loadScreenEnd");
-    const loadScreen = new CustomEvent("loadScreenStart");
-    const loadingScreen = document.querySelector(".loadingscreen");
-    const hideRendering = new CustomEvent("hideRenderingStart", {
-        bubbles: true
-    });
-    const unhideRendering = new CustomEvent("hideRenderingEnd", {
-        bubbles: true
-    });
-    const showPanel = new CustomEvent("showPanel", {
-        bubbles: true
-    });
-    const hidePanel = new CustomEvent("hidePanel", {
-        bubbles: true
-    });
     const isLoadScreen = () => document.body.contains(loadingScreen);
     const isHideRendering = (container) => container.classList.contains("hideRendering");
-    const navigateWithLoading = (url) => {
-        document.dispatchEvent(loadScreen);
-
-        setTimeout(() => {
-            if(typeof url === "function")
-                return url();
-            else
-                window.location.href = url;
-        }, timing);
-    };
     (() => {
         window.addEventListener("beforeunload", () => {
             if (!isLoadScreen()) {
@@ -74,22 +49,6 @@
             loadingScreen.style.animation = "appear " + timing + "ms ease-in forwards";
             document.body.appendChild(loadingScreen);
             intervalId = setInterval(update, timing);
-        });
-        document.addEventListener("hideRenderingStart", (e) => {
-            const container = e.target;
-            container.classList.add("hideRendering");
-        });
-        document.addEventListener("hideRenderingEnd", (e) => {
-            const container = e.target;
-            container.classList.remove("hideRendering");
-        });
-        document.addEventListener('hidePanel', (e) => {
-            const section = e.target;
-            section.classList.replace('visible', 'hidden');
-        });
-        document.addEventListener("showPanel", (e) => {
-            const panel = e.target;
-            setTimeout(() => panel.classList.replace('hidden', 'visible'), timing);
         });
     })();
 </script>
