@@ -1,7 +1,7 @@
-class GiocatoriAdapt {
+class GiocatoreInterface {
 
     constructor(dataFromServer) {
-        this.id = dataFromServer["identificativo"];
+        this.id = dataFromServer["id"];
         this.username = dataFromServer["username"];
         this.mazzo = dataFromServer["mazzo"].flat();
         dataFromServer = null;

@@ -1,0 +1,6 @@
+<% giocatori.forEach(giocatore => { %>
+    <div class="row">
+        <img src="<%= giocatore["pfp"] %>" alt="imgGiocatore" class="giocatorePfpWaiting">
+        <h3 class="giocatoreUsernameWaiting"><%= giocatore["username"] %></h3>
+    </div>
+<% }); %>

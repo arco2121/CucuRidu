@@ -1,12 +1,24 @@
 const socket = io({
     auth: {
         token: fromBackEnd["token"],
-        stanza: fromBackEnd["stanzaId"],
+        stanzaId: fromBackEnd["stanzaId"],
         userId: fromBackEnd["userId"]
     }
 });
 const base = document.getElementById("landpoint");
+const leaveBtn = document.getElementById("leaveBtn");
+const lasciaStanza = () => {
+    fetch("/deleteGameReference").then(async (response) => {
+        const result = (await response.json())["result"];
+        if(result) navigateWithLoading("/");
+    });
+};
 let referenceGiocatore;
+let referenceStanza = "";
+
+leaveBtn?.addEventListener("click", () => socket.emit("lasciaStanza", {
+    id: referenceStanza
+}));
 
 socket.on("connect", () => {
     switch (fromBackEnd["action"]) {
@@ -29,8 +41,8 @@ socket.on("connect", () => {
 
 socket.on("confermaStanza", (data) => {
     const { reference } = data;
-    const stanzaId = data["stanzaId"] || fromBackEnd["stanzaId"];
-    referenceGiocatore = new GiocatoriAdapt(reference);
+    referenceStanza = data["stanzaId"] || fromBackEnd["stanzaId"];
+    referenceGiocatore = new GiocatoreInterface(reference);
     fetch("/saveGameReference", {
         method: 'POST',
         headers: {
@@ -38,19 +50,21 @@ socket.on("confermaStanza", (data) => {
         },
         body: JSON.stringify({
             userId: referenceGiocatore.id,
-            stanzaId: stanzaId
+            stanzaId: referenceStanza
         })
     }).then(async (response) => {
         const result = (await response.json())["result"];
-        if(result === true) {
+        if(result) {
             await renderFragment(base, "wait", {
-                stanzaId: stanzaId
+                stanzaId: referenceStanza
             });
             document.dispatchEvent(unloadScreen);
         }
         else navigateWithLoading("/");
     });
 });
+
+socket.on("stanzaLasciata", lasciaStanza);
 
 socket.on("errore", (error) => {
     alert(error.message);
@@ -61,11 +75,11 @@ socket.on("connect_error", (err) => {
     switch(err.message) {
         case "SESSION_EXPIRED" : {
             alert("La tua sessione è scaduta o la stanza è stata chiusa."); //TODO Messaggio silly per la sessione che non vale più
-            return navigateWithLoading("/");
+            return lasciaStanza();
         }
         case "INVALID_KEY" : {
-            alert("La chiave dal server è sbagliata");
-            return navigateWithLoading("/");
+            alert("La chiave per la connessione al server è sbagliata");
+            return lasciaStanza();
         }
     }
 });

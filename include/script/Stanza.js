@@ -14,6 +14,7 @@ class Stanza {
     constructor(username, pfp, memory) {
         this.id = generateId(6, memory);
         this.giocatori = [];
+        this.giocatoriPassati = new Set();
         this.stato = StatoStanza.WAIT;
         this.minimoGiocatori = 3
         this.master = new Giocatore(username, pfp, memory);
@@ -49,17 +50,34 @@ class Stanza {
         if(giocatore === this.master)
             this.master = this.giocatori[this.giocatori.indexOf(giocatore)];
         this.mazzoCompletamenti.mazzo.aggiungiCarte(...giocatore.prendiTuttaLaMano())
-        this.giocatori.splice(this.giocatori.findIndex(giocatoreDaEliminare => giocatoreDaEliminare.id === giocatoreId), 1);
+        this.giocatori.splice(this.giocatori.indexOf(giocatore), 1);
+        this.giocatoriPassati.add(giocatore);
     }
 
     trovaGiocatore(idGiocatore) {
-        return this.giocatori.find(giocatore => giocatore.id === idGiocatore);
+        return this.giocatori?.find(giocatore => giocatore.id === idGiocatore);
+    }
+
+    trovaGiocatoreAnchePassato(idGiocatore) {
+        const temp = this.trovaGiocatore(idGiocatore);
+        if(temp)
+            return [temp, true];
+        const passato = [...this.giocatoriPassati.values()].find(giocatorePassato => giocatorePassato.id === idGiocatore);
+        if(passato)
+            return [null, false];
+        return null;
     }
 
     terminaPartita(idGiocatore) {
         if(this.stato !== StatoStanza.END && this.trovaGiocatore(idGiocatore) === this.master) {
             this.stato = StatoStanza.END;
-            return this.giocatori.toSorted((a, b) => a.punti - b.punti);
+            const classifica = this.giocatori.toSorted((a, b) => a.punti - b.punti);
+            this.giocatori.forEach(giocatore => giocatore = null);
+            this.giocatori = null;
+            this.mazzoFrasi = null;
+            this.mazzoCompletamenti = null;
+            this.master = null;
+            return classifica;
         }
         return false;
     }
@@ -91,10 +109,10 @@ class Stanza {
     }
 
     aggiungiRisposta(giocatoreId, ... indexCarte) {
-        if(this.stato === StatoStanza.CHOOSING_CARDS && this.giocatori.find(giocatore => giocatore.id === giocatoreId)
+        if(this.stato === StatoStanza.CHOOSING_CARDS && this.trovaGiocatore(giocatoreId)
             && !this.round.risposte.find(risposta => risposta.chi === giocatoreId)) {
             this.round.risposte.push({
-                carte: this.giocatori.find(giocatore => giocatore.id === giocatoreId).prendiMano(...indexCarte),
+                carte: this.trovaGiocatore(giocatoreId).prendiMano(...indexCarte),
                 chi: giocatoreId
             });
             if(this.round.risposte.length === (this.giocatori.length - 1)) {

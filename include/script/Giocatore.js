@@ -27,7 +27,7 @@ class Giocatore {
 
     adaptToClient() {
         return {
-            identificativo: this.id,
+            id: this.id,
             username: this.username,
             mazzo: this.mazzo.toArray(),
             pfp: this.pfp

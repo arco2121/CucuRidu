@@ -1,27 +1,34 @@
-<div class="column">
-    <h4>Codice Stanza: <%= stanzaId %></h4>
-    <h4 id="attesa">Wait per il prossimo turno</h4>
-    <h6 id="numeroGiocatori">Giocatori presenti: 0</h6>
-    <button id="shareButton">Condividi</button>
+<div class="row">
+   <div class="column">
+       <h4>Codice Stanza: <%= stanzaId %></h4>
+       <h4 id="attesa">Wait per il prossimo turno</h4>
+       <h6 id="numeroGiocatori">Giocatori presenti: 0</h6>
+       <button id="shareButton">Condividi</button>
+   </div>
+    <div class="column" id="showGiocatori"></div>
 </div>
 <script>
-    socket.off("aggiornamentoNumeroGiocatori");
+    socket.off("aggiornamentoAttesa");
     const numeroGiocatoriCount = document.getElementById("numeroGiocatori");
     const attesaView = document.getElementById("attesa");
     const shareButton = document.getElementById("shareButton");
+    const showGiocatori = document.getElementById("showGiocatori");
     const idStanza = "<%= stanzaId %>";
+    let idAttesaInterval;
 
     if(socket) {
-        socket.on("aggiornamentoNumeroGiocatori", (data) => {
-            const { numeroGiocatori } = data || {};
+        socket.on("aggiornamentoAttesa", async (data) => {
+            const { numeroGiocatori, giocatori } = data || {};
             numeroGiocatoriCount.textContent = numeroGiocatoriCount.textContent.split(":")[0] + ": " + numeroGiocatori;
+            await renderFragment(showGiocatori, "giocatoreRow", {
+                giocatori: giocatori
+            });
         });
-        socket.emit("aggiornaNumeroGiocatori", {
+        socket.emit("aggiornaAttesa", {
             stanzaId: idStanza
         });
     }
 
-    let idAttesaInterval;
     try {
         const initialText = attesaView.textContent;
         idAttesaInterval = setInterval(() => {

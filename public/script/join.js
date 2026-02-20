@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     sendStanza.addEventListener("click", async () => {
         if(doing) return;
         doing = true;
-        const stanzaId = inputStanza.value;
+        const stanzaId = inputStanza.value?.toUpperCase();
         const { result } = await doRoomExists(stanzaId);
         if(result === true)  navigateWithLoading("/partecipaStanza?stanza=" + stanzaId);
         else alert("Non può entrare... Entraa? Non Entra! Entraaa? Non Entra! ENTRAAA? NON PENSO PROPRIO!1!");
