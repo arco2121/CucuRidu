@@ -20,12 +20,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const possibleStanzaId = fromBackEnd["stanza"] || "";
     const displayPfp = document.getElementById("displayPfp");
     const displayName = document.getElementById("displayName");
-
+    const pfpPanel = document.getElementById("selectPfp");
     const btn_randomize = document.getElementById("randomize");
     const btn_confirm = document.getElementById("confirm");
     const sectionToHide = document.querySelector(".sectionToHide");
-
-
+    const pfpSelections = document.querySelectorAll(".pfp_selection");
+    const randomImg = document.getElementById("randomImg");
 
     async function getNewInfos () {
         let infos = await getInfo();
@@ -38,6 +38,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await getNewInfos();
     let doing = false;
+
+    pfpSelections.forEach(pfp => {
+        pfp.addEventListener("click", () => {
+            displayPfp.src = pfp.src;
+            pfpPanel.dispatchEvent(hidePanel);
+            sectionToHide.dispatchEvent(showPanel);
+        });
+    });
+
+    randomImg.addEventListener("click", async () => {
+        displayPfp.src = (await getInfo())["pfp"];
+        pfpPanel.dispatchEvent(hidePanel);
+        sectionToHide.dispatchEvent(showPanel);
+    })
 
     displayPfp.addEventListener("click", () => {
        sectionToHide.dispatchEvent(hidePanel);
