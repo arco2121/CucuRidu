@@ -4,6 +4,7 @@ const TipoMazzo = Object.freeze({
 })
 const fs = require('fs');
 const path = require('path');
+const packsCache = {};
 
 class Mazzo {
 
@@ -11,9 +12,15 @@ class Mazzo {
         this.carte = [];
         if (data) {
             if(typeof data["pack"] === "string") {
-                const carte = fs.readFileSync(path.join(__dirname, "../cards/", data["pack"], data["tipoMazzo"] === TipoMazzo.COMPLETAMENTI ? "/completamenti.json" : "/frasi.json"), "utf-8");
-                this.aggiungiCarte(...JSON.parse(carte));
+                if(!packsCache[data["pack"]]) {
+                    packsCache[data["pack"]] = {
+                        completamenti : JSON.parse(fs.readFileSync(path.join(__dirname, "../cards/", data["pack"], data["tipoMazzo"] === TipoMazzo.COMPLETAMENTI ? "/completamenti.json" : "/frasi.json"), "utf-8"))
+                    };
+                }
+                const carte = packsCache[data["pack"]];
+                this.aggiungiCarte(...carte);
             }
+            //Mazzi che provengono da file dei giocatori
             if(typeof data["pack"] === "object") {
                 const type = data["tipoMazzo"] === TipoMazzo.COMPLETAMENTI ? "completamenti" : "frasi";
                 this.aggiungiCarte(...data["pack"][type]);
@@ -26,20 +33,21 @@ class Mazzo {
     }
 
     shuffle() {
-        this.carte.sort(() => Math.random() - 0.5);
+        for (let i = this.carte.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this.carte[i], this.carte[j]] = [this.carte[j], this.carte[i]];
+        }
     }
 
     prendiCarte(numeroCarte) {
-        const temp = [];
         numeroCarte = Math.min(numeroCarte, this.carte.length);
-        for(let i = 0; i < numeroCarte; i++) temp.push(this.carte.shift());
-        return temp;
+        return this.carte.splice(0, numeroCarte);
     }
 
     prendiCarteByIndex(...indexCarte) {
-        const temp = [];
-        for(const carta of indexCarte) temp.push(this.carte.splice(carta, 1)[0]);
-        return temp;
+        return indexCarte
+            .sort((a, b) => b - a)
+            .map(index => this.carte.splice(index, 1)[0]);
     }
 
     static unisciMazzi(...mazzi) {
