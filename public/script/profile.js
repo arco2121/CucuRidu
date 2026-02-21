@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const pfpPanel = document.getElementById("selectPfp");
     const btn_randomize = document.getElementById("randomize");
     const btn_confirm = document.getElementById("confirm");
-    const sectionToHide = document.querySelector(".sectionToHide");
+    const profile = document.getElementById("profile");
     const pfpSelections = document.querySelectorAll(".pfp_selection");
     const randomImg = document.getElementById("randomImg");
 
@@ -43,18 +43,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         pfp.addEventListener("click", () => {
             displayPfp.src = pfp.src;
             pfpPanel.dispatchEvent(hidePanel);
-            sectionToHide.dispatchEvent(showPanel);
+            profile.dispatchEvent(showPanel);
         });
     });
 
     randomImg.addEventListener("click", async () => {
         displayPfp.src = (await getInfo())["pfp"];
         pfpPanel.dispatchEvent(hidePanel);
-        sectionToHide.dispatchEvent(showPanel);
+        profile.dispatchEvent(showPanel);
     })
 
     displayPfp.addEventListener("click", () => {
-       sectionToHide.dispatchEvent(hidePanel);
+       profile.dispatchEvent(hidePanel);
        pfpPanel.dispatchEvent(showPanel);
     });
 
@@ -64,6 +64,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         await getNewInfos();
         doing = false;
     });
+
     btn_confirm.addEventListener("click", () => possibleStanzaId !== "" ?
         navigateWithLoading("/partecipaStanza?pfp=" + encodeURIComponent(displayPfp.src) + "&nome=" + encodeURIComponent(displayName.textContent) + "&stanza=" + encodeURIComponent(possibleStanzaId)) :
         navigateWithLoading("/creaStanza?pfp=" + encodeURIComponent(displayPfp.src) + "&nome=" + encodeURIComponent(displayName.textContent)));

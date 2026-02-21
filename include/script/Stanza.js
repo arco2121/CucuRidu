@@ -13,7 +13,7 @@ class Stanza {
 
     constructor(username, pfp, memory) {
         this.id = generateId(6, memory);
-        this.giocatori = [];
+        this.giocatori = new Map();
         this.giocatoriPassati = new Set();
         this.stato = StatoStanza.WAIT;
         this.minimoGiocatori = 3
@@ -32,48 +32,45 @@ class Stanza {
             }),
             scarto: new Mazzo()
         }
-        this.giocatori.push(this.master);
-        this.numeroRound = [1, this.giocatori.length];
+        this.giocatori.set(this.master.id, this.master);
+        this.numeroRound = [1, this.giocatori.size];
     }
 
     aggiungiGiocatore(username, pfp, memory) {
         if(this.stato !== StatoStanza.WAIT)
             return false;
         const giocatore = new Giocatore(username, pfp, memory);
-        this.numeroRound = [this.numeroRound[0], (this.numeroRound[1] / this.giocatori.length) * (this.giocatori.length + 1)];
-        this.giocatori.push(giocatore);
+        this.numeroRound = [this.numeroRound[0], (this.numeroRound[1] / this.giocatori.size) * (this.giocatori.size + 1)];
+        this.giocatori.set(giocatore.id, giocatore);
         return giocatore;
     }
 
     eliminaGiocatore(giocatoreId) {
         const giocatore = this.trovaGiocatore(giocatoreId);
+        this.giocatori.delete(giocatoreId);
         if(giocatore === this.master)
-            this.master = this.giocatori[this.giocatori.indexOf(giocatore)];
+            this.master = this.giocatori.values().next().value;
         this.mazzoCompletamenti.mazzo.aggiungiCarte(...giocatore.prendiTuttaLaMano())
-        this.giocatori.splice(this.giocatori.indexOf(giocatore), 1);
         this.giocatoriPassati.add(giocatore);
     }
 
     trovaGiocatore(idGiocatore) {
-        return this.giocatori?.find(giocatore => giocatore.id === idGiocatore);
+        return this.giocatori.get(idGiocatore);
     }
 
     trovaGiocatoreAnchePassato(idGiocatore) {
-        const temp = this.trovaGiocatore(idGiocatore);
-        if(temp)
-            return [temp, true];
-        const passato = [...this.giocatoriPassati.values()].find(giocatorePassato => giocatorePassato.id === idGiocatore);
-        if(passato)
-            return [null, false];
+        if(this.giocatori.has(idGiocatore))
+            return this.giocatori.get(idGiocatore);
+        if(this.giocatoriPassati.has(idGiocatore))
+            return false;
         return null;
     }
 
     terminaPartita(idGiocatore) {
         if(this.stato !== StatoStanza.END && this.trovaGiocatore(idGiocatore) === this.master) {
             this.stato = StatoStanza.END;
-            const classifica = this.giocatori.toSorted((a, b) => a.punti - b.punti);
-            this.giocatori.forEach(giocatore => giocatore = null);
-            this.giocatori = null;
+            const classifica = Array.from(this.giocatori.values()).sort((a, b) => b.punti - a.punti);
+            this.giocatori.clear();
             this.mazzoFrasi = null;
             this.mazzoCompletamenti = null;
             this.master = null;
@@ -83,14 +80,14 @@ class Stanza {
     }
 
     iniziaTurno(chiStaChidedendo) {
-        if(this.stato !== StatoStanza.WAIT || this.giocatori.length < this.minimoGiocatori)
+        if(this.stato !== StatoStanza.WAIT || this.giocatori.size < this.minimoGiocatori)
             return false;
         if(this.numeroRound[0] === this.numeroRound[1])
             return this.terminaPartita();
         if(this.numeroRound[0] === 1) {
             let maxOccorrenze = 0;
             this.mazzoFrasi.mazzo.carte.map(carta => carta[1]).forEach(occorrenza => maxOccorrenze += occorrenza);
-            this.numeroRound = [1, maxOccorrenze * this.giocatori.length];
+            this.numeroRound = [1, maxOccorrenze * this.giocatori.size];
             this.mazzoCompletamenti.mazzo.shuffle();
             this.mazzoFrasi.mazzo.shuffle();
             this.round = {
@@ -99,8 +96,8 @@ class Stanza {
                 chiStaInterrogando: this.master.id
             }
         }
-        for (const giocatore of this.giocatori)
-            giocatore.mazzo.carte.length === 0 ? giocatore.aggiungiMano(this.mazzoCompletamenti.mazzo.prendiCarte(12)) : null;
+        for (const giocatore of this.giocatori.values())
+            if(giocatore.mazzo.carte.length === 0)  giocatore.aggiungiMano(this.mazzoCompletamenti.mazzo.prendiCarte(12));
         if(chiStaChidedendo === this.round.chiStaInterrogando) {
             this.stato = StatoStanza.CHOOSING_CARDS;
             return true;
@@ -149,8 +146,13 @@ class Stanza {
         return [this.giocatori[vincitoreRound].id, this.giocatori[vincitoreRound].username, domanda, risposte] || false;
     }
 
-    static trovaDaGiocatore(idGiocatore, ...Stanze) {
-        return Stanze.find(stanza => stanza.giocatori.filter(giocatore => giocatore.id === idGiocatore).length > 0)?.id;
+    static trovaDaGiocatore(idGiocatore, Stanze) {
+        for (const stanza of Stanze) {
+            if (stanza.giocatori.some(g => g.id === idGiocatore)) {
+                return stanza.id;
+            }
+        }
+        return null;
     }
 }
 

@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm@#!£$%&/";
 
 const generateId = (length, memory) => {
@@ -19,6 +21,11 @@ const generateId = (length, memory) => {
     memory.add(code);
     return code;
 }
+
+const getknownPacks = () => {
+    const dirs = fs.readdirSync(path.join(__dirname, "../cards/"), { withFileTypes: true });
+    return dirs.filter(dir => dir.isDirectory()).map(dir => dir.name);
+};
 
 // Generazione Nome Casuale
 const generateName = () => {
@@ -56,4 +63,4 @@ const getAllPfp = () => {
 
 const getIcon = (defaultIcon) => String("/assets/icon_imgs/" + (defaultIcon ? 1 : Math.floor(Math.random() * (11 - 1) + 1)) + ".png");
 
-module.exports = { generateId, generatePfp, generateName, getIcon, getAllPfp };
+module.exports = { generateId, generatePfp, generateName, getIcon, getAllPfp, getknownPacks };

@@ -9,9 +9,11 @@
         </div>
         <div class="options_content column nunito_bold flex_gap_30">
             <div class="row_mobileColumn">
-                <div class="tile">
-                    <h4>Standard</h4>
-                </div>
+                <% knownPacks.forEach(pack => { %>
+                    <div class="tile defaultPack" pack="<%= pack %>">
+                        <h4><%= pack.charAt(0).toUpperCase() + pack.slice(1) %>></h4>
+                    </div>
+                <% }) %>
                 <div id="customPack" class="tile">
                     <h4>Personalizzati</h4>
                     <input type="file" id="inputFile" class="hidden" accept="application/json,.cucuridupack" multiple/>
