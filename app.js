@@ -41,7 +41,7 @@ const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
         }
         case StatoStanza.CHOOSING_WINNER : {
             socket.emit("sceltaVincitore", {
-                risposte: Stanze.get(stanzaId).round.risposte.map(risposta => [risposta, Stanze.get(stanzaId).giocatori.find(giocatori => giocatori.id === risposta.chi).username]),
+                risposte: Array.from(Stanze.get(stanzaId).round.risposte.entries()),
                 domanda: Stanze.get(stanzaId).round.domanda,
                 chiInterroga: Stanze.get(stanzaId).round.chiStaInterrogando,
                 reference: socket.data.referenceGiocatore.adaptToClient()
@@ -67,6 +67,7 @@ const server = new Server(serverConfig, {
     pingInterval: 10000,
     pingTimeout: 8000
 });
+
 app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.use(express.urlencoded({extended : true}));
@@ -80,15 +81,16 @@ app.use(session({
         maxAge: timeout * 60
     }
 }));
+
 server.use((socket, next) => {
     const { token, stanzaId, userId } = socket.handshake.auth;
     if(token !== TEMPORARY_TOKEN) return next(new Error("INVALID_KEY"));
     if(!stanzaId) return next();
     const exist = Stanze.get(stanzaId)?.trovaGiocatoreAnchePassato(userId);
     if(exist === null) return next();
-    if(exist && !exist[1]) return next(new Error("SESSION_EXPIRED"));
-    exist[0].online = true;
-    socket.data.referenceGiocatore = exist[0];
+    if(!exist) return next(new Error("SESSION_EXPIRED"));
+    exist.online = true;
+    socket.data.referenceGiocatore = exist;
     socket.join(stanzaId);
     emitStatoStanza(stanzaId, socket, next);
 });
@@ -213,8 +215,8 @@ server.on("connection", (user) => {
                 reference: user.data.referenceGiocatore.adaptToClient()
             });
             server.to(stanza.id).emit("aggiornamentoAttesa", {
-                numeroGiocatori: Stanze.get(stanza.id).giocatori.length,
-                giocatori: Stanze.get(stanza.id)?.giocatori.map(giocatore => giocatore.adaptToClient())
+                numeroGiocatori: Stanze.get(stanza.id).giocatori.size,
+                giocatori: Array.from(Stanze.get(stanza.id).giocatori.values()).map(giocatore => giocatore.adaptToClient())
             });
             console.log("Stanza creata => " + stanza.id);
         } catch {
@@ -238,8 +240,8 @@ server.on("connection", (user) => {
                 reference: user.data.referenceGiocatore.adaptToClient()
             });
             server.to(stanzaId).emit("aggiornamentoAttesa", {
-                numeroGiocatori: Stanze.get(stanzaId).giocatori.length,
-                giocatori: Stanze.get(stanzaId)?.giocatori.map(giocatore => giocatore.adaptToClient())
+                numeroGiocatori: Stanze.get(stanzaId).giocatori.size,
+                giocatori: Array.from(Stanze.get(stanzaId).giocatori.values()).map(giocatore => giocatore.adaptToClient())
             });
             console.log("Giocatore aggiunto a Stanza => " + stanzaId);
         } catch (e) {
@@ -354,14 +356,14 @@ server.on("connection", (user) => {
         }
     });
     user.on("aggiornaAttesa", (data) => server.to(data["stanzaId"]).emit("aggiornamentoAttesa", {
-        numeroGiocatori: Stanze.get(data["stanzaId"])?.giocatori.length,
-        giocatori: Stanze.get(data["stanzaId"])?.giocatori.map(giocatore => giocatore.adaptToClient())
+        numeroGiocatori: Stanze.get(data["stanzaId"])?.giocatori.size,
+        giocatori: Array.from(Stanze.get(data["stanzaId"])?.giocatori.values()).map(giocatore => giocatore.adaptToClient())
     }));
     user.on("lasciaStanza", (data) => {
         try {
             const stanzaId = data["id"];
             Stanze.get(stanzaId).eliminaGiocatore(user.data.referenceGiocatore.id);
-            if(Stanze.get(stanzaId).giocatori.length < Stanze.get(stanzaId).minimoGiocatori) {
+            if(Stanze.get(stanzaId).giocatori.size < Stanze.get(stanzaId).minimoGiocatori) {
                 server.to(stanzaId).emit("stanzaChiusa");
                 Stanze.delete(stanzaId);
                 server.socketsLeave(stanzaId);
@@ -371,8 +373,10 @@ server.on("connection", (user) => {
             user.leave(stanzaId);
             user.emit("stanzaLasciata");
             server.in(stanzaId).fetchSockets().then(sockets => {
-                for(const socket of sockets)
+                for(const socket of sockets) {
+                    socket.data.referenceGiocatore = Stanze.get(stanzaId).giocatori.get(socket.data.referenceGiocatore.id);
                     emitStatoStanza(stanzaId, socket);
+                }
             });
             console.log("Giocatore eliminato da Stanza => " + stanzaId);
         } catch (e) {
@@ -387,12 +391,14 @@ server.on("connection", (user) => {
         if (giocatore && stanzaId) {
             giocatore.online = false;
             setTimeout(() => {
-                if (Stanze.get(stanzaId) && !giocatore.online && Stanze.get(stanzaId).trovaGiocatore(giocatore.id)) {
+                if (Stanze.get(stanzaId) && !giocatore.isOnline() && Stanze.get(stanzaId).trovaGiocatore(giocatore.id)) {
                     Stanze.get(stanzaId).eliminaGiocatore(giocatore.id);
                     console.log("Giocatore eliminato da Stanza => " + stanzaId);
                     server.in(stanzaId).fetchSockets().then(sockets => {
-                        for(const socket of sockets)
+                        for(const socket of sockets) {
+                            socket.data.referenceGiocatore = Stanze.get(stanzaId).giocatori.get(socket.data.referenceGiocatore.id);
                             emitStatoStanza(stanzaId, socket);
+                        }
                     });
                 }
             }, timeout);
@@ -409,7 +415,7 @@ app.use((req, res) => renderPage(res, "error", {
 }));
 
 serverConfig.listen(port, (error) => {
-    console.log(`Server started on port ${port}`);
+    console.log(`Cucu Ridu lanciato alla porta => ${port}`);
     if (error) {
         console.log(error.message);
     }

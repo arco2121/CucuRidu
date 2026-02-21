@@ -4,17 +4,18 @@ const { Mazzo, TipoMazzo } = require((path.join(__dirname, '/Mazzo')));
 
 class Giocatore {
 
-    constructor(username, pfp, memory) {
+    constructor(username, pfp, memory, role = false) {
         this.id = generateId(32, memory);
         this.username = username;
         this.punti = 0;
         this.pfp = pfp;
         this.online = true;
+        this.masterRole = role;
         this.mazzo = new Mazzo(TipoMazzo.COMPLETAMENTI);
     }
 
     aggiungiMano(...carte) {
-        this.mazzo.aggiungiCarte(carte);
+        this.mazzo.aggiungiCarte(...carte);
     }
 
     prendiMano(...indexCarte) {
@@ -25,12 +26,17 @@ class Giocatore {
         return this.mazzo.prendiCarte(this.mazzo.carte.length);
     }
 
+    isOnline() {
+        return this.online;
+    }
+
     adaptToClient() {
         return {
             id: this.id,
             username: this.username,
             mazzo: this.mazzo.toArray(),
-            pfp: this.pfp
+            pfp: this.pfp,
+            masterRole: this.masterRole
         }
     }
 }

@@ -12,12 +12,12 @@ const { generateId } = require(path.join(__dirname, '/generazione'));
 class Stanza {
 
     constructor(username, pfp, memory, minimoGiocatori = 3) {
-        this.id = generateId(6, memory);
+        this.id = typeof memory === "string" ? memory : generateId(6, memory);
         this.giocatori = new Map();
         this.giocatoriPassati = new Set();
         this.stato = StatoStanza.WAIT;
         this.minimoGiocatori = minimoGiocatori;
-        this.master = new Giocatore(username, pfp, memory);
+        this.master = new Giocatore(username, pfp, memory, true);
         this.mazzoCompletamenti = {
             mazzo: new Mazzo({
                 pack: "standard",
@@ -48,8 +48,10 @@ class Stanza {
     eliminaGiocatore(giocatoreId) {
         const giocatore = this.trovaGiocatore(giocatoreId);
         this.giocatori.delete(giocatoreId);
-        if(giocatore === this.master)
+        if(giocatore === this.master) {
             this.master = this.giocatori.values().next().value;
+            if (this.master) this.master.masterRole = true;
+        }
         this.mazzoCompletamenti.mazzo.aggiungiCarte(...giocatore.prendiTuttaLaMano())
         this.giocatoriPassati.add(giocatore.id);
     }
