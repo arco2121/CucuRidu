@@ -38,7 +38,7 @@ class Mazzo {
 
     prendiCarteByIndex(...indexCarte) {
         const temp = [];
-        for(const carta of indexCarte) temp.push(this.carte.slice(carta, 1)[0]);
+        for(const carta of indexCarte) temp.push(this.carte.splice(carta, 1)[0]);
         return temp;
     }
 
