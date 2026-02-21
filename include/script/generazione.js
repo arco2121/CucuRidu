@@ -22,22 +22,6 @@ const generateId = (length, memory) => {
     return code;
 }
 
-const generateGlobalId = async (length, RoomManager) => {
-    let id;
-    let isUsed = true;
-    const utilize = length <= 7 ? alphabet.slice(0, alphabet.indexOf("0")) : alphabet;
-    length = length > utilize.length ? utilize.length : length;
-    while (isUsed) {
-        id = "";
-        for (let i = 0; i < length; i++) {
-            id += utilize.charAt(Math.floor(Math.random() * utilize.length));
-        }
-        isUsed = await RoomManager.isIdUsed(id);
-    }
-    await RoomManager.reserveId(id);
-    return id;
-}
-
 const getknownPacks = () => {
     const dirs = fs.readdirSync(path.join(__dirname, "../cards/"), { withFileTypes: true });
     return dirs.filter(dir => dir.isDirectory()).map(dir => dir.name);
@@ -79,4 +63,4 @@ const getAllPfp = () => {
 
 const getIcon = (defaultIcon) => String("/assets/icon_imgs/" + (defaultIcon ? 1 : Math.floor(Math.random() * (11 - 1) + 1)) + ".png");
 
-module.exports = { generateId, generatePfp, generateName, getIcon, getAllPfp, getknownPacks, generateGlobalId };
+module.exports = { generateId, generatePfp, generateName, getIcon, getAllPfp, getknownPacks };
