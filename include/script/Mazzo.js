@@ -14,14 +14,13 @@ class Mazzo {
             if(typeof data["pack"] === "string") {
                 if(!packsCache[data["pack"]]) {
                     packsCache[data["pack"]] = {
-                        completamenti : JSON.parse(fs.readFileSync(path.join(__dirname, "../cards/", data["pack"], data["tipoMazzo"] === TipoMazzo.COMPLETAMENTI ? "/completamenti.json" : "/frasi.json"), "utf-8"))
+                        completamenti : JSON.parse(fs.readFileSync(path.join(__dirname, "../cards/" + data["pack"] + "/completamenti.json"), "utf-8")),
+                        frasi: JSON.parse(fs.readFileSync(path.join(__dirname, "../cards/" + data["pack"] + "/frasi.json"), "utf-8"))
                     };
                 }
-                const carte = packsCache[data["pack"]];
-                this.aggiungiCarte(...carte);
-            }
-            //Mazzi che provengono da file dei giocatori
-            if(typeof data["pack"] === "object") {
+                const carte = data["tipoMazzo"] === TipoMazzo.COMPLETAMENTI ? packsCache[data["pack"]].completamenti : packsCache[data["pack"]].frasi;
+                this.aggiungiCarte(...[...carte]);
+            } else if(typeof data["pack"] === "object") {
                 const type = data["tipoMazzo"] === TipoMazzo.COMPLETAMENTI ? "completamenti" : "frasi";
                 this.aggiungiCarte(...data["pack"][type]);
             }
