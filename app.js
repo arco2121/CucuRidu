@@ -150,6 +150,8 @@ app.get("/creaStanza", resumeGame, (req, res) => {
 });
 
 app.get("/game", (req, res) => {
+    console.log("GET /game - session:", req.session.storeData);
+    console.log("GET /game - sessionID:", req.sessionID);
     const { nome, pfp, stanzaId, userId } = req.session.storeData || {};
     if(userId && stanzaId && Stanze.has(stanzaId) && Stanze.get(stanzaId).trovaGiocatore(userId)) renderPage(res, "lobby", {
         userId: userId,
@@ -186,16 +188,28 @@ app.post("/doRoomExists", (req, res) => {
 })
 
 app.post("/saveGameReference", (req, res) => {
-   const { userId, stanzaId } = req.body || {};
-   if(userId && stanzaId) {
-       req.session.storeData = {
-           userId: userId,
-           stanzaId: stanzaId
-       };
-       return res.status(200).json({ result: true });
-   }
-   req.session.destroy();
-   res.status(406).json({ result: false });
+    const { userId, stanzaId } = req.body || {};
+    console.log("saveGameReference chiamato:", { userId, stanzaId });
+    console.log("Session ID:", req.sessionID);
+    console.log("Cookie header ricevuto:", req.headers.cookie);
+
+    if(userId && stanzaId) {
+        req.session.storeData = {
+            userId: userId,
+            stanzaId: stanzaId
+        };
+        req.session.save((err) => {
+            if(err) {
+                console.error("Errore salvataggio sessione:", err);
+                return res.status(500).json({ result: false });
+            }
+            console.log("Sessione salvata con successo");
+            return res.status(200).json({ result: true });
+        });
+        return;
+    }
+    req.session.destroy();
+    res.status(406).json({ result: false });
 });
 
 app.post("/deleteGameReference", (req, res) => {
