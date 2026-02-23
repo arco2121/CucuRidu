@@ -20,7 +20,9 @@ const readText = async (file) => {
     });
 };
 const lasciaStanza = () => {
-    fetch("/deleteGameReference").then(async (response) => {
+    fetch("/deleteGameReference", {
+        credentials: 'include'
+    }).then(async (response) => {
         const result = (await response.json())["result"];
         if(result) navigateWithLoading("/");
     });
@@ -62,6 +64,7 @@ socket.on("confermaStanza", (data) => {
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
             userId: referenceGiocatore.id,
             stanzaId: referenceStanza
