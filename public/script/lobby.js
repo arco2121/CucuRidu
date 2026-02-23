@@ -91,7 +91,7 @@ socket.on("errore", (error) => {
 socket.on("connect_error", (err) => {
     switch(err.message) {
         case "SESSION_EXPIRED" : {
-            alert("La tua sessione è scaduta o la stanza è stata chiusa."); //TODO Messaggio silly per la sessione che non vale più
+            alert("La tua sessione è scaduta o la stanza è stata chiusa. Come al solito in ritardo");
             return lasciaStanza();
         }
         case "INVALID_KEY" : {
@@ -145,7 +145,7 @@ inputFile.addEventListener("change", async () => {
             if(check)
                 packs.push(JSON.parse(mazzo.content));
             else
-                throw new Error(`${mazzo.name} non è un mazzo valido`) //TODO Messaggio silly per errore nell'inserimento di un mazzo;
+                throw new Error(`Ma ce la fai? Hai una malattia grave? Dei cormosomi di troppo su per il culo? ${mazzo.name} non è un mazzo valido, pirla!`)
         }
     } catch (error) {
         alert(error);
@@ -156,7 +156,7 @@ inputFile.addEventListener("change", async () => {
 
 confirmPacks.addEventListener("click", () => {
     if(standardPacks.size === 0 && packs.length === 0)
-        alert("") //TODO messaggio silly per non aver selezionato un cazzo
+        alert("Ma porchino il dio piccolino... devi selezionare qualcosa... NO?")
     else {
         socket.emit("aggiungiMazzo", {
             id: referenceStanza,
