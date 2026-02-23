@@ -7,29 +7,40 @@
     const audiosCache = {};
     const vibrationPattern = [10, 5, 10];
     const randomSound = () => Math.floor(Math.random() * (2 - 1) + 1);
+    const locks = {
+        audio: false,
+        sound: false
+    };
 
     const playAudio = async (elementToPlay, checkValue = "sound") => {
         const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
         const permissions = { audio: true, sound: true, ...savedSettings };
-
-        switch (checkValue) {
-            case "sound": {
-                const sound = randomSound();
-                if(permissions[checkValue]) {
-                    if(!audiosCache[sound]) {
-                        const result = await fetch("/audio/sound/" + sound + ".mp3");
-                        if(!result.ok) throw new Error("audio not found");
-                        audiosCache[sound] = URL.createObjectURL(await result.blob());
-                    }
-                    elementToPlay.src = audiosCache[sound];
-                    await elementToPlay.play().catch(() => null);
+        if (locks[checkValue]) return;
+        locks[checkValue] = true;
+        try {
+            switch (checkValue) {
+                case "sound": {
+                    const sound = randomSound();
+                    if(permissions[checkValue]) {
+                        if(!audiosCache[sound]) {
+                            const result = await fetch("/audio/sound/" + sound + ".mp3");
+                            if(!result.ok) throw new Error("audio not found");
+                            audiosCache[sound] = URL.createObjectURL(await result.blob());
+                        }
+                        elementToPlay.src = audiosCache[sound];
+                        await elementToPlay.play();
+                        elementToPlay.onpause = () =>  locks[checkValue] = false;
+                    } else locks[checkValue] = false;
+                    break;
                 }
-                break;
+                case "audio": {
+                    if(permissions[checkValue]) await elementToPlay.play();
+                    else await elementToPlay.pause();
+                    locks[checkValue] = false;
+                }
             }
-            case "audio": {
-                if(permissions[checkValue]) await elementToPlay.play().catch(() => null);
-                else await elementToPlay.pause();
-            }
+        } catch {
+            locks[checkValue] = false;
         }
     };
 

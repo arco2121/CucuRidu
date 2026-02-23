@@ -57,6 +57,7 @@ const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
 const app = express();
 const serverConfig = createServer(app);
 const port = process.env.PORT || 7860;
+const host = process.env.PORT || "http://localhost:";
 const Stanze = new Map();
 const generationMemory = new Set();
 const TEMPORARY_TOKEN = generateId(64, generationMemory);
@@ -431,7 +432,7 @@ app.use((req, res) => renderPage(res, "error", {
 }));
 
 serverConfig.listen(port, (error) => {
-    console.log(`Cucu Ridu lanciato sulla porta => ${port}`);
+    console.log(`Cucu Ridu lanciato => ${host !== port ? host + port : port}`);
     if (error) {
         console.log(error.message);
     }
