@@ -36,11 +36,11 @@ if(window.self !== window.top) {
     try {
         window.top.location.href = window.location.href;
     } catch {
-        renderFragment(document.body, "absolutePanel", {
+        await renderFragment(document.body, "absolutePanel", {
             title: "Accesso negato",
             message: "Scusa, ma niente compenetrazioni ammesse",
             redirect: window.location.href
-        }).then(() => throw new Error("Iframe detected"));
+        });
     }
 }
 
