@@ -27,7 +27,8 @@
                             if(!result.ok) throw new Error("audio not found");
                             audiosCache[sound] = URL.createObjectURL(await result.blob());
                         }
-                        elementToPlay.src = audiosCache[sound];
+                        if(elementToPlay.src !== audiosCache[sound])
+                            elementToPlay.src = audiosCache[sound];
                         await elementToPlay.play();
                         elementToPlay.onpause = () =>  locks[checkValue] = false;
                     } else locks[checkValue] = false;

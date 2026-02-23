@@ -21,6 +21,10 @@ const readText = async (file) => {
 };
 const lasciaStanza = () => {
     fetch("/deleteGameReference", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
         credentials: 'include'
     }).then(async (response) => {
         const result = (await response.json())["result"];

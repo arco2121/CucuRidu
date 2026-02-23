@@ -19,6 +19,7 @@ const resumeGame = (req, res, next) => {
 };
 const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
     if (!Stanze.get(stanzaId)) return next();
+    console.log(`Stanza ${stanzaId} => ${Stanze.get(stanzaId).toString()}`)
     switch (Stanze.get(stanzaId).stato) {
         case StatoStanza.WAIT : {
             socket.emit("confermaStanza", {
@@ -57,7 +58,8 @@ const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
 const app = express();
 const serverConfig = createServer(app);
 const port = process.env.PORT || 7860;
-const host = process.env.PORT || "http://localhost:";
+const host = "http://localhost:";
+const local = process.env.NODE_ENV !== "production";
 const Stanze = new Map();
 const generationMemory = new Set();
 const TEMPORARY_TOKEN = generateId(64, generationMemory);
@@ -80,8 +82,8 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        secure: true,
-        sameSite: 'none',
+        secure: !local,
+        sameSite: !local ? 'none' : null,
         maxAge: timeout * 60
     }
 }));
@@ -204,7 +206,6 @@ app.post("/saveGameReference", (req, res) => {
                 console.error("Errore salvataggio sessione:", err);
                 return res.status(500).json({ result: false });
             }
-            console.log("Sessione salvata con successo");
             return res.status(200).json({ result: true });
         });
         return;
@@ -275,8 +276,11 @@ server.on("connection", (user) => {
                 server.to(stanzaId).emit("partitaTerminata", {
                     classifica: result
                 });
+                for(const id of Stanze.get(stanzaId).giocatoriPassati.values()) generationMemory.delete(id);
                 Stanze.delete(stanzaId);
+                generationMemory.delete(stanzaId);
                 server.socketsLeave(stanzaId);
+                console.log("Stanza " + stanzaId + " chiusa");
             }
             else if(result)
                 server.in(stanzaId).fetchSockets().then((sockets) => {
@@ -362,7 +366,9 @@ server.on("connection", (user) => {
                 server.to(stanzaId).emit("partitaTerminata", {
                     classifica: result
                 });
+                for(const id of Stanze.get(stanzaId).giocatoriPassati.values()) generationMemory.delete(id);
                 Stanze.delete(stanzaId);
+                generationMemory.delete(stanzaId);
                 server.socketsLeave(stanzaId);
                 console.log("Stanza eliminata => " + stanzaId);
             }
@@ -380,9 +386,11 @@ server.on("connection", (user) => {
         try {
             const stanzaId = data["id"];
             Stanze.get(stanzaId).eliminaGiocatore(user.data.referenceGiocatore.id);
-            if(Stanze.get(stanzaId).giocatori.size < Stanze.get(stanzaId).minimoGiocatori) {
+            if(Stanze.get(stanzaId).giocatori.size === 0 && Stanze.get(stanzaId).giocatoriPassati.size > 0) {
                 server.to(stanzaId).emit("stanzaChiusa");
+                for(const id of Stanze.get(stanzaId).giocatoriPassati.values()) generationMemory.delete(id);
                 Stanze.delete(stanzaId);
+                generationMemory.delete(stanzaId);
                 server.socketsLeave(stanzaId);
                 console.log("Stanza eliminata => " + stanzaId);
                 return;
@@ -423,6 +431,23 @@ server.on("connection", (user) => {
     });
 });
 
+setInterval(async () => {
+    try {
+        for(const stanza of Stanze.values()) {
+            if(stanza?.stato === StatoStanza.END || stanza?.giocatori.size === 0 && stanza?.giocatoriPassati.size > 0) {
+                server.to(stanza.id).emit("stanzaChiusa");
+                for(const id of stanza.giocatoriPassati.values()) generationMemory.delete(id);
+                Stanze.delete(stanza.id);
+                generationMemory.delete(stanza.id);
+                server.socketsLeave(stanza.id);
+                console.log("Stanza eliminata => " + stanza.id);
+            }
+        }
+    } catch(err) {
+        console.error(err);
+    }
+}, timeout/30);
+
 //Listening
 app.use((req, res) => renderPage(res, "error", {
     error: 104,
@@ -432,7 +457,7 @@ app.use((req, res) => renderPage(res, "error", {
 }));
 
 serverConfig.listen(port, (error) => {
-    console.log(`Cucu Ridu lanciato => ${host !== port ? host + port : port}`);
+    console.log(`Cucu Ridu lanciato => ${local ? host + port : port}`);
     if (error) {
         console.log(error.message);
     }

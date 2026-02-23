@@ -33,7 +33,7 @@ class Stanza {
             scarto: new Mazzo()
         }
         this.giocatori.set(this.master.id, this.master);
-        this.numeroRound = [1, this.giocatori.size];
+        this.numeroRound = [0, this.giocatori.size];
     }
 
     aggiungiGiocatore(username, pfp, memory) {
@@ -84,9 +84,7 @@ class Stanza {
     iniziaTurno(chiStaChidedendo) {
         if(this.stato !== StatoStanza.WAIT || this.giocatori.size < this.minimoGiocatori)
             return false;
-        if(this.numeroRound[0] === this.numeroRound[1])
-            return this.terminaPartita();
-        if(this.numeroRound[0] === 1) {
+        if(this.numeroRound[0] === 0) {
             let maxOccorrenze = 0;
             this.mazzoFrasi.mazzo.carte.map(carta => carta[1]).forEach(occorrenza => maxOccorrenze += occorrenza);
             this.numeroRound = [1, maxOccorrenze * this.giocatori.size];
@@ -98,6 +96,8 @@ class Stanza {
                 chiStaInterrogando: this.master.id
             }
         }
+        if(this.numeroRound[0] === this.numeroRound[1])
+            return this.terminaPartita();
         this.controllaMazzi(this.round.domanda[1]);
         for (const giocatore of this.giocatori.values())
             if(giocatore.mazzo.carte.length === 0) giocatore.aggiungiMano(this.mazzoCompletamenti.mazzo.prendiCarte(12));
@@ -165,6 +165,13 @@ class Stanza {
             }
         }
         return null;
+    }
+
+    toString() {
+        return JSON.stringify({
+            numeroGiocatori: this.giocatori.size,
+            stato: Object.keys(StatoStanza).filter(chiave => StatoStanza[chiave] === this.stato)[0]
+        })
     }
 }
 
