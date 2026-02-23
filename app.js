@@ -289,7 +289,7 @@ server.on("connection", (user) => {
                     }
                 });
             else user.emit("aspettaAltri", {
-                    message: "Aspetta altri giocatori" //TODO Messaggio silly per aspettare almeno 3 giocatori
+                    message: "Girl non ci sono chatbot ai che fingano di scoparti qui. Go touch some grass or smt"
                 });
         } catch (e) {
             user.emit("errore", {
