@@ -39,7 +39,7 @@ if(window.self !== window.top) {
         (async () => await renderFragment(document.body, "absolutePanel", {
             title: "Accesso negato",
             message: "Scusa, ma niente compenetrazioni ammesse",
-            redirect: window.location.href
+            redirect: fromBackEnd["knownOrigin"] || window.location.href
         }))();
     }
 }

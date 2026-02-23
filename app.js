@@ -9,7 +9,8 @@ const { getIcon, generateName, generatePfp, generateId, getAllPfp, getknownPacks
 const renderPage = (res, page, params = {}) => res.render("header", {
     params: params,
     page: page,
-    headerIcon: getIcon(true)
+    headerIcon: getIcon(true),
+    knownOrigin: process.env.HOSTING || null
 });
 const resumeGame = (req, res, next) => {
     const { userId, stanzaId } = req.session.storeData || {};
@@ -74,7 +75,7 @@ app.set('trust proxy', 1);
 app.use(express.urlencoded({extended : true}));
 app.use(express.json());
 app.use(session({
-    secret: "CucuRiduSuperSecret123",
+    secret: generateId(64, generationMemory),
     resave: false,
     saveUninitialized: true,
     cookie: {
