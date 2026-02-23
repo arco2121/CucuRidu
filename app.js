@@ -70,6 +70,7 @@ const server = new Server(serverConfig, {
 
 app.use(express.static("public"));
 app.set("view engine", "ejs");
+app.set('trust proxy', 1);
 app.use(express.urlencoded({extended : true}));
 app.use(express.json());
 app.use(session({
