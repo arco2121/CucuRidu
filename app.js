@@ -386,15 +386,14 @@ server.on("connection", (user) => {
         try {
             const stanzaId = data["id"];
             Stanze.get(stanzaId).eliminaGiocatore(user.data.referenceGiocatore.id);
-            if(Stanze.get(stanzaId).giocatori.size === 0 && Stanze.get(stanzaId).giocatoriPassati.size > 0) {
-                server.to(stanzaId).emit("stanzaChiusa");
-                for(const id of Stanze.get(stanzaId).giocatoriPassati.values()) generationMemory.delete(id);
-                Stanze.delete(stanzaId);
-                generationMemory.delete(stanzaId);
-                server.socketsLeave(stanzaId);
-                console.log("Stanza eliminata => " + stanzaId);
-                return;
-            }
+            let deleted = false;
+            Stanza.pulisciStanza((id) => {
+                server.to(id).emit("stanzaChiusa");
+                server.socketsLeave(id);
+                console.log("Stanza eliminata => " + id);
+                deleted = true;
+            }, generationMemory, Stanze, stanzaId);
+            if(deleted) return;
             user.leave(stanzaId);
             user.emit("stanzaLasciata");
             server.in(stanzaId).fetchSockets().then(sockets => {
@@ -433,16 +432,11 @@ server.on("connection", (user) => {
 
 setInterval(async () => {
     try {
-        for(const stanza of Stanze.values()) {
-            if(stanza?.stato === StatoStanza.END || stanza?.giocatori.size === 0 && stanza?.giocatoriPassati.size > 0) {
-                server.to(stanza.id).emit("stanzaChiusa");
-                for(const id of stanza.giocatoriPassati.values()) generationMemory.delete(id);
-                Stanze.delete(stanza.id);
-                generationMemory.delete(stanza.id);
-                server.socketsLeave(stanza.id);
-                console.log("Stanza eliminata => " + stanza.id);
-            }
-        }
+        Stanza.pulisciStanza((id) => {
+            server.to(id).emit("stanzaChiusa");
+            server.socketsLeave(id);
+            console.log("Stanza eliminata => " + id);
+        }, generationMemory, Stanze);
     } catch(err) {
         console.error(err);
     }
