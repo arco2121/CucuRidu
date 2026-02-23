@@ -73,7 +73,7 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({extended : true}));
 app.use(express.json());
 app.use(session({
-    secret: generateId(64, generationMemory),
+    secret: "CucuRiduSuperSecret123",
     resave: false,
     saveUninitialized: true,
     cookie: {
