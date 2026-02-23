@@ -32,6 +32,7 @@ const renderFragment = async (root, page, params = {}) => {
         console.error(e);
     }
 }
+if(window.self !== window.top) window.top.location.href = window.location.href;
 
 //COLORS
 const cssVars = (fileName) => {
