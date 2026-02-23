@@ -1,0 +1,20 @@
+<div class="section visible" id="absolutePanel">
+    <div class="floatSection optionsSection flex_gap_30 btn_doubleBorder">
+        <div class="options_exit_btn upper sour_gummy_extra" >
+            <h2 class="panel_title sour_gummy_bold"><%= title %></h2>
+        </div>
+        <div class="options_content column nunito_bold flex_gap_30">
+            <div class="column">
+                <h1><%= message %></h1>
+            </div>
+        </div>
+        <div class="options_row options_footer">
+            <a href="<%= redirect %>">Torna alla home</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.body.querySelectorAll("div").forEach(div => div.dispatchEvent(hidePanel));
+    document.getElementById("absolutePanel").dispatchEvent(showPanel);
+</script>

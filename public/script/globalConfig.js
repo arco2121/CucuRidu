@@ -32,7 +32,17 @@ const renderFragment = async (root, page, params = {}) => {
         console.error(e);
     }
 }
-if(window.self !== window.top) window.top.location.href = window.location.href;
+if(window.self !== window.top) {
+    try {
+        window.top.location.href = window.location.href;
+    } catch {
+        renderFragment(document.body, "absolutePanel", {
+            title: "Accesso negato",
+            message: "Scusa, ma niente compenetrazioni ammesse",
+            redirect: window.location.href
+        }).then(() => throw new Error("Iframe detected"));
+    }
+}
 
 //COLORS
 const cssVars = (fileName) => {
