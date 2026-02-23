@@ -81,6 +81,7 @@ app.use(session({
         maxAge: timeout * 60
     }
 }));
+app.set('trust proxy', 1);
 
 server.use((socket, next) => {
     const { token, stanzaId, userId } = socket.handshake.auth;
