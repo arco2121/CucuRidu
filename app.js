@@ -123,7 +123,9 @@ app.get("/partecipaStanza", resumeGame, (req, res) => {
             stanzaId: stanza,
             bgm: "Choosing_Menu-Feeling_Good"
         };
-        res.redirect("/game");
+        req.session.save(() => {
+            res.redirect("/game");
+        });
     } else if(stanza) renderPage(res, "profile", {
         stanza: stanza,
         setOfPfp: getAllPfp(),
@@ -142,7 +144,9 @@ app.get("/creaStanza", resumeGame, (req, res) => {
             pfp: pfp,
             bgm: "Choosing_Menu-Feeling_Good"
         };
-        res.redirect("/game");
+        req.session.save(() => {
+            res.redirect("/game");
+        });
     } else renderPage(res, "profile", {
         setOfPfp: getAllPfp(),
         bgm: "Choosing_Menu-Feeling_Good"
@@ -153,13 +157,14 @@ app.get("/game", (req, res) => {
     console.log("GET /game - session:", req.session.storeData);
     console.log("GET /game - sessionID:", req.sessionID);
     const { nome, pfp, stanzaId, userId } = req.session.storeData || {};
-    if(userId && stanzaId && Stanze.has(stanzaId) && Stanze.get(stanzaId).trovaGiocatore(userId)) renderPage(res, "lobby", {
-        userId: userId,
-        stanzaId: stanzaId,
-        token: TEMPORARY_TOKEN,
-        knownPacks: getknownPacks(),
-        bgm: "GameMusic-Candy_Bazaar"
-    });
+    if(userId && stanzaId && Stanze.has(stanzaId) && Stanze.get(stanzaId).trovaGiocatore(userId))
+        renderPage(res, "lobby", {
+            userId: userId,
+            stanzaId: stanzaId,
+            token: TEMPORARY_TOKEN,
+            knownPacks: getknownPacks(),
+            bgm: "GameMusic-Candy_Bazaar"
+        });
     else if(nome && pfp) {
         renderPage(res, "lobby", {
             nome: nome,
