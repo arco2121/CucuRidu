@@ -1,0 +1,62 @@
+<audio preload="auto" loop id="musicAudio" src="/audio/background/<%= bgm %>.ogg" class="hidden"></audio>
+<audio preload="none" id="soundAudio" class="hidden"></audio>
+
+<script>
+    const musicPlayer = document.getElementById("musicAudio");
+    const soundPlayer = document.getElementById("soundAudio");
+    const audiosCache = {};
+    const vibrationPattern = [10, 5, 10];
+    const randomSound = () => Math.floor(Math.random() * (2 - 1) + 1);
+
+    const playAudio = async (elementToPlay, checkValue = "sound") => {
+        const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
+        const permissions = { audio: true, sound: true, ...savedSettings };
+
+        switch (checkValue) {
+            case "sound": {
+                const sound = randomSound();
+                if(permissions[checkValue]) {
+                    if(!audiosCache[sound]) {
+                        const result = await fetch("/audio/sound/" + sound + ".mp3");
+                        if(!result.ok) throw new Error("audio not found");
+                        audiosCache[sound] = URL.createObjectURL(await result.blob());
+                    }
+                    elementToPlay.src = audiosCache[sound];
+                    await elementToPlay.play().catch(() => null);
+                }
+                break;
+            }
+            case "audio": {
+                if(permissions[checkValue]) await elementToPlay.play().catch(() => null);
+                else await elementToPlay.pause();
+            }
+        }
+    };
+
+    (() => {
+        const initMusic = async () => {
+            try { await playAudio(musicPlayer, "audio") } catch {}
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            [...document.querySelectorAll("button"),
+                ...[...document.querySelectorAll("body *")].filter(element =>
+                    [element.classList].filter(classe => classe.toString().toLowerCase().includes("btn")).length > 0 || element.id.toLowerCase().includes("btn"))
+            ].forEach(button => {
+                button.addEventListener("click", async () => {
+                    navigator.vibrate(vibrationPattern);
+                    await playAudio(soundPlayer);
+                });
+            });
+        });
+
+        document.addEventListener("click", initMusic, { once: true });
+
+        window.addEventListener("pageshow", (event) => {
+            if (event.persisted) {
+                initMusic();
+                document.addEventListener("click", initMusic, { once: true });
+            }
+        });
+    })();
+</script>

@@ -1,0 +1,26 @@
+name: Sync to Hugging Face Hub
+on:
+  push:
+    branches: [main] # Si attiva quando fai il push sul ramo main
+
+  # Permette anche di farlo partire a mano dalla scheda "Actions"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Checkout LFS objects
+        run: git lfs checkout
+
+      - name: Push to Hub
+        env:
+          HF_TOKEN: ${{ secrets.HF_KEY }}
+        run: |
+          git config lfs.allowincompletepush true
+          git push --force https://arco2107:$HF_TOKEN@huggingface.co/spaces/arco2107/cucuridu main

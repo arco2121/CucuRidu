@@ -1,0 +1,89 @@
+{
+  "colors": [
+    {
+      "name": "red",
+      "normal": "#FFAEAE",
+      "middle": "#F09F9F",
+      "dark": "#D28181",
+      "text": "#B96868",
+      "outline": "#9B4A4A"
+    },
+    {
+      "name": "orange",
+      "normal": "#FFD187",
+      "middle": "#F0C278",
+      "dark": "#D2A45A",
+      "text": "#B98B41",
+      "outline": "#9B6D23"
+    },
+    {
+      "name": "yellow",
+      "normal": "#FFEA8F",
+      "middle": "#F0DB80",
+      "dark": "#D2BD62",
+      "text": "#B9A449",
+      "outline": "#9B862B"
+    },
+    {
+      "name": "green",
+      "normal": "#D8FF7D",
+      "middle": "#C9F06E",
+      "dark": "#ABD250",
+      "text": "#92B937",
+      "outline": "#749B19"
+    },
+    {
+      "name": "teal",
+      "normal": "#A0FFA9",
+      "middle": "#91F09A",
+      "dark": "#73D27C",
+      "text": "#5AB963",
+      "outline": "#3C9B45"
+    },
+    {
+      "name": "cyan",
+      "normal": "#C1FFF0",
+      "middle": "#B2F0E1",
+      "dark": "#94D2C3",
+      "text": "#7BB9AA",
+      "outline": "#5D9B8C"
+    },
+    {
+      "name": "blue",
+      "normal": "#A6A3FF",
+      "middle": "#9794F0",
+      "dark": "#7976D2",
+      "text": "#605DB9",
+      "outline": "#423F9B"
+    },
+    {
+      "name": "violet",
+      "normal": "#DEC1FF",
+      "middle": "#CFB2F0",
+      "dark": "#B194D2",
+      "text": "#987BB9",
+      "outline": "#7A5D9B"
+    },
+    {
+      "name": "pink",
+      "normal": "#FFB6E9",
+      "middle": "#F0A7DA",
+      "dark": "#D289BC",
+      "text": "#B970A3",
+      "outline": "#9B5285"
+    }
+  ],
+  "texts": {
+    "normal": "#161616",
+    "light": "#3a3a3a",
+    "dark": "#080808"
+  },
+  "staticColors": {
+    "confirm": "#aaff75",
+    "confirm_middle": "#9BF066",
+    "confirm_outline": "#469B11",
+    "critical": "#ff758e",
+    "critical_middle": "#F0667F",
+    "critical_outline": "#9B112A"
+  }
+}

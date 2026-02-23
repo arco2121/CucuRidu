@@ -1,0 +1,55 @@
+<div class="row">
+   <div class="column">
+       <h4>Codice Stanza: <%= stanzaId %></h4>
+       <h4 id="attesa">Wait per il prossimo turno</h4>
+       <h6 id="numeroGiocatori">Giocatori presenti: 0</h6>
+       <button id="shareButton">Condividi</button>
+   </div>
+    <div class="column" id="showGiocatori"></div>
+</div>
+<script>
+    socket.off("aggiornamentoAttesa");
+    const numeroGiocatoriCount = document.getElementById("numeroGiocatori");
+    const attesaView = document.getElementById("attesa");
+    const shareButton = document.getElementById("shareButton");
+    const showGiocatori = document.getElementById("showGiocatori");
+    const idStanza = "<%= stanzaId %>";
+    let idAttesaInterval;
+
+    if(socket) {
+        socket.on("aggiornamentoAttesa", async (data) => {
+            const { numeroGiocatori, giocatori } = data || {};
+            numeroGiocatoriCount.textContent = numeroGiocatoriCount.textContent.split(":")[0] + ": " + numeroGiocatori;
+            await renderFragment(showGiocatori, "giocatoreRow", {
+                giocatori: giocatori
+            });
+        });
+        socket.emit("aggiornaAttesa", {
+            stanzaId: idStanza
+        });
+    }
+
+    try {
+        const initialText = attesaView.textContent;
+        idAttesaInterval = setInterval(() => {
+            try {
+                const check = attesaView.textContent.split(")")[1].trim();
+                if(check === "...") attesaView.textContent = initialText + " ";
+                else attesaView.textContent += ".";
+            } catch { clearInterval(idAttesaInterval); }
+        }, 300);
+    } catch { clearInterval(idAttesaInterval); }
+
+    shareButton.addEventListener("click", async () => {
+        const shareText = "DIOTRENO";//TODO MESSAGGIO SILLY PER CONDIVISIONE
+        const shareData = {
+            title: "Cucu Ridu",
+            text: shareText,
+            url: "/partecipaStanza/" + idStanza
+        };
+        try {
+            if(navigator.canShare(shareData)) await navigator.share(shareData);
+            else await navigator.clipboard.writeText(idStanza).then(() => alert(shareText));
+        } catch (e) { console.error(e); }
+    });
+</script>

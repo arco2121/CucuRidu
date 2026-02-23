@@ -1,0 +1,54 @@
+<div class="loadingscreen">
+    <div class="loading_container">
+        <img loading="eager" fetchpriority="high" class="loading_img" src="/assets/loading.webp" alt="loadingScreen">
+        <h5 class="sour_gummy_bold_italic text_color_dark loading_text" id="textLoading">Caricando...</h5>
+    </div>
+</div>
+
+<script>
+    const timing = 200;
+    const isLoadScreen = () => document.body.contains(loadingScreen);
+    const isHideRendering = (container) => container.classList.contains("hideRendering");
+    (() => {
+        window.addEventListener("beforeunload", () => {
+            if (!isLoadScreen()) {
+                loadingScreen.style.animation = "none";
+                loadingScreen.style.opacity = "1";
+                document.body.appendChild(loadingScreen);
+            }
+        });
+        window.addEventListener("pageshow", (event) => {
+            if (event.persisted) {
+                loadingScreen.style.animation = "";
+                document.dispatchEvent(unloadScreen);
+                intervalId = setInterval(update, timing);
+            }
+        });
+        const update = () => {
+            try {
+                if (document.getElementById("textLoading").textContent === "Caricando...")
+                    document.getElementById("textLoading").textContent = "Caricando";
+                else
+                    document.getElementById("textLoading").textContent += '.';
+            } catch {
+                clearInterval(intervalId);
+            }
+        };
+        let intervalId = setInterval(update, timing);
+        document.addEventListener("loadScreenEnd", () => {
+            setTimeout(() => {
+                clearInterval(intervalId);
+                loadingScreen.style.animation = "disappear " + timing + "ms ease-out forwards";
+                setTimeout(() => {
+                    try { document.body.removeChild(loadingScreen); }
+                    catch { clearInterval(intervalId); }
+                }, timing);
+            }, timing);
+        });
+        document.addEventListener("loadScreenStart", () => {
+            loadingScreen.style.animation = "appear " + timing + "ms ease-in forwards";
+            document.body.appendChild(loadingScreen);
+            intervalId = setInterval(update, timing);
+        });
+    })();
+</script>

@@ -1,0 +1,36 @@
+<script>
+    document.body.style.overscrollBehaviorX = "none";
+    history.pushState({ page: 1 }, null, window.location.pathname);
+    let oneConfirm = false;
+
+    const confirmMessgaes = [
+        "Vuoi davvero abbandonare il gioco in questa balorda maniera?",
+        "Teresa non ladciarmi per favore",
+        "Papi non ci serve il latte, resta",
+        "Pretty pls non uscire",
+        "Guarda che scappi a tuo rischio e pericolo",
+        "你這混蛋，別離開網站!",
+        "Suriin bago ka lumabas nang random, bakla",
+        "Te ne vai? È proprio vero che i tradimenti non arrivano mai da un nemico",
+        "Davvero te ne vai? Ci abbiamo lavorato tanto pls :c",
+        "Nuuuuu che fai??? vuoi usciree???? :CCCCC",
+        "Ah, quindi mi ghosti così? Wow.",
+        "Se esci sei ufficialmente un NPC.",
+        "It's giving abbandono, e non mi piace per niente.",
+        "Ma sei serio? Proprio davanti alla mia insalata?",
+        "Guarda che ho problemi di abbandono, non farmi questo 😭",
+        "Questa mancanza di commitment è preoccupante, tesoro...",
+        "Andartene ora? Da rimasti tbh",
+        "Il tasto esci è solo per chi non ha taste 💅🏻"
+    ]
+
+    window.addEventListener('popstate', (e) => {
+        e.preventDefault();
+        if(oneConfirm) return;
+        const conferma = confirm(confirmMessgaes[Math.floor(Math.random()*confirmMessgaes.length)]);
+        if (conferma) {
+            oneConfirm = !oneConfirm;
+            history.back();
+        } else history.pushState({ page: 1 }, null, window.location.pathname);
+    });
+</script>

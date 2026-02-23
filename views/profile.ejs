@@ -1,0 +1,33 @@
+<div class="section visible" id="profile">
+    <div class="column">
+        <img class="profilePfp" src="" alt="pfp" id="displayPfp">
+        <h3>Scegli un nome</h3>
+        <div class="row">
+            <h4 id="displayName">Nomino Porchino</h4>
+            <img id="changeNameBtn" src="/assets/pencil.png" alt="cambiaNome">
+        </div>
+        <div class="row_mobileColumn">
+            <button id="randomize" class="profileButtons btn_style_2">Random</button>
+            <button id="confirm" class="profileButtons btn_style_1">Conferma</button>
+        </div>
+    </div>
+</div>
+
+<div class="section hidden" id="selectPfp">
+    <div class="floatSection optionsSection flex_gap_30 btn_doubleBorder">
+        <div class="options_exit_btn upper sour_gummy_extra" >
+            <h2 class="panel_title sour_gummy_bold">Seleziona Pfp</h2>
+            <h1 id="exitBtn">X</h1>
+        </div>
+        <div class="options_content column nunito_bold flex_gap_30">
+            <% setOfPfp.forEach(pfp => { %>
+                <img src="<%= pfp %>" class="pfp_selection" alt="pfp">
+            <% }); %>
+        </div>
+        <div class="options_row options_footer">
+            <button id="randomImg">Random</button>
+        </div>
+    </div>
+</div>
+
+<script src="/script/profile.js"></script>

@@ -1,0 +1,33 @@
+/* ---------------------------------------------------
+ >>> LAYOUT
+--------------------------------------------------- */
+footer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 20px;
+}
+
+
+
+/* ---------------------------------------------------
+ >>> COMPONENTS
+--------------------------------------------------- */
+.index_container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+}
+
+@media (min-width: 600px) {
+    .index_container {
+        width: 40%;
+    }
+}
+
+.index_logo {
+    width: 100%;
+}
