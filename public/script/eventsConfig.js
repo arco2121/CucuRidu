@@ -50,7 +50,7 @@ const navigateWithLoading = (url) => {
     if (!params.has("token") && token) {
         const newUrl = new URL(window.location.href);
         newUrl.searchParams.set("token", token);
-        window.location.replace(newUrl.href);
+        navigateWithLoading(newUrl.href);
     }
 })();
 
