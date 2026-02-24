@@ -32,17 +32,6 @@ const renderFragment = async (root, page, params = {}) => {
         console.error(e);
     }
 }
-if(window.self !== window.top) {
-    try {
-        window.top.location.href = window.location.href;
-    } catch {
-        (async () => await renderFragment(document.body, "absolutePanel", {
-            title: "Accesso negato",
-            message: "Scusa, ma niente compenetrazioni ammesse",
-            redirect: fromBackEnd["knownOrigin"] || window.location.href
-        }))();
-    }
-}
 
 //COLORS
 const cssVars = (fileName) => {

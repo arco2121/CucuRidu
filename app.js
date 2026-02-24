@@ -3,9 +3,10 @@ const { createServer } = require("node:http");
 const path = require("path");
 const { Server } = require("socket.io");
 const express = require("express");
-const session = require('express-session');
 const { Stanza, StatoStanza } = require(path.join(__dirname, "include/script/Stanza"));
+const { Session } = require(path.join(__dirname, "include/script/Session"));
 const { getIcon, generateName, generatePfp, generateId, getAllPfp, getknownPacks } = require(path.join(__dirname, "include/script/generazione"));
+
 const renderPage = (res, page, params = {}) => res.render("header", {
     params: params,
     page: page,
@@ -13,8 +14,9 @@ const renderPage = (res, page, params = {}) => res.render("header", {
     knownOrigin: process.env.HOSTING || null
 });
 const resumeGame = (req, res, next) => {
-    const { userId, stanzaId } = req.session.storeData || {};
-    if(userId && Stanze.get(stanzaId) && Stanze.get(stanzaId).trovaGiocatore(userId)) return res.redirect("/game");
+    const { userId, stanzaId } = serverSession.get(req, req.query?.token);
+    const redirecting = req.query?.token ? "?token=" + req.query.token : "";
+    if(userId && Stanze.get(stanzaId) && Stanze.get(stanzaId).trovaGiocatore(userId)) return res.redirect("/game" + redirecting);
     next();
 };
 const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
@@ -63,13 +65,14 @@ const local = process.env.NODE_ENV !== "production";
 const Stanze = new Map();
 const generationMemory = new Set();
 const TEMPORARY_TOKEN = generateId(64, generationMemory);
-const timeout = 60000;
+const timeout = 3600000;
+const serverSession = new Session(generationMemory, timeout);
 const server = new Server(serverConfig, {
     cors: {
         methods: ["GET", "POST"]
     },
-    pingInterval: 10000,
-    pingTimeout: 8000
+    pingInterval: 25000,
+    pingTimeout: 20000
 });
 
 app.use(express.static("public"));
@@ -77,20 +80,20 @@ app.set("view engine", "ejs");
 app.set('trust proxy', 1);
 app.use(express.urlencoded({extended : true}));
 app.use(express.json());
-app.use(session({
-    secret: generateId(64, generationMemory),
+app.use(serverSession.setupSession({
     resave: false,
     saveUninitialized: true,
     cookie: {
         secure: !local,
         sameSite: !local ? 'none' : null,
-        maxAge: timeout * 60
+        maxAge: timeout
     }
 }));
 
 server.use((socket, next) => {
-    const { token, stanzaId, userId } = socket.handshake.auth;
-    if(token !== TEMPORARY_TOKEN) return next(new Error("INVALID_KEY"));
+    const checks = ["validation", "stanzaId", "userId"];
+    const { validation, stanzaId, userId } = serverSession.validate(checks, socket.handshake.auth, socket.handshake.auth?.token)
+    if(validation !== TEMPORARY_TOKEN) return next(new Error("INVALID_KEY"));
     if(!stanzaId) return next();
     const exist = Stanze.get(stanzaId)?.trovaGiocatoreAnchePassato(userId);
     if(exist === null) return next();
@@ -121,15 +124,13 @@ app.get("/partecipaStanza/:codiceStanza", resumeGame, (req, res) => {
 app.get("/partecipaStanza", resumeGame, (req, res) => {
     const { nome, pfp, stanza } = req.query;
     if(nome && pfp && stanza) {
-        req.session.storeData = {
+        const token = serverSession.set(req, {
             nome: nome,
             pfp: pfp,
             stanzaId: stanza,
             bgm: "Choosing_Menu-Feeling_Good"
-        };
-        req.session.save(() => {
-            res.redirect("/game");
         });
+        res.redirect("/game?token=" + token);
     } else if(stanza) renderPage(res, "profile", {
         stanza: stanza,
         setOfPfp: getAllPfp(),
@@ -142,15 +143,12 @@ app.get("/partecipaStanza", resumeGame, (req, res) => {
 app.get("/creaStanza", resumeGame, (req, res) => {
     const { nome, pfp } = req.query;
     if(nome && pfp) {
-        req.session.storeData = {
-            ...req.session.storeData,
+        const token = serverSession.set(req, {
             nome: nome,
             pfp: pfp,
             bgm: "Choosing_Menu-Feeling_Good"
-        };
-        req.session.save(() => {
-            res.redirect("/game");
         });
+        res.redirect("/game?token=" + token);
     } else renderPage(res, "profile", {
         setOfPfp: getAllPfp(),
         bgm: "Choosing_Menu-Feeling_Good"
@@ -158,7 +156,8 @@ app.get("/creaStanza", resumeGame, (req, res) => {
 });
 
 app.get("/game", (req, res) => {
-    const { nome, pfp, stanzaId, userId } = req.session.storeData || {};
+    const check = ["nome", "pfp", "stanzaId", "userId"];
+    const { nome, pfp, stanzaId, userId } = serverSession.validate(check, req.session.storeData, req.query?.token);
     if(userId && stanzaId && Stanze.has(stanzaId) && Stanze.get(stanzaId).trovaGiocatore(userId))
         renderPage(res, "lobby", {
             userId: userId,
@@ -179,7 +178,7 @@ app.get("/game", (req, res) => {
         });
     }
     else {
-        req.session.destroy();
+        serverSession.invalidate(req, req.query?.token);
         res.redirect("/");
     }
 })
@@ -197,25 +196,21 @@ app.post("/doRoomExists", (req, res) => {
 app.post("/saveGameReference", (req, res) => {
     const { userId, stanzaId } = req.body || {};
     if(userId && stanzaId) {
-        req.session.storeData = {
+        const token = serverSession.set(req, {
             userId: userId,
-            stanzaId: stanzaId
-        };
-        req.session.save((err) => {
-            if(err) {
-                console.error("Errore salvataggio sessione:", err);
-                return res.status(500).json({ result: false });
-            }
-            return res.status(200).json({ result: true });
+            stanzaId: stanzaId,
         });
-        return;
+        return res.status(200).json({
+            result: true,
+            fallback: token
+        });
     }
-    req.session.destroy();
+    serverSession.invalidate(req);
     res.status(406).json({ result: false });
 });
 
 app.post("/deleteGameReference", (req, res) => {
-    req.session.destroy();
+    serverSession.invalidate(req)
     res.status(200).json({ result: true });
 });
 
@@ -425,7 +420,7 @@ server.on("connection", (user) => {
                         }
                     });
                 }
-            }, timeout);
+            }, timeout/2/60);
         }
     });
 });
@@ -440,7 +435,7 @@ setInterval(async () => {
     } catch(err) {
         console.error(err);
     }
-}, timeout/30);
+}, timeout/30/60);
 
 //Listening
 app.use((req, res) => renderPage(res, "error", {

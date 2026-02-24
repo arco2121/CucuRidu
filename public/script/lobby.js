@@ -7,10 +7,20 @@ const exitBtn = document.getElementById("exitBtn");
 const tiles = document.querySelectorAll(".tile");
 const base = document.getElementById("landpoint");
 const leaveBtn = document.getElementById("leaveBtn");
+const socket = io({
+    auth: {
+        validation: fromBackEnd["token"],
+        stanzaId: fromBackEnd["stanzaId"],
+        userId: fromBackEnd["userId"],
+        token: JSON.parse(localStorage.getItem("cucuRiduSettings") || {})["savingToken"] || null
+    },
+    transports: ["websocket", "polling"]
+});
 const packs = [];
 let standardPacks = new Set();
 let referenceGiocatore;
 let referenceStanza = "";
+
 const readText = async (file) => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -25,19 +35,12 @@ const lasciaStanza = () => {
         headers: {
             'Content-Type': 'application/json'
         },
-        credentials: 'include'
+        credentials: true
     }).then(async (response) => {
         const result = (await response.json())["result"];
         if(result) navigateWithLoading("/");
     });
 };
-const socket = io({
-    auth: {
-        token: fromBackEnd["token"],
-        stanzaId: fromBackEnd["stanzaId"],
-        userId: fromBackEnd["userId"]
-    }
-});
 
 //Endpoints
 socket.on("connect", () => {
@@ -58,6 +61,19 @@ socket.on("connect", () => {
         }
     }
 });
+socket.on("connect_error", (err) => {
+    switch(err.message) {
+        case "SESSION_EXPIRED" : {
+            alert("La tua sessione è scaduta o la stanza è stata chiusa. Come al solito in ritardo");
+            return lasciaStanza();
+        }
+        case "INVALID_KEY" : {
+            alert("La chiave per la connessione al server è sbagliata");
+            return lasciaStanza();
+        }
+        default: socket.io.opts.transports = ["polling", "websocket"];
+    }
+});
 
 socket.on("confermaStanza", (data) => {
     const { reference } = data;
@@ -68,17 +84,24 @@ socket.on("confermaStanza", (data) => {
         headers: {
             'Content-Type': 'application/json'
         },
-        credentials: 'include',
+        credentials: true,
         body: JSON.stringify({
             userId: referenceGiocatore.id,
             stanzaId: referenceStanza
         })
     }).then(async (response) => {
-        const result = (await response.json())["result"];
-        if(result) {
+        const result = (await response.json());
+        if(result?.result) {
             await renderFragment(base, "wait", {
                 stanzaId: referenceStanza
             });
+            if(result.fallback) {
+                const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || {});
+                localStorage.setItem("cucuRiduSettings", JSON.stringify({
+                    ...settings,
+                    savingToken: result.fallback
+                }));
+            }
             document.dispatchEvent(unloadScreen);
         }
         else navigateWithLoading("/");
@@ -90,19 +113,6 @@ socket.on("stanzaLasciata", lasciaStanza);
 socket.on("errore", (error) => {
     alert(error.message);
     navigateWithLoading("/");
-});
-
-socket.on("connect_error", (err) => {
-    switch(err.message) {
-        case "SESSION_EXPIRED" : {
-            alert("La tua sessione è scaduta o la stanza è stata chiusa. Come al solito in ritardo");
-            return lasciaStanza();
-        }
-        case "INVALID_KEY" : {
-            alert("La chiave per la connessione al server è sbagliata");
-            return lasciaStanza();
-        }
-    }
 });
 
 //GESTIONE MAZZI
