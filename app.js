@@ -184,15 +184,20 @@ app.get("/game", (req, res) => {
     }
 })
 
-app.get("/alreadyConnected", (req, res) => {
-    if(req.query.origin === TEMPORARY_TOKEN) return renderPage(res, "error", {
-        error: 420,
+app.get("/error", (req, res) => {
+    let status = 104;
+    let message = "Questa pagina non esiste, brutta sottospecie di spermatozoo di elefante con la disfunzione erettile";
+    if(req.query["alreadyConnected"]) {
+        status = 420;
+        message = "Allora signora, si scanti fora e torni alla pagina del gioco";
+    }
+    renderPage(res, "error", {
+        error: status,
         icon: getIcon(),
-        message: "Allora signora, si scanti fora e torni alla pagina del gioco",
+        message: message,
+        loadToken: false,
         bgm: "Error-Tough_Decisions"
     });
-    else if(req.query.origin) return res.redirect("/mona");
-    else res.redirect("/");
 })
 
 app.post("/generateInfo", (req, res) => {
@@ -271,8 +276,8 @@ server.on("connection", (user) => {
             console.log("Giocatore aggiunto a Stanza => " + stanzaId);
         } catch (e) {
             user.emit("errore", {
-                message: e
-            });
+               message: e.message
+           });
         }
     });
     user.on("iniziaTurno", (data) => {
@@ -305,8 +310,8 @@ server.on("connection", (user) => {
                 });
         } catch (e) {
             user.emit("errore", {
-                message: e
-            });
+               message: e.message
+           });
         }
     });
     user.on("inviaRisposta", (data) => {
@@ -332,8 +337,8 @@ server.on("connection", (user) => {
            }
        } catch (e) {
            user.emit("errore", {
-               message: e
-           })
+               message: e.message
+           });
        }
     });
     user.on("scegliVincitore", (data) => {
@@ -361,8 +366,8 @@ server.on("connection", (user) => {
             }
         } catch (e) {
             user.emit("errore", {
-                message: e
-            });
+               message: e.message
+           });
         }
     });
     user.on("terminaPartita", (data) => {
@@ -381,8 +386,8 @@ server.on("connection", (user) => {
             }
         } catch (e) {
             user.emit("errore", {
-                message: e
-            });
+               message: e.message
+           });
         }
     });
     user.on("aggiornaAttesa", (data) => server.to(data["stanzaId"]).emit("aggiornamentoAttesa", {
@@ -421,7 +426,7 @@ server.on("connection", (user) => {
             }
         } catch (e) {
             user.emit("errore", {
-                message: e
+               message: e.message
             });
         }
     });
@@ -459,12 +464,7 @@ setInterval(async () => {
 }, timeout/30/60);
 
 //Listening
-app.use((req, res) => renderPage(res, "error", {
-    error: 104,
-    icon: getIcon(),
-    message: "Questa pagina non esiste, brutta sottospecie di spermatozoo di elefante con la disfunzione erettile",
-    bgm: "Error-Tough_Decisions"
-}));
+app.use((req, res) => res.redirect("/error"));
 
 serverConfig.listen(port, (error) => {
     console.log(`Cucu Ridu lanciato => ${local ? host + port : port}`);

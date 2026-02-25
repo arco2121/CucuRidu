@@ -30,7 +30,6 @@ const readText = async (file) => {
     });
 };
 const lasciaStanza = () => {
-    socket.emit("lasciaStanza");
     fetch("/deleteGameReference", {
         method: 'POST',
         headers: {
@@ -83,7 +82,7 @@ socket.on("connect_error", (err) => {
             return lasciaStanza();
         }
         case "ALREADY_CONNECTED" : {
-            window.location.replace("/alreadyConnected?origin=" + fromBackEnd["token"]);
+            window.location.replace("/error?alreadyConnected=true");
             break;
         }
         default: {
@@ -129,7 +128,7 @@ socket.on("confermaStanza", (data) => {
 socket.on("stanzaLasciata", lasciaStanza);
 
 socket.on("errore", (error) => {
-    alert(error.message);
+    alert(error);
     navigateWithLoading("/");
 });
 
