@@ -27,6 +27,7 @@
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "jsonwebtoken": "^9.0.3",
+    "memorystore": "^1.6.7",
     "socket.io": "^4.8.3"
   }
 }
