@@ -1,6 +1,6 @@
 <script>
     document.body.style.overscrollBehaviorX = "none";
-    const preventBack = new Event("activatePreventBack");
+    const preventBack = new CustomEvent("activatePreventBack");
     (() => {
         let oneConfirm = false;
         let active = false;

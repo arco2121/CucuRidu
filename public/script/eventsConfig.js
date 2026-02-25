@@ -1,16 +1,16 @@
-const unloadScreen = new Event("loadScreenEnd");
-const loadScreen = new Event("loadScreenStart");
+const unloadScreen = new CustomEvent("loadScreenEnd");
+const loadScreen = new CustomEvent("loadScreenStart");
 const loadingScreen = document.querySelector(".loadingscreen");
-const hideRendering = new Event("hideRenderingStart", {
+const hideRendering = new CustomEvent("hideRenderingStart", {
     bubbles: true
 });
-const unhideRendering = new Event("hideRenderingEnd", {
+const unhideRendering = new CustomEvent("hideRenderingEnd", {
     bubbles: true
 });
-const showPanel = new Event("showPanel", {
+const showPanel = new CustomEvent("showPanel", {
     bubbles: true
 });
-const hidePanel = new Event("hidePanel", {
+const hidePanel = new CustomEvent("hidePanel", {
     bubbles: true
 });
 const navigateWithLoading = (url) => {

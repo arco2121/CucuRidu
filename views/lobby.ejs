@@ -1,30 +1,5 @@
+<%- include("components/packsPanel") %>
 <div class="section" id="landpoint"></div>
-
-<div class="section hidden" id="selectPacks">
-    <div class="floatSection">
-        <div class="options_exit_btn upper sour_gummy_extra" >
-            <h1 class="panel_title sour_gummy_bold">Seleziona Mazzo</h1>
-            <h1 id="exitBtn">X</h1>
-        </div>
-        <div class="options_content column nunito_bold flex_gap_30">
-            <div class="row_mobileColumn">
-                <% knownPacks.forEach(pack => { %>
-                    <div class="tile defaultPack" pack="<%= pack %>">
-                        <h4><%= pack.charAt(0).toUpperCase() + pack.slice(1) %>></h4>
-                    </div>
-                <% }) %>
-                <div id="customPack" class="tile">
-                    <h4>Personalizzati</h4>
-                    <input type="file" id="inputFile" class="hidden" accept="application/json,.cucuridupack" multiple/>
-                </div>
-            </div>
-            <button id="confirmPacks">Seleziona</button>
-        </div>
-        <div class="options_row options_footer">
-            <h6><a href="/creaMazzo" target="_blank" class="shrinks_on_active_for_no_reason">Scopri come creare un mazzo</a></h6>
-        </div>
-    </div>
-</div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/script/GiocatoreInterface.js"></script>
