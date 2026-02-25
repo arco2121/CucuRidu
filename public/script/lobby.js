@@ -35,7 +35,7 @@ const lasciaStanza = () => {
         headers: {
             'Content-Type': 'application/json'
         },
-        credentials: true
+        credentials: "include"
     }).then(async (response) => {
         const result = (await response.json())["result"];
         if(result) navigateWithLoading("/");
@@ -84,7 +84,7 @@ socket.on("confermaStanza", (data) => {
         headers: {
             'Content-Type': 'application/json'
         },
-        credentials: true,
+        credentials: "include",
         body: JSON.stringify({
             userId: referenceGiocatore.id,
             stanzaId: referenceStanza
