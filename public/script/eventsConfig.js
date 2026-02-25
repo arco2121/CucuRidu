@@ -20,7 +20,7 @@ const navigateWithLoading = (url) => {
         if(typeof url === "function")
             return url();
         else
-            window.location.replace(url);
+            window.location.href = url;
     }, timing);
 };
 
@@ -43,18 +43,17 @@ const navigateWithLoading = (url) => {
     });
 })();
 
-(() => {
-    const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
-    const token = settings.savingToken;
-    const params = new URLSearchParams(window.location.search);
-    if (!params.has("token") && token) {
-        const newUrl = new URL(window.location.href);
-        newUrl.searchParams.set("token", token);
-        navigateWithLoading(newUrl.href);
-    }
-})();
+const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
+const token = settings.savingToken;
+const params = new URLSearchParams(window.location.search);
+if (!params.has("token") && token) {
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set("token", token);
+    navigateWithLoading(() => window.location.replace(newUrl.href));
+}
 
-/*if(window.self !== window.top) {
+/*
+if(window.self !== window.top) {
     try {
         window.top.location.href = window.location.href;
     } catch {

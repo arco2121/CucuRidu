@@ -58,6 +58,7 @@ const cssVars = (fileName) => {
     });
     return Array.from(variableNames);
 };
+
 (async () => {
     const colorsData = await (await fetch('/assets/colors.json')).json();
     const colorsList = colorsData['colors'];
