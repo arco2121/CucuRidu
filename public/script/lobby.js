@@ -84,6 +84,7 @@ socket.on("connect_error", (err) => {
         }
         case "ALREADY_CONNECTED" : {
             window.location.replace("/alreadyConnected?origin=" + fromBackEnd["token"]);
+            break;
         }
         default: {
             alert("Errore inaspettato dal server");
