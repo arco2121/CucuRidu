@@ -12,7 +12,7 @@ const socket = io({
         validation: fromBackEnd["token"],
         stanzaId: fromBackEnd["stanzaId"],
         userId: fromBackEnd["userId"],
-        token: JSON.parse(localStorage.getItem("cucuRiduSettings") || {})["savingToken"] || null
+        token: JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}")["savingToken"] || null
     },
     transports: ["websocket", "polling"]
 });
@@ -30,15 +30,26 @@ const readText = async (file) => {
     });
 };
 const lasciaStanza = () => {
+    socket.emit("lasciaStanza");
     fetch("/deleteGameReference", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        credentials: "include"
+        credentials: "include",
+        body: JSON.stringify({
+            token: JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}")["savingToken"] || null
+        })
     }).then(async (response) => {
         const result = (await response.json())["result"];
-        if(result) navigateWithLoading("/");
+        if(result) {
+            const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
+            localStorage.setItem("cucuRiduSettings", JSON.stringify({
+                ...settings,
+                savingToken: null
+            }));
+            navigateWithLoading("/");
+        }
     });
 };
 
@@ -71,7 +82,10 @@ socket.on("connect_error", (err) => {
             alert("La chiave per la connessione al server è sbagliata");
             return lasciaStanza();
         }
-        default: socket.io.opts.transports = ["polling", "websocket"];
+        default: {
+            alert("Errore inaspettato dal server");
+            return lasciaStanza();
+        }
     }
 });
 
@@ -96,7 +110,7 @@ socket.on("confermaStanza", (data) => {
                 stanzaId: referenceStanza
             });
             if(result.fallback) {
-                const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || {});
+                const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
                 localStorage.setItem("cucuRiduSettings", JSON.stringify({
                     ...settings,
                     savingToken: result.fallback

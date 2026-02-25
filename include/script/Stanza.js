@@ -47,6 +47,7 @@ class Stanza {
 
     eliminaGiocatore(giocatoreId) {
         const giocatore = this.trovaGiocatore(giocatoreId);
+        if(!giocatore) return false;
         this.giocatori.delete(giocatoreId);
         if(giocatore === this.master) {
             this.master = this.giocatori.values().next().value;
@@ -54,6 +55,7 @@ class Stanza {
         }
         this.mazzoCompletamenti.mazzo.aggiungiCarte(...giocatore.prendiTuttaLaMano())
         this.giocatoriPassati.add(giocatore.id);
+        return true;
     }
 
     trovaGiocatore(idGiocatore) {

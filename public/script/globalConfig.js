@@ -3,35 +3,6 @@ const fromBackEnd = (() => {
     document.querySelector("meta[name='dataFromBackEnd']").remove();
     return JSON.parse(data);
 })();
-const fragmentsCache = {};
-const loadedScripts = new Set();
-const renderFragment = async (root, page, params = {}) => {
-    try {
-        if(!fragmentsCache[page]) {
-            const input = await fetch("/fragments/" + page + ".ejs");
-            if(!input.ok) throw new Error("fragment not found");
-            fragmentsCache[page] = await input.text();
-        }
-        const rendering = ejs.render(fragmentsCache[page], { ...params });
-        root.innerHTML = rendering;
-        const scripts = root.querySelectorAll("script");
-        for (const oldScript of scripts) {
-            const scriptId = oldScript.id || oldScript.getAttribute("src") || oldScript.textContent.trim();
-            if (loadedScripts.has(scriptId)) continue;
-            const newScript = document.createElement("script");
-            Array.from(oldScript.attributes).forEach(attr => {
-                newScript.setAttribute(attr.name, attr.value);
-            });
-            newScript.textContent = oldScript.textContent;
-            loadedScripts.add(scriptId);
-            document.body.appendChild(newScript);
-            newScript.remove();
-        }
-        return rendering;
-    } catch (e) {
-        console.error(e);
-    }
-}
 
 //COLORS
 const cssVars = (fileName) => {

@@ -210,7 +210,7 @@ app.post("/saveGameReference", (req, res) => {
 });
 
 app.post("/deleteGameReference", (req, res) => {
-    serverSession.invalidate(req)
+    serverSession.invalidate(req, req.body?.token);
     res.status(200).json({ result: true });
 });
 
@@ -380,24 +380,33 @@ server.on("connection", (user) => {
     user.on("lasciaStanza", (data) => {
         try {
             const stanzaId = data["id"];
-            Stanze.get(stanzaId).eliminaGiocatore(user.data.referenceGiocatore.id);
-            let deleted = false;
-            Stanza.pulisciStanza((id) => {
-                server.to(id).emit("stanzaChiusa");
-                server.socketsLeave(id);
-                console.log("Stanza eliminata => " + id);
-                deleted = true;
-            }, generationMemory, Stanze, stanzaId);
-            if(deleted) return;
-            user.leave(stanzaId);
-            user.emit("stanzaLasciata");
-            server.in(stanzaId).fetchSockets().then(sockets => {
-                for(const socket of sockets) {
-                    socket.data.referenceGiocatore = Stanze.get(stanzaId).giocatori.get(socket.data.referenceGiocatore.id);
-                    emitStatoStanza(stanzaId, socket);
-                }
-            });
-            console.log("Giocatore eliminato da Stanza => " + stanzaId);
+            const giocatoreId = data["giocatore"] || user.data.referenceGiocatore.id;
+            const result = Stanze.get(stanzaId).eliminaGiocatore(giocatoreId);
+            if(result) {
+                let deleted = false;
+                Stanza.pulisciStanza((id) => {
+                    server.to(id).emit("stanzaChiusa");
+                    server.socketsLeave(id);
+                    console.log("Stanza eliminata => " + id);
+                    deleted = true;
+                }, generationMemory, Stanze, stanzaId);
+                if(deleted) return;
+                server.in(stanzaId).fetchSockets().then(sockets => {
+                    const persona = sockets.filter(socket =>
+                        socket.data?.referenceGiocatore.id === giocatoreId).at(0);
+                    if(persona) {
+                        persona.emit("stanzaLasciata");
+                        persona.leave(stanzaId);
+                    }
+                });
+                server.in(stanzaId).fetchSockets().then(sockets => {
+                    for(const socket of sockets) {
+                        socket.data.referenceGiocatore = Stanze.get(stanzaId).giocatori.get(socket.data.referenceGiocatore.id);
+                        emitStatoStanza(stanzaId, socket);
+                    }
+                });
+                console.log("Giocatore eliminato da Stanza => " + stanzaId);
+            }
         } catch (e) {
             user.emit("errore", {
                 message: e
