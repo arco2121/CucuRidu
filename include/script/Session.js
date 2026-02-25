@@ -15,7 +15,10 @@ class Session {
     setupSession(config = {}) {
         return session({
             ...config,
-            secret: this.tokenKey
+            secret: this.tokenKey,
+            store: new MemoryStore({
+                checkPeriod: this.timeout
+            }),
         });
     }
 

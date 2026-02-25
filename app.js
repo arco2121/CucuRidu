@@ -63,7 +63,6 @@ const port = process.env.PORT || 7860;
 const host = "http://localhost:";
 const local = process.env.NODE_ENV !== "production";
 const Stanze = new Map();
-console.log(process.env.NODE_ENV, process.env.HOSTING)
 const generationMemory = new Set();
 const TEMPORARY_TOKEN = generateId(64, generationMemory);
 const timeout = 3600000;
