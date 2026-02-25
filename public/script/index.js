@@ -13,3 +13,5 @@ document.addEventListener("DOMContentLoaded", () => {
         optionPanel.dispatchEvent(showPanel);
     });
 });
+
+document.dispatchEvent(preventBack);

@@ -187,3 +187,5 @@ exitBtn.addEventListener("click", () => {
 leaveBtn?.addEventListener("click", () => socket.emit("lasciaStanza", {
     id: referenceStanza
 }));
+
+document.dispatchEvent(preventBack);
