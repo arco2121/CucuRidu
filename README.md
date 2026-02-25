@@ -1,8 +1,8 @@
 ---
 title: Cucuridu
 emoji: ✨️
-colorFrom: indigo
-colorTo: pink
+colorFrom: pink
+colorTo: yellow
 sdk: docker
 app_port: 7860
 pinned: true
