@@ -17,6 +17,7 @@ const resumeGame = (req, res, next) => {
     const { userId, stanzaId } = serverSession.get(req, req.query?.token);
     const redirecting = req.query?.token ? "?token=" + req.query.token : "";
     if(userId && Stanze.get(stanzaId) && Stanze.get(stanzaId).trovaGiocatore(userId)) return res.redirect("/game" + redirecting);
+    req.deleteToken = !!req.query?.token;
     next();
 };
 const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
@@ -108,6 +109,7 @@ server.use((socket, next) => {
 //Endpoints
 app.get("/", resumeGame, (req, res) => renderPage(res, "index", {
     icon: getIcon(),
+    deleteToken: req.deleteToken,
     bgm: "MainMenu-City_Stroll"
 }));
 app.get(['/home', '/index'], (req, res) => res.redirect('/'));
@@ -117,6 +119,7 @@ app.get("/partecipaStanza/:codiceStanza", resumeGame, (req, res) => {
     if(stanza) renderPage(res, "profile", {
         stanza: stanza,
         setOfPfp: getAllPfp(),
+        deleteToken: req.deleteToken,
         bgm: "Choosing_Menu-Feeling_Good"
     });
     else res.redirect("/");
@@ -129,15 +132,18 @@ app.get("/partecipaStanza", resumeGame, (req, res) => {
             nome: nome,
             pfp: pfp,
             stanzaId: stanza,
+            deleteToken: req.deleteToken,
             bgm: "Choosing_Menu-Feeling_Good"
         });
         res.redirect("/game?token=" + token);
     } else if(stanza) renderPage(res, "profile", {
         stanza: stanza,
         setOfPfp: getAllPfp(),
+        deleteToken: req.deleteToken,
         bgm: "Choosing_Menu-Feeling_Good"
     }); else renderPage(res, "join", {
-        bgm: "Choosing_Menu-Feeling_Good"
+        bgm: "Choosing_Menu-Feeling_Good",
+        deleteToken: req.deleteToken
     });
 });
 
@@ -152,6 +158,7 @@ app.get("/creaStanza", resumeGame, (req, res) => {
         res.redirect("/game?token=" + token);
     } else renderPage(res, "profile", {
         setOfPfp: getAllPfp(),
+        deleteToken: req.deleteToken,
         bgm: "Choosing_Menu-Feeling_Good"
     });
 });

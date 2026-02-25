@@ -17,7 +17,7 @@
     <div class="floatSection optionsSection flex_gap_30 btn_doubleBorder">
         <div class="options_exit_btn upper sour_gummy_extra" >
             <h2 class="panel_title sour_gummy_bold">Seleziona Pfp</h2>
-            <h1 id="exitBtn">X</h1>
+            <h1 id="exitBtnPfp">X</h1>
         </div>
         <div class="options_content column nunito_bold flex_gap_30">
             <% setOfPfp.forEach(pfp => { %>
@@ -25,7 +25,23 @@
             <% }); %>
         </div>
         <div class="options_row options_footer">
-            <button id="randomImg">Random</button>
+            <button id="randomImg" class="btn_style_2 profileButtons">Random</button>
+        </div>
+    </div>
+</div>
+
+<div class="section hidden" id="selectUsername">
+    <div class="floatSection optionsSection flex_gap_30 btn_doubleBorder">
+        <div class="options_exit_btn upper sour_gummy_extra" >
+            <h2 class="panel_title sour_gummy_bold">Scegli un Username</h2>
+            <h1 id="exitBtnUsername">X</h1>
+        </div>
+        <div class="options_content column nunito_bold flex_gap_30">
+            <input class="input input_style_1" type="text" id="customUsername">
+        </div>
+        <div class="options_row options_footer">
+            <button id="randomUsername" class="btn_style_2 profileButtons">Random</button>
+            <button id="confirmUsername" class="profileButtons btn_style_1">Conferma</button>
         </div>
     </div>
 </div>
