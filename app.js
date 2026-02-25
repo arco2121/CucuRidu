@@ -98,6 +98,7 @@ server.use((socket, next) => {
     const exist = Stanze.get(stanzaId)?.trovaGiocatoreAnchePassato(userId);
     if(exist === null) return next();
     if(!exist) return next(new Error("SESSION_EXPIRED"));
+    if(exist.online === true) return next(new Error("ALREADY_CONNECTED"));
     exist.online = true;
     socket.data.referenceGiocatore = exist;
     socket.join(stanzaId);
@@ -109,7 +110,7 @@ app.get("/", resumeGame, (req, res) => renderPage(res, "index", {
     icon: getIcon(),
     bgm: "MainMenu-City_Stroll"
 }));
-app.get(['/home', '/index'], resumeGame, (req, res) => res.redirect('/'));
+app.get(['/home', '/index'], (req, res) => res.redirect('/'));
 
 app.get("/partecipaStanza/:codiceStanza", resumeGame, (req, res) => {
     const stanza = req.params["codiceStanza"];
@@ -181,6 +182,17 @@ app.get("/game", (req, res) => {
         serverSession.invalidate(req, req.query?.token);
         res.redirect("/");
     }
+})
+
+app.get("/alreadyConnected", (req, res) => {
+    if(req.query.origin === TEMPORARY_TOKEN) return renderPage(res, "error", {
+        error: 420,
+        icon: getIcon(),
+        message: "Allora signora, si scanti fora e torni alla pagina del gioco",
+        bgm: "Error-Tough_Decisions"
+    });
+    else if(req.query.origin) return res.redirect("/mona");
+    else res.redirect("/");
 })
 
 app.post("/generateInfo", (req, res) => {

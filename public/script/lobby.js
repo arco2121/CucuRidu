@@ -82,6 +82,9 @@ socket.on("connect_error", (err) => {
             alert("La chiave per la connessione al server è sbagliata");
             return lasciaStanza();
         }
+        case "ALREADY_CONNECTED" : {
+            window.location.replace("/alreadyConnected?origin=" + fromBackEnd["token"]);
+        }
         default: {
             alert("Errore inaspettato dal server");
             return lasciaStanza();
