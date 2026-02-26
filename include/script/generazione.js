@@ -58,7 +58,7 @@ const generatePfp = () => {
 const getAllPfp = () => {
     const pfpNumber = 80;
     const pfpPath = '/assets/pfps/';
-    return Array.from({ length: pfpNumber }, (empty, number) => pfpPath + number + ".jpg");
+    return Array.from({ length: pfpNumber }, (v, i) => `${pfpPath}${i + 1}.jpg`);
 }
 
 const getIcon = (defaultIcon) => String("/assets/icon_imgs/" + (defaultIcon ? 1 : Math.floor(Math.random() * (11 - 1) + 1)) + ".png");

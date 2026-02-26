@@ -25,12 +25,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const btn_confirm = document.getElementById("confirm");
     const profile = document.getElementById("profile");
     const pfpSelections = document.querySelectorAll(".pfp_selection");
-    const randomImg = document.getElementById("randomImg");
     const randomUsername = document.getElementById("randomUsername");
     const usernamePanel = document.getElementById("selectUsername");
     const btn_confirmUsername = document.getElementById("confirmUsername");
     const editUsername = document.getElementById("changeNameBtn");
     const editBoxUsername = document.getElementById("customUsername");
+
+    const exitBtnName = document.getElementById("exitBtnName");
+    const exitBtnPfp = document.getElementById("exitBtnPfp");
 
     async function getNewInfos () {
         let infos = await getInfo();
@@ -52,16 +54,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
-    randomImg.addEventListener("click", async () => {
-        displayPfp.src = (await getInfo())["pfp"];
-        pfpPanel.dispatchEvent(hidePanel);
-        profile.dispatchEvent(showPanel);
-    });
 
     randomUsername.addEventListener("click", async () => {
         displayName.textContent = (await getInfo())["nome"];
-        usernamePanel.dispatchEvent(hidePanel);
-        profile.dispatchEvent(showPanel);
+        editBoxUsername.value = displayName.innerText;
     });
 
     displayPfp.addEventListener("click", () => {
@@ -70,9 +66,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     editUsername.addEventListener("click", () => {
+        editBoxUsername.value = displayName.innerText;
         profile.dispatchEvent(hidePanel);
         usernamePanel.dispatchEvent(showPanel);
     });
+
+    exitBtnName.addEventListener("click", () => {
+        usernamePanel.dispatchEvent(hidePanel);
+        profile.dispatchEvent(showPanel);
+    })
+
+    exitBtnPfp.addEventListener("click", () => {
+        pfpPanel.dispatchEvent(hidePanel);
+        profile.dispatchEvent(showPanel);
+    })
 
     btn_confirmUsername.addEventListener("click", () => {
         if(!editBoxUsername.value || editBoxUsername.value === "") {
