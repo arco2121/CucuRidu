@@ -1,19 +1,34 @@
-<div class="section hidden" id="absolutePanel">
+<div class="section hidden" id="connectionPanel">
     <div class="floatSection optionsSection flex_gap_30 btn_doubleBorder">
         <div class="options_exit_btn upper sour_gummy_extra" >
-            <h2 class="panel_title sour_gummy_bold"><%= title %></h2>
+            <h2 class="panel_title sour_gummy_bold">Nessuna connessione</h2>
         </div>
         <div class="column">
-            <img class="error_img" alt="cucuridu" src="./assets/error_icon.png">
-            <h1 class="absoluteTitle"><%= message %></h1>
-        </div>
-        <div class="row options_footer">
-            <a target="_blank" href="<%= redirect %>" class="button">Torna alla home</a>
+            <img class="error_img" alt="nointernet" src="./assets/error_icon.png">
+            <h3 class="absoluteTitle">Sembra che tu non sia connesso ad internet, pirla</h3>
         </div>
     </div>
 </div>
 
 <script>
-    document.body.querySelectorAll("div").forEach(div => div.dispatchEvent(hidePanel));
-    document.getElementById("absolutePanel").dispatchEvent(showPanel);
+    const connectionPanel = document.getElementById("connectionPanel");
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const sectionHide = document.querySelector(".sectionToHide");
+
+        window.addEventListener("offline", () => document.dispatchEvent(stateDisconnected));
+        window.addEventListener("online", () => document.dispatchEvent(stateConnected));
+
+        (() => {
+            document.addEventListener("doConnected", () => {
+                connectionPanel.dispatchEvent(hidePanel);
+                sectionHide.dispatchEvent(showPanel);
+            });
+
+            document.addEventListener("doDisconnected", () => {
+                sectionHide.dispatchEvent(hidePanel);
+                connectionPanel.dispatchEvent(showPanel);
+            });
+        })();
+    });
 </script>

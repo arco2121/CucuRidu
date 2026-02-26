@@ -12,14 +12,6 @@ const socket = io({
 let referenceGiocatore;
 let referenceStanza = "";
 
-const readText = async (file) => {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = () => reject(new Error("Errore durante la lettura del file"));
-        reader.readAsText(file);
-    });
-};
 const lasciaStanza = () => {
     fetch("/deleteGameReference", {
         method: 'POST',
@@ -45,6 +37,7 @@ const lasciaStanza = () => {
 
 //Endpoints
 socket.on("connect", () => {
+    document.dispatchEvent(stateConnected);
     switch (fromBackEnd["action"]) {
         case "Crea": {
             socket.emit("creaStanza", {
@@ -76,15 +69,11 @@ socket.on("connect_error", (err) => {
             window.location.replace("/error?alreadyConnected=true");
             break;
         }
-        default: {
-            alert("Errore inaspettato dal server");
-            return lasciaStanza();
-        }
     }
 });
-
 socket.on("confermaStanza", (data) => {
     const { reference } = data;
+    console.log("DIOOOO")
     referenceStanza = data["stanzaId"] || fromBackEnd["stanzaId"];
     referenceGiocatore = new GiocatoreInterface(reference);
     fetch("/saveGameReference", {
@@ -115,12 +104,16 @@ socket.on("confermaStanza", (data) => {
         else navigateWithLoading("/");
     });
 });
-
 socket.on("stanzaLasciata", lasciaStanza);
-
 socket.on("errore", (error) => {
     alert(error);
     navigateWithLoading("/");
+});
+
+window.addEventListener("offline", () => socket.disconnect());
+window.addEventListener("offline", () => {
+    if(!socket.connected)
+        socket.connect();
 });
 
 leaveBtn?.addEventListener("click", () => socket.emit("lasciaStanza", {

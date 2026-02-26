@@ -72,8 +72,8 @@ const server = new Server(serverConfig, {
     cors: {
         methods: ["GET", "POST"]
     },
-    pingInterval: 25000,
-    pingTimeout: 20000
+    pingInterval: 15000,
+    pingTimeout: 10000
 });
 
 app.use(express.static("public"));

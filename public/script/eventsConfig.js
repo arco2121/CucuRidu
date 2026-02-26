@@ -1,6 +1,8 @@
 const unloadScreen = new CustomEvent("loadScreenEnd");
 const loadScreen = new CustomEvent("loadScreenStart");
 const loadingScreen = document.querySelector(".loadingscreen");
+const stateConnected = new CustomEvent("doConnected");
+const stateDisconnected = new CustomEvent("doDisconnected");
 const hideRendering = new CustomEvent("hideRenderingStart", {
     bubbles: true
 });
@@ -25,6 +27,7 @@ const navigateWithLoading = (url) => {
 };
 const fragmentsCache = {};
 const loadedScripts = new Set();
+const loadedPage = new Set();
 const renderFragment = async (root, page, params = {}) => {
     try {
         if(!fragmentsCache[page]) {
@@ -32,8 +35,10 @@ const renderFragment = async (root, page, params = {}) => {
             if(!input.ok) throw new Error("fragment not found");
             fragmentsCache[page] = await input.text();
         }
+        if(root.getAttribute("page") === page) return;
         const rendering = ejs.render(fragmentsCache[page], { ...params });
         root.innerHTML = rendering;
+        root.setAttribute("page", page);
         const scripts = root.querySelectorAll("script");
         for (const oldScript of scripts) {
             const scriptId = oldScript.id || oldScript.getAttribute("src") || oldScript.textContent.trim();
