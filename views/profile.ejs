@@ -1,47 +1,54 @@
 <div class="section visible" id="profile">
-    <div class="column">
-        <img class="profilePfp" src="" alt="pfp" id="displayPfp">
-        <h3>Scegli un nome</h3>
-        <div class="row">
-            <h4 id="displayName">Nomino Porchino</h4>
-            <img id="changeNameBtn" src="/assets/pencil.png" alt="cambiaNome">
+    <div class="column_100 flex_gap_25">
+        <img class="profile_pfp btn_doubleBorder" src="" alt="pfp" id="displayPfp">
+
+        <div class="column flex_gap_10">
+            <div class="profile_title_row">
+                <h3 class="profile_title sour_gummy_regular">Scegli un nome</h3>
+                <img id="changeNameBtn" src="/assets/pencil.png" alt="cambiaNome">
+            </div>
+
+            <h4 class="profile_name sour_gummy_bold" id="displayName">Nomino Porchino</h4>
         </div>
-        <div class="row_mobileColumn">
-            <button id="randomize" class="profileButtons btn_style_2">Random</button>
-            <button id="confirm" class="profileButtons btn_style_1">Conferma</button>
+
+        <div class="column flex_gap_5">
+            <button id="confirm" class="button btn_mediumText btn_style_2 sour_gummy_bold btn_doubleBorder">Conferma
+            </button>
+            <button id="randomize" class="button btn_smallText btn_style_3 sour_gummy_bold btn_doubleBorder">Random
+            </button>
         </div>
     </div>
 </div>
 
 <div class="section hidden" id="selectPfp">
-    <div class="floatSection optionsSection flex_gap_30 btn_doubleBorder">
-        <div class="options_exit_btn upper sour_gummy_extra" >
+    <div class="floatSection largeSection btn_doubleBorder flex_gap_30">
+        <div class="options_exit_btn upper sour_gummy_extra">
             <h2 class="panel_title sour_gummy_bold">Seleziona Pfp</h2>
             <h1 id="exitBtnPfp">X</h1>
         </div>
-        <div class="options_content column nunito_bold flex_gap_30">
-            <% setOfPfp.forEach(pfp => { %>
-                <img src="<%= pfp %>" class="pfp_selection" alt="pfp">
-            <% }); %>
-        </div>
-        <div class="options_row options_footer">
-            <button id="randomImg" class="btn_style_2 profileButtons">Random</button>
+        <div class="pfp_content nunito_bold flex_gap_30">
+            <div class="profile_pfp_grid">
+                <% setOfPfp.forEach(pfp => { %>
+                    <img src="<%= pfp %>" class="pfp_selection" alt="pfp">
+                <% }); %>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="section hidden" id="selectUsername">
-    <div class="floatSection optionsSection flex_gap_30 btn_doubleBorder">
-        <div class="options_exit_btn upper sour_gummy_extra" >
-            <h2 class="panel_title sour_gummy_bold">Scegli un Username</h2>
-            <h1 id="exitBtnUsername">X</h1>
+    <div class="floatSection inputSection flex_gap_25 btn_doubleBorder">
+        <div class="options_exit_btn sour_gummy_extra">
+            <h2 class="panel_title sour_gummy_bold">Scegli Un Nome</h2>
+            <h1 id="exitBtnName">X</h1>
         </div>
-        <div class="options_content column nunito_bold flex_gap_30">
-            <input class="input input_style_1" type="text" id="customUsername">
+        <div class="column nunito_bold">
+            <input class="input profile_input input_style_1 sour_gummy_bold btn_doubleBorder" type="text"
+                   id="customUsername">
         </div>
-        <div class="options_row options_footer">
-            <button id="randomUsername" class="btn_style_2 profileButtons">Random</button>
-            <button id="confirmUsername" class="profileButtons btn_style_1">Conferma</button>
+        <div class="column options_footer">
+            <button id="confirmUsername" class="button btn_mediumText btn_style_1 sour_gummy_bold">Conferma</button>
+            <button id="randomUsername" class="button btn_smallText btn_style_2 sour_gummy_bold">Random</button>
         </div>
     </div>
 </div>
