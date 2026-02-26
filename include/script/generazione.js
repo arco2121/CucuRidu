@@ -49,18 +49,18 @@ const generateName = () => {
 
 // Generazione Foto Profilo
 const generatePfp = () => {
-    const pfpNumber = 80;
+    const pfpNumber = 104;
     const pfpPath = '/assets/pfps/';
     let rdmNumber = Math.floor(Math.random() * (pfpNumber - 1) + 1);
     return pfpPath + rdmNumber + ".jpg";
 }
 
 const getAllPfp = () => {
-    const pfpNumber = 80;
+    const pfpNumber = 104;
     const pfpPath = '/assets/pfps/';
     return Array.from({ length: pfpNumber }, (v, i) => `${pfpPath}${i + 1}.jpg`);
 }
 
-const getIcon = (defaultIcon) => String("/assets/icon_imgs/" + (defaultIcon ? 1 : Math.floor(Math.random() * (11 - 1) + 1)) + ".png");
+const getIcon = (defaultIcon) => String("/assets/icon_imgs/" + (defaultIcon ? 1 : Math.floor(Math.random() * (13 - 1) + 1)) + ".png");
 
 module.exports = { generateId, generatePfp, generateName, getIcon, getAllPfp, getknownPacks };
