@@ -1,7 +1,17 @@
 <%- include("components/connectionManager") %>
 <%- include("components/packsPanel") %>
-<div class="section visible sectionToHide" id="landpoint"></div>
+<%- include("components/pauseMenu") %>
+<div class="game_section visible sectionToHide" id="game_section">
+    <div id="navbar_con"></div>
+    <div id="landpoint"></div>
+</div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/script/GiocatoreInterface.js"></script>
 <script src="/script/lobby.js"></script>
+
+<script>
+    const navbar_con = document.getElementById("navbar_con");
+
+    renderFragment(navbar_con, "gameNavbar", {});
+</script>

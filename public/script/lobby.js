@@ -1,5 +1,16 @@
 const base = document.getElementById("landpoint");
+const game_section = document.getElementById("game_section");
+const pauseMenu = document.getElementById("pauseMenu");
+
 const leaveBtn = document.getElementById("leaveBtn");
+const exitPauseBtn = document.getElementById("exitPauseBtn");
+
+exitPauseBtn.addEventListener("click", () => {
+    pauseMenu.dispatchEvent(hidePanel);
+    game_section.dispatchEvent(showPanel);
+})
+
+
 const socket = io({
     auth: {
         validation: fromBackEnd["token"],
@@ -115,7 +126,7 @@ window.addEventListener("offline", () => {
         socket.connect();
 });
 
-leaveBtn?.addEventListener("click", () => socket.emit("lasciaStanza", {
+leaveBtn.addEventListener("click", () => socket.emit("lasciaStanza", {
     id: referenceStanza
 }));
 

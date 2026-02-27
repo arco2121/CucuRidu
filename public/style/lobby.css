@@ -1,9 +1,55 @@
-.wait_main_con {
+/* ---------------------------------------------------
+ >>> NAVBAR STYLES
+--------------------------------------------------- */
+.lobby_navbar {
+    position: fixed;
+}
+
+.game_section {
+    position: absolute;
+    justify-content: start;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: top left;
     display: flex;
-    width: 90%;
+    width: 100%;
+    height: 100%;
+    align-items: stretch;
+    flex-direction: column;
+}
+
+#landpoint {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+#navbar_con {
+    width: 100%;
+    min-height: 60px;
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+}
+
+.navbar_pause_btn {
+    margin: 5px;
+}
+
+
+/* ---------------------------------------------------
+ >>> WAIT PAGE
+--------------------------------------------------- */
+.game_main_con {
+    display: flex;
     justify-content: space-around;
     align-items: center;
     flex-direction: row;
+    width: 100%;
 }
 
 .wait_code_text {
@@ -55,10 +101,14 @@
 }
 
 @media (max-width: 800px) {
-    .wait_main_con {
+    .game_main_con {
         width: 90%;
         justify-content: center;
         flex-direction: column;
+        align-items: center;
+    }
+
+    .wait_main_con {
         align-items: center;
     }
 }

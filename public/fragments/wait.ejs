@@ -1,20 +1,25 @@
-<div class="flex_gap_30 wait_main_con">
-    <div class="column sour_gummy_regular flex_gap_25 wait_code_con">
-        <div class="column flex_gap_10">
-            <div class="row wait_code_text flex_gap_10">
-                <h4>Codice Stanza: </h4><h4 class="sour_gummy_bold"> <%= stanzaId %></h4>
+<div class="flex_gap_30 game_main_con">
+        <div class="column sour_gummy_regular flex_gap_25 wait_code_con">
+            <div class="column flex_gap_10">
+                <div class="row wait_code_text flex_gap_10">
+                    <h4>Codice Stanza: </h4><h4 class="sour_gummy_bold"> <%= stanzaId %></h4>
+                </div>
+                <button class="button btn_smallText btn_style_1 sour_gummy_bold" id="shareButton">Condividi</button>
             </div>
-            <button class="button btn_smallText btn_style_1 sour_gummy_bold" id="shareButton">Condividi</button>
-        </div>
-        <h4 id="attesa">Wait per il prossimo turno</h4>
-    </div>
-    <div class="column wait_players_list flex_gap_15 btn_doubleBorder">
-        <h1 class="sour_gummy_bold wait_players_list_title" id="numeroGiocatori">Giocatori presenti: 0</h1>
-        <div class="wait_players_list_hr"></div>
-        <div id="showGiocatori">
+            <div class="column flex_gap_10">
+                <h4 id="attesa">Wait per il prossimo turno</h4>
+                <button class="button btn_mediumText btn_style_2 sour_gummy_bold" id="startButton">Inizia</button>
+            </div>
 
         </div>
-    </div>
+        <div class="column wait_players_list flex_gap_15 btn_doubleBorder">
+            <h1 class="sour_gummy_bold wait_players_list_title" id="numeroGiocatori">Giocatori presenti: 0</h1>
+            <div class="wait_players_list_hr"></div>
+            <div id="showGiocatori">
+
+            </div>
+        </div>
+
 </div>
 
 <script>
@@ -23,6 +28,15 @@
     const attesaView = document.getElementById("attesa");
     const shareButton = document.getElementById("shareButton");
     const showGiocatori = document.getElementById("showGiocatori");
+    const startButton = document.getElementById("startButton");
+
+    const menuBtn = document.getElementById("menuBtn");
+
+    menuBtn.addEventListener("click", () => {
+        game_section.dispatchEvent(hidePanel);
+        pauseMenu.dispatchEvent(showPanel);
+    })
+
     const idStanza = "<%= stanzaId %>";
     let idAttesaInterval;
 
