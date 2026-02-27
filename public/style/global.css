@@ -701,8 +701,13 @@ input:active {
     margin-top: 5px;
 }
 
-#exitBtn:active {
+.active_Btn:active {
     scale: 0.7;
+    filter: brightness(0.9);
+}
+
+.active_Img:active {
+    scale: 0.95;
     filter: brightness(0.9);
 }
 

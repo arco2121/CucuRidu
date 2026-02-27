@@ -56,6 +56,7 @@ const renderFragment = async (root, page, params = {}) => {
 };
 
 (() => {
+    const timeOut = 150;
     document.addEventListener("hideRenderingStart", (e) => {
         const container = e.target;
         container.classList.add("hideRendering");
@@ -70,6 +71,6 @@ const renderFragment = async (root, page, params = {}) => {
     });
     document.addEventListener("showPanel", (e) => {
         const panel = e.target;
-        setTimeout(() => panel.classList.replace('hidden', 'visible'), timing);
+        setTimeout(() => panel.classList.replace('hidden', 'visible'), timeOut);
     });
 })();
