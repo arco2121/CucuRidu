@@ -133,6 +133,9 @@ body {
     flex-direction: column;
     align-items: center;
     overflow-x: hidden;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 
