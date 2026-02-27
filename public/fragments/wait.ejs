@@ -1,12 +1,22 @@
-<div class="row">
-   <div class="column">
-       <h4>Codice Stanza: <%= stanzaId %></h4>
-       <h4 id="attesa">Wait per il prossimo turno</h4>
-       <h6 id="numeroGiocatori">Giocatori presenti: 0</h6>
-       <button id="shareButton">Condividi</button>
-   </div>
-    <div class="column" id="showGiocatori"></div>
+<div class="flex_gap_30 wait_main_con">
+    <div class="column sour_gummy_regular flex_gap_25 wait_code_con">
+        <div class="column flex_gap_10">
+            <div class="row wait_code_text flex_gap_10">
+                <h4>Codice Stanza: </h4><h4 class="sour_gummy_bold"> <%= stanzaId %></h4>
+            </div>
+            <button class="button btn_smallText btn_style_1 sour_gummy_bold" id="shareButton">Condividi</button>
+        </div>
+        <h4 id="attesa">Wait per il prossimo turno</h4>
+    </div>
+    <div class="column wait_players_list flex_gap_15 btn_doubleBorder">
+        <h1 class="sour_gummy_bold wait_players_list_title" id="numeroGiocatori">Giocatori presenti: 0</h1>
+        <div class="wait_players_list_hr"></div>
+        <div id="showGiocatori">
+
+        </div>
+    </div>
 </div>
+
 <script>
     socket.off("aggiornamentoAttesa");
     const numeroGiocatoriCount = document.getElementById("numeroGiocatori");
@@ -17,7 +27,7 @@
     let idAttesaInterval;
 
     socket.on("aggiornamentoAttesa", async (data) => {
-        const { numeroGiocatori, giocatori } = data || {};
+        const {numeroGiocatori, giocatori} = data || {};
         numeroGiocatoriCount.textContent = numeroGiocatoriCount.textContent.split(":")[0] + ": " + numeroGiocatori;
         await renderFragment(showGiocatori, "giocatoreRow", {
             giocatori: giocatori
@@ -32,11 +42,15 @@
         idAttesaInterval = setInterval(() => {
             try {
                 const check = attesaView.textContent.split(")")[1].trim();
-                if(check === "...") attesaView.textContent = initialText + " ";
+                if (check === "...") attesaView.textContent = initialText + " ";
                 else attesaView.textContent += ".";
-            } catch { clearInterval(idAttesaInterval); }
+            } catch {
+                clearInterval(idAttesaInterval);
+            }
         }, 300);
-    } catch { clearInterval(idAttesaInterval); }
+    } catch {
+        clearInterval(idAttesaInterval);
+    }
 
     shareButton.addEventListener("click", async () => {
         const shareText = "Muovi il culo ed entra nella stanza per giocare inconcepibile sgorbio nato dall'errare umano che non sei altro :))";
@@ -46,8 +60,10 @@
             url: "/partecipaStanza/" + idStanza
         };
         try {
-            if(navigator.canShare(shareData)) await navigator.share(shareData);
+            if (navigator.canShare(shareData)) await navigator.share(shareData);
             else await navigator.clipboard.writeText(idStanza).then(() => alert(shareText));
-        } catch (e) { console.error(e); }
+        } catch (e) {
+            console.error(e);
+        }
     });
 </script>
