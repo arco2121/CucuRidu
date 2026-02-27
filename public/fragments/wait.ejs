@@ -16,18 +16,16 @@
     const idStanza = "<%= stanzaId %>";
     let idAttesaInterval;
 
-    if(socket) {
-        socket.on("aggiornamentoAttesa", async (data) => {
-            const { numeroGiocatori, giocatori } = data || {};
-            numeroGiocatoriCount.textContent = numeroGiocatoriCount.textContent.split(":")[0] + ": " + numeroGiocatori;
-            await renderFragment(showGiocatori, "giocatoreRow", {
-                giocatori: giocatori
-            });
+    socket.on("aggiornamentoAttesa", async (data) => {
+        const { numeroGiocatori, giocatori } = data || {};
+        numeroGiocatoriCount.textContent = numeroGiocatoriCount.textContent.split(":")[0] + ": " + numeroGiocatori;
+        await renderFragment(showGiocatori, "giocatoreRow", {
+            giocatori: giocatori
         });
-        socket.emit("aggiornaAttesa", {
-            stanzaId: idStanza
-        });
-    }
+    });
+    socket.emit("aggiornaAttesa", {
+        stanzaId: idStanza
+    });
 
     try {
         const initialText = attesaView.textContent;

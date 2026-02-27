@@ -25,9 +25,8 @@ const navigateWithLoading = (url) => {
             window.location.href = url;
     }, timing);
 };
+
 const fragmentsCache = {};
-const loadedScripts = new Set();
-const loadedPage = new Set();
 const renderFragment = async (root, page, params = {}) => {
     try {
         if(!fragmentsCache[page]) {
@@ -35,22 +34,20 @@ const renderFragment = async (root, page, params = {}) => {
             if(!input.ok) throw new Error("fragment not found");
             fragmentsCache[page] = await input.text();
         }
-        if(root.getAttribute("page") === page) return;
         const rendering = ejs.render(fragmentsCache[page], { ...params });
         root.innerHTML = rendering;
-        root.setAttribute("page", page);
         const scripts = root.querySelectorAll("script");
         for (const oldScript of scripts) {
-            const scriptId = oldScript.id || oldScript.getAttribute("src") || oldScript.textContent.trim();
-            if (loadedScripts.has(scriptId)) continue;
             const newScript = document.createElement("script");
             Array.from(oldScript.attributes).forEach(attr => {
                 newScript.setAttribute(attr.name, attr.value);
             });
-            newScript.textContent = oldScript.textContent;
-            loadedScripts.add(scriptId);
+            if (!oldScript.src) {
+                newScript.textContent = `{ ${oldScript.textContent} }`;
+            }
             document.body.appendChild(newScript);
             newScript.remove();
+            oldScript.remove();
         }
         return rendering;
     } catch (e) {

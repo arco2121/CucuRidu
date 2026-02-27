@@ -282,9 +282,7 @@ server.on("connection", (user) => {
             });
             console.log("Giocatore aggiunto a Stanza => " + stanzaId);
         } catch (e) {
-            user.emit("errore", {
-               message: e.message
-           });
+            user.emit("errore", JSON.stringify(e));
         }
     });
     user.on("iniziaTurno", (data) => {
@@ -314,11 +312,9 @@ server.on("connection", (user) => {
                 });
             else user.emit("aspettaAltri", {
                     message: "Girl non ci sono chatbot ai che fingano di scoparti qui. Go touch some grass or smt"
-                });
+            });
         } catch (e) {
-            user.emit("errore", {
-               message: e.message
-           });
+            user.emit("errore", JSON.stringify(e));
         }
     });
     user.on("inviaRisposta", (data) => {
@@ -343,9 +339,7 @@ server.on("connection", (user) => {
                });
            }
        } catch (e) {
-           user.emit("errore", {
-               message: e.message
-           });
+           user.emit("errore", JSON.stringify(e));
        }
     });
     user.on("scegliVincitore", (data) => {
@@ -372,9 +366,7 @@ server.on("connection", (user) => {
                 });
             }
         } catch (e) {
-            user.emit("errore", {
-               message: e.message
-           });
+            user.emit("errore", JSON.stringify(e));
         }
     });
     user.on("terminaPartita", (data) => {
@@ -392,9 +384,7 @@ server.on("connection", (user) => {
                 console.log("Stanza eliminata => " + stanzaId);
             }
         } catch (e) {
-            user.emit("errore", {
-               message: e.message
-           });
+            user.emit("errore", JSON.stringify(e));
         }
     });
     user.on("aggiornaAttesa", (data) => server.to(data["stanzaId"]).emit("aggiornamentoAttesa", {
@@ -433,7 +423,7 @@ server.on("connection", (user) => {
             }
         } catch (e) {
             user.emit("errore", {
-               message: e.message
+               message: JSON.stringify(e)
             });
         }
     });

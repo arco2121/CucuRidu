@@ -73,7 +73,6 @@ socket.on("connect_error", (err) => {
 });
 socket.on("confermaStanza", (data) => {
     const { reference } = data;
-    console.log("DIOOOO")
     referenceStanza = data["stanzaId"] || fromBackEnd["stanzaId"];
     referenceGiocatore = new GiocatoreInterface(reference);
     fetch("/saveGameReference", {
@@ -106,7 +105,7 @@ socket.on("confermaStanza", (data) => {
 });
 socket.on("stanzaLasciata", lasciaStanza);
 socket.on("errore", (error) => {
-    alert(error);
+    alert(error.message);
     navigateWithLoading("/");
 });
 
