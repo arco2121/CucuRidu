@@ -80,4 +80,8 @@
             console.error(e);
         }
     });
+
+    startButton.addEventListener("click", () => socket.emit("iniziaTurno", {
+        id: referenceStanza
+    }));
 </script>
