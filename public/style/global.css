@@ -382,7 +382,6 @@ a {
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 50px;
     transition: all 150ms ease;
 }
 
@@ -397,6 +396,7 @@ a {
     width: 210px;
     height: 65px;
     margin: 10px;
+    border-radius: 50px;
 }
 
 .btn_mediumText {
@@ -405,6 +405,7 @@ a {
     width: 190px;
     height: 52px;
     margin: 5px;
+    border-radius: 50px;
 }
 
 .btn_smallText {
@@ -413,6 +414,7 @@ a {
     width: 105px;
     height: 42px;
     margin: 5px;
+    border-radius: 50px;
 }
 
 .btn_toggle {
@@ -420,6 +422,13 @@ a {
     padding: 5px;
     width: 60px;
     height: 40px;
+    border-radius: 50px;
+}
+
+.btn_square {
+    width: 40px;
+    height: 40px;
+    border-radius: 15px;
 }
 
 .btn_style_1 {
@@ -429,6 +438,10 @@ a {
     color: var(--accent-color-1-outline);
 }
 
+.btn_style_1 svg path {
+    fill: var(--accent-color-1-outline); !important;
+}
+
 .btn_style_2 {
     border: solid 6px var(--accent-color-2-outline);
     background: var(--accent-color-2);
@@ -436,11 +449,19 @@ a {
     color: var(--accent-color-2-outline);
 }
 
+.btn_style_2 svg path {
+    fill: var(--accent-color-2-outline); !important;
+}
+
 .btn_style_3 {
     border: solid 6px var(--accent-color-3-outline);
     background: var(--accent-color-3);
     background-image: linear-gradient(to bottom, var(--accent-color-3), var(--accent-color-3-middle));
     color: var(--accent-color-3-outline);
+}
+
+.btn_style_3 svg path {
+    fill: var(--accent-color-3-outline); !important;
 }
 
 .btn_style_confirm {
