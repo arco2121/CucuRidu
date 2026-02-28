@@ -12,7 +12,7 @@ const generateCards = (group, files) => {
             for (const line of lines) {
                 const string = line[0]?.toUpperCase() + line.slice(1);
                 const completamenti = (line.match(/_/g) || []).length;
-                array.push(completamenti === 0 ? [
+                array.push(completamenti !== 0 ? [
                     string,
                     completamenti,
                 ] : string)
