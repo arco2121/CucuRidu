@@ -325,7 +325,7 @@ a {
     border: solid 6px var(--background-variant-outline);
     background: var(--background-variant);
     background-image: linear-gradient(to bottom, var(--background-variant), var(--background-variant-middle));
-    color: var(--accent-color-1-outline);
+    color: var(--text-color-normal);
     border-radius: 25px;
     padding: 5px;
     font-family: inherit;
@@ -802,6 +802,33 @@ input:active {
         width: 30%;
     }
 }
+
+
+/* ---------------------------------------------------
+ >>> NO INTERNET
+--------------------------------------------------- */
+.noInternetSection {
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+    align-items: center;
+    justify-content: center;
+    overflow-y: scroll;
+    padding: 20px;
+}
+
+.noInternet_img {
+    width: 90%;
+    margin-bottom: 10px;
+    flex-grow: 1;
+}
+
+.noInternet_title {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--text-color-normal);
+}
+
 
 /* ---------------------------------------------------
  >>> OTHER
