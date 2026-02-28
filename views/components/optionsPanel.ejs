@@ -2,7 +2,7 @@
     <div class="floatSection optionsSection flex_gap_30 btn_doubleBorder">
         <div class="options_exit_btn upper sour_gummy_extra" >
             <h1 class="panel_title sour_gummy_bold">Opzioni</h1>
-            <h1 class="active_Btn" id="exitBtn">X</h1>
+            <h1 class="active_Btn" id="exitOptionsBtn">X</h1>
         </div>
         <div class="options_content column nunito_bold flex_gap_30">
             <div class="options_row">
@@ -46,7 +46,7 @@
     document.addEventListener("DOMContentLoaded", () => {
         const musicBtn = document.getElementById("musicbtn");
         const soundBtn = document.getElementById("soundbtn");
-        const exitBtn = document.getElementById("exitBtn");
+        const exitOptionsBtn = document.getElementById("exitOptionsBtn");
         const vibrationBtn = document.getElementById("vibrationbtn");
         const sectionDefault = document.querySelector(".sectionToHide");
         const updateButtonUI = (btn, isOn) => {
@@ -87,7 +87,7 @@
         });
         soundBtn.addEventListener("click", (e) => toggleSetting(e, "sound"));
         vibrationBtn.addEventListener("click", (e) => toggleSetting(e, "vibration"));
-        exitBtn.addEventListener("click", () => {
+        exitOptionsBtn.addEventListener("click", () => {
             optionPanel.dispatchEvent(hidePanel);
             sectionDefault.dispatchEvent(showPanel);
         });

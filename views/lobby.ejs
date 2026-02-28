@@ -1,7 +1,8 @@
 <%- include("components/connectionManager") %>
-<%- include("components/packsPanel") %>
+<!-- <%- include("components/packsPanel") %> -->
+<%- include("components/optionsPanel") %>
 <%- include("components/pauseMenu") %>
-<div class="game_section visible sectionToHide" id="game_section">
+<div class="game_section visible showByConnectionManager" id="game_section">
     <div id="navbar_con"></div>
     <div id="landpoint"></div>
 </div>
@@ -12,6 +13,5 @@
 
 <script>
     const navbar_con = document.getElementById("navbar_con");
-
     renderFragment(navbar_con, "gameNavbar", {});
 </script>
