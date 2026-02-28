@@ -23,10 +23,11 @@ const resumeGame = (req, res, next) => {
 const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
     if (!Stanze.get(stanzaId)) return next();
     console.log(`Stanza ${stanzaId} => ${Stanze.get(stanzaId).toString()}`)
+
     switch (Stanze.get(stanzaId).stato) {
         case StatoStanza.WAIT : {
             socket.emit("confermaStanza", {
-                reference: socket.data.referenceGiocatore.adaptToClient(),
+                reference: socket.data.referenceGiocatore?.adaptToClient(),
                 stanza: Stanze.get(stanzaId).id
             });
             return next();
@@ -39,7 +40,8 @@ const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
         }
         case StatoStanza.CHOOSING_CARDS : {
             socket.emit("roundIniziato", {
-                round: Stanze.get(stanzaId).round,
+                chiStaInterrogandoInfo: Stanze.get(stanzaId).trovaGiocatore(Stanze.get(stanzaId).round.chiStaInterrogando).adaptToClient(),
+                domanda: Stanze.get(stanzaId).domanda,
                 reference: socket.data.referenceGiocatore.adaptToClient()
             });
             return next();
@@ -305,7 +307,8 @@ server.on("connection", (user) => {
                     for(const socket of sockets) {
                         socket.data.referenceGiocatore = Stanze.get(stanzaId).trovaGiocatore(socket.data.referenceGiocatore.id);
                         socket.emit("roundIniziato", {
-                            round: round,
+                            chiStaInterrogandoInfo: Stanze.get(stanzaId).trovaGiocatore(round.chiStaInterrogando).adaptToClient(),
+                            domanda: round.domanda,
                             reference: socket.data.referenceGiocatore.adaptToClient()
                         });
                     }

@@ -131,11 +131,12 @@ socket.on("errore", (error) => {
 
 socket.on("roundIniziato", async (data) => {
     referenceGiocatore = new GiocatoreInterface(data["reference"]);
-    const staiInterrogando = data["round"]?.chiStaInterrogando === referenceGiocatore.id;
-    const domanda = data["round"]?.domanda;
+    const informazioniSuChiInterroga = new GiocatoreInterface(data["chiStaInterrogandoInfo"]);
+    const domanda = data["domanda"];
     await renderFragment(base, "showTurn", {
         domanda: domanda,
-        risposte: staiInterrogando ? referenceGiocatore.carte : null
+        risposte: informazioniSuChiInterroga.interrogationRole ? referenceGiocatore.carte : null,
+        informazioniSuChiInterroga: informazioniSuChiInterroga
     });
 });
 

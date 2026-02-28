@@ -11,13 +11,13 @@ const { generateId } = require(path.join(__dirname, '/generazione'));
 
 class Stanza {
 
-    constructor(username, pfp, memory, minimoGiocatori = 3) {
+    constructor(username, pfp, memory, minimoGiocatori = 2) {
         this.id = typeof memory === "string" ? memory : generateId(6, memory);
         this.giocatori = new Map();
         this.giocatoriPassati = new Set();
         this.stato = StatoStanza.WAIT;
         this.minimoGiocatori = minimoGiocatori;
-        this.master = new Giocatore(username, pfp, memory, true);
+        this.master = new Giocatore(username, pfp, memory, true, true);
         this.mazzoCompletamenti = {
             mazzo: new Mazzo({
                 pack: "standard",
@@ -54,6 +54,11 @@ class Stanza {
         if(giocatore === this.master) {
             this.master = this.giocatori.values().next().value;
             if (this.master) this.master.masterRole = true;
+        }
+        if(giocatore.id === this.round.chiStaInterrogando) {
+            this.round.chiStaInterrogando = this.giocatori.values().next().value.id;
+            const nuovoInterrogante = this.trovaGiocatore(this.round.chiStaInterrogando);
+            if (nuovoInterrogante) nuovoInterrogante.interrogationRole = true;
         }
         this.mazzoCompletamenti.mazzo.aggiungiCarte(...giocatore.prendiTuttaLaMano())
         this.giocatoriPassati.add(giocatore.id);
@@ -141,7 +146,10 @@ class Stanza {
         this.mazzoCompletamenti.scarto.aggiungiCarte(...Array.from(this.round.risposte.values()).flatMap(x => x));
         this.mazzoFrasi.scarto.aggiungiCarte(this.round.domanda);
         const risposte = this.round.risposte.get(idGiocatore);
-        const domanda = this.round.domanda
+        const domanda = this.round.domanda;
+
+        vincitoreRound.interrogationRole = true;
+        this.trovaGiocatore(this.round.chiStaInterrogando).interrogationRole = false;
         this.round = {
             domanda: this.mazzoFrasi.mazzo.prendiCarte(1)[0],
             risposte: new Map(),

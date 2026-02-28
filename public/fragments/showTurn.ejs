@@ -1,7 +1,9 @@
 <div class="flex_gap_30 game_main_con">
     <div class="column sour_gummy_regular flex_gap_25 wait_code_con">
         <div class="column flex_gap_10">
-            <div id="question" class="card question"></div>
+            <div id="<%= domanda[1] %>" class="card domanda">
+                <%= domanda[0] %>
+            </div>
         </div>
     </div>
     <% if(risposte) { %>
@@ -20,6 +22,23 @@
 </div>
 
 <script>
-    const question = document.getElementById("question");
+    const cards = document.querySelectorAll(".risposta");
+    const domandaAttuale = document.querySelector(".domanda");
+    const defaultText = domandaAttuale.textContent;
+    const risposte = Array.from({ length: parseInt(domandaAttuale.id) }, (val) => val = null);
+    const toggleCards = (target) => {
+        if(risposte.length > 2) return;
+        if(risposte.indexOf(target.textContent) !== -1)
+            risposte[risposte.indexOf(target.textContent)] = null;
+        else
+            risposte[risposte.findIndex(ele => ele === null)] = target.textContent;
+        const risposteAttuali = risposte.find(ele => ele !== null).length;
+        if(risposteAttuali > 0)
+            risposte.forEach(risposta => domandaAttuale.textContent = defaultText.replace("_", risposta));
+        else
+            domandaAttuale.textContent = defaultText;
+        target.classList.toggle("selected");
+    };
 
+    cards.forEach(card => card.addEventListener("click", (e) => toggleCards(e.target)));
 </script>
