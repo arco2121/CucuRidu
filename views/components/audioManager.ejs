@@ -5,17 +5,24 @@
     const musicPlayer = document.getElementById("musicAudio");
     const soundPlayer = document.getElementById("soundAudio");
     const audiosCache = {};
-    const vibrationPattern = [10, 5, 10];
+    const vibrationPattern = [6, 3, 6];
     const randomSound = () => Math.floor(Math.random() * (2 - 1) + 1);
     const locks = {
         audio: false,
         sound: false
     };
 
-    const playAudio = async (elementToPlay, checkValue = "sound") => {
+    const vibrate = (pattern) => {
+        const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
+        const permissions = { vibration: true, ...savedSettings };
+        if(permissions["vibration"])
+            navigator.vibrate(pattern);
+    };
+    const playAudio = async (elementToPlay, checkValue = "sound", reverse = false) => {
+        if(reverse) return await elementToPlay.pause();
         const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
         const permissions = { audio: true, sound: true, ...savedSettings };
-        if (locks[checkValue]) return;
+        if (checkValue === "audio" && locks[checkValue]) return;
         locks[checkValue] = true;
         try {
             switch (checkValue) {
@@ -55,14 +62,19 @@
                 ...[...document.querySelectorAll("body *")].filter(element =>
                     [element.classList].filter(classe => classe.toString().toLowerCase().includes("btn")).length > 0 || element.id.toLowerCase().includes("btn"))
             ].forEach(button => {
-                button.addEventListener("click", async () => {
-                    navigator.vibrate(vibrationPattern);
-                    await playAudio(soundPlayer);
+                button.addEventListener("click", () => {
+                    vibrate(vibrationPattern);
+                    playAudio(soundPlayer);
                 });
             });
         });
 
         document.addEventListener("click", initMusic, { once: true });
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) playAudio(musicPlayer, "audio", true);
+            else playAudio(musicPlayer, "audio");
+        });
 
         window.addEventListener("pageshow", (event) => {
             if (event.persisted) {

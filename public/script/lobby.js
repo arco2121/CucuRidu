@@ -115,6 +115,10 @@ socket.on("confermaStanza", (data) => {
     });
 });
 socket.on("stanzaLasciata", lasciaStanza);
+socket.on("stanzaChiusa", () => {
+    alert("NOOOOOOO, la chiusura della stanza NOOOOOOO");
+    lasciaStanza();
+});
 socket.on("errore", (error) => {
     alert(error.message);
     navigateWithLoading("/");

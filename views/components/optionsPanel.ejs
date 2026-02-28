@@ -13,6 +13,10 @@
                 <label class="menu_row_title text_color_normal">Suoni:</label>
                 <button id="soundbtn" class="button btn_toggle btn_style_critical sour_gummy_extra">On</button>
             </div>
+            <div class="options_row">
+                <label class="menu_row_title text_color_normal">Vibrazione:</label>
+                <button id="vibrationbtn" class="button btn_toggle btn_style_critical sour_gummy_extra">On</button>
+            </div>
         </div>
         <div class="options_row options_footer">
 
@@ -43,6 +47,7 @@
         const musicBtn = document.getElementById("musicbtn");
         const soundBtn = document.getElementById("soundbtn");
         const exitBtn = document.getElementById("exitBtn");
+        const vibrationBtn = document.getElementById("vibrationbtn");
         const sectionDefault = document.querySelector(".sectionToHide");
         const updateButtonUI = (btn, isOn) => {
             btn.textContent = isOn ? "On" : "Off";
@@ -81,6 +86,7 @@
             await playAudio(musicPlayer, "audio");
         });
         soundBtn.addEventListener("click", (e) => toggleSetting(e, "sound"));
+        vibrationBtn.addEventListener("click", (e) => toggleSetting(e, "vibration"));
         exitBtn.addEventListener("click", () => {
             optionPanel.dispatchEvent(hidePanel);
             sectionDefault.dispatchEvent(showPanel);
