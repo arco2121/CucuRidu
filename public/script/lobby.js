@@ -66,6 +66,7 @@ socket.on("connect", () => {
         }
     }
 });
+
 socket.on("connect_error", (err) => {
     switch(err.message) {
         case "SESSION_EXPIRED" : {
@@ -82,6 +83,7 @@ socket.on("connect_error", (err) => {
         }
     }
 });
+
 socket.on("confermaStanza", (data) => {
     const { reference } = data;
     referenceStanza = data["stanzaId"] || fromBackEnd["stanzaId"];
@@ -114,14 +116,27 @@ socket.on("confermaStanza", (data) => {
         else navigateWithLoading("/");
     });
 });
+
 socket.on("stanzaLasciata", lasciaStanza);
+
 socket.on("stanzaChiusa", () => {
     alert("NOOOOOOO, la chiusura della stanza NOOOOOOO");
     lasciaStanza();
 });
+
 socket.on("errore", (error) => {
     alert(error.message);
     navigateWithLoading("/");
+});
+
+socket.on("roundIniziato", async (data) => {
+    referenceGiocatore = new GiocatoreInterface(data["reference"]);
+    const staiInterrogando = data["round"]?.chiStaInterrogando === referenceGiocatore.id;
+    const domanda = data["round"]?.domanda;
+    await renderFragment(base, "showTurn", {
+        domanda: domanda,
+        risposte: staiInterrogando ? referenceGiocatore.carte : null
+    });
 });
 
 window.addEventListener("offline", () => socket.disconnect());

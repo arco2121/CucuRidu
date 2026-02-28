@@ -5,6 +5,7 @@ class GiocatoreInterface {
         this.username = dataFromServer["username"];
         this.mazzo = dataFromServer["mazzo"].flat();
         this.masterRole = dataFromServer["masterRole"];
+        this.interrogationRole = dataFromServer["interrogationRole"];
         dataFromServer = null;
     }
 }

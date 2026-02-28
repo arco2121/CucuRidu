@@ -1,0 +1,25 @@
+<div class="flex_gap_30 game_main_con">
+    <div class="column sour_gummy_regular flex_gap_25 wait_code_con">
+        <div class="column flex_gap_10">
+            <div id="question" class="card question"></div>
+        </div>
+    </div>
+    <% if(risposte) { %>
+        <div class="column wait_players_list flex_gap_15 btn_doubleBorder">
+            <div id="showCards">
+                <% risposte.forEach((risposta, index) => { %>
+                    <div class="card risposta" id="<%= index %>">
+                        <%= risposta %>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    <% } else { %>
+        <h1>Aspetta che tutti finiscano di rispondere</h1>
+    <% } %>
+</div>
+
+<script>
+    const question = document.getElementById("question");
+
+</script>

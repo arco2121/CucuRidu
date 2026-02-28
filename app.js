@@ -311,7 +311,7 @@ server.on("connection", (user) => {
                     }
                 });
             else user.emit("aspettaAltri", {
-                    message: "Girl non ci sono chatbot ai che fingano di scoparti qui. Go touch some grass or smt"
+                message: "Girl non ci sono chatbot ai che fingano di scoparti qui. Go touch some grass or smt"
             });
         } catch (e) {
             user.emit("errore", JSON.stringify(e));

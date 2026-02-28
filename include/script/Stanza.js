@@ -40,7 +40,9 @@ class Stanza {
         if(this.stato !== StatoStanza.WAIT)
             return false;
         const giocatore = new Giocatore(username, pfp, memory);
-        this.numeroRound = [this.numeroRound[0], Math.max(1, Math.floor(this.numeroRound[1] / this.giocatori.size) * (this.giocatori.size + 1))];
+        let maxOccorrenze = 0;
+        this.mazzoFrasi.mazzo.carte.map(carta => carta[1]).forEach(occorrenza => maxOccorrenze += occorrenza);
+        this.numeroRound = [this.numeroRound[0], Math.floor(maxOccorrenze / (this.giocatori.size + 1))];
         this.giocatori.set(giocatore.id, giocatore);
         return giocatore;
     }
@@ -89,7 +91,7 @@ class Stanza {
         if(this.numeroRound[0] === 0) {
             let maxOccorrenze = 0;
             this.mazzoFrasi.mazzo.carte.map(carta => carta[1]).forEach(occorrenza => maxOccorrenze += occorrenza);
-            this.numeroRound = [1, maxOccorrenze * this.giocatori.size];
+            this.numeroRound = [1, Math.floor(maxOccorrenze / this.giocatori.size)];
             this.mazzoCompletamenti.mazzo.shuffle();
             this.mazzoFrasi.mazzo.shuffle();
             this.round = {
