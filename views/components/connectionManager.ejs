@@ -14,7 +14,7 @@
     const connectionPanel = document.getElementById("connectionPanel");
 
     document.addEventListener("DOMContentLoaded", () => {
-        const sectionHide = document.querySelector(".sectionToHide");
+        const showByConnectionManager = document.querySelector(".showByConnectionManager");
 
         window.addEventListener("offline", () => document.dispatchEvent(stateDisconnected));
         window.addEventListener("online", () => document.dispatchEvent(stateConnected));
@@ -22,11 +22,11 @@
         (() => {
             document.addEventListener("doConnected", () => {
                 connectionPanel.dispatchEvent(hidePanel);
-                sectionHide.dispatchEvent(showPanel);
+                showByConnectionManager.dispatchEvent(showPanel);
             });
 
             document.addEventListener("doDisconnected", () => {
-                sectionHide.dispatchEvent(hidePanel);
+                showByConnectionManager.dispatchEvent(hidePanel);
                 connectionPanel.dispatchEvent(showPanel);
             });
         })();

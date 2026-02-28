@@ -1,4 +1,4 @@
-<div class="section hidden" id="pauseMenu">
+<div class="section hidden sectionToHide" id="pauseMenu">
     <div class="floatSection optionsSection flex_gap_30 btn_doubleBorder">
         <div class="options_exit_btn upper sour_gummy_extra" >
             <h1 class="panel_title sour_gummy_bold">Pause</h1>
@@ -8,7 +8,17 @@
 
         </div>
         <div class="options_row options_footer">
-            <button class="button btn_smallText btn_style_1 sour_gummy_bold" id="leaveBtn">Leave</button>
+            <button class="button btn_smallText btn_style_critical sour_gummy_bold" id="leaveBtn">Leave</button>
+            <button class="button btn_smallText btn_style_1 sour_gummy_bold" id="optionsBtn">Options</button>
         </div>
     </div>
 </div>
+
+<script>
+    const optionsBtn = document.getElementById("optionsBtn");
+
+    optionsBtn.addEventListener("click", () => {
+        pauseMenu.dispatchEvent(hidePanel);
+        optionPanel.dispatchEvent(showPanel);
+    });
+</script>
