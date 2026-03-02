@@ -47,10 +47,10 @@
 
     sendCards.addEventListener("click", () => {
         if(risposte.filter(ele => ele !== null).length > 0)
-            return alert("Finisci di selezionare, mongolo");
+            return alert("Finisci di selezionare le risposte, mongolo");
         socket.emit("inviaRisposta", {
             id: referenceStanza,
             indexCarte: referenceGiocatore.mazzo.filter(carta => risposte.indexOf(carta) !== -1).map(carta => referenceGiocatore.mazzo.indexOf(carta))
         });
-    })
+    });
 </script>

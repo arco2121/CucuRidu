@@ -85,7 +85,7 @@ socket.on("connect_error", (err) => {
 });
 
 socket.on("confermaStanza", (data) => {
-    const { reference } = data;
+    const { reference, interroghi } = data;
     referenceStanza = data["stanzaId"] || fromBackEnd["stanzaId"];
     referenceGiocatore = new GiocatoreInterface(reference);
     fetch("/saveGameReference", {
@@ -102,7 +102,8 @@ socket.on("confermaStanza", (data) => {
         const result = (await response.json());
         if(result?.result) {
             await renderFragment(base, "wait", {
-                stanzaId: referenceStanza
+                stanzaId: referenceStanza,
+                interroghi: interroghi || false
             });
             if(result.fallback) {
                 const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
@@ -134,14 +135,30 @@ socket.on("errore", (error) => {
 });
 
 socket.on("roundIniziato", async (data) => {
-    referenceGiocatore = new GiocatoreInterface(data["reference"]);
-    const informazioniSuChiInterroga = new GiocatoreInterface(data["chiStaInterrogandoInfo"]);
-    const domanda = data["domanda"];
-    console.log(!referenceGiocatore.interrogationRole)
+    const { chiStaInterrogando, reference, domanda } = data;
+    referenceGiocatore = new GiocatoreInterface(reference);
     await renderFragment(base, "showTurn", {
         domanda: domanda,
         risposte: !referenceGiocatore.interrogationRole ? referenceGiocatore.mazzo : null,
-        informazioniSuChiInterroga: informazioniSuChiInterroga
+        chiStaInterrogando: chiStaInterrogando
+    });
+});
+
+socket.on("rispostaRegistrata", (data) => {
+    alert(data.message);
+});
+
+socket.on("giaRegistrata", (data) => {
+    alert(data.message);
+});
+
+socket.on("sceltaVincitore", async (data) => {
+    const { reference, domanda, chiInterroga, risposte } = data;
+    if(reference) referenceGiocatore = new GiocatoreInterface(reference);
+    await renderFragment(base, "chooseWinner", {
+        domanda: domanda,
+        risposte: risposte,
+        chiStaInterrogando: chiInterroga
     });
 });
 

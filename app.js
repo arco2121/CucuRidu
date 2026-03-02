@@ -29,7 +29,8 @@ const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
         case StatoStanza.WAIT : {
             socket.emit("confermaStanza", {
                 reference: socket.data.referenceGiocatore.adaptToClient(),
-                stanza: Stanze.get(stanzaId).id
+                stanza: Stanze.get(stanzaId).id,
+                interroghi: Stanze.get(stanzaId).round.chiStaInterrogando === socket.data.referenceGiocatore.id
             });
             return next();
         }
@@ -41,7 +42,7 @@ const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
         }
         case StatoStanza.CHOOSING_CARDS : {
             socket.emit("roundIniziato", {
-                chiStaInterrogandoInfo: Stanze.get(stanzaId).trovaGiocatore(Stanze.get(stanzaId).round.chiStaInterrogando).adaptToClient(),
+                chiStaInterrogando: Stanze.get(stanzaId).trovaGiocatore(Stanze.get(stanzaId).round.chiStaInterrogando).adaptToClient(),
                 domanda: Stanze.get(stanzaId).round.domanda,
                 reference: socket.data.referenceGiocatore.adaptToClient()
             });
@@ -51,7 +52,7 @@ const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
             socket.emit("sceltaVincitore", {
                 risposte: Array.from(Stanze.get(stanzaId).round.risposte.entries()),
                 domanda: Stanze.get(stanzaId).round.domanda,
-                chiInterroga: Stanze.get(stanzaId).round.chiStaInterrogando,
+                chiInterroga: Stanze.get(stanzaId).trovaGiocatore(Stanze.get(stanzaId).round.chiStaInterrogando).adaptToClient(),
                 reference: socket.data.referenceGiocatore.adaptToClient()
             });
             return next();
@@ -252,7 +253,8 @@ server.on("connection", (user) => {
             user.data.referenceGiocatore = stanza.master;
             user.emit("confermaStanza", {
                 stanzaId: stanza.id,
-                reference: user.data.referenceGiocatore.adaptToClient()
+                reference: user.data.referenceGiocatore.adaptToClient(),
+                interroghi: Stanze.get(stanza.id).round.chiStaInterrogando === user.data.referenceGiocatore.id
             });
             server.to(stanza.id).emit("aggiornamentoAttesa", {
                 numeroGiocatori: Stanze.get(stanza.id).giocatori.size,
@@ -278,7 +280,8 @@ server.on("connection", (user) => {
             }
             user.join(stanzaId);
             user.emit("confermaStanza", {
-                reference: user.data.referenceGiocatore.adaptToClient()
+                reference: user.data.referenceGiocatore.adaptToClient(),
+                interroghi: Stanze.get(stanzaId).round.chiStaInterrogando === user.data.referenceGiocatore.id
             });
             server.to(stanzaId).emit("aggiornamentoAttesa", {
                 numeroGiocatori: Stanze.get(stanzaId).giocatori.size,
@@ -310,7 +313,7 @@ server.on("connection", (user) => {
                     for(const socket of sockets) {
                         socket.data.referenceGiocatore = Stanze.get(stanzaId).trovaGiocatore(socket.data.referenceGiocatore.id);
                         socket.emit("roundIniziato", {
-                            chiStaInterrogandoInfo: Stanze.get(stanzaId).trovaGiocatore(round.chiStaInterrogando).adaptToClient(),
+                            chiStaInterrogando: Stanze.get(stanzaId).trovaGiocatore(round.chiStaInterrogando).adaptToClient(),
                             domanda: round.domanda,
                             reference: socket.data.referenceGiocatore.adaptToClient()
                         });
@@ -332,7 +335,7 @@ server.on("connection", (user) => {
                server.to(stanzaId).emit("sceltaVincitore", {
                    domanda: result[0],
                    risposte: result[1],
-                   chiInterroga: result[2]
+                   chiInterroga: Stanze.get(stanzaId).trovaGiocatore(result[2]).adaptToClient(),
                });
            } else if(result) {
                user.emit("rispostaRegistrata", {
