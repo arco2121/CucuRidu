@@ -22,7 +22,7 @@
         if(reverse) return await elementToPlay.pause();
         const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
         const permissions = { audio: true, sound: true, ...savedSettings };
-        if (checkValue === "audio" && locks[checkValue]) return;
+        if (checkValue !== "sound" && locks[checkValue]) return;
         locks[checkValue] = true;
         try {
             switch (checkValue) {
@@ -60,7 +60,8 @@
         document.addEventListener("DOMContentLoaded", () => {
             [...document.querySelectorAll("button"),
                 ...[...document.querySelectorAll("body *")].filter(element =>
-                    [element.classList].filter(classe => classe.toString().toLowerCase().includes("btn")).length > 0 || element.id.toLowerCase().includes("btn"))
+                    [...element.classList].filter(classe => classe.toString().toLowerCase().includes("btn")
+                    || classe.toString().includes("active_Img")).length > 0 || element.id.toLowerCase().includes("btn"))
             ].forEach(button => {
                 button.addEventListener("click", () => {
                     vibrate(vibrationPattern);

@@ -4,12 +4,7 @@ const pauseMenu = document.getElementById("pauseMenu");
 
 const leaveBtn = document.getElementById("leaveBtn");
 const exitPauseBtn = document.getElementById("exitPauseBtn");
-
-exitPauseBtn.addEventListener("click", () => {
-    pauseMenu.dispatchEvent(hidePanel);
-    game_section.dispatchEvent(showPanel);
-})
-
+const menuBtn = document.getElementById("menuBtn");
 
 const socket = io({
     auth: {
@@ -172,5 +167,15 @@ window.addEventListener("offline", () => {
 leaveBtn.addEventListener("click", () => socket.emit("lasciaStanza", {
     id: referenceStanza
 }));
+
+exitPauseBtn.addEventListener("click", () => {
+    pauseMenu.dispatchEvent(hidePanel);
+    game_section.dispatchEvent(unhideRendering);
+});
+
+menuBtn.addEventListener("click", () => {
+    game_section.dispatchEvent(hideRendering);
+    pauseMenu.dispatchEvent(showPanel);
+});
 
 document.dispatchEvent(preventBack);

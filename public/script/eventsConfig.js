@@ -63,7 +63,7 @@ const renderFragment = async (root, page, params = {}) => {
     });
     document.addEventListener("hideRenderingEnd", (e) => {
         const container = e.target;
-        container.classList.remove("hideRendering");
+        setTimeout(() => container.classList.remove("hideRendering"), timeOut);
     });
     document.addEventListener('hidePanel', (e) => {
         const section = e.target;

@@ -49,6 +49,10 @@ table {
  >>> VARIABLES
 --------------------------------------------------- */
 :root {
+
+    /* Max Index Z */
+    --max-index: 9999999999999;
+
     /* Dynamic Colors */
 
     /* Background 1 */
@@ -578,6 +582,7 @@ input:active {
     transition: all 0.3s ease;
     opacity: 0.6;
     pointer-events: none;
+    z-index: -1;
 }
 
 /* Mobile */
@@ -643,11 +648,11 @@ input:active {
 @keyframes popup {
     0% {
         opacity: 0;
-        scale: 0.5;
+        scale: 0.75;
     }
     70% {
         opacity: 1;
-        scale: 1.05;
+        scale: 1.01;
     }
     100% {
         opacity: 1;
@@ -662,7 +667,7 @@ input:active {
     }
     20% {
         opacity: 0.7;
-        scale: 1.02;
+        scale: 1.01;
     }
     25% {
         opacity: 0.2;
@@ -679,7 +684,7 @@ input:active {
 }
 
 .hidden {
-    animation: popdown 0.3s ease-in forwards;
+    animation: popdown 0.25s ease-out forwards;
     pointer-events: none;
 }
 

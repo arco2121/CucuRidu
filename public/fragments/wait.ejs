@@ -32,15 +32,9 @@
     const showGiocatori = document.getElementById("showGiocatori");
     const startButton = document.getElementById("startButton");
 
-    const menuBtn = document.getElementById("menuBtn");
-
-    menuBtn.addEventListener("click", () => {
-        game_section.dispatchEvent(hidePanel);
-        pauseMenu.dispatchEvent(showPanel);
-    })
-
     const idStanza = "<%= stanzaId %>";
     let idAttesaInterval;
+    clearInterval(idAttesaInterval);
 
     socket.on("aggiornamentoAttesa", async (data) => {
         const {numeroGiocatori, minimoGiocatori, giocatori} = data || {};
