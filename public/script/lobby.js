@@ -85,7 +85,7 @@ socket.on("connect_error", (err) => {
 });
 
 socket.on("confermaStanza", (data) => {
-    const { reference, interroghi } = data;
+    const { reference, interroghi, primoRound } = data;
     referenceStanza = data["stanzaId"] || fromBackEnd["stanzaId"];
     referenceGiocatore = new GiocatoreInterface(reference);
     fetch("/saveGameReference", {
@@ -103,7 +103,8 @@ socket.on("confermaStanza", (data) => {
         if(result?.result) {
             await renderFragment(base, "wait", {
                 stanzaId: referenceStanza,
-                interroghi: interroghi || false
+                interroghi: interroghi || false,
+                primoRound: primoRound || true
             });
             if(result.fallback) {
                 const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");

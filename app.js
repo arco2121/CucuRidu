@@ -30,6 +30,7 @@ const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
             socket.emit("confermaStanza", {
                 reference: socket.data.referenceGiocatore.adaptToClient(),
                 stanza: Stanze.get(stanzaId).id,
+                primoRound: Stanze.get(stanzaId).numeroRound[0] === 0,
                 interroghi: Stanze.get(stanzaId).round.chiStaInterrogando === socket.data.referenceGiocatore.id
             });
             return next();
@@ -254,6 +255,7 @@ server.on("connection", (user) => {
             user.emit("confermaStanza", {
                 stanzaId: stanza.id,
                 reference: user.data.referenceGiocatore.adaptToClient(),
+                primoRound: Stanze.get(stanza.id).numeroRound[0] === 0,
                 interroghi: Stanze.get(stanza.id).round.chiStaInterrogando === user.data.referenceGiocatore.id
             });
             server.to(stanza.id).emit("aggiornamentoAttesa", {
@@ -281,7 +283,8 @@ server.on("connection", (user) => {
             user.join(stanzaId);
             user.emit("confermaStanza", {
                 reference: user.data.referenceGiocatore.adaptToClient(),
-                interroghi: Stanze.get(stanzaId).round.chiStaInterrogando === user.data.referenceGiocatore.id
+                interroghi: Stanze.get(stanzaId).round.chiStaInterrogando === user.data.referenceGiocatore.id,
+                primoRound: Stanze.get(stanzaId).numeroRound[0] === 0
             });
             server.to(stanzaId).emit("aggiornamentoAttesa", {
                 numeroGiocatori: Stanze.get(stanzaId).giocatori.size,

@@ -55,7 +55,11 @@ class Stanza {
     eliminaGiocatore(giocatoreId) {
         const giocatore = this.trovaGiocatore(giocatoreId);
         if(!giocatore) return false;
+
+        this.mazzoCompletamenti.mazzo.aggiungiCarte(...giocatore.prendiTuttaLaMano())
+        this.giocatoriPassati.add(giocatore.id);
         this.giocatori.delete(giocatoreId);
+
         if(giocatore === this.master) {
             this.master = this.giocatori.values().next().value;
             if (this.master) this.master.masterRole = true;
@@ -65,9 +69,31 @@ class Stanza {
             const nuovoInterrogante = this.trovaGiocatore(this.round.chiStaInterrogando);
             if (nuovoInterrogante) nuovoInterrogante.interrogationRole = true;
         }
-        this.mazzoCompletamenti.mazzo.aggiungiCarte(...giocatore.prendiTuttaLaMano())
-        this.giocatoriPassati.add(giocatore.id);
-        if(this.giocatori.size < this.minimoGiocatori) this.stato = StatoStanza.WAIT;
+
+        if (this.round.risposte?.has(giocatoreId)) {
+            const carteGiocate = this.round.risposte.get(giocatoreId);
+            this.mazzoCompletamenti.mazzo.aggiungiCarte(...carteGiocate);
+            this.round.risposte.delete(giocatoreId);
+        }
+
+        if(this.giocatori.size < this.minimoGiocatori) {
+            this.stato = StatoStanza.WAIT;
+            this.numeroRound[0] = Math.max(0, this.numeroRound[0] - 1);
+            Array.from(this.round.risposte?.entries() || []).forEach(([key, value]) => {
+                this.trovaGiocatore(key)?.aggiungiMano(...value);
+            });
+            this.round.risposte?.clear();
+        }
+        else if (this.stato === StatoStanza.CHOOSING_CARDS) {
+            if (this.round.risposte.size === (this.giocatori.size - 1)) {
+                this.stato = StatoStanza.CHOOSING_WINNER;
+            }
+        }
+
+        if(this.giocatori.size === 0) return true;
+        let maxOccorrenze = 0;
+        this.mazzoFrasi.mazzo.carte.map(carta => carta[1]).forEach(occorrenza => maxOccorrenze += occorrenza);
+        this.numeroRound = [this.numeroRound[0], Math.floor(maxOccorrenze / this.giocatori.size)];
         return true;
     }
 
