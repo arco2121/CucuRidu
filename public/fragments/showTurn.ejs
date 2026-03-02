@@ -16,6 +16,7 @@
                 <% }); %>
             </div>
         </div>
+        <button id="sendCards">Conferma</button>
     <% } else { %>
         <h1>Aspetta che tutti finiscano di rispondere</h1>
     <% } %>
@@ -24,7 +25,9 @@
 <script>
     const cards = document.querySelectorAll(".risposta");
     const domandaAttuale = document.querySelector(".domanda");
+    const sendCards = document.getElementById("sendCards");
     const defaultText = domandaAttuale.textContent;
+
     const risposte = Array.from({ length: parseInt(domandaAttuale.id) }, (val) => val = null);
     const toggleCards = (target) => {
         if(risposte.length > 2) return;
@@ -41,4 +44,13 @@
     };
 
     cards.forEach(card => card.addEventListener("click", (e) => toggleCards(e.target)));
+
+    sendCards.addEventListener("click", () => {
+        if(risposte.filter(ele => ele !== null).length > 0)
+            return alert("Finisci di selezionare, mongolo");
+        socket.emit("inviaRisposta", {
+            id: referenceStanza,
+            indexCarte: referenceGiocatore.mazzo.filter(carta => risposte.indexOf(carta) !== -1).map(carta => referenceGiocatore.mazzo.indexOf(carta))
+        });
+    })
 </script>

@@ -326,7 +326,7 @@ server.on("connection", (user) => {
     user.on("inviaRisposta", (data) => {
        try {
            const stanzaId = data["id"];
-           const carte = data["indexCarta"];
+           const carte = data["indexCarte"];
            const result = Stanze.get(stanzaId).aggiungiRisposta(user.data.referenceGiocatore.id, ...carte);
            if(typeof result === "object") {
                server.to(stanzaId).emit("sceltaVincitore", {
