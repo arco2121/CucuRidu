@@ -124,6 +124,10 @@ socket.on("stanzaChiusa", () => {
     lasciaStanza();
 });
 
+socket.on("aspettaAltri", (data) => {
+    alert(data.message);
+});
+
 socket.on("errore", (error) => {
     alert(error.message);
     navigateWithLoading("/");
@@ -133,9 +137,10 @@ socket.on("roundIniziato", async (data) => {
     referenceGiocatore = new GiocatoreInterface(data["reference"]);
     const informazioniSuChiInterroga = new GiocatoreInterface(data["chiStaInterrogandoInfo"]);
     const domanda = data["domanda"];
+    console.log(!referenceGiocatore.interrogationRole)
     await renderFragment(base, "showTurn", {
         domanda: domanda,
-        risposte: informazioniSuChiInterroga.interrogationRole ? referenceGiocatore.carte : null,
+        risposte: !referenceGiocatore.interrogationRole ? referenceGiocatore.mazzo : null,
         informazioniSuChiInterroga: informazioniSuChiInterroga
     });
 });

@@ -23,11 +23,12 @@ const resumeGame = (req, res, next) => {
 const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
     if (!Stanze.get(stanzaId)) return next();
     console.log(`Stanza ${stanzaId} => ${Stanze.get(stanzaId).toString()}`)
+    if(!socket.data.referenceGiocatore) return next();
 
     switch (Stanze.get(stanzaId).stato) {
         case StatoStanza.WAIT : {
             socket.emit("confermaStanza", {
-                reference: socket.data.referenceGiocatore?.adaptToClient(),
+                reference: socket.data.referenceGiocatore.adaptToClient(),
                 stanza: Stanze.get(stanzaId).id
             });
             return next();
@@ -41,7 +42,7 @@ const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
         case StatoStanza.CHOOSING_CARDS : {
             socket.emit("roundIniziato", {
                 chiStaInterrogandoInfo: Stanze.get(stanzaId).trovaGiocatore(Stanze.get(stanzaId).round.chiStaInterrogando).adaptToClient(),
-                domanda: Stanze.get(stanzaId).domanda,
+                domanda: Stanze.get(stanzaId).round.domanda,
                 reference: socket.data.referenceGiocatore.adaptToClient()
             });
             return next();
@@ -255,6 +256,7 @@ server.on("connection", (user) => {
             });
             server.to(stanza.id).emit("aggiornamentoAttesa", {
                 numeroGiocatori: Stanze.get(stanza.id).giocatori.size,
+                minimoGiocatori: Stanze.get(stanza.id).minimoGiocatori,
                 giocatori: Array.from(Stanze.get(stanza.id).giocatori.values()).map(giocatore => giocatore.adaptToClient())
             });
             console.log("Stanza creata => " + stanza.id);
@@ -280,11 +282,12 @@ server.on("connection", (user) => {
             });
             server.to(stanzaId).emit("aggiornamentoAttesa", {
                 numeroGiocatori: Stanze.get(stanzaId).giocatori.size,
+                minimoGiocatori: Stanze.get(stanzaId).minimoGiocatori,
                 giocatori: Array.from(Stanze.get(stanzaId).giocatori.values()).map(giocatore => giocatore.adaptToClient())
             });
             console.log("Giocatore aggiunto a Stanza => " + stanzaId);
         } catch (e) {
-            user.emit("errore", JSON.stringify(e));
+            console.log(e)
         }
     });
     user.on("iniziaTurno", (data) => {
@@ -317,7 +320,7 @@ server.on("connection", (user) => {
                 message: "Girl non ci sono chatbot ai che fingano di scoparti qui. Go touch some grass or smt"
             });
         } catch (e) {
-            user.emit("errore", JSON.stringify(e));
+            console.log(e)
         }
     });
     user.on("inviaRisposta", (data) => {
@@ -342,7 +345,7 @@ server.on("connection", (user) => {
                });
            }
        } catch (e) {
-           user.emit("errore", JSON.stringify(e));
+           console.log(e)
        }
     });
     user.on("scegliVincitore", (data) => {
@@ -369,7 +372,7 @@ server.on("connection", (user) => {
                 });
             }
         } catch (e) {
-            user.emit("errore", JSON.stringify(e));
+            console.log(e)
         }
     });
     user.on("terminaPartita", (data) => {
@@ -387,11 +390,12 @@ server.on("connection", (user) => {
                 console.log("Stanza eliminata => " + stanzaId);
             }
         } catch (e) {
-            user.emit("errore", JSON.stringify(e));
+            console.log(e)
         }
     });
     user.on("aggiornaAttesa", (data) => server.to(data["stanzaId"]).emit("aggiornamentoAttesa", {
         numeroGiocatori: Stanze.get(data["stanzaId"])?.giocatori.size,
+        minimoGiocatori: Stanze.get(data["stanzaId"]).minimoGiocatori,
         giocatori: Array.from(Stanze.get(data["stanzaId"])?.giocatori.values()).map(giocatore => giocatore.adaptToClient())
     }));
     user.on("lasciaStanza", (data) => {
@@ -409,8 +413,8 @@ server.on("connection", (user) => {
                 }, generationMemory, Stanze, stanzaId);
                 if(deleted) return;
                 server.in(stanzaId).fetchSockets().then(sockets => {
-                    const persona = sockets.filter(socket =>
-                        socket.data?.referenceGiocatore.id === giocatoreId).at(0);
+                    const persona = sockets.find(socket =>
+                        socket.data?.referenceGiocatore.id === giocatoreId);
                     if(persona) {
                         persona.emit("stanzaLasciata");
                         persona.leave(stanzaId);
@@ -425,9 +429,7 @@ server.on("connection", (user) => {
                 console.log("Giocatore eliminato da Stanza => " + stanzaId);
             }
         } catch (e) {
-            user.emit("errore", {
-               message: JSON.stringify(e)
-            });
+            console.log(e)
         }
     });
     user.on("disconnect", () => {

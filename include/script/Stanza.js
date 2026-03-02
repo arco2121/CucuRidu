@@ -32,6 +32,11 @@ class Stanza {
             }),
             scarto: new Mazzo()
         }
+        this.round = {
+            domanda: null,
+            risposte: null,
+            chiStaInterrogando: this.master.id
+        }
         this.giocatori.set(this.master.id, this.master);
         this.numeroRound = [0, this.giocatori.size];
     }
@@ -56,12 +61,13 @@ class Stanza {
             if (this.master) this.master.masterRole = true;
         }
         if(giocatore.id === this.round.chiStaInterrogando) {
-            this.round.chiStaInterrogando = this.giocatori.values().next().value.id;
+            this.round.chiStaInterrogando = this.giocatori.values().next()?.value.id;
             const nuovoInterrogante = this.trovaGiocatore(this.round.chiStaInterrogando);
             if (nuovoInterrogante) nuovoInterrogante.interrogationRole = true;
         }
         this.mazzoCompletamenti.mazzo.aggiungiCarte(...giocatore.prendiTuttaLaMano())
         this.giocatoriPassati.add(giocatore.id);
+        if(this.giocatori.size < this.minimoGiocatori) this.stato = StatoStanza.WAIT;
         return true;
     }
 

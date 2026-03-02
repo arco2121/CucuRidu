@@ -32,7 +32,7 @@
             risposte[risposte.indexOf(target.textContent)] = null;
         else
             risposte[risposte.findIndex(ele => ele === null)] = target.textContent;
-        const risposteAttuali = risposte.find(ele => ele !== null).length;
+        const risposteAttuali = risposte.filter(ele => ele !== null).length;
         if(risposteAttuali > 0)
             risposte.forEach(risposta => domandaAttuale.textContent = defaultText.replace("_", risposta));
         else
