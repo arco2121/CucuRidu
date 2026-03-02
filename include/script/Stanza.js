@@ -86,7 +86,7 @@ class Stanza {
     terminaPartita(idGiocatore) {
         if(this.stato !== StatoStanza.END && this.trovaGiocatore(idGiocatore) === this.master) {
             this.stato = StatoStanza.END;
-            const classifica = Array.from(this.giocatori.values()).sort((a, b) => b.punti - a.punti);
+            const classifica = this.classifica();
             this.giocatori.clear();
             this.mazzoFrasi = null;
             this.mazzoCompletamenti = null;
@@ -94,6 +94,10 @@ class Stanza {
             return classifica;
         }
         return false;
+    }
+
+    classifica() {
+        return Array.from(this.giocatori.values()).toSorted((a, b) => b.punti - a.punti)
     }
 
     iniziaTurno(chiStaChidedendo) {

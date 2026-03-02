@@ -259,7 +259,7 @@ server.on("connection", (user) => {
             server.to(stanza.id).emit("aggiornamentoAttesa", {
                 numeroGiocatori: Stanze.get(stanza.id).giocatori.size,
                 minimoGiocatori: Stanze.get(stanza.id).minimoGiocatori,
-                giocatori: Array.from(Stanze.get(stanza.id).giocatori.values()).map(giocatore => giocatore.adaptToClient())
+                giocatori: Stanze.get(stanza.id).classifica().map(giocatore => giocatore.adaptToClient())
             });
             console.log("Stanza creata => " + stanza.id);
         } catch {
@@ -286,7 +286,7 @@ server.on("connection", (user) => {
             server.to(stanzaId).emit("aggiornamentoAttesa", {
                 numeroGiocatori: Stanze.get(stanzaId).giocatori.size,
                 minimoGiocatori: Stanze.get(stanzaId).minimoGiocatori,
-                giocatori: Array.from(Stanze.get(stanzaId).giocatori.values()).map(giocatore => giocatore.adaptToClient())
+                giocatori: Stanze.get(stanzaId).classifica().map(giocatore => giocatore.adaptToClient())
             });
             console.log("Giocatore aggiunto a Stanza => " + stanzaId);
         } catch (e) {
@@ -399,7 +399,7 @@ server.on("connection", (user) => {
     user.on("aggiornaAttesa", (data) => server.to(data["stanzaId"]).emit("aggiornamentoAttesa", {
         numeroGiocatori: Stanze.get(data["stanzaId"])?.giocatori.size,
         minimoGiocatori: Stanze.get(data["stanzaId"]).minimoGiocatori,
-        giocatori: Array.from(Stanze.get(data["stanzaId"])?.giocatori.values()).map(giocatore => giocatore.adaptToClient())
+        giocatori: Stanze.get(data["stanzaId"]).classifica().map(giocatore => giocatore.adaptToClient())
     }));
     user.on("lasciaStanza", (data) => {
         try {
