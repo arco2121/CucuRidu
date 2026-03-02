@@ -11,13 +11,13 @@ const { generateId } = require(path.join(__dirname, '/generazione'));
 
 class Stanza {
 
-    constructor(username, pfp, memory, minimoGiocatori = 3) {
+    constructor(username, pfp, memory, minimoGiocatori = 2) {
         this.id = typeof memory === "string" ? memory : generateId(6, memory);
         this.giocatori = new Map();
         this.giocatoriPassati = new Set();
         this.stato = StatoStanza.WAIT;
         this.minimoGiocatori = minimoGiocatori;
-        this.master = new Giocatore(username, pfp, memory, true);
+        this.master = new Giocatore(username, pfp, memory, true, true);
         this.mazzoCompletamenti = {
             mazzo: new Mazzo({
                 pack: "standard",
@@ -32,6 +32,11 @@ class Stanza {
             }),
             scarto: new Mazzo()
         }
+        this.round = {
+            domanda: null,
+            risposte: null,
+            chiStaInterrogando: this.master.id
+        }
         this.giocatori.set(this.master.id, this.master);
         this.numeroRound = [0, this.giocatori.size];
     }
@@ -40,7 +45,9 @@ class Stanza {
         if(this.stato !== StatoStanza.WAIT)
             return false;
         const giocatore = new Giocatore(username, pfp, memory);
-        this.numeroRound = [this.numeroRound[0], Math.max(1, Math.floor(this.numeroRound[1] / this.giocatori.size) * (this.giocatori.size + 1))];
+        let maxOccorrenze = 0;
+        this.mazzoFrasi.mazzo.carte.map(carta => carta[1]).forEach(occorrenza => maxOccorrenze += occorrenza);
+        this.numeroRound = [this.numeroRound[0], Math.floor(maxOccorrenze / (this.giocatori.size + 1))];
         this.giocatori.set(giocatore.id, giocatore);
         return giocatore;
     }
@@ -48,13 +55,45 @@ class Stanza {
     eliminaGiocatore(giocatoreId) {
         const giocatore = this.trovaGiocatore(giocatoreId);
         if(!giocatore) return false;
+
+        this.mazzoCompletamenti.mazzo.aggiungiCarte(...giocatore.prendiTuttaLaMano())
+        this.giocatoriPassati.add(giocatore.id);
         this.giocatori.delete(giocatoreId);
+
         if(giocatore === this.master) {
             this.master = this.giocatori.values().next().value;
             if (this.master) this.master.masterRole = true;
         }
-        this.mazzoCompletamenti.mazzo.aggiungiCarte(...giocatore.prendiTuttaLaMano())
-        this.giocatoriPassati.add(giocatore.id);
+        if(giocatore.id === this.round.chiStaInterrogando) {
+            this.round.chiStaInterrogando = this.giocatori.values().next()?.value?.id;
+            const nuovoInterrogante = this.trovaGiocatore(this.round.chiStaInterrogando);
+            if (nuovoInterrogante) nuovoInterrogante.interrogationRole = true;
+        }
+
+        if (this.round.risposte?.has(giocatoreId)) {
+            const carteGiocate = this.round.risposte.get(giocatoreId);
+            this.mazzoCompletamenti.mazzo.aggiungiCarte(...carteGiocate);
+            this.round.risposte.delete(giocatoreId);
+        }
+
+        if(this.giocatori.size < this.minimoGiocatori) {
+            this.stato = StatoStanza.WAIT;
+            this.numeroRound[0] = Math.max(0, this.numeroRound[0] - 1);
+            Array.from(this.round.risposte?.entries() || []).forEach(([key, value]) => {
+                this.trovaGiocatore(key)?.aggiungiMano(...value);
+            });
+            this.round.risposte?.clear();
+        }
+        else if (this.stato === StatoStanza.CHOOSING_CARDS) {
+            if (this.round.risposte.size === (this.giocatori.size - 1)) {
+                this.stato = StatoStanza.CHOOSING_WINNER;
+            }
+        }
+
+        if(this.giocatori.size === 0) return true;
+        let maxOccorrenze = 0;
+        this.mazzoFrasi.mazzo.carte.map(carta => carta[1]).forEach(occorrenza => maxOccorrenze += occorrenza);
+        this.numeroRound = [this.numeroRound[0], Math.floor(maxOccorrenze / this.giocatori.size)];
         return true;
     }
 
@@ -73,7 +112,7 @@ class Stanza {
     terminaPartita(idGiocatore) {
         if(this.stato !== StatoStanza.END && this.trovaGiocatore(idGiocatore) === this.master) {
             this.stato = StatoStanza.END;
-            const classifica = Array.from(this.giocatori.values()).sort((a, b) => b.punti - a.punti);
+            const classifica = this.classifica();
             this.giocatori.clear();
             this.mazzoFrasi = null;
             this.mazzoCompletamenti = null;
@@ -83,13 +122,17 @@ class Stanza {
         return false;
     }
 
+    classifica() {
+        return Array.from(this.giocatori.values()).toSorted((a, b) => b.punti - a.punti)
+    }
+
     iniziaTurno(chiStaChidedendo) {
         if(this.stato !== StatoStanza.WAIT || this.giocatori.size < this.minimoGiocatori)
             return false;
         if(this.numeroRound[0] === 0) {
             let maxOccorrenze = 0;
             this.mazzoFrasi.mazzo.carte.map(carta => carta[1]).forEach(occorrenza => maxOccorrenze += occorrenza);
-            this.numeroRound = [1, maxOccorrenze * this.giocatori.size];
+            this.numeroRound = [1, Math.floor(maxOccorrenze / this.giocatori.size)];
             this.mazzoCompletamenti.mazzo.shuffle();
             this.mazzoFrasi.mazzo.shuffle();
             this.round = {
@@ -139,7 +182,10 @@ class Stanza {
         this.mazzoCompletamenti.scarto.aggiungiCarte(...Array.from(this.round.risposte.values()).flatMap(x => x));
         this.mazzoFrasi.scarto.aggiungiCarte(this.round.domanda);
         const risposte = this.round.risposte.get(idGiocatore);
-        const domanda = this.round.domanda
+        const domanda = this.round.domanda;
+
+        vincitoreRound.interrogationRole = true;
+        this.trovaGiocatore(this.round.chiStaInterrogando).interrogationRole = false;
         this.round = {
             domanda: this.mazzoFrasi.mazzo.prendiCarte(1)[0],
             risposte: new Map(),

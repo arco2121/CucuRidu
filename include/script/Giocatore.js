@@ -4,13 +4,14 @@ const { Mazzo, TipoMazzo } = require((path.join(__dirname, '/Mazzo')));
 
 class Giocatore {
 
-    constructor(username, pfp, memory, role = false) {
+    constructor(username, pfp, memory, role = false, interrogating = false) {
         this.id = generateId(32, memory);
         this.username = username;
         this.punti = 0;
         this.pfp = pfp;
         this.online = true;
         this.masterRole = role;
+        this.interrogationRole = interrogating;
         this.mazzo = new Mazzo(TipoMazzo.COMPLETAMENTI);
     }
 
@@ -36,7 +37,8 @@ class Giocatore {
             username: this.username,
             mazzo: this.mazzo.toArray(),
             pfp: this.pfp,
-            masterRole: this.masterRole
+            masterRole: this.masterRole,
+            interrogationRole: this.interrogationRole
         }
     }
 }

@@ -23,11 +23,15 @@ const resumeGame = (req, res, next) => {
 const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
     if (!Stanze.get(stanzaId)) return next();
     console.log(`Stanza ${stanzaId} => ${Stanze.get(stanzaId).toString()}`)
+    if(!socket.data.referenceGiocatore) return next();
+
     switch (Stanze.get(stanzaId).stato) {
         case StatoStanza.WAIT : {
             socket.emit("confermaStanza", {
                 reference: socket.data.referenceGiocatore.adaptToClient(),
-                stanza: Stanze.get(stanzaId).id
+                stanza: Stanze.get(stanzaId).id,
+                primoRound: Stanze.get(stanzaId).numeroRound[0] === 0,
+                interroghi: Stanze.get(stanzaId).round.chiStaInterrogando === socket.data.referenceGiocatore.id
             });
             return next();
         }
@@ -39,7 +43,8 @@ const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
         }
         case StatoStanza.CHOOSING_CARDS : {
             socket.emit("roundIniziato", {
-                round: Stanze.get(stanzaId).round,
+                chiStaInterrogando: Stanze.get(stanzaId).trovaGiocatore(Stanze.get(stanzaId).round.chiStaInterrogando).adaptToClient(),
+                domanda: Stanze.get(stanzaId).round.domanda,
                 reference: socket.data.referenceGiocatore.adaptToClient()
             });
             return next();
@@ -48,7 +53,7 @@ const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
             socket.emit("sceltaVincitore", {
                 risposte: Array.from(Stanze.get(stanzaId).round.risposte.entries()),
                 domanda: Stanze.get(stanzaId).round.domanda,
-                chiInterroga: Stanze.get(stanzaId).round.chiStaInterrogando,
+                chiInterroga: Stanze.get(stanzaId).trovaGiocatore(Stanze.get(stanzaId).round.chiStaInterrogando).adaptToClient(),
                 reference: socket.data.referenceGiocatore.adaptToClient()
             });
             return next();
@@ -249,11 +254,14 @@ server.on("connection", (user) => {
             user.data.referenceGiocatore = stanza.master;
             user.emit("confermaStanza", {
                 stanzaId: stanza.id,
-                reference: user.data.referenceGiocatore.adaptToClient()
+                reference: user.data.referenceGiocatore.adaptToClient(),
+                primoRound: Stanze.get(stanza.id).numeroRound[0] === 0,
+                interroghi: Stanze.get(stanza.id).round.chiStaInterrogando === user.data.referenceGiocatore.id
             });
             server.to(stanza.id).emit("aggiornamentoAttesa", {
                 numeroGiocatori: Stanze.get(stanza.id).giocatori.size,
-                giocatori: Array.from(Stanze.get(stanza.id).giocatori.values()).map(giocatore => giocatore.adaptToClient())
+                minimoGiocatori: Stanze.get(stanza.id).minimoGiocatori,
+                giocatori: Stanze.get(stanza.id).classifica().map(giocatore => giocatore.adaptToClient())
             });
             console.log("Stanza creata => " + stanza.id);
         } catch {
@@ -274,15 +282,18 @@ server.on("connection", (user) => {
             }
             user.join(stanzaId);
             user.emit("confermaStanza", {
-                reference: user.data.referenceGiocatore.adaptToClient()
+                reference: user.data.referenceGiocatore.adaptToClient(),
+                interroghi: Stanze.get(stanzaId).round.chiStaInterrogando === user.data.referenceGiocatore.id,
+                primoRound: Stanze.get(stanzaId).numeroRound[0] === 0
             });
             server.to(stanzaId).emit("aggiornamentoAttesa", {
                 numeroGiocatori: Stanze.get(stanzaId).giocatori.size,
-                giocatori: Array.from(Stanze.get(stanzaId).giocatori.values()).map(giocatore => giocatore.adaptToClient())
+                minimoGiocatori: Stanze.get(stanzaId).minimoGiocatori,
+                giocatori: Stanze.get(stanzaId).classifica().map(giocatore => giocatore.adaptToClient())
             });
             console.log("Giocatore aggiunto a Stanza => " + stanzaId);
         } catch (e) {
-            user.emit("errore", JSON.stringify(e));
+            console.log(e)
         }
     });
     user.on("iniziaTurno", (data) => {
@@ -305,28 +316,29 @@ server.on("connection", (user) => {
                     for(const socket of sockets) {
                         socket.data.referenceGiocatore = Stanze.get(stanzaId).trovaGiocatore(socket.data.referenceGiocatore.id);
                         socket.emit("roundIniziato", {
-                            round: round,
+                            chiStaInterrogando: Stanze.get(stanzaId).trovaGiocatore(round.chiStaInterrogando).adaptToClient(),
+                            domanda: round.domanda,
                             reference: socket.data.referenceGiocatore.adaptToClient()
                         });
                     }
                 });
             else user.emit("aspettaAltri", {
-                    message: "Girl non ci sono chatbot ai che fingano di scoparti qui. Go touch some grass or smt"
+                message: "Girl non ci sono chatbot ai che fingano di scoparti qui. Go touch some grass or smt"
             });
         } catch (e) {
-            user.emit("errore", JSON.stringify(e));
+            console.log(e)
         }
     });
     user.on("inviaRisposta", (data) => {
        try {
            const stanzaId = data["id"];
-           const carte = data["indexCarta"];
+           const carte = data["indexCarte"];
            const result = Stanze.get(stanzaId).aggiungiRisposta(user.data.referenceGiocatore.id, ...carte);
            if(typeof result === "object") {
                server.to(stanzaId).emit("sceltaVincitore", {
                    domanda: result[0],
                    risposte: result[1],
-                   chiInterroga: result[2]
+                   chiInterroga: Stanze.get(stanzaId).trovaGiocatore(result[2]).adaptToClient(),
                });
            } else if(result) {
                user.emit("rispostaRegistrata", {
@@ -339,7 +351,7 @@ server.on("connection", (user) => {
                });
            }
        } catch (e) {
-           user.emit("errore", JSON.stringify(e));
+           console.log(e)
        }
     });
     user.on("scegliVincitore", (data) => {
@@ -366,7 +378,7 @@ server.on("connection", (user) => {
                 });
             }
         } catch (e) {
-            user.emit("errore", JSON.stringify(e));
+            console.log(e)
         }
     });
     user.on("terminaPartita", (data) => {
@@ -384,12 +396,13 @@ server.on("connection", (user) => {
                 console.log("Stanza eliminata => " + stanzaId);
             }
         } catch (e) {
-            user.emit("errore", JSON.stringify(e));
+            console.log(e)
         }
     });
     user.on("aggiornaAttesa", (data) => server.to(data["stanzaId"]).emit("aggiornamentoAttesa", {
         numeroGiocatori: Stanze.get(data["stanzaId"])?.giocatori.size,
-        giocatori: Array.from(Stanze.get(data["stanzaId"])?.giocatori.values()).map(giocatore => giocatore.adaptToClient())
+        minimoGiocatori: Stanze.get(data["stanzaId"]).minimoGiocatori,
+        giocatori: Stanze.get(data["stanzaId"]).classifica().map(giocatore => giocatore.adaptToClient())
     }));
     user.on("lasciaStanza", (data) => {
         try {
@@ -406,8 +419,8 @@ server.on("connection", (user) => {
                 }, generationMemory, Stanze, stanzaId);
                 if(deleted) return;
                 server.in(stanzaId).fetchSockets().then(sockets => {
-                    const persona = sockets.filter(socket =>
-                        socket.data?.referenceGiocatore.id === giocatoreId).at(0);
+                    const persona = sockets.find(socket =>
+                        socket.data?.referenceGiocatore.id === giocatoreId);
                     if(persona) {
                         persona.emit("stanzaLasciata");
                         persona.leave(stanzaId);
@@ -422,9 +435,7 @@ server.on("connection", (user) => {
                 console.log("Giocatore eliminato da Stanza => " + stanzaId);
             }
         } catch (e) {
-            user.emit("errore", {
-               message: JSON.stringify(e)
-            });
+            console.log(e)
         }
     });
     user.on("disconnect", () => {

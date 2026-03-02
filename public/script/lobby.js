@@ -66,6 +66,7 @@ socket.on("connect", () => {
         }
     }
 });
+
 socket.on("connect_error", (err) => {
     switch(err.message) {
         case "SESSION_EXPIRED" : {
@@ -82,8 +83,9 @@ socket.on("connect_error", (err) => {
         }
     }
 });
+
 socket.on("confermaStanza", (data) => {
-    const { reference } = data;
+    const { reference, interroghi, primoRound } = data;
     referenceStanza = data["stanzaId"] || fromBackEnd["stanzaId"];
     referenceGiocatore = new GiocatoreInterface(reference);
     fetch("/saveGameReference", {
@@ -100,7 +102,9 @@ socket.on("confermaStanza", (data) => {
         const result = (await response.json());
         if(result?.result) {
             await renderFragment(base, "wait", {
-                stanzaId: referenceStanza
+                stanzaId: referenceStanza,
+                interroghi: interroghi || false,
+                primoRound: primoRound || true
             });
             if(result.fallback) {
                 const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
@@ -114,14 +118,49 @@ socket.on("confermaStanza", (data) => {
         else navigateWithLoading("/");
     });
 });
+
 socket.on("stanzaLasciata", lasciaStanza);
+
 socket.on("stanzaChiusa", () => {
     alert("NOOOOOOO, la chiusura della stanza NOOOOOOO");
     lasciaStanza();
 });
+
+socket.on("aspettaAltri", (data) => {
+    alert(data.message);
+});
+
 socket.on("errore", (error) => {
     alert(error.message);
     navigateWithLoading("/");
+});
+
+socket.on("roundIniziato", async (data) => {
+    const { chiStaInterrogando, reference, domanda } = data;
+    referenceGiocatore = new GiocatoreInterface(reference);
+    await renderFragment(base, "showTurn", {
+        domanda: domanda,
+        risposte: !referenceGiocatore.interrogationRole ? referenceGiocatore.mazzo : null,
+        chiStaInterrogando: chiStaInterrogando
+    });
+});
+
+socket.on("rispostaRegistrata", (data) => {
+    alert(data.message);
+});
+
+socket.on("giaRegistrata", (data) => {
+    alert(data.message);
+});
+
+socket.on("sceltaVincitore", async (data) => {
+    const { reference, domanda, chiInterroga, risposte } = data;
+    if(reference) referenceGiocatore = new GiocatoreInterface(reference);
+    await renderFragment(base, "chooseWinner", {
+        domanda: domanda,
+        risposte: risposte,
+        chiStaInterrogando: chiInterroga
+    });
 });
 
 window.addEventListener("offline", () => socket.disconnect());

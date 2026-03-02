@@ -7,8 +7,10 @@
                 <button class="button btn_smallText btn_style_1 sour_gummy_bold" id="shareButton">Condividi</button>
             </div>
             <div class="column flex_gap_10">
-                <h4 id="attesa">Wait per il prossimo turno</h4>
-                <button class="button btn_mediumText btn_style_2 sour_gummy_bold" id="startButton">Inizia</button>
+                <h4 id="attesa"></h4>
+                <% if (interroghi) { %>
+                    <button class="button btn_mediumText btn_style_2 sour_gummy_bold" id="startButton"><%= primoRound ? "Inizia" : "Continua" %></button>
+                <% } %>
             </div>
 
         </div>
@@ -41,8 +43,14 @@
     let idAttesaInterval;
 
     socket.on("aggiornamentoAttesa", async (data) => {
-        const {numeroGiocatori, giocatori} = data || {};
+        const {numeroGiocatori, minimoGiocatori, giocatori} = data || {};
         numeroGiocatoriCount.textContent = numeroGiocatoriCount.textContent.split(":")[0] + ": " + numeroGiocatori;
+        console.log(minimoGiocatori)
+        if(numeroGiocatori < minimoGiocatori)
+            attesaView.textContent = "Wait per altri giocatori ✨";
+        else
+            attesaView.textContent = "Wait per il prossimo turno ✨";
+        updateAttesa();
         await renderFragment(showGiocatori, "giocatoreRow", {
             giocatori: giocatori
         });
@@ -51,20 +59,22 @@
         stanzaId: idStanza
     });
 
-    try {
-        const initialText = attesaView.textContent;
-        idAttesaInterval = setInterval(() => {
-            try {
-                const check = attesaView.textContent.split(")")[1].trim();
-                if (check === "...") attesaView.textContent = initialText + " ";
-                else attesaView.textContent += ".";
-            } catch {
-                clearInterval(idAttesaInterval);
-            }
-        }, 300);
-    } catch {
-        clearInterval(idAttesaInterval);
-    }
+    const updateAttesa = () => {
+        try {
+            const initialText = attesaView.textContent;
+            idAttesaInterval = setInterval(() => {
+                try {
+                    const check = attesaView.textContent.split("✨")[1].trim();
+                    if (check === "...") attesaView.textContent = initialText + " ";
+                    else attesaView.textContent += ".";
+                } catch {
+                    clearInterval(idAttesaInterval);
+                }
+            }, 300);
+        } catch {
+            clearInterval(idAttesaInterval);
+        }
+    };
 
     shareButton.addEventListener("click", async () => {
         const shareText = "Muovi il culo ed entra nella stanza per giocare inconcepibile sgorbio nato dall'errare umano che non sei altro :))";
