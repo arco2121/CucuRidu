@@ -33,10 +33,9 @@
     const startButton = document.getElementById("startButton");
 
     const idStanza = "<%= stanzaId %>";
-    let idAttesaInterval;
-    clearInterval(idAttesaInterval);
+    let idAttesaInterval = null;
 
-    socket.on("aggiornamentoAttesa", async (data) => {
+    socket.on("aggiornamentoAttesa", (data) => {
         const {numeroGiocatori, minimoGiocatori, giocatori} = data || {};
         numeroGiocatoriCount.textContent = numeroGiocatoriCount.textContent.split(":")[0] + ": " + numeroGiocatori;
         console.log(minimoGiocatori)
@@ -45,7 +44,7 @@
         else
             attesaView.textContent = "Wait per il prossimo turno ✨";
         updateAttesa();
-        await renderFragment(showGiocatori, "giocatoreRow", {
+        renderFragment(showGiocatori, "giocatoreRow", {
             giocatori: giocatori
         });
     });
@@ -56,6 +55,10 @@
     const updateAttesa = () => {
         try {
             const initialText = attesaView.textContent;
+            while(idAttesaInterval !== null) {
+                clearInterval(idAttesaInterval);
+                idAttesaInterval = null;
+            }
             idAttesaInterval = setInterval(() => {
                 try {
                     const check = attesaView.textContent.split("✨")[1].trim();
@@ -64,7 +67,7 @@
                 } catch {
                     clearInterval(idAttesaInterval);
                 }
-            }, 300);
+            }, 700);
         } catch {
             clearInterval(idAttesaInterval);
         }

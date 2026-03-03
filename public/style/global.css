@@ -578,9 +578,9 @@ input:active {
 }
 
 .hideRendering {
-    filter: blur(16px);
+    filter: blur(7px);
     transition: all 0.3s ease;
-    opacity: 0.6;
+    opacity: 0.2;
     pointer-events: none;
     z-index: -1;
 }

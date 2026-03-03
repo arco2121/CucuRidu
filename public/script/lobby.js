@@ -1,7 +1,7 @@
 const base = document.getElementById("landpoint");
 const game_section = document.getElementById("game_section");
 const pauseMenu = document.getElementById("pauseMenu");
-
+const codiceStanzaPause = document.getElementById("codiceStanzaPause");
 const leaveBtn = document.getElementById("leaveBtn");
 const exitPauseBtn = document.getElementById("exitPauseBtn");
 const menuBtn = document.getElementById("menuBtn");
@@ -93,10 +93,9 @@ socket.on("confermaStanza", (data) => {
             userId: referenceGiocatore.id,
             stanzaId: referenceStanza
         })
-    }).then(async (response) => {
-        const result = (await response.json());
+    }).then((response) => response.json().then((result) => {
         if(result?.result) {
-            await renderFragment(base, "wait", {
+            renderFragment(base, "wait", {
                 stanzaId: referenceStanza,
                 interroghi: interroghi || false,
                 primoRound: primoRound || true
@@ -111,7 +110,7 @@ socket.on("confermaStanza", (data) => {
             document.dispatchEvent(unloadScreen);
         }
         else navigateWithLoading("/");
-    });
+    }));
 });
 
 socket.on("stanzaLasciata", lasciaStanza);
@@ -131,8 +130,9 @@ socket.on("errore", (error) => {
 });
 
 socket.on("roundIniziato", async (data) => {
-    const { chiStaInterrogando, reference, domanda } = data;
-    referenceGiocatore = new GiocatoreInterface(reference);
+    const { chiStaInterrogando, stanza, reference, domanda } = data;
+    if(reference) referenceGiocatore = new GiocatoreInterface(reference);
+    if(stanza) referenceStanza = stanza
     await renderFragment(base, "showTurn", {
         domanda: domanda,
         risposte: !referenceGiocatore.interrogationRole ? referenceGiocatore.mazzo : null,
@@ -149,8 +149,9 @@ socket.on("giaRegistrata", (data) => {
 });
 
 socket.on("sceltaVincitore", async (data) => {
-    const { reference, domanda, chiInterroga, risposte } = data;
+    const { reference, stanza, domanda, chiInterroga, risposte } = data;
     if(reference) referenceGiocatore = new GiocatoreInterface(reference);
+    if(stanza) referenceStanza = stanza
     await renderFragment(base, "chooseWinner", {
         domanda: domanda,
         risposte: risposte,
@@ -159,7 +160,7 @@ socket.on("sceltaVincitore", async (data) => {
 });
 
 window.addEventListener("offline", () => socket.disconnect());
-window.addEventListener("offline", () => {
+window.addEventListener("online", () => {
     if(!socket.connected)
         socket.connect();
 });
@@ -170,11 +171,12 @@ leaveBtn.addEventListener("click", () => socket.emit("lasciaStanza", {
 
 exitPauseBtn.addEventListener("click", () => {
     pauseMenu.dispatchEvent(hidePanel);
-    game_section.dispatchEvent(unhideRendering);
+    game_section.dispatchEvent(showPanel);
 });
 
 menuBtn.addEventListener("click", () => {
-    game_section.dispatchEvent(hideRendering);
+    game_section.dispatchEvent(hidePanel);
+    codiceStanzaPause.textContent = referenceStanza;
     pauseMenu.dispatchEvent(showPanel);
 });
 

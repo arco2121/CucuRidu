@@ -28,6 +28,7 @@ const navigateWithLoading = (url) => {
 
 const fragmentsCache = {};
 const renderFragment = async (root, page, params = {}) => {
+    root.dispatchEvent(hideRendering);
     try {
         if(!fragmentsCache[page]) {
             const input = await fetch("/fragments/" + page + ".ejs");
@@ -49,10 +50,10 @@ const renderFragment = async (root, page, params = {}) => {
             newScript.remove();
             oldScript.remove();
         }
-        return rendering;
     } catch (e) {
         console.error(e);
     }
+    root.dispatchEvent(unhideRendering);
 };
 
 (() => {

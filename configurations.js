@@ -2,72 +2,31 @@ const path = require("path");
 const { getIcon, generateName, generatePfp, getAllPfp, getknownPacks } = require(path.join(__dirname, "include/script/generazione"));
 const { Stanza, StatoStanza } = require(path.join(__dirname, "include/script/Stanza"));
 
-const renderPage = (res, page, params = {}) => res.render("header", {
-    params: params,
-    page: page,
-    headerIcon: getIcon(true),
-    knownOrigin: process.env.HOSTING || null
-});
-
-const resumeGame = (req, res, next, Stanze, serverSession) => {
-    const { userId, stanzaId } = serverSession.get(req, req.query?.token);
-    const redirecting = req.query?.token ? "?token=" + req.query.token : "";
-    if(userId && Stanze.get(stanzaId) && Stanze.get(stanzaId).trovaGiocatore(userId)) return res.redirect("/game" + redirecting);
-    req.deleteToken = !!req.query?.token;
-    next();
-};
-
-const emitStatoStanza = (Stanze, stanzaId, socket, next = () => {}) => {
-    if (!Stanze.get(stanzaId)) return next();
-    console.log(`Stanza ${stanzaId} => ${Stanze.get(stanzaId).toString()}`)
-    if(!socket.data.referenceGiocatore) return next();
-
-    switch (Stanze.get(stanzaId).stato) {
-        case StatoStanza.WAIT : {
-            socket.emit("confermaStanza", {
-                reference: socket.data.referenceGiocatore.adaptToClient(),
-                stanza: Stanze.get(stanzaId).id,
-                primoRound: Stanze.get(stanzaId).numeroRound[0] === 0,
-                interroghi: Stanze.get(stanzaId).round.chiStaInterrogando === socket.data.referenceGiocatore.id
-            });
-            return next();
-        }
-        case StatoStanza.END : {
-            socket.emit("stanzaChiusa");
-            socket.data.referenceGiocatore = null;
-            socket.leave(stanzaId);
-            return next();
-        }
-        case StatoStanza.CHOOSING_CARDS : {
-            socket.emit("roundIniziato", {
-                chiStaInterrogando: Stanze.get(stanzaId).trovaGiocatore(Stanze.get(stanzaId).round.chiStaInterrogando).adaptToClient(),
-                domanda: Stanze.get(stanzaId).round.domanda,
-                reference: socket.data.referenceGiocatore.adaptToClient()
-            });
-            return next();
-        }
-        case StatoStanza.CHOOSING_WINNER : {
-            socket.emit("sceltaVincitore", {
-                risposte: Array.from(Stanze.get(stanzaId).round.risposte.entries()),
-                domanda: Stanze.get(stanzaId).round.domanda,
-                chiInterroga: Stanze.get(stanzaId).trovaGiocatore(Stanze.get(stanzaId).round.chiStaInterrogando).adaptToClient(),
-                reference: socket.data.referenceGiocatore.adaptToClient()
-            });
-            return next();
-        }
-    }
-    next();
-};
-
 const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
-    app.get("/", (req, res, next) => resumeGame(req, res, next, Stanze, serverSession), (req, res) => renderPage(res, "index", {
+
+    const renderPage = (res, page, params = {}) => res.render("header", {
+        params: params,
+        page: page,
+        headerIcon: getIcon(true),
+        knownOrigin: process.env.HOSTING || null
+    });
+
+    const resumeGame = (req, res, next) => {
+        const { userId, stanzaId } = serverSession.get(req, req.query?.token);
+        const redirecting = req.query?.token ? "?token=" + req.query.token : "";
+        if(userId && Stanze.get(stanzaId) && Stanze.get(stanzaId).trovaGiocatore(userId)) return res.redirect("/game" + redirecting);
+        req.deleteToken = !!req.query?.token;
+        next();
+    };
+
+    app.get("/", resumeGame, (req, res) => renderPage(res, "index", {
         icon: getIcon(),
         deleteToken: req.deleteToken,
         bgm: "MainMenu-City_Stroll"
     }));
     app.get(['/home', '/index'], (req, res) => res.redirect('/'));
 
-    app.get("/partecipaStanza/:codiceStanza", (req, res, next) => resumeGame(req, res, next, Stanze, serverSession), (req, res) => {
+    app.get("/partecipaStanza/:codiceStanza", resumeGame, (req, res) => {
         const stanza = req.params["codiceStanza"];
         if (stanza) renderPage(res, "profile", {
             stanza: stanza,
@@ -78,7 +37,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
         else res.redirect("/");
     });
 
-    app.get("/partecipaStanza", (req, res, next) => resumeGame(req, res, next, Stanze, serverSession), (req, res) => {
+    app.get("/partecipaStanza", resumeGame, (req, res) => {
         const {nome, pfp, stanza} = req.query;
         if (nome && pfp && stanza) {
             const token = serverSession.set(req, {
@@ -100,7 +59,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
         });
     });
 
-    app.get("/creaStanza", (req, res, next) => resumeGame(req, res, next, Stanze, serverSession), (req, res) => {
+    app.get("/creaStanza", resumeGame, (req, res) => {
         const {nome, pfp} = req.query;
         if (nome && pfp) {
             const token = serverSession.set(req, {
@@ -194,6 +153,51 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
 };
 
 const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout) => {
+
+    const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
+        if (!Stanze.get(stanzaId)) return next();
+        console.log(`Stanza ${stanzaId} => ${Stanze.get(stanzaId).toString()}`)
+        if(!socket.data.referenceGiocatore) return next();
+
+        switch (Stanze.get(stanzaId).stato) {
+            case StatoStanza.WAIT : {
+                socket.emit("confermaStanza", {
+                    reference: socket.data.referenceGiocatore.adaptToClient(),
+                    stanzaId: Stanze.get(stanzaId).id,
+                    primoRound: Stanze.get(stanzaId).numeroRound[0] === 0,
+                    interroghi: Stanze.get(stanzaId).round.chiStaInterrogando === socket.data.referenceGiocatore.id
+                });
+                return next();
+            }
+            case StatoStanza.END : {
+                socket.emit("stanzaChiusa");
+                socket.data.referenceGiocatore = null;
+                socket.leave(stanzaId);
+                return next();
+            }
+            case StatoStanza.CHOOSING_CARDS : {
+                socket.emit("roundIniziato", {
+                    chiStaInterrogando: Stanze.get(stanzaId).trovaGiocatore(Stanze.get(stanzaId).round.chiStaInterrogando).adaptToClient(),
+                    domanda: Stanze.get(stanzaId).round.domanda,
+                    reference: socket.data.referenceGiocatore.adaptToClient(),
+                    stanza: Stanze.get(stanzaId).id
+                });
+                return next();
+            }
+            case StatoStanza.CHOOSING_WINNER : {
+                socket.emit("sceltaVincitore", {
+                    risposte: Array.from(Stanze.get(stanzaId).round.risposte.entries()),
+                    domanda: Stanze.get(stanzaId).round.domanda,
+                    chiInterroga: Stanze.get(stanzaId).trovaGiocatore(Stanze.get(stanzaId).round.chiStaInterrogando).adaptToClient(),
+                    reference: socket.data.referenceGiocatore.adaptToClient(),
+                    stanza: Stanze.get(stanzaId).id
+                });
+                return next();
+            }
+        }
+        next();
+    };
+
     server.use((socket, next) => {
         const checks = ["validation", "stanzaId", "userId"];
         const {
@@ -210,7 +214,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         exist.online = true;
         socket.data.referenceGiocatore = exist;
         socket.join(stanzaId);
-        emitStatoStanza(Stanze, stanzaId, socket, next);
+        emitStatoStanza(stanzaId, socket, next);
     });
 
     server.on("connection", (user) => {
@@ -398,7 +402,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     server.in(stanzaId).fetchSockets().then(sockets => {
                         for(const socket of sockets) {
                             socket.data.referenceGiocatore = Stanze.get(stanzaId).giocatori.get(socket.data.referenceGiocatore.id);
-                            emitStatoStanza(Stanze, stanzaId, socket);
+                            emitStatoStanza(stanzaId, socket);
                         }
                     });
                     console.log("Giocatore eliminato da Stanza => " + stanzaId);
@@ -419,7 +423,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                         server.in(stanzaId).fetchSockets().then(sockets => {
                             for(const socket of sockets) {
                                 socket.data.referenceGiocatore = Stanze.get(stanzaId).giocatori.get(socket.data.referenceGiocatore.id);
-                                emitStatoStanza(Stanze, stanzaId, socket);
+                                emitStatoStanza(stanzaId, socket);
                             }
                         });
                     }
@@ -428,6 +432,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         });
     });
 
+    //Pulizia stanze automatica
     setInterval(async () => {
         try {
             Stanza.pulisciStanza((id) => {
@@ -439,6 +444,6 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             console.error(err);
         }
     }, timeout/30/60);
-}
+};
 
 module.exports = { appConfig, serverConfig };
