@@ -25,36 +25,7 @@ const navigateWithLoading = (url) => {
             window.location.href = url;
     }, timing);
 };
-
-const fragmentsCache = {};
-const renderFragment = async (root, page, params = {}) => {
-    root.dispatchEvent(hideRendering);
-    try {
-        if(!fragmentsCache[page]) {
-            const input = await fetch("/fragments/" + page + ".ejs");
-            if(!input.ok) throw new Error("fragment not found");
-            fragmentsCache[page] = await input.text();
-        }
-        const rendering = ejs.render(fragmentsCache[page], { ...params });
-        root.innerHTML = rendering;
-        const scripts = root.querySelectorAll("script");
-        for (const oldScript of scripts) {
-            const newScript = document.createElement("script");
-            Array.from(oldScript.attributes).forEach(attr => {
-                newScript.setAttribute(attr.name, attr.value);
-            });
-            if (!oldScript.src) {
-                newScript.textContent = `{ ${oldScript.textContent} }`;
-            }
-            document.body.appendChild(newScript);
-            newScript.remove();
-            oldScript.remove();
-        }
-    } catch (e) {
-        console.error(e);
-    }
-    root.dispatchEvent(unhideRendering);
-};
+const fragmentRendered = new CustomEvent("fragmentRendered");
 
 (() => {
     const timeOut = 150;

@@ -1,0 +1,57 @@
+<div class="flex_gap_30 game_main_con">
+    <div class="column sour_gummy_regular flex_gap_25 wait_code_con">
+        <div class="column flex_gap_10">
+            <div id="<%= domanda[1] %>" class="card domanda">
+                <%= domanda[0] %>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <button id="prima">N</button>
+        <button id="dopo">N</button>
+    </div>
+    <% if(staiInterrogando) { %>
+        <button id="sendConferma">Conferma</button>
+    <% } %>
+</div>
+
+<script>
+    const domandaAttuale = document.querySelector(".domanda");
+    const sendConferma = document.getElementById("sendConferma");
+    const defaultText = domandaAttuale.textContent;
+    const risposteDiTutti = (() => {
+        return <%- JSON.stringify(risposte) %>;
+    })();
+    const prima = document.getElementById("prima");
+    const dopo = document.getElementById("dopo");
+    let index = 0;
+    console.log(risposteDiTutti)
+
+    const updateDomanda = () => {
+        const risposta = risposteDiTutti[index];
+        let domanda = defaultText;
+        domandaAttuale.textContent = risposta[1].forEach(entry => {
+            domanda = domanda.replace("_", entry);
+        });
+        domandaAttuale.textContent = domanda;
+    };
+
+    prima.addEventListener("click", () => {
+        if(index - 1 < 0) return;
+        index--;
+        updateDomanda();
+    });
+
+    dopo.addEventListener("click", () => {
+        if(index + 1 >= risposteDiTutti.length) return;
+        index++;
+        updateDomanda();
+    });
+
+    updateDomanda();
+
+    sendConferma?.addEventListener("click", () => socket.emit("scegliVincitore", {
+        id: referenceStanza,
+        vincitore: risposteDiTutti[index][0]
+    }));
+</script>

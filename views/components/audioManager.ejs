@@ -56,12 +56,11 @@
         const initMusic = async () => {
             try { await playAudio(musicPlayer, "audio") } catch {}
         };
-
-        document.addEventListener("DOMContentLoaded", () => {
+        const initSound = () => {
             [...document.querySelectorAll("button"),
                 ...[...document.querySelectorAll("body *")].filter(element =>
                     [...element.classList].filter(classe => classe.toString().includes("active_Btn")
-                    || classe.toString().includes("active_Img") ||
+                        || classe.toString().includes("active_Img") || classe.toString().includes("button") ||
                         classe.toString().includes("shrinks_on_active_for_no_reason")).length > 0 || element.id.toLowerCase().includes("btn"))
             ].forEach(button => {
                 button.addEventListener("click", () => {
@@ -69,7 +68,10 @@
                     playAudio(soundPlayer);
                 });
             });
-        });
+        };
+
+        document.addEventListener("DOMContentLoaded", () => initSound());
+        document.addEventListener("fragmentRendered", () => initSound());
 
         document.addEventListener("click", initMusic, { once: true });
 

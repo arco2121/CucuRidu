@@ -20,7 +20,7 @@ class Giocatore {
     }
 
     prendiMano(...indexCarte) {
-        return this.mazzo.prendiCarteByIndex(indexCarte);
+        return this.mazzo.prendiCarteByIndex(...indexCarte);
     }
 
     prendiTuttaLaMano() {

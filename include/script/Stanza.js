@@ -145,7 +145,7 @@ class Stanza {
             return this.terminaPartita();
         this.controllaMazzi(this.round.domanda[1]);
         for (const giocatore of this.giocatori.values())
-            if(giocatore.mazzo.carte.length === 0) giocatore.aggiungiMano(this.mazzoCompletamenti.mazzo.prendiCarte(12));
+            if(giocatore.mazzo.carte.length === 0) giocatore.aggiungiMano(...this.mazzoCompletamenti.mazzo.prendiCarte(12));
         if(chiStaChidedendo === this.round.chiStaInterrogando) {
             this.stato = StatoStanza.CHOOSING_CARDS;
             return true;
@@ -153,10 +153,13 @@ class Stanza {
         return false;
     }
 
-    aggiungiRisposta(giocatoreId, ... indexCarte) {
+    aggiungiRisposta(giocatoreId, ...indexCarte) {
         if(this.stato === StatoStanza.CHOOSING_CARDS && this.giocatori.has(giocatoreId)
             && !this.round.risposte.has(giocatoreId)) {
+            console.log(giocatoreId)
             this.round.risposte.set(giocatoreId, this.trovaGiocatore(giocatoreId).prendiMano(...indexCarte));
+            console.log("round risposte: ", this.round.risposte)
+            console.log("PORCO", this.round.risposte.get(giocatoreId))
             if(this.round.risposte.size === (this.giocatori.size - 1)) {
                 this.stato = StatoStanza.CHOOSING_WINNER;
                 return [

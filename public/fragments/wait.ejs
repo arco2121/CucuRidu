@@ -38,13 +38,12 @@
     socket.on("aggiornamentoAttesa", (data) => {
         const {numeroGiocatori, minimoGiocatori, giocatori} = data || {};
         numeroGiocatoriCount.textContent = numeroGiocatoriCount.textContent.split(":")[0] + ": " + numeroGiocatori;
-        console.log(minimoGiocatori)
         if(numeroGiocatori < minimoGiocatori)
             attesaView.textContent = "Wait per altri giocatori ✨";
         else
             attesaView.textContent = "Wait per il prossimo turno ✨";
         updateAttesa();
-        renderFragment(showGiocatori, "giocatoreRow", {
+        renderFragment(showGiocatori, "components/giocatoreRow", {
             giocatori: giocatori
         });
     });
@@ -88,7 +87,7 @@
         }
     });
 
-    startButton.addEventListener("click", () => socket.emit("iniziaTurno", {
+    startButton?.addEventListener("click", () => socket.emit("iniziaTurno", {
         id: referenceStanza
     }));
 </script>

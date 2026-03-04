@@ -10,9 +10,7 @@
         <div class="column wait_players_list flex_gap_15 btn_doubleBorder">
             <div id="showCards">
                 <% risposte.forEach((risposta, index) => { %>
-                    <div class="card risposta" id="<%= index %>">
-                        <%= risposta %>
-                    </div>
+                    <div class="card risposta" id="<%= index %>"><%= risposta %></div>
                 <% }); %>
             </div>
         </div>
@@ -26,18 +24,22 @@
     const cards = document.querySelectorAll(".risposta");
     const domandaAttuale = document.querySelector(".domanda");
     const sendCards = document.getElementById("sendCards");
-    const defaultText = domandaAttuale.textContent;
+    const defaultText = domandaAttuale.textContent.trim();
+    const risposteDate = Array.from({ length: parseInt(domandaAttuale.id) }, () => null);
 
-    const risposte = Array.from({ length: parseInt(domandaAttuale.id) }, (val) => val = null);
     const toggleCards = (target) => {
-        if(risposte.length > 2) return;
-        if(risposte.indexOf(target.textContent) !== -1)
-            risposte[risposte.indexOf(target.textContent)] = null;
+        if(risposteDate.length > 2) return;
+        if(risposteDate.indexOf(target.textContent) !== -1)
+            risposteDate[risposteDate.indexOf(target.textContent)] = null;
         else
-            risposte[risposte.findIndex(ele => ele === null)] = target.textContent;
-        const risposteAttuali = risposte.filter(ele => ele !== null).length;
-        if(risposteAttuali > 0)
-            risposte.forEach(risposta => domandaAttuale.textContent = defaultText.replace("_", risposta));
+            risposteDate[risposteDate.findIndex(ele => ele === null)] = target.textContent;
+        const risposteAttuali = risposteDate.filter(ele => ele !== null).length;
+        if(risposteAttuali > 0) {
+            let initText = defaultText;
+            risposteDate.filter(risposta => risposta !== null).forEach(risposta => initText = (initText[0] === "_"  || initText[(initText.indexOf("_") - 1)] === ".") ? initText.replace("_", risposta) :
+                initText.replace("_", risposta[0].toLowerCase() + risposta.slice(1, risposta.length)));
+            domandaAttuale.textContent = initText;
+        }
         else
             domandaAttuale.textContent = defaultText;
         target.classList.toggle("selected");
@@ -45,12 +47,14 @@
 
     cards.forEach(card => card.addEventListener("click", (e) => toggleCards(e.target)));
 
-    sendCards.addEventListener("click", () => {
-        if(risposte.filter(ele => ele !== null).length > 0)
-            return alert("Finisci di selezionare le risposte, mongolo");
+    sendCards?.addEventListener("click", () => {
+        if(risposteDate.filter(ele => ele === null).length > 0) {
+            alert("Finisci di selezionare le risposte, mongolo");
+            return;
+        }
         socket.emit("inviaRisposta", {
             id: referenceStanza,
-            indexCarte: referenceGiocatore.mazzo.filter(carta => risposte.indexOf(carta) !== -1).map(carta => referenceGiocatore.mazzo.indexOf(carta))
+            indexCarte: risposteDate.map(risposta => referenceGiocatore.mazzo.indexOf(risposta))
         });
     });
 </script>

@@ -107,7 +107,6 @@ socket.on("confermaStanza", (data) => {
                     savingToken: result.fallback
                 }));
             }
-            document.dispatchEvent(unloadScreen);
         }
         else navigateWithLoading("/");
     }));
@@ -155,7 +154,8 @@ socket.on("sceltaVincitore", async (data) => {
     await renderFragment(base, "chooseWinner", {
         domanda: domanda,
         risposte: risposte,
-        chiStaInterrogando: chiInterroga
+        chiStaInterrogando: chiInterroga,
+        staiInterrogando: chiInterroga.id === referenceGiocatore.id
     });
 });
 
@@ -181,3 +181,4 @@ menuBtn.addEventListener("click", () => {
 });
 
 document.dispatchEvent(preventBack);
+document.dispatchEvent(unloadScreen);

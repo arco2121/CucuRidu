@@ -4,6 +4,35 @@ const fromBackEnd = (() => {
     return JSON.parse(data);
 })();
 
+const fragmentsCache = {};
+const renderFragment = async (root, page, params = {}) => {
+    try {
+        if(!fragmentsCache[page]) {
+            const input = await fetch("/fragments/" + page + ".ejs");
+            if(!input.ok) throw new Error("fragment not found");
+            fragmentsCache[page] = await input.text();
+        }
+        const rendering = ejs.render(fragmentsCache[page], { ...params });
+        root.innerHTML = rendering;
+        const scripts = root.querySelectorAll("script");
+        for (const oldScript of scripts) {
+            const newScript = document.createElement("script");
+            Array.from(oldScript.attributes).forEach(attr => {
+                newScript.setAttribute(attr.name, attr.value);
+            });
+            if (!oldScript.src) {
+                newScript.textContent = `{ ${oldScript.textContent} }`;
+            }
+            document.body.appendChild(newScript);
+            newScript.remove();
+            oldScript.remove();
+        }
+    } catch (e) {
+        console.error(e);
+    }
+    document.dispatchEvent(fragmentRendered);
+};
+
 //COLORS
 const cssVars = (fileName) => {
     const variableNames = new Set();
@@ -29,85 +58,3 @@ const cssVars = (fileName) => {
     });
     return Array.from(variableNames);
 };
-
-(async () => {
-    const colorsData = await (await fetch('/assets/colors.json')).json();
-    const colorsList = colorsData['colors'];
-    const textColors = colorsData['texts'];
-    const staticColors = colorsData['staticColors'];
-
-    const usedColorNames = new Set();
-
-    const getRandomUniqueColor = () => {
-        const available = colorsList.filter(c => !usedColorNames.has(c.name));
-        if (available.length === 0) return colorsList[0];
-        const color = available[Math.floor(Math.random() * available.length)];
-        usedColorNames.add(color.name);
-        return color;
-    }
-
-    const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
-
-    const loadingBack = savedSettings["loadingColorBack"] || getRandomUniqueColor();
-    const loadingAccent = savedSettings["loadingColorAccent"] || getRandomUniqueColor();
-
-    if (savedSettings["loadingColorBack"]) usedColorNames.add(loadingBack.name);
-    if (savedSettings["loadingColorAccent"]) usedColorNames.add(loadingAccent.name);
-
-    localStorage.setItem("cucuRiduSettings", JSON.stringify({
-        ...savedSettings,
-        loadingColorBack: loadingBack,
-        loadingColorAccent: loadingAccent
-    }));
-
-    const bgMain = getRandomUniqueColor();
-    const bgVariant = getRandomUniqueColor();
-    const accentsMap = {
-        1: getRandomUniqueColor(),
-        2: getRandomUniqueColor(),
-        3: getRandomUniqueColor()
-    };
-
-    // --- 3. ASSIGNMENT ---
-    const setCSS = (name, value) => document.documentElement.style.setProperty(name, value);
-
-    // > LOADING SCREEN
-    setCSS('--loadingScreen-background', loadingBack.normal);
-    setCSS('--loadingScreen-background-dark', loadingBack.dark);
-    setCSS('--loadingScreen-accent', loadingAccent.normal);
-    setCSS('--loadingScreen-accent-outline', loadingAccent.outline);
-
-    // > BACKGROUNDS
-    setCSS('--background', bgMain.normal);
-    setCSS('--background-dark', bgMain.dark);
-    setCSS('--background-middle', bgMain.middle);
-    setCSS('--background-outline', bgMain.outline);
-
-    setCSS('--background-variant', bgVariant.normal);
-    setCSS('--background-variant-middle', bgVariant.middle);
-    setCSS('--background-variant-dark', bgVariant.dark);
-    setCSS('--background-variant-outline', bgVariant.outline);
-
-    // > ACCENT COLORS 1, 2, 3
-    [1, 2, 3].forEach(i => {
-        const palette = accentsMap[i];
-        setCSS(`--accent-color-${i}`, palette.normal);
-        setCSS(`--accent-color-${i}-dark`, palette.dark);
-        setCSS(`--accent-color-${i}-middle`, palette.middle);
-        setCSS(`--accent-color-${i}-text`, palette.text);
-        setCSS(`--accent-color-${i}-outline`, palette.outline);
-    });
-
-    // > STATIC COLORS & TEXTS
-    setCSS('--accent-color-confirm', staticColors.confirm);
-    setCSS('--accent-color-confirm-middle', staticColors.confirm_middle);
-    setCSS('--accent-color-confirm-outline', staticColors.confirm_outline);
-    setCSS('--accent-color-critical', staticColors.critical);
-    setCSS('--accent-color-critical-middle', staticColors.critical_middle);
-    setCSS('--accent-color-critical-outline', staticColors.critical_outline);
-
-    setCSS('--text-color-normal', textColors.normal);
-    setCSS('--text-color-dark', textColors.dark);
-    setCSS('--text-color-light', textColors.light);
-
-})();

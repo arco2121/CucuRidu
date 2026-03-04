@@ -19,7 +19,7 @@ class Mazzo {
                     };
                 }
                 const carte = data["tipoMazzo"] === TipoMazzo.COMPLETAMENTI ? packsCache[data["pack"]].completamenti : packsCache[data["pack"]].frasi;
-                this.aggiungiCarte(...[...carte]);
+                this.aggiungiCarte(...carte.map(carta => typeof carta === "string" ? carta.trim() : [carta[0].toString().trim(), carta[1]]));
             } else if(typeof data["pack"] === "object") {
                 const type = data["tipoMazzo"] === TipoMazzo.COMPLETAMENTI ? "completamenti" : "frasi";
                 this.aggiungiCarte(...data["pack"][type]);
@@ -44,9 +44,10 @@ class Mazzo {
     }
 
     prendiCarteByIndex(...indexCarte) {
-        return indexCarte
-            .sort((a, b) => b - a)
-            .map(index => this.carte.splice(index, 1)[0]);
+        const result = indexCarte.map(index => this.carte[index]);
+        indexCarte.forEach(index => this.carte[index] = null);
+        this.carte = this.carte.filter(carta => carta !== null);
+        return result;
     }
 
     static unisciMazzi(...mazzi) {

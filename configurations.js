@@ -156,7 +156,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
 
     const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
         if (!Stanze.get(stanzaId)) return next();
-        console.log(`Stanza ${stanzaId} => ${Stanze.get(stanzaId).toString()}`)
+        //console.log(`Stanza ${stanzaId} => ${Stanze.get(stanzaId).toString()}`)
         if(!socket.data.referenceGiocatore) return next();
 
         switch (Stanze.get(stanzaId).stato) {
@@ -330,7 +330,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         user.on("scegliVincitore", (data) => {
             try {
                 const stanzaId = data["id"];
-                const vincitore = data["rispostaIndex"];
+                const vincitore = data["vincitore"];
                 const result = Stanze.get(stanzaId).scegliVincitore(user.data.referenceGiocatore.id, vincitore);
                 if(result) {
                     server.in(stanzaId).fetchSockets().then(sockets => {
