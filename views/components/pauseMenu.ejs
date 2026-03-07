@@ -29,14 +29,21 @@
     const showGiocatoriPause = document.getElementById("showGiocatoriPause");
 
     document.addEventListener("DOMContentLoaded", function() {
-        console.log("AAAAAAAAAAAAAA", showGiocatoriPause);
+        const idStanza = "<%= stanzaId %>";
 
-        socket.on("aggiornamentoAttesa", (data) => {
-            const { numeroGiocatori, minimoGiocatori, giocatori } = data || {};
-            console.log("bbbbbbbbbbbbbbbbb", giocatori);
+        socket.on("listaPlayerPause", (data) => {
+            const { numeroGiocatori, minimoGiocatori, giocatori = [] } = data || {};
+            console.log("AAAAAAAAAAAAAA", showGiocatoriPause);
+
+            const sortedGiocatori = [...giocatori].sort((a, b) => (b.punti || 0) - (a.punti || 0));
+
             renderFragment(showGiocatoriPause, "giocatorePauseRow", {
-                giocatori: giocatori
+                giocatori: sortedGiocatori
             });
+        });
+
+        socket.emit("listaPlayerPause", {
+            stanzaId: idStanza
         });
     });
 
