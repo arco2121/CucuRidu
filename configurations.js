@@ -377,6 +377,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             minimoGiocatori: Stanze.get(data["stanzaId"]).minimoGiocatori,
             giocatori: Stanze.get(data["stanzaId"]).classifica().map(giocatore => giocatore.adaptToClient())
         }));
+        user.on("listaGiocatori", (data) => user.emit("listaGiocatoriAggiornamento", {
+            giocatori: Stanze.get(data["stanzaId"])?.classifica().map(giocatore => giocatore.adaptToClient())
+        }));
         user.on("lasciaStanza", (data) => {
             try {
                 const stanzaId = data["id"];

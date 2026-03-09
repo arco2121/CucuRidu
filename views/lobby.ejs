@@ -1,7 +1,5 @@
 <%- include("components/connectionManager") %>
-<!-- <%- include("components/packsPanel") %> -->
 <%- include("components/optionsPanel") %>
-<%- include("components/pauseMenu") %>
 <div class="game_section visible showByConnectionManager" id="game_section">
     <div id="navbar_con" class="wait_navbar">
         <div class="navbar_pause_btn btn_square button btn_style_3" id="menuBtn">
@@ -17,3 +15,5 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="/script/GiocatoreInterface.js"></script>
 <script src="/script/lobby.js"></script>
+
+<%- include("components/pauseMenu") %>

@@ -1,11 +1,4 @@
 const base = document.getElementById("landpoint");
-const game_section = document.getElementById("game_section");
-const pauseMenu = document.getElementById("pauseMenu");
-const codiceStanzaPause = document.getElementById("codiceStanzaPause");
-const leaveBtn = document.getElementById("leaveBtn");
-const exitPauseBtn = document.getElementById("exitPauseBtn");
-const menuBtn = document.getElementById("menuBtn");
-
 const socket = io({
     auth: {
         validation: fromBackEnd["token"],
@@ -165,19 +158,28 @@ window.addEventListener("online", () => {
         socket.connect();
 });
 
-leaveBtn.addEventListener("click", () => socket.emit("lasciaStanza", {
-    id: referenceStanza
-}));
+document.addEventListener("DOMContentLoaded", () => {
+    const game_section = document.getElementById("game_section");
+    const pauseMenu = document.getElementById("pauseMenu");
+    const leaveBtn = document.getElementById("leaveBtn");
+    const exitPauseBtn = document.getElementById("exitPauseBtn");
+    const menuBtn = document.getElementById("menuBtn");
+    const codiceStanzaPause = document.getElementById("codiceStanzaPause");
 
-exitPauseBtn.addEventListener("click", () => {
-    pauseMenu.dispatchEvent(hidePanel);
-    game_section.dispatchEvent(showPanel);
-});
+    leaveBtn.addEventListener("click", () => socket.emit("lasciaStanza", {
+        id: referenceStanza
+    }));
 
-menuBtn.addEventListener("click", () => {
-    game_section.dispatchEvent(hidePanel);
-    codiceStanzaPause.textContent = referenceStanza;
-    pauseMenu.dispatchEvent(showPanel);
+    exitPauseBtn.addEventListener("click", () => {
+        pauseMenu.dispatchEvent(hidePanel);
+        game_section.dispatchEvent(showPanel);
+    });
+
+    menuBtn.addEventListener("click", () => {
+        game_section.dispatchEvent(hidePanel);
+        codiceStanzaPause.textContent = referenceStanza;
+        pauseMenu.dispatchEvent(showPanel);
+    });
 });
 
 document.dispatchEvent(preventBack);

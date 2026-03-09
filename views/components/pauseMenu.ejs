@@ -25,28 +25,23 @@
 </div>
 
 <script>
+    socket.off("listaGiocatori");
     const optionsBtn = document.getElementById("optionsBtn");
     const showGiocatoriPause = document.getElementById("showGiocatoriPause");
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const idStanza = "<%= stanzaId %>";
+    const idStanza = "<%= stanzaId %>";
 
-        socket.on("listaPlayerPause", (data) => {
-            const { numeroGiocatori, minimoGiocatori, giocatori = [] } = data || {};
-            console.log("AAAAAAAAAAAAAA", showGiocatoriPause);
+    socket.on("listaGiocatoriAggiornamento", (data) => {
+        const { giocatori = [] } = data || {};
 
-            const sortedGiocatori = [...giocatori].sort((a, b) => (b.punti || 0) - (a.punti || 0));
-
-            renderFragment(showGiocatoriPause, "giocatorePauseRow", {
-                giocatori: sortedGiocatori
-            });
-        });
-
-        socket.emit("listaPlayerPause", {
-            stanzaId: idStanza
+        renderFragment(showGiocatoriPause, "components/giocatorePauseRow", {
+            giocatori: giocatori
         });
     });
 
+    socket.emit("listaGiocatori", {
+        stanzaId: idStanza
+    });
 
     optionsBtn.addEventListener("click", () => {
         pauseMenu.dispatchEvent(hidePanel);
