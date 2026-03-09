@@ -4,22 +4,49 @@
             <h1 class="panel_title sour_gummy_bold">Pause</h1>
             <h1 class="active_Btn" id="exitPauseBtn">X</h1>
         </div>
-        <div class="options_content column nunito_bold">
-            <div class="row wait_code_text flex_gap_10">
+        <div class="pause_content nunito_bold flex_gap_15">
+            <div class="row wait_code_text_pause flex_gap_10">
                 <h4>Codice Stanza: </h4><h4 id="codiceStanzaPause" class="sour_gummy_bold"><%= stanzaId %></h4>
             </div>
-            <button class="button btn_bigText btn_style_1 sour_gummy_bold" id="optionsBtn">Options</button>
-            <button class="button btn_bigText btn_style_critical sour_gummy_bold" id="leaveBtn">Leave</button>
+
+            <div class="row wait_code_text_title flex_gap_10">
+                <h4>Giocatori:</h4>
+            </div>
+            <div class="column pause_players_list_con" id="showGiocatoriPause">
+
+            </div>
+
         </div>
         <div class="options_row options_footer">
-
-
+            <button class="button btn_mediumText btn_style_critical sour_gummy_bold" id="leaveBtn">Leave</button>
+            <button class="button btn_mediumText btn_style_1 sour_gummy_bold" id="optionsBtn">Options</button>
         </div>
     </div>
 </div>
 
 <script>
     const optionsBtn = document.getElementById("optionsBtn");
+    const showGiocatoriPause = document.getElementById("showGiocatoriPause");
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const idStanza = "<%= stanzaId %>";
+
+        socket.on("listaPlayerPause", (data) => {
+            const { numeroGiocatori, minimoGiocatori, giocatori = [] } = data || {};
+            console.log("AAAAAAAAAAAAAA", showGiocatoriPause);
+
+            const sortedGiocatori = [...giocatori].sort((a, b) => (b.punti || 0) - (a.punti || 0));
+
+            renderFragment(showGiocatoriPause, "giocatorePauseRow", {
+                giocatori: sortedGiocatori
+            });
+        });
+
+        socket.emit("listaPlayerPause", {
+            stanzaId: idStanza
+        });
+    });
+
 
     optionsBtn.addEventListener("click", () => {
         pauseMenu.dispatchEvent(hidePanel);

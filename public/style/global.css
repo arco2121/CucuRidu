@@ -348,6 +348,10 @@ a {
     gap: 15px;
 }
 
+.flex_gap_20 {
+    gap: 25px;
+}
+
 .flex_gap_25 {
     gap: 25px;
 }

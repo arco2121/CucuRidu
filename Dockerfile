@@ -1,5 +1,5 @@
 # Usa una versione leggera di Node.js
-FROM node:18-slim
+FROM node:22-slim
 
 # Crea la cartella dell'app
 WORKDIR /app
