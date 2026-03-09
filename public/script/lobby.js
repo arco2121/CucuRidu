@@ -176,6 +176,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     menuBtn.addEventListener("click", () => {
+        socket.emit("listaGiocatori", {
+            stanzaId: referenceStanza
+        });
         game_section.dispatchEvent(hidePanel);
         codiceStanzaPause.textContent = referenceStanza;
         pauseMenu.dispatchEvent(showPanel);

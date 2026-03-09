@@ -29,18 +29,12 @@
     const optionsBtn = document.getElementById("optionsBtn");
     const showGiocatoriPause = document.getElementById("showGiocatoriPause");
 
-    const idStanza = "<%= stanzaId %>";
-
     socket.on("listaGiocatoriAggiornamento", (data) => {
         const { giocatori = [] } = data || {};
 
         renderFragment(showGiocatoriPause, "components/giocatorePauseRow", {
             giocatori: giocatori
         });
-    });
-
-    socket.emit("listaGiocatori", {
-        stanzaId: idStanza
     });
 
     optionsBtn.addEventListener("click", () => {
