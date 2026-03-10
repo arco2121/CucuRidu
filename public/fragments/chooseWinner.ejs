@@ -19,9 +19,7 @@
     const domandaAttuale = document.querySelector(".domanda");
     const sendConferma = document.getElementById("sendConferma");
     const defaultText = domandaAttuale.textContent;
-    const risposteDiTutti = (() => {
-        return <%- JSON.stringify(risposte) %>;
-    })();
+    const risposteDiTutti = (() => { return <%- JSON.stringify(risposte) %>; })();
     const prima = document.getElementById("prima");
     const dopo = document.getElementById("dopo");
     let index = 0;

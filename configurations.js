@@ -236,6 +236,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     minimoGiocatori: Stanze.get(stanza.id).minimoGiocatori,
                     giocatori: Stanze.get(stanza.id).classifica().map(giocatore => giocatore.adaptToClient())
                 });
+                server.to(stanza.id).emit("listaGiocatoriAggiornamento", {
+                    giocatori: Stanze.get(stanza.id).classifica().map(giocatore => giocatore.adaptToClient())
+                });
                 console.log("Stanza creata => " + stanza.id);
             } catch {
                 user.emit("errore", {
@@ -262,6 +265,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 server.to(stanzaId).emit("aggiornamentoAttesa", {
                     numeroGiocatori: Stanze.get(stanzaId).giocatori.size,
                     minimoGiocatori: Stanze.get(stanzaId).minimoGiocatori,
+                    giocatori: Stanze.get(stanzaId).classifica().map(giocatore => giocatore.adaptToClient())
+                });
+                server.to(stanzaId).emit("listaGiocatoriAggiornamento", {
                     giocatori: Stanze.get(stanzaId).classifica().map(giocatore => giocatore.adaptToClient())
                 });
                 console.log("Giocatore aggiunto a Stanza => " + stanzaId);
