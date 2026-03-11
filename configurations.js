@@ -262,6 +262,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 });
             }
         });
+        
         user.on("partecipaStanza", (data) => {
             try {
                 const stanzaId = data["id"];
@@ -291,6 +292,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 console.log(e)
             }
         });
+
         user.on("iniziaTurno", (data) => {
             try {
                 const stanzaId = data["id"];
@@ -324,6 +326,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 console.log(e)
             }
         });
+
         user.on("inviaRisposta", (data) => {
             try {
                 const stanzaId = data["id"];
@@ -349,6 +352,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 console.log(e)
             }
         });
+
         user.on("scegliVincitore", (data) => {
             try {
                 const stanzaId = data["id"];
@@ -376,6 +380,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 console.log(e)
             }
         });
+
         user.on("terminaPartita", (data) => {
             try {
                 const stanzaId = data["id"];
@@ -394,14 +399,17 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 console.log(e)
             }
         });
+
         user.on("aggiornaAttesa", (data) => server.to(data["stanzaId"]).emit("aggiornamentoAttesa", {
             numeroGiocatori: Stanze.get(data["stanzaId"])?.giocatori.size,
             minimoGiocatori: Stanze.get(data["stanzaId"]).minimoGiocatori,
             giocatori: Stanze.get(data["stanzaId"]).classifica().map(giocatore => giocatore.adaptToClient())
         }));
+
         user.on("listaGiocatori", (data) => user.emit("listaGiocatoriAggiornamento", {
             giocatori: Stanze.get(data["stanzaId"])?.classifica().map(giocatore => giocatore.adaptToClient())
         }));
+
         user.on("lasciaStanza", (data) => {
             try {
                 const stanzaId = data["id"];
@@ -436,6 +444,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 console.log(e)
             }
         });
+
         user.on("disconnect", () => {
             const stanzaId = Stanza.trovaDaGiocatore(user.data.referenceGiocatore?.id, Stanze.values());
             const giocatore = Stanze.get(stanzaId)?.trovaGiocatore(user.data.referenceGiocatore?.id);
@@ -472,9 +481,10 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
 };
 
 const terminate = (server, serverIo, Stanze) => {
+    for (const id of Stanze.keys()) serverIo.to(id).emit("stanzaChiusa");
+    serverIo.close();
+
     server.close(() => {
-        for(const id of Array.from(Stanze.keys()))
-            serverIo.to(id).emit("stanzaChiusa");
         Stanze.clear();
         console.error('Chiusura normale');
         process.exit(0);
