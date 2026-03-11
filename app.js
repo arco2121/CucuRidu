@@ -17,6 +17,7 @@ const serverSession = new Session(generationMemory, timeout);
 
 const host = "http://localhost:";
 const local = process.env.NODE_ENV !== "production";
+const port = !local ? 7860 : 0
 
 const Stanze = new Map();
 const TEMPORARY_TOKEN = generateId(64, generationMemory);
@@ -50,9 +51,9 @@ appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze);
 serverConfig(server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout);
 
 //Listening
-const listening = httpServer.listen(0, (error) => {
-    const port = httpServer.address().port;
-    console.log(`Cucu Ridu lanciato => ${local ? host + port : port}`);
+const listening = httpServer.listen(port, (error) => {
+    const listeningPort = httpServer.address().port;
+    console.log(`Cucu Ridu lanciato => ${local ? host + listeningPort : listeningPort}`);
     if (error) console.log(error.message);
 });
 
