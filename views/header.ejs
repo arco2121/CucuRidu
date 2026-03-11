@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -28,5 +28,6 @@
     <%- include("components/manageBack") %>
     <%- include(page, params) %>
     <%- include("components/audioManager", { bgm: params.bgm || "GameMusic-Candy_Bazaar" }) %>
+    <%- include("components/clearDom") %>
 </body>
 </html>
