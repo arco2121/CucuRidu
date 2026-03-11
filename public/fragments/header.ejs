@@ -1,5 +1,42 @@
-<div class="contents"></div>
+<meta name="dataFromFragment_<%= id %>" content="<%= JSON.stringify(params) %>">
+<meta name="rawFragment_<%= id %>" content="<%= JSON.stringify(data) %>">
+<div id="<%= id %>" class="fragment"></div>
 
 <script>
-    const fromFragments =
+    (() => {
+        const fromRendering = (() => {
+            const data = document.querySelector("meta[name='dataFromFragment_<%= id %>']").getAttribute("content");
+            document.querySelector("meta[name='dataFromFragment_<%= id %>']").remove();
+            return JSON.parse(data);
+        })();
+        const raw = (() => {
+            const data = document.querySelector("meta[name='rawFragment_<%= id %>']").getAttribute("content");
+            document.querySelector("meta[name='rawFragment_<%= id %>']").remove();
+            return JSON.parse(data);
+        })();
+
+        const scripts = [];
+        const scriptRegex = /<script\b[^>]*>([\s\S]*?)<\/script>/gim;
+
+        const html = raw.replace(scriptRegex, (match, scriptContent) => {
+            if (scriptContent.trim()) {
+                scripts.push(scriptContent.trim());
+            }
+            return "";
+        });
+
+        document.getElementById("<%= id %>").innerHTML = ejs.render(html, fromRendering);
+        for(const script of scripts) {
+            const origin = ejs.render(script, fromRendering);
+            (() => {
+                try {
+                    const fromFragments = fromRendering;
+                    eval(origin);
+                } catch (e) {
+                    console.error(e);
+                }
+            })();
+        }
+        document.currentScript?.remove();
+    })();
 </script>

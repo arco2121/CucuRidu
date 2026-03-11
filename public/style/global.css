@@ -692,7 +692,7 @@ input:active {
     pointer-events: none;
 }
 
-.contents {
+.fragment {
     display: contents;
 }
 

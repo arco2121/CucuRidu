@@ -3,6 +3,24 @@ const fromBackEnd = (() => {
     document.querySelector("meta[name='dataFromBackEnd']").remove();
     return JSON.parse(data);
 })();
+const utilize = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm";
+const generateId = (memory) => {
+    let code = "";
+    do {
+        code = "";
+        for (let i = 0; i < 64; i++) {
+            let index;
+            do {
+                index = Math.floor(Math.random() * utilize.length);
+            } while (utilize[index] === code[i - 1]);
+
+            code += utilize[index];
+        }
+    } while (memory.has(code));
+    memory.add(code);
+    return code;
+}
+const memory = new Set();
 
 const fragmentsCache = {};
 const renderFragment = async (root, page, params = {}) => {
@@ -12,21 +30,16 @@ const renderFragment = async (root, page, params = {}) => {
             if(!input.ok) throw new Error("fragment not found");
             fragmentsCache[page] = await input.text();
         }
-        const rendering = ejs.render(fragmentsCache[page], { ...params });
-        root.innerHTML = rendering;
-        const scripts = root.querySelectorAll("script");
-        for (const oldScript of scripts) {
-            const newScript = document.createElement("script");
-            Array.from(oldScript.attributes).forEach(attr => {
-                newScript.setAttribute(attr.name, attr.value);
-            });
-            if (!oldScript.src) {
-                newScript.textContent = `{ ${oldScript.textContent} }`;
-            }
-            document.body.appendChild(newScript);
-            newScript.remove();
-            oldScript.remove();
-        }
+        if(!root) return fragmentsCache[page];
+        const header = await renderFragment(null, "header");
+        const processed = ejs.render(header, {
+            params: params,
+            data: fragmentsCache[page],
+            id: generateId(memory)
+        });
+        root.innerHTML = "";
+        const fragment = document.createRange().createContextualFragment(processed);
+        root.appendChild(fragment);
     } catch (e) {
         console.error(e);
     }

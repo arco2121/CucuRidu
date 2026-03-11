@@ -32,7 +32,7 @@
     const showGiocatori = document.getElementById("showGiocatori");
     const startButton = document.getElementById("startButton");
 
-    const idStanza = "<%= stanzaId %>";
+    const idStanza = fromFragments["stanzaId"];
     let idAttesaInterval = null;
 
     socket.on("aggiornamentoAttesa", (data) => {

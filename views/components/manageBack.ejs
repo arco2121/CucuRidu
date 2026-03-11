@@ -45,4 +45,6 @@
             } else history.pushState({ page: 1 }, null, window.location.pathname);
         });
     })();
+
+    document.currentScript?.remove();
 </script>
