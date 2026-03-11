@@ -2,6 +2,13 @@ const path = require("path");
 const { getIcon, generateName, generatePfp, getAllPfp, getknownPacks } = require(path.join(__dirname, "include/script/generazione"));
 const { Stanza, StatoStanza } = require(path.join(__dirname, "include/script/Stanza"));
 
+/**
+ * Configura gli endpoint dell' app Express
+ * @param app
+ * @param serverSession
+ * @param TEMPORARY_TOKEN
+ * @param Stanze
+ */
 const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
 
     const renderPage = (res, page, params = {}) => res.render("header", {
@@ -152,6 +159,15 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
     app.use((req, res) => res.redirect("/error"));
 };
 
+/**
+ * Configura gli endpoint del ServerIO
+ * @param server
+ * @param serverSession
+ * @param TEMPORARY_TOKEN
+ * @param Stanze
+ * @param generationMemory
+ * @param timeout
+ */
 const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout) => {
 
     const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
@@ -455,4 +471,19 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
     }, timeout/30/60);
 };
 
-module.exports = { appConfig, serverConfig };
+const terminate = (server, serverIo, Stanze) => {
+    server.close(() => {
+        for(const id of Array.from(Stanze.keys()))
+            serverIo.to(id).emit("stanzaChiusa");
+        Stanze.clear();
+        console.error('Chiusura normale');
+        process.exit(0);
+    });
+
+    setTimeout(() => {
+        console.error('Chiusura forzata');
+        process.exit(1);
+    }, 10000);
+};
+
+module.exports = { appConfig, serverConfig, terminate };

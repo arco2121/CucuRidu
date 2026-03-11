@@ -5,7 +5,7 @@ const { Server } = require("socket.io");
 const express = require("express");
 const { Session } = require(path.join(__dirname, "include/script/Session"));
 const { generateId } = require(path.join(__dirname, "include/script/generazione"));
-const { appConfig, serverConfig } = require(path.join(__dirname, "configurations"));
+const { appConfig, serverConfig, terminate } = require(path.join(__dirname, "configurations"));
 
 //Configuration
 const timeout = 3600000;
@@ -15,7 +15,6 @@ const app = express();
 const httpServer = createServer(app);
 const serverSession = new Session(generationMemory, timeout);
 
-const port = process.env.PORT || 7860;
 const host = "http://localhost:";
 const local = process.env.NODE_ENV !== "production";
 
@@ -51,7 +50,11 @@ appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze);
 serverConfig(server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout);
 
 //Listening
-httpServer.listen(port, (error) => {
+const listening = httpServer.listen(0, (error) => {
+    const port = httpServer.address().port;
     console.log(`Cucu Ridu lanciato => ${local ? host + port : port}`);
     if (error) console.log(error.message);
 });
+
+process.on('SIGINT', () => terminate(listening, server, Stanze));
+process.on('SIGTERM', () => terminate(listening, server, Stanze));

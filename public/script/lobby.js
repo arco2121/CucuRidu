@@ -55,6 +55,8 @@ socket.on("connect", () => {
     }
 });
 
+socket.on("disconnect", () => document.dispatchEvent(stateDisconnected));
+
 socket.on("connect_error", (err) => {
     switch(err.message) {
         case "SESSION_EXPIRED" : {
