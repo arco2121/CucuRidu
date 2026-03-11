@@ -692,6 +692,10 @@ input:active {
     pointer-events: none;
 }
 
+.contents {
+    display: contents;
+}
+
 .optionsSection {
     display: flex;
     flex-direction: column;

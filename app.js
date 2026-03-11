@@ -5,7 +5,7 @@ const { Server } = require("socket.io");
 const express = require("express");
 const { Session } = require(path.join(__dirname, "include/script/Session"));
 const { generateId } = require(path.join(__dirname, "include/script/generazione"));
-const { appConfig, serverConfig, terminate } = require(path.join(__dirname, "configurations"));
+const { appConfig, serverConfig } = require(path.join(__dirname, "configurations"));
 
 //Configuration
 const timeout = 3600000;
@@ -56,6 +56,23 @@ const listening = httpServer.listen(port, (error) => {
     console.log(`Cucu Ridu lanciato => ${local ? host + listeningPort : listeningPort}`);
     if (error) console.log(error.message);
 });
+
+//Terminate
+const terminate = (server, serverIo, Stanze) => {
+    for (const id of Stanze.keys()) serverIo.to(id).emit("stanzaChiusa");
+    serverIo.close();
+
+    server.close(() => {
+        Stanze.clear();
+        console.error('Chiusura normale');
+        process.exit(0);
+    });
+
+    setTimeout(() => {
+        console.error('Chiusura forzata');
+        process.exit(1);
+    }, 10000);
+};
 
 process.on('SIGINT', () => terminate(listening, server, Stanze));
 process.on('SIGTERM', () => terminate(listening, server, Stanze));

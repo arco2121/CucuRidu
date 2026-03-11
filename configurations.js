@@ -480,20 +480,4 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
     }, timeout/30/60);
 };
 
-const terminate = (server, serverIo, Stanze) => {
-    for (const id of Stanze.keys()) serverIo.to(id).emit("stanzaChiusa");
-    serverIo.close();
-
-    server.close(() => {
-        Stanze.clear();
-        console.error('Chiusura normale');
-        process.exit(0);
-    });
-
-    setTimeout(() => {
-        console.error('Chiusura forzata');
-        process.exit(1);
-    }, 10000);
-};
-
-module.exports = { appConfig, serverConfig, terminate };
+module.exports = { appConfig, serverConfig };
