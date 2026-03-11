@@ -31,7 +31,7 @@ const server = new Server(httpServer, {
 });
 
 //App Config
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 app.set("view engine", "ejs");
 app.set('trust proxy', 1);
 app.use(express.urlencoded({extended: true}));
