@@ -188,5 +188,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+document.addEventListener("fragmentRendered", () => {
+    if(isLoadScreen()) document.dispatchEvent(unloadScreen);
+})
+
 document.dispatchEvent(preventBack);
-document.dispatchEvent(unloadScreen);

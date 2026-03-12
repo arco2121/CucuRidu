@@ -25,6 +25,7 @@ const memory = new Set();
 
 const fragmentsCache = {};
 const renderFragment = async (root, page, params = {}) => {
+    root?.dispatchEvent(hideRendering);
     try {
         if(!fragmentsCache[page]) {
             const input = await fetch("/fragments/" + page + ".ejs");
@@ -32,7 +33,7 @@ const renderFragment = async (root, page, params = {}) => {
             fragmentsCache[page] = await input.text();
         }
         if(!root) return fragmentsCache[page];
-        const header = await renderFragment(null, "header");
+        const header = await renderFragment(null, "wrapper");
         const processed = ejs.render(header, {
             params: params,
             data: fragmentsCache[page],
@@ -44,6 +45,7 @@ const renderFragment = async (root, page, params = {}) => {
     } catch (e) {
         console.error(e);
     }
+    root.dispatchEvent(unhideRendering);
     document.dispatchEvent(fragmentRendered);
 };
 

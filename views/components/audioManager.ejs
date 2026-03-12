@@ -5,12 +5,8 @@
     const musicPlayer = document.getElementById("musicAudio");
     const soundPlayer = document.getElementById("soundAudio");
     const audiosCache = {};
-    const vibrationPattern = [6, 3, 6];
+    const vibrationPattern = [9, 5, 9];
     const randomSound = () => Math.floor(Math.random() * (2 - 1) + 1);
-    const locks = {
-        audio: false,
-        sound: false
-    };
 
     const vibrate = (pattern) => {
         const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
@@ -22,8 +18,6 @@
         if(reverse) return await elementToPlay.pause();
         const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
         const permissions = { audio: true, sound: true, ...savedSettings };
-        if (checkValue !== "sound" && locks[checkValue]) return;
-        locks[checkValue] = true;
         try {
             switch (checkValue) {
                 case "sound": {
@@ -37,18 +31,16 @@
                         if(elementToPlay.src !== audiosCache[sound])
                             elementToPlay.src = audiosCache[sound];
                         await elementToPlay.play();
-                        elementToPlay.onpause = () =>  locks[checkValue] = false;
-                    } else locks[checkValue] = false;
+                    }
                     break;
                 }
                 case "audio": {
                     if(permissions[checkValue]) await elementToPlay.play();
                     else await elementToPlay.pause();
-                    locks[checkValue] = false;
                 }
             }
-        } catch {
-            locks[checkValue] = false;
+        } catch(e) {
+            console.log(e)
         }
     };
 

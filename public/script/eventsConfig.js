@@ -37,11 +37,15 @@ const fragmentRendered = new Event("fragmentRendered");
     const timeOut = 150;
     document.addEventListener("hideRenderingStart", (e) => {
         const container = e.target;
+        container.classList.remove('unhideRendering');
         container.classList.add("hideRendering");
     });
     document.addEventListener("hideRenderingEnd", (e) => {
         const container = e.target;
-        setTimeout(() => container.classList.remove("hideRendering"), timeOut);
+        setTimeout(() => {
+            container.classList.remove('hideRendering');
+            container.classList.add("unhideRendering");
+        }, timeOut);
     });
     document.addEventListener('hidePanel', (e) => {
         const section = e.target;

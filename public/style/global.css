@@ -582,11 +582,18 @@ input:active {
 }
 
 .hideRendering {
-    filter: blur(7px);
+    filter: blur(6px);
     transition: all 0.3s ease;
-    opacity: 0.2;
+    opacity: 0.7;
     pointer-events: none;
     z-index: -1;
+}
+
+.unhideRendering {
+    filter: blur(0px);
+    transition: all 0.3s ease;
+    opacity: 1;
+    pointer-events: all;
 }
 
 /* Mobile */
