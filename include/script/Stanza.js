@@ -123,7 +123,7 @@ class Stanza {
     }
 
     classifica() {
-        return Array.from(this.giocatori.values() || [])?.toSorted((a, b) => b.punti - a.punti)
+        return Array.from(this.giocatori.values() || [])?.sort((a, b) => b.punti - a.punti)
     }
 
     iniziaTurno(chiStaChidedendo) {

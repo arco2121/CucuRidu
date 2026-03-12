@@ -14,9 +14,8 @@
             document.querySelector("meta[name='rawFragment_<%= id %>']").remove();
             return JSON.parse(data);
         })();
-
+        const container = document.getElementById("<%= id %>");
         const scripts = [];
-        const scriptRegex = /<script\b[^>]*>([\s\S]*?)<\/script>/gim;
 
         const html = raw.replace(scriptRegex, (match, scriptContent) => {
             if (scriptContent.trim()) {
@@ -25,18 +24,16 @@
             return "";
         });
 
-        document.getElementById("<%= id %>").innerHTML = ejs.render(html, fromRendering);
-        for(const script of scripts) {
-            const origin = ejs.render(script, fromRendering);
-            (() => {
-                try {
-                    const fromFragments = fromRendering;
-                    eval(origin);
-                } catch (e) {
-                    console.error(e);
-                }
-            })();
-        }
+        container.innerHTML = ejs.render(html, fromRendering);
+        scripts.forEach(script => {
+            try {
+                const fromFragments = fromRendering;
+                eval(ejs.render(script, fromRendering));
+            } catch (e) {
+                console.error(e);
+            }
+        });
+
         document.currentScript?.remove();
     })();
 </script>

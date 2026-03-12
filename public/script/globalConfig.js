@@ -4,6 +4,7 @@ const fromBackEnd = (() => {
     return JSON.parse(data);
 })();
 const utilize = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm";
+const scriptRegex = /<script\b[^>]*>([\s\S]*?)<\/script>/gim;
 const generateId = (memory) => {
     let code = "";
     do {
