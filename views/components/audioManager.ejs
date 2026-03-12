@@ -6,7 +6,9 @@
     const soundPlayer = document.getElementById("soundAudio");
     const audiosCache = {};
     const vibrationPattern = [9, 5, 9];
+    const buttons = new Set();
     const randomSound = () => Math.floor(Math.random() * (2 - 1) + 1);
+    let loadLock = false;
 
     const vibrate = (pattern) => {
         const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
@@ -22,21 +24,24 @@
             switch (checkValue) {
                 case "sound": {
                     const sound = randomSound();
+                    if(loadLock) return;
                     if(permissions[checkValue]) {
                         if(!audiosCache[sound]) {
+                            loadLock = true;
                             const result = await fetch("/audio/sound/" + sound + ".mp3");
                             if(!result.ok) throw new Error("audio not found");
                             audiosCache[sound] = URL.createObjectURL(await result.blob());
+                            loadLock = false;
                         }
                         if(elementToPlay.src !== audiosCache[sound])
                             elementToPlay.src = audiosCache[sound];
-                        await elementToPlay.play();
+                        elementToPlay.play();
                     }
                     break;
                 }
                 case "audio": {
-                    if(permissions[checkValue]) await elementToPlay.play();
-                    else await elementToPlay.pause();
+                    if(permissions[checkValue]) elementToPlay.play();
+                    else elementToPlay.pause();
                 }
             }
         } catch(e) {
@@ -55,10 +60,12 @@
                         || classe.toString().includes("active_Img") || classe.toString().includes("button") ||
                         classe.toString().includes("shrinks_on_active_for_no_reason")).length > 0 || element.id.toLowerCase().includes("btn"))
             ].forEach(button => {
-                button.addEventListener("click", () => {
-                    vibrate(vibrationPattern);
-                    playAudio(soundPlayer);
-                });
+                if(!buttons.has(button))
+                    button.addEventListener("click", () => {
+                        vibrate(vibrationPattern);
+                        playAudio(soundPlayer);
+                    });
+                buttons.add(button);
             });
         };
 

@@ -598,15 +598,14 @@ input:active {
 }
 
 .hideRendering {
-    filter: blur(6px);
+    opacity: 0;
     transition: all 0.3s ease;
-    opacity: 0.7;
     pointer-events: none;
     z-index: -1;
 }
 
 .unhideRendering {
-    filter: blur(0px);
+   opacity: 1;
     transition: all 0.3s ease;
     opacity: 1;
     pointer-events: all;
@@ -649,10 +648,10 @@ input:active {
 
 @keyframes bubbleBlur {
     from {
-        filter: blur(0px);
+        opacity: 0;
     }
     to {
-        filter: blur(16px);
+        opacity: 1;
     }
 }
 
@@ -732,6 +731,16 @@ input:active {
     align-items: center;
     justify-content: space-between;
     overflow-y: scroll;
+}
+
+.pauseSection {
+    display: flex;
+    flex-direction: column;
+    height: 70%;
+    width: 70%;
+    align-items: center;
+    justify-content: space-between;
+    overflow-y: hidden;
 }
 
 .largeSection {
@@ -823,10 +832,20 @@ input:active {
     }
 }
 
+@media (max-width: 500px) {
+    .pauseSection{
+        width: 90%;
+    }
+}
+
 /* PC */
 @media (min-width: 700px) {
     .optionsSection {
         width: 50%;
+    }
+
+    .pauseSection {
+        width: 60%;
     }
 
     .inputSection {
@@ -837,6 +856,10 @@ input:active {
 @media (min-width: 1000px) {
     .optionsSection {
         width: 30%;
+    }
+
+    .pauseSection {
+        width: 50%;
     }
 
     .inputSection {
