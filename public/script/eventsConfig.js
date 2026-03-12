@@ -1,18 +1,24 @@
-const unloadScreen = new CustomEvent("loadScreenEnd");
-const loadScreen = new CustomEvent("loadScreenStart");
+const unloadScreen = new Event("loadScreenEnd");
+const loadScreen = new Event("loadScreenStart");
 const loadingScreen = document.querySelector(".loadingscreen");
-const stateConnected = new CustomEvent("doConnected");
-const stateDisconnected = new CustomEvent("doDisconnected");
-const hideRendering = new CustomEvent("hideRenderingStart", {
+const stateConnected = new Event("doConnected");
+const stateDisconnected = new Event("doDisconnected");
+const hideRendering = new Event("hideRenderingStart", {
     bubbles: true
 });
-const unhideRendering = new CustomEvent("hideRenderingEnd", {
+const unhideRendering = new Event("hideRenderingEnd", {
     bubbles: true
 });
-const showPanel = new CustomEvent("showPanel", {
+const showPanel = new Event("showPanel", {
     bubbles: true
 });
-const hidePanel = new CustomEvent("hidePanel", {
+const hidePanel = new Event("hidePanel", {
+    bubbles: true
+});
+const showPanelCond = new Event("showPanelCond", {
+    bubbles: true
+});
+const hidePanelCond = new Event("hidePanelCond", {
     bubbles: true
 });
 const navigateWithLoading = (url) => {
@@ -25,7 +31,7 @@ const navigateWithLoading = (url) => {
             window.location.href = url;
     }, timing);
 };
-const fragmentRendered = new CustomEvent("fragmentRendered");
+const fragmentRendered = new Event("fragmentRendered");
 
 (() => {
     const timeOut = 150;
@@ -44,5 +50,15 @@ const fragmentRendered = new CustomEvent("fragmentRendered");
     document.addEventListener("showPanel", (e) => {
         const panel = e.target;
         setTimeout(() => panel.classList.replace('hidden', 'visible'), timeOut);
+    });
+    document.addEventListener('hidePanelCond', (e) => {
+        const section = e.target;
+        section.classList.add('hidden');
+    });
+    document.addEventListener("showPanelCond", (e) => {
+        const panel = e.target;
+        setTimeout(() => {
+            if(panel.classList.contains("visible")) panel.classList.remove('hidden')
+        }, timeOut);
     });
 })();

@@ -53,6 +53,7 @@ socket.on("connect", () => {
             });
         }
     }
+    fromBackEnd["action"] = null;
 });
 
 socket.on("disconnect", () => document.dispatchEvent(stateDisconnected));
