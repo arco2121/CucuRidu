@@ -1,25 +1,30 @@
 <div class="section hidden sectionToHide showByConnectionManager" id="pauseMenu">
     <div class="floatSection optionsSection flex_gap_30 btn_doubleBorder">
         <div class="options_exit_btn upper sour_gummy_extra" >
-            <h1 class="panel_title sour_gummy_bold">Pause</h1>
+            <h1 class="panel_title sour_gummy_bold">Menu</h1>
             <h1 class="active_Btn" id="exitPauseBtn">X</h1>
         </div>
         <div class="pause_content nunito_bold flex_gap_15">
             <div class="row wait_code_text_pause flex_gap_10">
-                <h4>Codice Stanza: </h4><h4 id="codiceStanzaPause" class="sour_gummy_bold"><%= stanzaId %></h4>
+                <h4>Codice Stanza: </h4><h4 id="codiceStanzaPause" class="sour_gummy_bold underlined_text"><%= stanzaId %></h4>
             </div>
 
-            <div class="row wait_code_text_title flex_gap_10">
-                <h4>Giocatori:</h4>
-            </div>
-            <div class="column pause_players_list_con" id="showGiocatoriPause">
+            <div class="wait_players_list_hr"></div>
 
+            <div class="pause_players_list_con_bg">
+                <div class="row wait_code_text_title flex_gap_10">
+                    <h4>Giocatori:</h4>
+                </div>
+                <div class="column pause_players_list_con" id="showGiocatoriPause">
+
+                </div>
             </div>
+
 
         </div>
         <div class="options_row options_footer">
-            <button class="button btn_mediumText btn_style_critical sour_gummy_bold" id="leaveBtn">Leave</button>
-            <button class="button btn_mediumText btn_style_1 sour_gummy_bold" id="optionsBtn">Options</button>
+            <button class="button btn_mediumText btn_style_critical sour_gummy_bold" id="leaveBtn">Esci</button>
+            <button class="button btn_mediumText btn_style_1 sour_gummy_bold" id="optionsBtn">Opzioni</button>
         </div>
     </div>
 </div>

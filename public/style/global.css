@@ -118,6 +118,11 @@ table {
     -ms-overflow-style: none;
     scrollbar-width: none;
     transition: all ease 0.1s;
+    box-sizing: border-box;
+}
+
+*::before, *::after {
+    box-sizing: inherit;
 }
 
 *::-webkit-scrollbar {
@@ -128,18 +133,28 @@ table {
     outline: none;
 }
 
+html {
+    overflow: hidden;
+    overscroll-behavior: none;
+    width: 100%;
+    height: 100dvh;
+}
+
 body {
     background-color: var(--background-dark);
     background-image: linear-gradient(to bottom, var(--background), var(--background-dark));
     line-height: 1;
-    min-height: 100vh;
+    height: 100dvh;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow-x: hidden;
+    overflow: hidden;
+    overscroll-behavior: none;
     background-attachment: fixed;
     background-repeat: no-repeat;
     background-size: cover;
+    position: fixed;
 }
 
 
@@ -295,10 +310,11 @@ a {
     justify-content: space-evenly;
     width: 100%;
     height: 100%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    transform-origin: top left;
+    inset: 0;
+    margin: auto;
+    transform-origin: center;
+    overflow: hidden;
+    max-width: 100%;
 }
 
 .column {
@@ -436,7 +452,7 @@ a {
 .btn_square {
     width: 40px;
     height: 40px;
-    border-radius: 18px;
+    border-radius: 16px;
 }
 
 .btn_style_1 {
@@ -678,7 +694,7 @@ input:active {
     }
     20% {
         opacity: 0.7;
-        scale: 1.01;
+        scale: 0.99;
     }
     25% {
         opacity: 0.2;
@@ -697,6 +713,11 @@ input:active {
 .hidden {
     animation: popdown 0.25s ease-out forwards;
     pointer-events: none;
+}
+
+.visible, .hidden {
+    will-change: transform, opacity;
+    contain: layout style;
 }
 
 .fragment {
@@ -881,4 +902,8 @@ input:active {
     .error_img {
         width: 25%;
     }
+}
+
+.underlined_text {
+    text-decoration: underline;
 }

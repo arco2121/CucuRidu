@@ -36,7 +36,7 @@
 .profile_pfp_grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 25px;
+    gap: 15px;
     align-content: start;
     justify-items: center;
 }
