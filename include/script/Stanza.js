@@ -11,7 +11,7 @@ const { generateId } = require(path.join(__dirname, '/generazione'));
 
 class Stanza {
 
-    constructor(username, pfp, memory, minimoGiocatori = 2) {
+    constructor(username, pfp, memory, minimoGiocatori = 3) {
         this.id = typeof memory === "string" ? memory : generateId(6, memory);
         this.giocatori = new Map();
         this.giocatoriPassati = new Set();
