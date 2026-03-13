@@ -1,0 +1,27 @@
+<div class="flex_gap_30 game_main_con">
+    <div class="column sour_gummy_regular flex_gap_25 wait_code_con">
+        <!-- Sarà da fare la visualizzazione del profilo che ha vinto, i dati si trovano dentro fromFragments["vincitore"] e hanno la struttura che trovi anche in Giocatore.js nel adaptToClient-->
+        <div class="column flex_gap_10">
+            <div class="card domanda">
+                <%= domanda[0] %>
+            </div>
+        </div>
+    </div>
+    <button id="vaiAvanti">Avanti</button>
+</div>
+
+<script>
+    const domandaAttuale = document.querySelector(".domanda");
+    const vaiAvanti = document.getElementById("vaiAvanti");
+    const risposte = fromFragments["risposte"];
+
+    risposte.forEach(entry => {
+        domandaAttuale.textContent = domandaAttuale.textContent.replace("_", entry);
+    });
+
+    vaiAvanti.addEventListener("click", () => renderFragment(base, "wait", {
+        stanzaId: referenceStanza,
+        interroghi: fromFragments["interroghi"],
+        primoRound: false
+    }));
+</script>

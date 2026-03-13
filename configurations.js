@@ -407,9 +407,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                             socket.data.referenceGiocatore = Stanze.get(stanzaId).trovaGiocatore(socket.data.referenceGiocatore.id);
                             socket.emit("fineTurno", {
                                 vincitore: result[0],
-                                usernameVincitore: result[1],
-                                domanda: result[2],
-                                risposte: result[3],
+                                domanda: result[1],
+                                risposte: result[2],
                                 reference: socket.data.referenceGiocatore.adaptToClient()
                             });
                         }

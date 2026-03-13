@@ -77,7 +77,7 @@
 }
 
 .pause_code_text_pause {
-    font-size: 1.35rem;
+    font-size: 1.15rem;
     margin-top: 10px;
 }
 
@@ -90,7 +90,7 @@
 }
 
 .pause_players_list_con_bg {
-    width: 100%;
+    width: 90%;
     border: solid 5px var(--background-outline);
     background: var(--background);
     background-image: linear-gradient(to bottom, var(--background), var(--background-middle));
@@ -100,7 +100,7 @@
     color: var(--background-outline);
     margin: 5px 0;
     overflow-y: scroll;
-    height: 15rem;
+    height: 14rem;
 }
 
 .pause_players_list_con {

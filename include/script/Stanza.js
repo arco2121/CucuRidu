@@ -11,7 +11,7 @@ const { generateId } = require(path.join(__dirname, '/generazione'));
 
 class Stanza {
 
-    constructor(username, pfp, memory, minimoGiocatori = 3) {
+    constructor(username, pfp, memory, minimoGiocatori = 2) {
         this.id = typeof memory === "string" ? memory : generateId(6, memory);
         this.giocatori = new Map();
         this.giocatoriPassati = new Set();
@@ -156,10 +156,7 @@ class Stanza {
     aggiungiRisposta(giocatoreId, ...indexCarte) {
         if(this.stato === StatoStanza.CHOOSING_CARDS && this.giocatori.has(giocatoreId)
             && !this.round.risposte.has(giocatoreId)) {
-            console.log(giocatoreId)
             this.round.risposte.set(giocatoreId, this.trovaGiocatore(giocatoreId).prendiMano(...indexCarte));
-            console.log("round risposte: ", this.round.risposte)
-            console.log("PORCO", this.round.risposte.get(giocatoreId))
             if(this.round.risposte.size === (this.giocatori.size - 1)) {
                 this.stato = StatoStanza.CHOOSING_WINNER;
                 return [
@@ -195,7 +192,7 @@ class Stanza {
             chiStaInterrogando: vincitoreRound.id
         }
         this.numeroRound[0]++;
-        return [vincitoreRound.id, vincitoreRound.username, domanda, risposte] || false;
+        return [vincitoreRound.adaptToClient(), domanda, risposte] || false;
     }
 
     controllaMazzi(spaziNecessari) {

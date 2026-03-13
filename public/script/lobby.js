@@ -72,7 +72,6 @@ socket.on("connect_error", (err) => {
             window.location.replace("/error?alreadyConnected=true");
             break;
         }
-
         default: {
             navigateWithLoading("/")
         }
@@ -156,6 +155,16 @@ socket.on("sceltaVincitore", async (data) => {
         risposte: risposte,
         chiStaInterrogando: chiInterroga,
         staiInterrogando: chiInterroga.id === referenceGiocatore.id
+    });
+});
+
+socket.on("fineTurno", async (data) => {
+    const { reference, vincitore, domanda, risposte } = data;
+    if(reference) referenceGiocatore = new GiocatoreInterface(reference);
+    await renderFragment(base, "showWinner", {
+        domanda: domanda,
+        risposte: risposte,
+        interroghi: vincitore.id === referenceGiocatore.id,
     });
 });
 
