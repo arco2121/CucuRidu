@@ -29,8 +29,8 @@ const lasciaStanza = () => {
                 ...settings,
                 savingToken: null
             }));
-            navigateWithLoading("/");
         }
+        navigateWithLoading("/");
     });
 };
 
@@ -71,6 +71,10 @@ socket.on("connect_error", (err) => {
         case "ALREADY_CONNECTED" : {
             window.location.replace("/error?alreadyConnected=true");
             break;
+        }
+
+        default: {
+            navigateWithLoading("/")
         }
     }
 });

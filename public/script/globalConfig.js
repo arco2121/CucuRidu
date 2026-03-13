@@ -25,7 +25,6 @@ const memory = new Set();
 
 const fragmentsCache = {};
 const renderFragment = async (root, page, params = {}) => {
-    root?.dispatchEvent(hideRendering);
     try {
         if(!fragmentsCache[page]) {
             const input = await fetch("/fragments/" + page + ".ejs");
@@ -45,7 +44,6 @@ const renderFragment = async (root, page, params = {}) => {
     } catch (e) {
         console.error(e);
     }
-    root.dispatchEvent(unhideRendering);
     document.dispatchEvent(fragmentRendered);
 };
 
