@@ -26,8 +26,6 @@ jobs:
           rm -rf hosting/
           rm -rf scratch/
           rm -f LICENSE
-          rm -f .gitignore
-          rm -f .gitattributes
           rm -rf .github/
           
           git add .
