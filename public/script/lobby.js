@@ -122,6 +122,11 @@ socket.on("aspettaAltri", (data) => {
     alert(data.message);
 });
 
+socket.on("impossibileAggiungersi", (error) => {
+    alert(error.message);
+    navigateWithLoading("/partecipaStanza");
+});
+
 socket.on("errore", (error) => {
     alert(error.message);
     navigateWithLoading("/");

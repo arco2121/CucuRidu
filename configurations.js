@@ -185,7 +185,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
 
 // creaStanza: Crea una stanza, assegna il ruolo di Master e notifica la lobby
 // partecipaStanza: Aggiunge un nuovo giocatore alla stanza esistente (se c'è posto)
-// iniziaTurno: (Solo Master) Avvia il round, distribuisce la domanda o chiude la partita se finita
+// iniziaTurno: (Solo Interrogante) Avvia il round, distribuisce la domanda o chiude la partita se finita
 // inviaRisposta: Riceve gli indici delle carte scelte dal giocatore
 // scegliVincitore: (Solo Interrogante) Riceve l'ID del giocatore che ha vinto il round
 // terminaPartita: (Solo Master) Forza la chiusura della stanza per tutti
