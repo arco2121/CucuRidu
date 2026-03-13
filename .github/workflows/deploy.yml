@@ -20,5 +20,16 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_KEY }}
         run: |
+          git config user.name "github-actions"
+          git config user.email "action@github.com"
+
+          rm -rf hosting/
+          rm -rf scratch/
+          rm -f LICENSE
+          rm -rf .github/
+          
+          git add .
+          git commit -m "Cleanup: removing hosting, scratch and LICENSE.github" || echo "No changes to commit"
+          
           git config lfs.allowincompletepush true
           git push --force https://arco2107:$HF_TOKEN@huggingface.co/spaces/arco2107/cucuridu main
