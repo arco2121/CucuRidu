@@ -74,6 +74,8 @@
 
     shareButton.addEventListener("click", async () => {
         const shareText = "Muovi il culo ed entra nella stanza per giocare inconcepibile sgorbio nato dall'errare umano che non sei altro :))";
+        const copytext = "Codice copiato, ora usalo saggiamente scarto umano :))";
+        const failText = "Codice non copiato, fai meno il fannullone e faglielo semplicemente vedere :))";
         const shareData = {
             title: "Cucu Ridu",
             text: shareText,
@@ -81,9 +83,10 @@
         };
         try {
             if (navigator.canShare(shareData)) await navigator.share(shareData);
-            else await navigator.clipboard.writeText(idStanza).then(() => alert(shareText));
+            else await navigator.clipboard.writeText(idStanza).then(() => alert(copytext));
         } catch (e) {
             console.error(e);
+            alert(failText);
         }
     });
 
