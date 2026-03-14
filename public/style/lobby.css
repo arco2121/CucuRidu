@@ -26,6 +26,10 @@
     justify-content: center;
     align-items: center;
     width: 100%;
+
+    overflow-y: scroll;
+    height: 100%;
+    flex-grow: unset;
 }
 
 #navbar_con {
@@ -34,7 +38,7 @@
     display: flex;
     flex-direction: row;
     justify-content: end;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 }
 
 .navbar_pause_btn {
@@ -209,17 +213,25 @@
  >>> GAME PAGE
 --------------------------------------------------- */
 #landpoint:has(.game_main_con_selectCards) {
+    justify-content: flex-start;
     overflow-y: scroll;
+    height: 100%;
+    flex-grow: unset;
 }
 
 .game_main_con_selectCards {
-    height: 95%;
+    height: 100%;
+    gap: 30px;
 }
 
 .game_side_r {
     width: 40%;
     text-align: center;
     margin: 5px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .game_side_l {
@@ -259,7 +271,7 @@
 
 .game_card {
     border-radius: 16px;
-    padding: 10px;
+    padding: 13px 10px;
 }
 
 .game_card_domanda {
@@ -298,6 +310,7 @@
         justify-content: space-between;
         flex-direction: column;
         align-items: center;
+        gap: unset;
     }
 
     .game_main_con_selectCards:has(.game_card_domanda) {
@@ -310,6 +323,10 @@
     .game_side_r {
         width: 100%;
         margin: 0;
+    }
+
+    .game_side_r {
+        gap: unset;
     }
 
     .game_side_l {
