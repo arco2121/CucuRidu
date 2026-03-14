@@ -1,60 +1,101 @@
-<div class="flex_gap_30 game_main_con">
-    <div class="column sour_gummy_regular flex_gap_25 wait_code_con">
+<div class="flex_gap_30 game_main_con game_main_con_selectCards">
+    <div class="column sour_gummy_regular flex_gap_25 wait_code_con game_side_r">
         <div class="column flex_gap_10">
-            <div id="<%= domanda[1] %>" class="card domanda">
-                <%= domanda[0] %>
-            </div>
+            <% if(risposte) { %>
+                <div id="<%= domanda[1] %>"
+                     class="card domanda sour_gummy_regular">
+                    <%= domanda[0] %>
+                </div>
+            <% } else { %>
+                <div id="<%= domanda[1] %>"
+                     class="card game_card domanda game_card_domanda game_card_style_2 sour_gummy_bold">
+                    <%= domanda[0] %>
+                </div>
+            <% } %>
         </div>
     </div>
+
     <% if(risposte) { %>
-        <div class="column wait_players_list flex_gap_15 btn_doubleBorder">
-            <div id="showCards">
-                <% risposte.forEach((risposta, index) => { %>
-                    <div class="card risposta" id="<%= index %>"><%= risposta %></div>
-                <% }); %>
+        <div class="column flex_gap_10 game_side_l">
+            <div class="column game_cards_list btn_doubleBorder flex_gap_5">
+                <div class="game_complete_cards_title flex_gap_10">
+                    <h4 class="sour_gummy_regular_italic">Completa la frase:</h4>
+                    <div class="wait_players_list_hr"></div>
+                </div>
+
+                <div id="showCards" class="column flex_gap_10">
+                    <% risposte.forEach((risposta, index) => { %>
+                        <div class="card risposta game_card game_card_style_1 sour_gummy_medium"
+                             id="<%= index %>"><%= risposta %></div>
+                    <% }); %>
+                </div>
             </div>
+            <button id="sendCards" class="btn_mediumText btn_style_2 sour_gummy_bold">Conferma</button>
         </div>
-        <button id="sendCards">Conferma</button>
     <% } else { %>
-        <h1>Aspetta che tutti finiscano di rispondere</h1>
+        <h1 class="sour_gummy_regular_italic textAlign_center">Aspetta che tutti finiscano di rispondere</h1>
     <% } %>
 </div>
 
 <script>
     const cards = document.querySelectorAll(".risposta");
-    const domandaAttuale = document.querySelector(".domanda");
-    const sendCards = document.getElementById("sendCards");
-    const defaultText = domandaAttuale.textContent.trim();
-    const risposteDate = Array.from({ length: parseInt(domandaAttuale.id) }, () => null);
+    const currentQuestion = document.querySelector(".domanda");
+    const sendCardsBtn = document.getElementById("sendCards");
+    const defaultText = currentQuestion.textContent.trim();
+    const givenAnswers = Array.from({length: parseInt(currentQuestion.id)}, () => null);
 
     const toggleCards = (target) => {
-        if(risposteDate.length > 2) return;
-        if(risposteDate.indexOf(target.textContent) !== -1)
-            risposteDate[risposteDate.indexOf(target.textContent)] = null;
-        else
-            risposteDate[risposteDate.findIndex(ele => ele === null)] = target.textContent;
-        const risposteAttuali = risposteDate.filter(ele => ele !== null).length;
-        if(risposteAttuali > 0) {
-            let initText = defaultText;
-            risposteDate.filter(risposta => risposta !== null).forEach(risposta => initText = (initText[0] === "_"  || initText[(initText.indexOf("_") - 1)] === ".") ? initText.replace("_", risposta) :
-                initText.replace("_", risposta[0].toLowerCase() + risposta.slice(1, risposta.length)));
-            domandaAttuale.textContent = initText;
+        if (givenAnswers.length > 2) return;
+
+        const targetIndex = givenAnswers.indexOf(target.textContent);
+        if (targetIndex !== -1) {
+            givenAnswers[targetIndex] = null;
+        } else {
+            const emptyIndex = givenAnswers.findIndex(ele => ele === null);
+            if (emptyIndex !== -1) givenAnswers[emptyIndex] = target.textContent;
         }
-        else
-            domandaAttuale.textContent = defaultText;
-        target.classList.toggle("selected");
+
+        const currentAnswersCount = givenAnswers.filter(ele => ele !== null).length;
+
+        if (currentAnswersCount > 0) {
+            let initText = defaultText;
+            givenAnswers.filter(answer => answer !== null).forEach(answer => {
+                initText = (initText[0] === "_" || initText[(initText.indexOf("_") - 1)] === ".")
+                    ? initText.replace("_", answer)
+                    : initText.replace("_", answer[0].toLowerCase() + answer.slice(1));
+            });
+            currentQuestion.textContent = initText;
+        } else {
+            currentQuestion.textContent = defaultText;
+        }
+
+        const isFull = givenAnswers.every(ele => ele !== null);
+
+        cards.forEach(card => {
+            const isThisCardSelected = givenAnswers.includes(card.textContent);
+
+            if (isThisCardSelected) {
+                card.classList.add("selected");
+                card.classList.remove("unselected");
+            } else if (isFull) {
+                card.classList.remove("selected");
+                card.classList.add("unselected");
+            } else {
+                card.classList.remove("selected", "unselected");
+            }
+        });
     };
 
     cards.forEach(card => card.addEventListener("click", (e) => toggleCards(e.target)));
 
-    sendCards?.addEventListener("click", () => {
-        if(risposteDate.filter(ele => ele === null).length > 0) {
+    sendCardsBtn?.addEventListener("click", () => {
+        if (givenAnswers.some(ele => ele === null)) {
             alert("Finisci di selezionare le risposte, mongolo");
             return;
         }
         socket.emit("inviaRisposta", {
             id: referenceStanza,
-            indexCarte: risposteDate.map(risposta => referenceGiocatore.mazzo.indexOf(risposta))
+            indexCarte: givenAnswers.map(answer => referenceGiocatore.mazzo.indexOf(answer))
         });
     });
 </script>
