@@ -41,7 +41,7 @@
         try {
             const initialText = attesaView.textContent;
             while(idAttesaInterval !== null) {
-                clearFragmentInterval(idAttesaInterval, fromFragment["pageId"]);
+                clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
                 idAttesaInterval = null;
             }
             idAttesaInterval = fragmentInterval(() => {
@@ -50,11 +50,11 @@
                     if (check === "...") attesaView.textContent = initialText + " ";
                     else attesaView.textContent += ".";
                 } catch {
-                    clearFragmentInterval(idAttesaInterval, fromFragment["pageId"]);
+                    clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
                 }
-            }, 500, fromFragment["pageId"]);
+            }, 500, fromFragments["pageId"]);
         } catch {
-            clearFragmentInterval(idAttesaInterval, fromFragment["pageId"]);
+            clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
         }
     };
 
