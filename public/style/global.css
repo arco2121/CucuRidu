@@ -550,8 +550,8 @@ input:active {
     transform: translate(-50%, -50%);
     transform-origin: top left;
     z-index: 1000;
-    background-color: var(--loadingScreen-background-dark);
-    background-image: linear-gradient(to right top, var(--loadingScreen-background-dark), var(--loadingScreen-background));
+    background: #FFAEAE;
+    background: linear-gradient(to right bottom, rgba(255, 156, 156, 1) 0%, rgba(255, 233, 122, 1) 25%, rgba(221, 255, 143, 1) 50%, rgba(193, 255, 240, 1) 75%, rgba(222, 193, 255, 1) 100%);
     line-height: 1;
     overflow-x: hidden;
 }
@@ -586,8 +586,8 @@ input:active {
 
 .loading_img {
     border-radius: 100%;
-    border: solid var(--loadingScreen-accent-outline) 6px;
-    background: var(--loadingScreen-accent);
+    border: solid #fabbcb 6px;
+    background: #ffe8ee;
     height: 5rem;
     box-shadow: 0 0 0 3px white;
 }
