@@ -1,19 +1,25 @@
 <div class="flex_gap_30 game_main_con">
     <div class="column sour_gummy_regular flex_gap_25 wait_code_con">
-        <!-- Sarà da fare la visualizzazione del profilo che ha vinto, i dati si trovano dentro fromFragments["vincitore"] e hanno la struttura che trovi anche in Giocatore.js nel adaptToClient-->
+        <div class="winner_profile_con">
+            <img class="profile_pfp btn_doubleBorder active_Img" src="" alt="pfp" id="displayPfp">
+        </div>
         <div class="column flex_gap_10">
-            <div class="card domanda">
+            <div class="card game_card domanda game_card_domanda game_card_style_2 sour_gummy_bold">
                 <%= domanda[0] %>
             </div>
         </div>
     </div>
-    <button id="vaiAvanti">Avanti</button>
+    <button id="vaiAvanti" class="button btn_mediumText btn_style_1 sour_gummy_bold">Avanti</button>
 </div>
 
 <script>
     const domandaAttuale = document.querySelector(".domanda");
     const vaiAvanti = document.getElementById("vaiAvanti");
     const risposte = fromFragments["risposte"];
+    const vincitore = fromFragments["vincitore"];
+
+    const displayPfp = document.getElementById("displayPfp");
+    console.log(fromFragments)
 
     risposte.forEach(entry => {
         domandaAttuale.textContent = domandaAttuale.textContent.replace("_", entry);
