@@ -173,6 +173,7 @@ socket.on("fineTurno", async (data) => {
         domanda: domanda,
         risposte: risposte,
         interroghi: vincitore.id === referenceGiocatore.id,
+        vincitore: vincitore
     });
 });
 
