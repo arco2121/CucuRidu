@@ -89,10 +89,8 @@ table {
     --accent-color-3-outline: #886AA9;
 
     /* Loading Screen */
-    --loadingScreen-background: #A6A3FF;
-    --loadingScreen-background-dark: #7976D2;
-    --loadingScreen-accent: #A0FFA9;
-    --loadingScreen-accent-outline: #3C9B45;
+    --loadingScreen-background: linear-gradient(to right bottom, rgba(255, 156, 156, 1) 0%, rgba(255, 233, 122, 1) 25%, rgba(221, 255, 143, 1) 50%, rgba(193, 255, 240, 1) 75%, rgba(222, 193, 255, 1) 100%);
+    --loadingScreen-accent: #ffe8ee;
 
 
     /* Static Colors */
@@ -551,7 +549,7 @@ input:active {
     transform-origin: top left;
     z-index: 1000;
     background: #FFAEAE;
-    background: linear-gradient(to right bottom, rgba(255, 156, 156, 1) 0%, rgba(255, 233, 122, 1) 25%, rgba(221, 255, 143, 1) 50%, rgba(193, 255, 240, 1) 75%, rgba(222, 193, 255, 1) 100%);
+    background: var(--loadingScreen-background);
     line-height: 1;
     overflow-x: hidden;
 }
@@ -587,7 +585,7 @@ input:active {
 .loading_img {
     border-radius: 100%;
     border: solid #fabbcb 6px;
-    background: #ffe8ee;
+    background: var(--loadingScreen-accent);
     height: 5rem;
     box-shadow: 0 0 0 3px white;
 }
