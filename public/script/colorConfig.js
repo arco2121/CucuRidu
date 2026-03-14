@@ -13,20 +13,6 @@ const getRandomUniqueColor = () => {
     return color;
 }
 
-const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
-
-const loadingBack = savedSettings["loadingColorBack"] || getRandomUniqueColor();
-const loadingAccent = savedSettings["loadingColorAccent"] || getRandomUniqueColor();
-
-if (savedSettings["loadingColorBack"]) usedColorNames.add(loadingBack.name);
-if (savedSettings["loadingColorAccent"]) usedColorNames.add(loadingAccent.name);
-
-localStorage.setItem("cucuRiduSettings", JSON.stringify({
-    ...savedSettings,
-    loadingColorBack: loadingBack,
-    loadingColorAccent: loadingAccent
-}));
-
 const bgMain = getRandomUniqueColor();
 const bgVariant = getRandomUniqueColor();
 const accentsMap = {
@@ -37,12 +23,6 @@ const accentsMap = {
 
 // --- 3. ASSIGNMENT ---
 const setCSS = (name, value) => document.documentElement.style.setProperty(name, value);
-
-// > LOADING SCREEN
-setCSS('--loadingScreen-background', loadingBack.normal);
-setCSS('--loadingScreen-background-dark', loadingBack.dark);
-setCSS('--loadingScreen-accent', loadingAccent.normal);
-setCSS('--loadingScreen-accent-outline', loadingAccent.outline);
 
 // > BACKGROUNDS
 setCSS('--background', bgMain.normal);
