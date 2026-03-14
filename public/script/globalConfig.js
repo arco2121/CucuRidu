@@ -3,8 +3,8 @@ const fromBackEnd = (() => {
     document.querySelector("meta[name='dataFromBackEnd']").remove();
     return JSON.parse(data);
 })();
+
 const utilize = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm";
-const scriptRegex = /<script\b[^>]*>([\s\S]*?)<\/script>/gim;
 const generateId = (memory) => {
     let code = "";
     do {
@@ -38,6 +38,9 @@ const renderFragment = async (root, page, params = {}) => {
             data: fragmentsCache[page],
             id: generateId(memory)
         });
+        const old = root.querySelectorAll(".fragment");
+        for (const fragment of old)
+            clearAllFragmentInterval(fragment.id);
         root.innerHTML = "";
         const fragment = document.createRange().createContextualFragment(processed);
         root.appendChild(fragment);
@@ -45,6 +48,38 @@ const renderFragment = async (root, page, params = {}) => {
         console.error(e);
     }
     document.dispatchEvent(fragmentRendered);
+};
+
+const fragmentIntervalsMemory = new Map();
+const fragmentInterval = (call, interval, fragmentId) => {
+    let internal = null;
+    internal = setInterval(() => {
+        try {
+            call();
+        } catch {
+           clearFragmentInterval(internal, fragmentId);
+        }
+    }, interval);
+    const temporary = fragmentIntervalsMemory.get(fragmentId) || [];
+    temporary.push(internal);
+    fragmentIntervalsMemory.set(fragmentId, temporary);
+    return internal;
+};
+const clearFragmentInterval = (id, fragmentId) => {
+    clearInterval(id);
+    const temporary = fragmentIntervalsMemory.get(fragmentId);
+    if(temporary) {
+        temporary.splice(temporary.indexOf(id), 1);
+        fragmentIntervalsMemory.set(fragmentId, temporary);
+    }
+};
+const clearAllFragmentInterval = (fragmentId) => {
+    const temporary = fragmentIntervalsMemory.get(fragmentId);
+    if(temporary) {
+        for(const id of temporary)
+            clearInterval(id)
+        fragmentIntervalsMemory.delete(fragmentId);
+    }
 };
 
 //COLORS

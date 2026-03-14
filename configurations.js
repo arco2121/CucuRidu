@@ -211,7 +211,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
  * @param generationMemory
  * @param timeout
  */
-const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout) => {
+const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout = 3600000) => {
 
     const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
         if (!Stanze.get(stanzaId)) return next();
@@ -452,6 +452,11 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             giocatori: Stanze.get(data["stanzaId"])?.classifica().map(giocatore => giocatore.adaptToClient())
         }));
 
+        user.on("aggiornaAttesaRisposta", (data) => server.to(data["stanzaId"]).emit("aggiornamentoAttesaRisposta", {
+            numeroGiocatori: Stanze.get(data["stanzaId"])?.round.risposte.size,
+            giocatori: Array.from(Stanze.get(data["stanzaId"]).round.risposte.keys()).map(giocatore => Stanze.get(data["stanzaId"]).trovaGiocatore(giocatore).adaptToClient())
+        }));
+
         user.on("lasciaStanza", (data) => {
             try {
                 const stanzaId = data["id"];
@@ -503,7 +508,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                             }
                         });
                     }
-                }, timeout/2/60);
+                }, timeout/60);
             }
         });
     });

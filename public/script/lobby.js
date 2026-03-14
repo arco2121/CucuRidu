@@ -92,9 +92,9 @@ socket.on("confermaStanza", (data) => {
             userId: referenceGiocatore.id,
             stanzaId: referenceStanza
         })
-    }).then((response) => response.json().then((result) => {
+    }).then((response) => response.json().then(async (result) => {
         if(result?.result) {
-            renderFragment(base, "wait", {
+            await renderFragment(base, "wait", {
                 stanzaId: referenceStanza,
                 interroghi: interroghi || false,
                 primoRound: primoRound || true
@@ -143,8 +143,11 @@ socket.on("roundIniziato", async (data) => {
     });
 });
 
-socket.on("rispostaRegistrata", (data) => {
+socket.on("rispostaRegistrata", async (data) => {
     alert(data.message);
+    await renderFragment(base, "waitWinner", {
+        stanzaId: referenceStanza
+    });
 });
 
 socket.on("giaRegistrata", (data) => {
