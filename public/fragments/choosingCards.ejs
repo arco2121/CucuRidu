@@ -85,7 +85,7 @@
             givenAnswers.filter(answer => answer !== null).forEach(answer => {
                 initText = (initText[0] === "_" || initText[(initText.indexOf("_") - 1)] === ".")
                     ? initText.replace("_", answer)
-                    : initText.replace("_", answer[0].toLowerCase() + answer.slice(1));
+                    : initText.replace("_", answer[0] === "§" ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toLowerCase() + answer.slice(1)));
             });
             currentQuestion.textContent = initText;
         } else {
@@ -120,7 +120,7 @@
         }
         socket.emit("inviaRisposta", {
             id: referenceStanza,
-            indexCarte: givenAnswers.map(answer => referenceGiocatore.mazzo.indexOf(answer))
+            indexCarte: givenAnswers.filter(ele => ele !== null).map(answer => referenceGiocatore.mazzo.indexOf(answer))
         });
     });
 </script>

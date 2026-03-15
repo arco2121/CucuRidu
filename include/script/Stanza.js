@@ -215,18 +215,18 @@ class Stanza {
         return null;
     }
 
-    static pulisciStanza(callback, memory, Stanze, ...stanzeId) {
-        const check = (stanzaId) => {
-            const stanza = Stanze.get(stanzaId);
+    static async pulisciStanza(callback, memory, Stanze, ...stanzeId) {
+        const check = async (stanzaId) => {
+            const stanza = await Stanze.get(stanzaId);
             if(stanza?.stato === StatoStanza.END || stanza?.giocatori.size === 0 && stanza?.giocatoriPassati.size > 0) {
                 for (const id of stanza.giocatoriPassati.values()) memory.delete(id);
-                Stanze.delete(stanza.id);
+                await Stanze.delete(stanza.id);
                 memory.delete(stanza.id);
                 callback(stanza.id);
             }
         };
-        if(stanzeId.length === 0) for (const stanzaId of Stanze.keys()) check(stanzaId);
-        else for (const stanzaId of stanzeId) check(stanzaId);
+        if(stanzeId.length === 0) for (const stanzaId of await Stanze.keys()) await check(stanzaId);
+        else for (const stanzaId of stanzeId) await check(stanzaId);
     }
 
     toString() {
