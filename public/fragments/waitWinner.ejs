@@ -2,7 +2,7 @@
     <div class="column sour_gummy_regular flex_gap_25 wait_code_con">
         <div class="column sour_gummy_regular flex_gap_25 wait_code_con">
             <div class="column flex_gap_10 textAlign_center">
-                <h4 id="attesa">Aspetta che tutti quanti rispondano, tonto ✨</h4>
+                <h4 id="attesa">Aspetta gli altri, tonto ✨</h4>
             </div>
 
         </div>
@@ -45,14 +45,14 @@
                 idAttesaInterval = null;
             }
             idAttesaInterval = fragmentInterval(() => {
-                try {/*
+                try {
                     const check = attesaView.textContent.split("✨")[1].trim();
                     if (check === "...") attesaView.textContent = initialText + " ";
-                    else attesaView.textContent += ".";*/
+                    else attesaView.textContent += ".";
                 } catch {
                     clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
                 }
-            }, 500, fromFragments["pageId"]);
+            }, 700, fromFragments["pageId"]);
         } catch {
             clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
         }

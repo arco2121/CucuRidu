@@ -84,7 +84,7 @@
             let initText = defaultText;
             givenAnswers.filter(answer => answer !== null).forEach(answer => {
                 initText = (initText[0] === "_" || initText[(initText.indexOf("_") - 1)] === ".")
-                    ? initText.replace("_", answer)
+                    ? initText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1] + answer.slice(2)) : answer)
                     : initText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toLowerCase() + answer.slice(1)));
             });
             Array.from(bannedSymbols).forEach(letter => initText.replaceAll(letter, ""));

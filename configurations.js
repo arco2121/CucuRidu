@@ -469,7 +469,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
 
             server.to(data["stanzaId"]).emit("aggiornamentoAttesaRisposta", {
                 numeroGiocatori: Stanza?.round.risposte.size,
-                giocatori: Array.from(Stanza.round.risposte.keys()).map(async (giocatore) => Stanza.trovaGiocatore(giocatore).adaptToClient())
+                giocatori: Array.from(Stanza.round.risposte.keys()).map(giocatore => Stanza.trovaGiocatore(giocatore).adaptToClient())
             })
         });
 
