@@ -1,15 +1,24 @@
 <div class="game_main_con game_main_con_selectCards">
     <div class="column sour_gummy_regular flex_gap_25 wait_code_con game_side_r">
-        <div class="column flex_gap_10">
+        <div class="game_card game_card_decrated flex_gap_10  game_card_style_2 game_choice_asnwer_card_domanda shrinks_on_active_for_no_reason btn_doubleBorder">
             <% if(risposte) { %>
                 <div id="<%= domanda[1] %>"
-                     class="card domanda sour_gummy_regular">
+                     class="card domanda sour_gummy_regular game_card_domanda_player">
                     <%= domanda[0] %>
                 </div>
             <% } else { %>
                 <div id="<%= domanda[1] %>"
-                     class="card game_card domanda game_card_domanda game_card_style_2 sour_gummy_bold">
+                     class="card domanda  sour_gummy_bold game_card_domanda textAlign_start">
                     <%= domanda[0] %>
+                </div>
+                <div class="game_card_decoration_con game_card_decoration_style_2">
+                    <svg width="20" height="20" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                              d="M17.373 20.8056C14.7475 23.4311 13.2725 26.992 13.2725 30.7051C13.2725 34.4181 14.7475 37.9791 17.373 40.6046L31.5151 54.7467L38.5862 61.8178C39.3672 62.5988 40.6335 62.5988 41.4146 61.8178L48.4857 54.7467L62.6278 40.6046C65.2533 37.9791 66.7283 34.4181 66.7283 30.7051C66.7283 26.992 65.2533 23.4311 62.6278 20.8056C60.0023 18.1801 56.4413 16.7051 52.7283 16.7051C49.0153 16.7051 45.4543 18.1801 42.8288 20.8056L40.6914 22.943C40.3098 23.3246 39.691 23.3246 39.3094 22.943L37.172 20.8056C34.5464 18.1801 30.9855 16.7051 27.2725 16.7051C23.5594 16.7051 19.9985 18.1801 17.373 20.8056Z"
+                              fill="#C2CCDE"/>
+                        <path d="M13.2725 30.7051H10.7725H13.2725ZM17.373 40.6046L19.1407 38.8368L17.373 40.6046ZM31.5151 54.7467L29.7473 56.5145L31.5151 54.7467ZM48.4857 54.7467L46.7179 52.9789L48.4857 54.7467ZM27.2725 16.7051L27.2725 14.2051H27.2725V16.7051ZM38.5862 61.8178L40.3539 60.05L38.5862 61.8178ZM41.4146 61.8178L39.6468 60.05L41.4146 61.8178ZM15.6052 19.0378C12.5108 22.1322 10.7725 26.329 10.7725 30.7051H15.7725C15.7725 27.6551 16.9841 24.73 19.1407 22.5734L15.6052 19.0378ZM10.7725 30.7051C10.7725 35.0812 12.5109 39.278 15.6052 42.3723L19.1407 38.8368C16.9841 36.6801 15.7725 33.7551 15.7725 30.7051H10.7725ZM15.6052 42.3723L29.7473 56.5145L33.2829 52.9789L19.1407 38.8368L15.6052 42.3723ZM29.7473 56.5145L36.8184 63.5855L40.3539 60.05L33.2829 52.9789L29.7473 56.5145ZM43.1824 63.5855L50.2534 56.5145L46.7179 52.9789L39.6468 60.05L43.1824 63.5855ZM50.2534 56.5145L64.3956 42.3723L60.86 38.8368L46.7179 52.9789L50.2534 56.5145ZM64.3956 42.3723C67.4899 39.278 69.2283 35.0812 69.2283 30.7051H64.2283C64.2283 33.7551 63.0167 36.6801 60.86 38.8368L64.3956 42.3723ZM69.2283 30.7051C69.2283 26.329 67.4899 22.1322 64.3956 19.0378L60.86 22.5734C63.0167 24.73 64.2283 27.6551 64.2283 30.7051H69.2283ZM64.3956 19.0378C61.3012 15.9435 57.1044 14.2051 52.7283 14.2051V19.2051C55.7783 19.2051 58.7034 20.4167 60.86 22.5734L64.3956 19.0378ZM52.7283 14.2051C48.3522 14.2051 44.1554 15.9435 41.061 19.0378L44.5966 22.5734C46.7532 20.4167 49.6783 19.2051 52.7283 19.2051V14.2051ZM41.061 19.0378L38.9236 21.1752L42.4592 24.7108L44.5966 22.5734L41.061 19.0378ZM41.0771 21.1752L38.9397 19.0378L35.4042 22.5734L37.5416 24.7108L41.0771 21.1752ZM38.9397 19.0378C35.8454 15.9435 31.6485 14.2051 27.2725 14.2051L27.2725 19.2051C30.3225 19.2051 33.2475 20.4167 35.4042 22.5734L38.9397 19.0378ZM27.2725 14.2051C22.8964 14.2051 18.6996 15.9435 15.6052 19.0378L19.1407 22.5734C21.2974 20.4167 24.2225 19.2051 27.2725 19.2051V14.2051ZM38.9236 21.1752C39.5183 20.5805 40.4825 20.5806 41.0771 21.1752L37.5416 24.7108C38.8995 26.0687 41.1012 26.0687 42.4592 24.7108L38.9236 21.1752ZM36.8184 63.5855C38.5758 65.3429 41.425 65.3429 43.1824 63.5855L39.6468 60.05C39.8421 59.8547 40.1587 59.8547 40.3539 60.05L36.8184 63.5855Z"
+                              fill="#C2CCDE"/>
+                    </svg>
                 </div>
             <% } %>
         </div>
@@ -23,17 +32,29 @@
                     <div class="wait_players_list_hr"></div>
                 </div>
 
-                <div id="showCards" class="column flex_gap_10">
+                <div id="showCards" class="column flex_gap_10 ">
                     <% risposte.forEach((risposta, index) => { %>
-                        <div class="card risposta game_card game_card_style_1 sour_gummy_medium"
-                             id="<%= index %>"><%= risposta %></div>
+                        <div id="<%= index %>" textValue="<%= risposta %>"
+                             class="card risposta game_card game_card_decrated game_card_style_1 sour_gummy_medium">
+                            <%= risposta %>
+
+                            <div class="game_card_decoration_con game_card_decoration_style_1">
+                                <svg width="20" height="20" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M38.1441 12.6217C38.8159 10.9488 41.1841 10.9488 41.8559 12.6217L47.8081 27.4439C48.0942 28.1563 48.7628 28.642 49.5288 28.694L65.4648 29.7745C67.2635 29.8965 67.9953 32.1489 66.6118 33.3047L54.3544 43.5459C53.7653 44.0381 53.5099 44.8241 53.6972 45.5686L57.5941 61.0586C58.0339 62.8069 56.1179 64.199 54.5911 63.2404L41.0634 54.7476C40.4132 54.3394 39.5868 54.3394 38.9366 54.7476L25.4089 63.2404C23.8821 64.199 21.9661 62.8069 22.4059 61.0586L26.3028 45.5686C26.4901 44.8241 26.2347 44.0381 25.6456 43.5459L13.3882 33.3047C12.0047 32.1489 12.7365 29.8965 14.5352 29.7745L30.4712 28.694C31.2372 28.642 31.9058 28.1563 32.1919 27.4439L38.1441 12.6217Z" fill="#C2CCDE" />
+                                </svg>
+                            </div>
+                        </div>
                     <% }); %>
+
                 </div>
             </div>
-            <button id="sendCards" class="btn_mediumText btn_style_2 sour_gummy_bold">Conferma</button>
+            <button id="sendCards" class="btn_mediumText btn_style_3 sour_gummy_bold btn_doubleBorder">Conferma</button>
         </div>
     <% } else { %>
-        <h1 class="sour_gummy_regular_italic textAlign_center">Aspetta che tutti finiscano di rispondere</h1>
+        <div class="game_turn_wait_text">
+            <h1 class="sour_gummy_regular_italic textAlign_center">Aspetta che tutti finiscano di rispondere</h1>
+        </div>
+
     <% } %>
 </div>
 
@@ -45,14 +66,15 @@
     const givenAnswers = Array.from({length: parseInt(currentQuestion.id)}, () => null);
 
     const toggleCards = (target) => {
+        console.log("target", target.getAttribute("textValue"));
         if (givenAnswers.length > 2) return;
 
-        const targetIndex = givenAnswers.indexOf(target.textContent);
+        const targetIndex = givenAnswers.indexOf(target.getAttribute("textValue"));
         if (targetIndex !== -1) {
             givenAnswers[targetIndex] = null;
         } else {
             const emptyIndex = givenAnswers.findIndex(ele => ele === null);
-            if (emptyIndex !== -1) givenAnswers[emptyIndex] = target.textContent;
+            if (emptyIndex !== -1) givenAnswers[emptyIndex] = target.getAttribute("textValue");
         }
 
         const currentAnswersCount = givenAnswers.filter(ele => ele !== null).length;
@@ -72,7 +94,7 @@
         const isFull = givenAnswers.every(ele => ele !== null);
 
         cards.forEach(card => {
-            const isThisCardSelected = givenAnswers.includes(card.textContent);
+            const isThisCardSelected = givenAnswers.includes(card.getAttribute("textValue"));
 
             if (isThisCardSelected) {
                 card.classList.add("selected");
@@ -84,9 +106,11 @@
                 card.classList.remove("selected", "unselected");
             }
         });
+
+        console.log(givenAnswers);
     };
 
-    cards.forEach(card => card.addEventListener("click", (e) => toggleCards(e.target)));
+    cards.forEach(card => card.addEventListener("click", () => toggleCards(card)));
 
     sendCardsBtn?.addEventListener("click", () => {
         if (givenAnswers.some(ele => ele === null)) {
