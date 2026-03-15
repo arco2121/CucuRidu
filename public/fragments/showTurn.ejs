@@ -64,10 +64,11 @@
     const sendCardsBtn = document.getElementById("sendCards");
     const defaultText = currentQuestion.textContent.trim();
     const givenAnswers = Array.from({length: parseInt(currentQuestion.id)}, () => null);
+    const maxSlots = (defaultText.match(/_/g) || []).length;
 
     const toggleCards = (target) => {
         console.log("target", target.getAttribute("textValue"));
-        if (givenAnswers.length > 2) return;
+        if (givenAnswers.length > maxSlots) return;
 
         const targetIndex = givenAnswers.indexOf(target.getAttribute("textValue"));
         if (targetIndex !== -1) {

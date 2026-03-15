@@ -444,6 +444,15 @@
     .game_main_con:has(.game_side_choice_l) {
         width: 95%;
     }
+
+    .winner_btns {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .game_complete_cards_title {
+        width: unset;
+    }
 }
 
 #prima svg {
