@@ -63,8 +63,8 @@
     const currentQuestion = document.querySelector(".domanda");
     const sendCardsBtn = document.getElementById("sendCards");
     const defaultText = currentQuestion.textContent.trim();
-    const givenAnswers = Array.from({length: parseInt(currentQuestion.id)}, () => null);
-    const maxSlots = (defaultText.match(/_/g) || []).length;
+    const givenAnswers = Array.from({length: parseInt(currentQuestion.id)}, (_) => null);
+    const maxSlots = currentQuestion.id;
 
     const toggleCards = (target) => {
         console.log("target", target.getAttribute("textValue"));
@@ -84,7 +84,7 @@
             let initText = defaultText;
             givenAnswers.filter(answer => answer !== null).forEach(answer => {
                 initText = (initText[0] === "_" || initText[(initText.indexOf("_") - 1)] === ".")
-                    ? initText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toUpperCase + answer.slice(1)))
+                    ? initText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toUpperCase() + answer.slice(1)))
                     : initText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toLowerCase() + answer.slice(1)));
             });
             Array.from(bannedSymbols).forEach(letter => initText.replaceAll(letter, ""));

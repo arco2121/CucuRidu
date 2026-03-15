@@ -68,7 +68,7 @@
         // currentSelection[1] dovrebbe essere l'array delle parole da inserire
         currentSelection[1].forEach(entry => {
             questionText = (questionText[0] === "_" || questionText[(questionText.indexOf("_") - 1)] === ".")
-                ? questionText.replace("_", bannedSymbols.includes(entry[0]) ? (entry[1].toUpperCase() + entry.slice(2)) : (entry[0].toUpperCase + entry.slice(1)))
+                ? questionText.replace("_", bannedSymbols.includes(entry[0]) ? (entry[1].toUpperCase() + entry.slice(2)) : (entry[0].toUpperCase() + entry.slice(1)))
                 : questionText.replace("_", bannedSymbols.includes(entry[0]) ? (entry[1].toUpperCase() + entry.slice(2)) : (entry[0].toLowerCase() + entry.slice(1)));
         });
         Array.from(bannedSymbols).forEach(letter => questionText.replaceAll(letter, ""));

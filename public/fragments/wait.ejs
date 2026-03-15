@@ -83,13 +83,8 @@
             text: shareText,
             url: "/partecipaStanza/" + idStanza
         };
-        try {
-            if (navigator.canShare(shareData)) await navigator.share(shareData);
-            else await navigator.clipboard.writeText(idStanza).then(() => alert(copytext));
-        } catch (e) {
-            console.error(e);
-            alert(failText);
-        }
+        if (navigator.canShare(shareData)) await navigator.share(shareData).catch(_ => null);
+        else await navigator.clipboard.writeText(idStanza).then(() => alert(copytext)).catch(_ => alert(failText));
     });
 
     startButton?.addEventListener("click", () => socket.emit("iniziaTurno", {
