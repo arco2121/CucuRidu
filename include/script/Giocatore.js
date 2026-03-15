@@ -39,7 +39,8 @@ class Giocatore {
             pfp: this.pfp,
             masterRole: this.masterRole,
             interrogationRole: this.interrogationRole,
-            punti: this.punti
+            punti: this.punti,
+            aaaaa: "aaaaa"
         }
     }
 }

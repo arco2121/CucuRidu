@@ -141,7 +141,7 @@ Sant'Iddio
 San Giovanni Decapitato
 Pierpiero
 Gianmariafilippo
-Maria Antonietta da Corvetto
+Maria Antonietta
 Loredano
 Giuseppina Bonaparte
 Massimilianotello
@@ -182,10 +182,10 @@ Napoleone
 Giulio Cesare
 Beata Ignoranza
 Sant'Iddio
-San Giovanni Decapitato
+San Giovanni
 Pierpiero
 Gianmariafilippo
-Maria Antonietta da Corvetto
+Maria Antonietta
 Loredano
 Giuseppina Bonaparte
 Massimilianotello
