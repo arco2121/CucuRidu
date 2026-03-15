@@ -922,3 +922,7 @@ input:active {
 .textAlign_center {
     text-align: center;
 }
+
+.textAlign_start {
+    text-align: start;
+}

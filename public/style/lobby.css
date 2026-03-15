@@ -27,7 +27,6 @@
     align-items: center;
     width: 100%;
 
-    overflow-y: scroll;
     height: 100%;
     flex-grow: unset;
 }
@@ -55,6 +54,7 @@
     align-items: center;
     flex-direction: row;
     width: 100%;
+    height: 100%;
 }
 
 .wait_code_text {
@@ -124,6 +124,8 @@
     font-family: inherit;
     color: var(--background-variant-outline);
     margin: 10px 0;
+    overflow-y: scroll;
+    height: 20%;
 }
 
 .wait_players_list_hr {
@@ -188,7 +190,17 @@
     min-width: 100%;
 }
 
-@media (max-width: 800px) {
+@media (min-width: 840px){
+    .game_main_con{
+        padding: 8px;
+    }
+
+    .wait_players_list {
+        height: 50%;
+    }
+}
+
+@media (max-width: 840px) {
     .game_main_con {
         width: 90%;
         justify-content: center;
@@ -214,21 +226,24 @@
 --------------------------------------------------- */
 #landpoint:has(.game_main_con_selectCards) {
     justify-content: flex-start;
-    overflow-y: scroll;
+    overflow-y: hidden;
     height: 100%;
     flex-grow: unset;
 }
 
 .game_main_con_selectCards {
-    height: 100%;
     gap: 30px;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
 }
 
 .game_side_r {
     width: 40%;
     text-align: center;
     margin: 5px;
-    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -272,10 +287,39 @@
 .game_card {
     border-radius: 16px;
     padding: 13px 10px;
+    min-height: 100px;
+    min-width: 90%;
 }
 
 .game_card_domanda {
-    padding: 20px 25px;
+    padding: 16px 18px;
+}
+
+.game_card_decrated {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    gap: 3px;
+}
+
+.game_card_decoration_con {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    height: 20px;
+}
+
+.game_card_decoration_style_1 svg path {
+    fill: var(--accent-color-1-outline); !important;
+}
+
+.game_card_decoration_style_2 svg path {
+    fill: var(--accent-color-2-outline); !important;
+}
+
+.game_card_decoration_style_3 svg path {
+    fill: var(--accent-color-3-outline); !important;
 }
 
 .game_card_style_1 {
@@ -299,15 +343,29 @@
     color: var(--accent-color-confirm-outline);
 }
 
+.selected svg path {
+    fill: var(--accent-color-confirm-outline);
+}
+
 .unselected {
     opacity: 0.8;
     filter: brightness(0.9);
 }
 
-@media (max-width: 800px) {
+.game_turn_wait_text {
+    margin-top: 20px;
+}
+
+@media (min-width: 840px) {
+    .game_cards_list {
+        height: 30rem;
+    }
+}
+
+@media (max-width: 840px) {
     .game_main_con_selectCards {
         width: 95%;
-        justify-content: space-between;
+        justify-content: space-evenly;
         flex-direction: column;
         align-items: center;
         gap: unset;
@@ -321,7 +379,8 @@
     }
 
     .game_side_r {
-        width: 100%;
+        width: 95%;
+        flex-shrink: 0;
         margin: 0;
     }
 
@@ -330,9 +389,8 @@
     }
 
     .game_side_l {
-        width: 100%;
-        height: 85%;
-        margin: 0;
+        width: 95%;
+        height: 75%;
     }
 
     .game_cards_list {
@@ -366,7 +424,7 @@
     width: 70%;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 840px) {
     .game_side_choice_r {
         width: 100%;
         height: 15rem;
@@ -386,10 +444,6 @@
     .game_main_con:has(.game_side_choice_l) {
         width: 95%;
     }
-
-    .game_card_domanda {
-        padding: 16px 18px;
-    }
 }
 
 #prima svg {
@@ -398,4 +452,26 @@
 
 #dopo svg {
     transform: rotate(90deg);
+}
+
+.winner_profile_con {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.winner_pfp {
+    border-radius: 100%;
+    padding: 5px;
+    border: solid var(--background-variant-outline) 10px;
+    background: var(--background-variant-dark);
+    width: 60%;
+}
+
+@media (min-width: 840px) {
+    .winner_pfp {
+        width: 40%;
+    }
 }
