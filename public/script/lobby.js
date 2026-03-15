@@ -136,7 +136,7 @@ socket.on("roundIniziato", async (data) => {
     const { chiStaInterrogando, stanza, reference, domanda } = data;
     if(reference) referenceGiocatore = new GiocatoreInterface(reference);
     if(stanza) referenceStanza = stanza
-    await renderFragment(base, "showTurn", {
+    await renderFragment(base, "choosingCards", {
         domanda: domanda,
         risposte: !referenceGiocatore.interrogationRole ? referenceGiocatore.mazzo : null,
         chiStaInterrogando: chiStaInterrogando
