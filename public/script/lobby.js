@@ -143,8 +143,7 @@ socket.on("roundIniziato", async (data) => {
     });
 });
 
-socket.on("rispostaRegistrata", async (data) => {
-    alert(data.message);
+socket.on("rispostaRegistrata", async () => {
     await renderFragment(base, "waitWinner", {
         stanzaId: referenceStanza
     });
