@@ -34,9 +34,14 @@
     displayPfp.src = vincitore.pfp;
     winnerText.textContent = `✦ ${vincitore.username} ha vinto il round ✦`;
 
-    risposte.forEach(entry => {
-        domandaAttuale.textContent = domandaAttuale.textContent.replace("_", entry);
+    let questionText = domandaAttuale.textContent;
+    risposte.forEach(answer => {
+        questionText = (questionText[0] === "_" || questionText[(questionText.indexOf("_") - 1)] === ".")
+            ? questionText.replace("_", answer)
+            : questionText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toLowerCase() + answer.slice(1)));
     });
+    Array.from(bannedSymbols).forEach(letter => questionText.replaceAll(letter, ""));
+    domandaAttuale.textContent = questionText;
 
     vaiAvanti.addEventListener("click", () => renderFragment(base, "wait", {
         stanzaId: referenceStanza,

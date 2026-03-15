@@ -5,6 +5,7 @@ const fromBackEnd = (() => {
 })();
 
 const utilize = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm";
+const bannedSymbols = "§";
 const generateId = (memory) => {
     let code = "";
     do {
@@ -32,7 +33,7 @@ const renderFragment = async (root, page, params = {}) => {
             fragmentsCache[page] = await input.text();
         }
         if(!root) return fragmentsCache[page];
-        const header = await renderFragment(null, "wrapper");
+        const header = await renderFragment(null, "header");
         const processed = ejs.render(header, {
             params: params,
             data: fragmentsCache[page],

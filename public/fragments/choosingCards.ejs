@@ -85,8 +85,9 @@
             givenAnswers.filter(answer => answer !== null).forEach(answer => {
                 initText = (initText[0] === "_" || initText[(initText.indexOf("_") - 1)] === ".")
                     ? initText.replace("_", answer)
-                    : initText.replace("_", answer[0] === "§" ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toLowerCase() + answer.slice(1)));
+                    : initText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toLowerCase() + answer.slice(1)));
             });
+            Array.from(bannedSymbols).forEach(letter => initText.replaceAll(letter, ""));
             currentQuestion.textContent = initText;
         } else {
             currentQuestion.textContent = defaultText;
@@ -107,11 +108,10 @@
                 card.classList.remove("selected", "unselected");
             }
         });
-
-        console.log(givenAnswers);
     };
 
     cards.forEach(card => card.addEventListener("click", () => toggleCards(card)));
+    cards.forEach(card => Array.from(bannedSymbols).forEach(letter =>  card.textContent = card.textContent.replaceAll(letter, "")))
 
     sendCardsBtn?.addEventListener("click", () => {
         if (givenAnswers.some(ele => ele === null)) {
