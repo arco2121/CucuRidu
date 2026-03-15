@@ -69,7 +69,7 @@
         currentSelection[1].forEach(entry => {
             questionText = (questionText[0] === "_" || questionText[(questionText.indexOf("_") - 1)] === ".")
                 ? questionText.replace("_", entry)
-                : questionText.replace("_", bannedSymbols.includes(entry[0]) ? (entry[1].toUpperCase() + entry.slice(2)) : (entry[0].toLowerCase() + answer.slice(1)));
+                : questionText.replace("_", bannedSymbols.includes(entry[0]) ? (entry[1].toUpperCase() + entry.slice(2)) : (entry[0].toLowerCase() + entry.slice(1)));
         });
         Array.from(bannedSymbols).forEach(letter => questionText.replaceAll(letter, ""));
         currentQuestion.textContent = questionText;
