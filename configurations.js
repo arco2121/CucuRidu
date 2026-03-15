@@ -477,8 +477,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             try {
                 const stanzaId = data["id"];
                 const giocatoreId = data["giocatore"] || user.data.referenceGiocatore.id;
-                const Stanza = await Stanze.get(stanzaId);
-                const result = Stanza.eliminaGiocatore(giocatoreId);
+                const stanza = await Stanze.get(stanzaId);
+                const result = stanza.eliminaGiocatore(giocatoreId);
                 if(result) {
                     let deleted = false;
                     await Stanza.pulisciStanza((id) => {
@@ -498,7 +498,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     });
                     server.in(stanzaId).fetchSockets().then(sockets => {
                         for(const socket of sockets) {
-                            socket.data.referenceGiocatore = Stanza.giocatori.get(socket.data.referenceGiocatore.id);
+                            socket.data.referenceGiocatore = stanza.giocatori.get(socket.data.referenceGiocatore.id);
                             emitStatoStanza(stanzaId, socket);
                         }
                     });

@@ -35,7 +35,7 @@
                 <div id="showCards" class="column flex_gap_10 ">
                     <% risposte.forEach((risposta, index) => { %>
                         <div id="<%= index %>" textValue="<%= risposta %>"
-                             class="card risposta game_card game_card_decrated game_card_style_1 sour_gummy_medium">
+                             class="card button risposta game_card game_card_decrated game_card_style_1 sour_gummy_medium">
                             <%= risposta %>
 
                             <div class="game_card_decoration_con game_card_decoration_style_1">
@@ -84,7 +84,7 @@
             let initText = defaultText;
             givenAnswers.filter(answer => answer !== null).forEach(answer => {
                 initText = (initText[0] === "_" || initText[(initText.indexOf("_") - 1)] === ".")
-                    ? initText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1] + answer.slice(2)) : answer)
+                    ? initText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toUpperCase + answer.slice(1)))
                     : initText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toLowerCase() + answer.slice(1)));
             });
             Array.from(bannedSymbols).forEach(letter => initText.replaceAll(letter, ""));
