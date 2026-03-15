@@ -29,8 +29,8 @@ const lasciaStanza = () => {
                 ...settings,
                 savingToken: null
             }));
-            navigateWithLoading("/");
         }
+        navigateWithLoading("/");
     });
 };
 
@@ -72,6 +72,9 @@ socket.on("connect_error", (err) => {
             window.location.replace("/error?alreadyConnected=true");
             break;
         }
+        default: {
+            navigateWithLoading("/")
+        }
     }
 });
 
@@ -89,9 +92,9 @@ socket.on("confermaStanza", (data) => {
             userId: referenceGiocatore.id,
             stanzaId: referenceStanza
         })
-    }).then((response) => response.json().then((result) => {
+    }).then((response) => response.json().then(async (result) => {
         if(result?.result) {
-            renderFragment(base, "wait", {
+            await renderFragment(base, "wait", {
                 stanzaId: referenceStanza,
                 interroghi: interroghi || false,
                 primoRound: primoRound || true
@@ -119,6 +122,11 @@ socket.on("aspettaAltri", (data) => {
     alert(data.message);
 });
 
+socket.on("impossibileAggiungersi", (error) => {
+    alert(error.message);
+    navigateWithLoading("/partecipaStanza");
+});
+
 socket.on("errore", (error) => {
     alert(error.message);
     navigateWithLoading("/");
@@ -135,8 +143,11 @@ socket.on("roundIniziato", async (data) => {
     });
 });
 
-socket.on("rispostaRegistrata", (data) => {
+socket.on("rispostaRegistrata", async (data) => {
     alert(data.message);
+    await renderFragment(base, "waitWinner", {
+        stanzaId: referenceStanza
+    });
 });
 
 socket.on("giaRegistrata", (data) => {
@@ -152,6 +163,17 @@ socket.on("sceltaVincitore", async (data) => {
         risposte: risposte,
         chiStaInterrogando: chiInterroga,
         staiInterrogando: chiInterroga.id === referenceGiocatore.id
+    });
+});
+
+socket.on("fineTurno", async (data) => {
+    const { reference, vincitore, domanda, risposte } = data;
+    if(reference) referenceGiocatore = new GiocatoreInterface(reference);
+    await renderFragment(base, "showWinner", {
+        domanda: domanda,
+        risposte: risposte,
+        interroghi: vincitore.id === referenceGiocatore.id,
+        vincitore: vincitore
     });
 });
 

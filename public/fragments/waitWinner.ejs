@@ -1,0 +1,62 @@
+<div class="flex_gap_30 game_main_con">
+    <div class="column sour_gummy_regular flex_gap_25 wait_code_con">
+        <div class="column sour_gummy_regular flex_gap_25 wait_code_con">
+            <div class="column flex_gap_10 textAlign_center">
+                <h4 id="attesa">Aspetta che tutti quanti rispondano, tonto ✨</h4>
+            </div>
+
+        </div>
+        <div class="column wait_players_list flex_gap_15 btn_doubleBorder">
+            <h1 class="sour_gummy_bold wait_players_list_title" id="numeroGiocatori">Completati: 0</h1>
+            <div class="wait_players_list_hr"></div>
+            <div id="showGiocatori">
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    socket.off("aggiornamentoAttesaRisposta");
+    const attesaView = document.getElementById("attesa");
+    const numeroGiocatoriCount = document.getElementById("numeroGiocatori");
+    const showGiocatori = document.getElementById("showGiocatori");
+    const idStanza = fromFragments["stanzaId"];
+    let idAttesaInterval = null;
+
+    socket.on("aggiornamentoAttesaRisposta", (data) => {
+        const {numeroGiocatori, giocatori} = data || {};
+        numeroGiocatoriCount.textContent = numeroGiocatoriCount.textContent.split(":")[0] + ": " + numeroGiocatori;
+        renderFragment(showGiocatori, "components/giocatoreRow", {
+            giocatori: giocatori
+        });
+    });
+    socket.emit("aggiornaAttesaRisposta", {
+        stanzaId: idStanza
+    });
+
+    const updateAttesa = () => {
+        try {
+            const initialText = attesaView.textContent;
+            while(idAttesaInterval !== null) {
+                clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
+                idAttesaInterval = null;
+            }
+            idAttesaInterval = fragmentInterval(() => {
+                try {
+                    const check = attesaView.textContent.split("✨")[1].trim();
+                    if (check === "...") attesaView.textContent = initialText + " ";
+                    else attesaView.textContent += ".";
+                } catch {
+                    clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
+                }
+            }, 500, fromFragments["pageId"]);
+        } catch {
+            clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
+        }
+    };
+
+    updateAttesa();
+</script>

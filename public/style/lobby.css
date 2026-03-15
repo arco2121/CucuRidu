@@ -26,6 +26,9 @@
     justify-content: center;
     align-items: center;
     width: 100%;
+
+    height: 100%;
+    flex-grow: unset;
 }
 
 #navbar_con {
@@ -34,7 +37,7 @@
     display: flex;
     flex-direction: row;
     justify-content: end;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 }
 
 .navbar_pause_btn {
@@ -51,6 +54,7 @@
     align-items: center;
     flex-direction: row;
     width: 100%;
+    height: 100%;
 }
 
 .wait_code_text {
@@ -77,7 +81,7 @@
 }
 
 .pause_code_text_pause {
-    font-size: 1.35rem;
+    font-size: 1.15rem;
     margin-top: 10px;
 }
 
@@ -90,7 +94,7 @@
 }
 
 .pause_players_list_con_bg {
-    width: 100%;
+    width: 98%;
     border: solid 5px var(--background-outline);
     background: var(--background);
     background-image: linear-gradient(to bottom, var(--background), var(--background-middle));
@@ -100,7 +104,7 @@
     color: var(--background-outline);
     margin: 5px 0;
     overflow-y: scroll;
-    height: 15rem;
+    height: 14rem;
 }
 
 .pause_players_list_con {
@@ -120,6 +124,8 @@
     font-family: inherit;
     color: var(--background-variant-outline);
     margin: 10px 0;
+    overflow-y: scroll;
+    height: 20%;
 }
 
 .wait_players_list_hr {
@@ -184,7 +190,17 @@
     min-width: 100%;
 }
 
-@media (max-width: 800px) {
+@media (min-width: 840px){
+    .game_main_con{
+        padding: 8px;
+    }
+
+    .wait_players_list {
+        height: 50%;
+    }
+}
+
+@media (max-width: 840px) {
     .game_main_con {
         width: 90%;
         justify-content: center;
@@ -201,5 +217,270 @@
     .wait_players_list {
         width: auto;
         padding: 25px 10px;
+    }
+}
+
+
+/* ---------------------------------------------------
+ >>> GAME PAGE
+--------------------------------------------------- */
+#landpoint:has(.game_main_con_selectCards) {
+    justify-content: flex-start;
+    overflow-y: hidden;
+    height: 100%;
+    flex-grow: unset;
+}
+
+.game_main_con_selectCards {
+    gap: 30px;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.game_side_r {
+    width: 40%;
+    text-align: center;
+    margin: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.game_side_l {
+    width: 60%;
+    margin: 5px;
+}
+
+.game_cards_list {
+    width: 90%;
+    border: solid 5px var(--background-variant-outline);
+    background: var(--background-variant);
+    background-image: linear-gradient(to bottom, var(--background-variant), var(--background-variant-middle));
+    border-radius: 25px;
+    padding: 10px;
+    font-family: inherit;
+    color: var(--background-variant-outline);
+    overflow-y: scroll;
+    height: 25rem;
+    flex-grow: 1;
+}
+
+.game_cards_list .column {
+    align-items: stretch;
+}
+
+.game_complete_cards_title {
+    font-size: 1.05rem;
+    text-align: center;
+    margin-bottom: 15px;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.game_complete_cards_title h4 {
+    margin-bottom: 8px;
+}
+
+.game_card {
+    border-radius: 16px;
+    padding: 13px 10px;
+    min-height: 100px;
+    min-width: 90%;
+}
+
+.game_card_domanda {
+    padding: 16px 18px;
+}
+
+.game_card_decrated {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    gap: 3px;
+}
+
+.game_card_decoration_con {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    height: 20px;
+}
+
+.game_card_decoration_style_1 svg path {
+    fill: var(--accent-color-1-outline); !important;
+}
+
+.game_card_decoration_style_2 svg path {
+    fill: var(--accent-color-2-outline); !important;
+}
+
+.game_card_decoration_style_3 svg path {
+    fill: var(--accent-color-3-outline); !important;
+}
+
+.game_card_style_1 {
+    border: solid 5px var(--accent-color-1-outline);
+    background: var(--accent-color-1);
+    background-image: linear-gradient(to bottom, var(--accent-color-1), var(--accent-color-1-middle));
+    color: var(--accent-color-1-outline);
+}
+
+.game_card_style_2 {
+    border: solid 5px var(--accent-color-2-outline);
+    background: var(--accent-color-2);
+    background-image: linear-gradient(to bottom, var(--accent-color-2), var(--accent-color-2-middle));
+    color: var(--accent-color-2-outline);
+}
+
+.selected {
+    border: solid 5px var(--accent-color-confirm-outline);
+    background: var(--accent-color-confirm);
+    background-image: linear-gradient(to bottom, var(--accent-color-confirm), var(--accent-color-confirm-middle));
+    color: var(--accent-color-confirm-outline);
+}
+
+.selected svg path {
+    fill: var(--accent-color-confirm-outline);
+}
+
+.unselected {
+    opacity: 0.8;
+    filter: brightness(0.9);
+}
+
+.game_turn_wait_text {
+    margin-top: 20px;
+}
+
+@media (min-width: 840px) {
+    .game_cards_list {
+        height: 30rem;
+    }
+}
+
+@media (max-width: 840px) {
+    .game_main_con_selectCards {
+        width: 95%;
+        justify-content: space-evenly;
+        flex-direction: column;
+        align-items: center;
+        gap: unset;
+    }
+
+    .game_main_con_selectCards:has(.game_card_domanda) {
+        width: 95%;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .game_side_r {
+        width: 95%;
+        flex-shrink: 0;
+        margin: 0;
+    }
+
+    .game_side_r {
+        gap: unset;
+    }
+
+    .game_side_l {
+        width: 95%;
+        height: 75%;
+    }
+
+    .game_cards_list {
+        width: 100%;
+        padding: 5px;
+    }
+}
+
+
+/* ---------------------------------------------------
+ >>> SCELTA VINCITORE
+--------------------------------------------------- */
+.game_side_choice_r {
+    width: 70%;
+    height: 15rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.game_side_choice_l {
+    width: 40%;
+}
+
+.game_main_con:has(.game_side_choice_l) {
+    justify-content: center;
+    align-items: center;
+}
+
+.game_choice_card_con {
+    width: 70%;
+}
+
+@media (max-width: 840px) {
+    .game_side_choice_r {
+        width: 100%;
+        height: 15rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
+    .game_side_choice_l {
+        width: 100%;
+    }
+
+    .game_choice_card_con {
+        width: 100%;
+    }
+
+    .game_main_con:has(.game_side_choice_l) {
+        width: 95%;
+    }
+
+    .winner_btns {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .game_complete_cards_title {
+        width: unset;
+    }
+}
+
+#prima svg {
+    transform: rotate(-90deg);
+}
+
+#dopo svg {
+    transform: rotate(90deg);
+}
+
+.winner_profile_con {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.winner_pfp {
+    border-radius: 100%;
+    padding: 5px;
+    border: solid var(--background-variant-outline) 10px;
+    background: var(--background-variant-dark);
+    width: 60%;
+}
+
+@media (min-width: 840px) {
+    .winner_pfp {
+        width: 40%;
     }
 }

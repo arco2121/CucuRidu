@@ -89,10 +89,8 @@ table {
     --accent-color-3-outline: #886AA9;
 
     /* Loading Screen */
-    --loadingScreen-background: #A6A3FF;
-    --loadingScreen-background-dark: #7976D2;
-    --loadingScreen-accent: #A0FFA9;
-    --loadingScreen-accent-outline: #3C9B45;
+    --loadingScreen-background: linear-gradient(to right bottom, rgba(255, 156, 156, 1) 0%, rgba(255, 233, 122, 1) 25%, rgba(221, 255, 143, 1) 50%, rgba(193, 255, 240, 1) 75%, rgba(222, 193, 255, 1) 100%);
+    --loadingScreen-accent: #ffe8ee;
 
 
     /* Static Colors */
@@ -425,7 +423,7 @@ a {
 
 .btn_mediumText {
     font-size: 20px;
-    padding: 10px;
+    /*padding: 10px;*/
     width: 190px;
     height: 52px;
     margin: 5px;
@@ -452,7 +450,7 @@ a {
 .btn_square {
     width: 40px;
     height: 40px;
-    border-radius: 16px;
+    border-radius: 13px;
 }
 
 .btn_style_1 {
@@ -534,6 +532,10 @@ input:active {
     box-shadow: 0 0 0 3px white;
 }
 
+.doubleBorder_small {
+    box-shadow: 0 0 0 2px white;
+}
+
 /* ---------------------------------------------------
  >>> LOADING SCREEN
 --------------------------------------------------- */
@@ -550,8 +552,8 @@ input:active {
     transform: translate(-50%, -50%);
     transform-origin: top left;
     z-index: 1000;
-    background-color: var(--loadingScreen-background-dark);
-    background-image: linear-gradient(to right top, var(--loadingScreen-background-dark), var(--loadingScreen-background));
+    background: #FFAEAE;
+    background: var(--loadingScreen-background);
     line-height: 1;
     overflow-x: hidden;
 }
@@ -586,7 +588,7 @@ input:active {
 
 .loading_img {
     border-radius: 100%;
-    border: solid var(--loadingScreen-accent-outline) 6px;
+    border: solid #fabbcb 6px;
     background: var(--loadingScreen-accent);
     height: 5rem;
     box-shadow: 0 0 0 3px white;
@@ -595,20 +597,6 @@ input:active {
 .loading_text {
     margin-left: 20px;
     font-size: 1.7rem;
-}
-
-.hideRendering {
-    opacity: 0;
-    transition: all 0.3s ease;
-    pointer-events: none;
-    z-index: -1;
-}
-
-.unhideRendering {
-   opacity: 1;
-    transition: all 0.3s ease;
-    opacity: 1;
-    pointer-events: all;
 }
 
 /* Mobile */
@@ -692,11 +680,11 @@ input:active {
         scale: 1;
     }
     20% {
-        opacity: 0.7;
-        scale: 0.99;
-    }
-    25% {
         opacity: 0.2;
+        scale: 0.7;
+    }
+    45% {
+        opacity: 0.1;
     }
     100% {
         opacity: 0;
@@ -929,4 +917,12 @@ input:active {
 
 .underlined_text {
     text-decoration: underline;
+}
+
+.textAlign_center {
+    text-align: center;
+}
+
+.textAlign_start {
+    text-align: start;
 }

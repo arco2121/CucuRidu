@@ -185,7 +185,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
 
 // creaStanza: Crea una stanza, assegna il ruolo di Master e notifica la lobby
 // partecipaStanza: Aggiunge un nuovo giocatore alla stanza esistente (se c'è posto)
-// iniziaTurno: (Solo Master) Avvia il round, distribuisce la domanda o chiude la partita se finita
+// iniziaTurno: (Solo Interrogante) Avvia il round, distribuisce la domanda o chiude la partita se finita
 // inviaRisposta: Riceve gli indici delle carte scelte dal giocatore
 // scegliVincitore: (Solo Interrogante) Riceve l'ID del giocatore che ha vinto il round
 // terminaPartita: (Solo Master) Forza la chiusura della stanza per tutti
@@ -211,7 +211,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
  * @param generationMemory
  * @param timeout
  */
-const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout) => {
+const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout = 3600000) => {
 
     const emitStatoStanza = (stanzaId, socket, next = () => {}) => {
         if (!Stanze.get(stanzaId)) return next();
@@ -407,9 +407,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                             socket.data.referenceGiocatore = Stanze.get(stanzaId).trovaGiocatore(socket.data.referenceGiocatore.id);
                             socket.emit("fineTurno", {
                                 vincitore: result[0],
-                                usernameVincitore: result[1],
-                                domanda: result[2],
-                                risposte: result[3],
+                                domanda: result[1],
+                                risposte: result[2],
                                 reference: socket.data.referenceGiocatore.adaptToClient()
                             });
                         }
@@ -451,6 +450,11 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
 
         user.on("listaGiocatori", (data) => user.emit("listaGiocatoriAggiornamento", {
             giocatori: Stanze.get(data["stanzaId"])?.classifica().map(giocatore => giocatore.adaptToClient())
+        }));
+
+        user.on("aggiornaAttesaRisposta", (data) => server.to(data["stanzaId"]).emit("aggiornamentoAttesaRisposta", {
+            numeroGiocatori: Stanze.get(data["stanzaId"])?.round.risposte.size,
+            giocatori: Array.from(Stanze.get(data["stanzaId"]).round.risposte.keys()).map(giocatore => Stanze.get(data["stanzaId"]).trovaGiocatore(giocatore).adaptToClient())
         }));
 
         user.on("lasciaStanza", (data) => {
@@ -504,7 +508,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                             }
                         });
                     }
-                }, timeout/2/60);
+                }, timeout/60);
             }
         });
     });

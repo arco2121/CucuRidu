@@ -8,7 +8,6 @@
 <script>
     const timing = 250;
     const isLoadScreen = () => document.body.contains(loadingScreen);
-    const isHideRendering = (container) => container.classList.contains("hideRendering");
     (() => {
         window.addEventListener("beforeunload", () => {
             if (!isLoadScreen()) {

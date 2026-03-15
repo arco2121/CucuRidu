@@ -1,0 +1,46 @@
+<div class="flex_gap_30 game_main_con">
+    <div class="column sour_gummy_regular flex_gap_30 wait_code_con">
+        <div class="winner_profile_con flex_gap_20 textAlign_center">
+            <img class="winner_pfp btn_doubleBorder active_Img" src="" alt="pfp" id="displayPfp">
+            <h4 id="winnerText" class="sour_gummy_bold">✦ NomeVincitore ha vinto il round ✦</h4>
+        </div>
+        <div class="column flex_gap_10">
+            <div class="game_card game_card_decrated flex_gap_10  game_card_style_2 game_choice_asnwer_card_domanda shrinks_on_active_for_no_reason btn_doubleBorder">
+                <div class="card domanda  sour_gummy_bold game_card_domanda textAlign_start">
+                    <%= domanda[0] %>
+                </div>
+                <div class="game_card_decoration_con game_card_decoration_style_2">
+                    <svg width="30" height="30" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M53.3576 30.6424L52 26L50.6424 30.6424L46 32L50.6424 33.3576L52 38L53.3576 33.3576L58 32L53.3576 30.6424Z" fill="#C2CCDE" />
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M17.373 20.8056C14.7475 23.4311 13.2725 26.992 13.2725 30.7051C13.2725 34.4181 14.7475 37.9791 17.373 40.6046L20.6234 43.855L20.8225 43.8222L22.0534 36.3497C22.3716 34.4175 24.042 32.9998 26.0002 32.9998C27.9584 32.9998 29.6287 34.4175 29.947 36.3497L31.1778 43.8222L38.6503 45.053C40.5825 45.3713 42.0002 47.0416 42.0002 48.9998C42.0002 50.958 40.5825 52.6284 38.6503 52.9466L31.1778 54.1775L31.145 54.3766L38.5862 61.8178C39.3672 62.5988 40.6335 62.5988 41.4146 61.8178L62.6278 40.6046C65.2533 37.9791 66.7283 34.4181 66.7283 30.7051C66.7283 26.992 65.2533 23.4311 62.6278 20.8056C60.0023 18.1801 56.4413 16.7051 52.7283 16.7051C49.0153 16.7051 45.4543 18.1801 42.8288 20.8056L40.6914 22.943C40.3098 23.3246 39.691 23.3246 39.3094 22.943L37.172 20.8056C34.5464 18.1801 30.9855 16.7051 27.2725 16.7051C23.5594 16.7051 19.9985 18.1801 17.373 20.8056ZM55.8394 24.8771C55.3407 23.1718 53.7769 21.9998 52.0002 21.9998C50.2235 21.9998 48.6597 23.1718 48.161 24.8771L47.418 27.4176L44.8774 28.1606C43.1721 28.6593 42.0002 30.2231 42.0002 31.9998C42.0002 33.7765 43.1721 35.3403 44.8774 35.839L47.418 36.582L48.161 39.1226C48.6597 40.8279 50.2235 41.9998 52.0002 41.9998C53.7769 41.9998 55.3407 40.8279 55.8394 39.1226L56.5824 36.582L59.123 35.839C60.8282 35.3403 62.0002 33.7765 62.0002 31.9998C62.0002 30.2231 60.8282 28.6593 59.123 28.1606L56.5824 27.4176L55.8394 24.8771Z" fill="#C2CCDE" />
+                        <path d="M26 37L27.6971 47.3029L38 49L27.6971 50.6971L26 61L24.3029 50.6971L14 49L24.3029 47.3029L26 37Z" fill="#C2CCDE" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <button id="vaiAvanti" class="button btn_mediumText btn_style_1 sour_gummy_bold btn_doubleBorder">Avanti</button>
+    </div>
+</div>
+
+<script>
+    const domandaAttuale = document.querySelector(".domanda");
+    const vaiAvanti = document.getElementById("vaiAvanti");
+    const risposte = fromFragments["risposte"];
+    const vincitore = fromFragments["vincitore"];
+
+    const displayPfp = document.getElementById("displayPfp");
+    const winnerText = document.getElementById("winnerText");
+
+    displayPfp.src = vincitore.pfp;
+    winnerText.textContent = `✦ ${vincitore.username} ha vinto il round ✦`;
+
+    risposte.forEach(entry => {
+        domandaAttuale.textContent = domandaAttuale.textContent.replace("_", entry);
+    });
+
+    vaiAvanti.addEventListener("click", () => renderFragment(base, "wait", {
+        stanzaId: referenceStanza,
+        interroghi: fromFragments["interroghi"],
+        primoRound: false
+    }));
+</script>

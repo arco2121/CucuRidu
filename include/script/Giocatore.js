@@ -38,7 +38,8 @@ class Giocatore {
             mazzo: this.mazzo.toArray(),
             pfp: this.pfp,
             masterRole: this.masterRole,
-            interrogationRole: this.interrogationRole
+            interrogationRole: this.interrogationRole,
+            punti: this.punti
         }
     }
 }

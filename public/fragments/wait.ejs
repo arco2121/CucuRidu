@@ -40,8 +40,10 @@
         numeroGiocatoriCount.textContent = numeroGiocatoriCount.textContent.split(":")[0] + ": " + numeroGiocatori;
         if(numeroGiocatori < minimoGiocatori)
             attesaView.textContent = "Wait per altri giocatori ✨";
-        else
-            attesaView.textContent = "Wait per il prossimo turno ✨";
+        else {
+            if(fromFragments["interroghi"]) attesaView.textContent = "Muoviti a far partire ✨";
+            else attesaView.textContent = "Wait per il prossimo turno ✨";
+        }
         updateAttesa();
         renderFragment(showGiocatori, "components/giocatoreRow", {
             giocatori: giocatori
@@ -55,25 +57,27 @@
         try {
             const initialText = attesaView.textContent;
             while(idAttesaInterval !== null) {
-                clearInterval(idAttesaInterval);
+                clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
                 idAttesaInterval = null;
             }
-            idAttesaInterval = setInterval(() => {
+            idAttesaInterval = fragmentInterval(() => {
                 try {
                     const check = attesaView.textContent.split("✨")[1].trim();
                     if (check === "...") attesaView.textContent = initialText + " ";
                     else attesaView.textContent += ".";
                 } catch {
-                    clearInterval(idAttesaInterval);
+                    clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
                 }
-            }, 700);
+            }, 500, fromFragments["pageId"]);
         } catch {
-            clearInterval(idAttesaInterval);
+            clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
         }
     };
 
     shareButton.addEventListener("click", async () => {
         const shareText = "Muovi il culo ed entra nella stanza per giocare inconcepibile sgorbio nato dall'errare umano che non sei altro :))";
+        const copytext = "Codice copiato, ora usalo saggiamente scarto umano :))";
+        const failText = "Codice non copiato, fai meno il fannullone e faglielo semplicemente vedere :))";
         const shareData = {
             title: "Cucu Ridu",
             text: shareText,
@@ -81,9 +85,10 @@
         };
         try {
             if (navigator.canShare(shareData)) await navigator.share(shareData);
-            else await navigator.clipboard.writeText(idStanza).then(() => alert(shareText));
+            else await navigator.clipboard.writeText(idStanza).then(() => alert(copytext));
         } catch (e) {
             console.error(e);
+            alert(failText);
         }
     });
 

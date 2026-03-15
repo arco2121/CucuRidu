@@ -15,6 +15,7 @@
             return JSON.parse(data);
         })();
         const container = document.getElementById("<%= id %>");
+        const scriptRegex = /<script\b[^>]*>([\s\S]*?)<\/script>/gim;
         const scripts = [];
 
         const html = raw.replace(scriptRegex, (match, scriptContent) => {
@@ -27,7 +28,10 @@
         container.innerHTML = ejs.render(html, fromRendering);
         scripts.forEach(script => {
             try {
-                const fromFragments = fromRendering;
+                const fromFragments = {
+                    ...fromRendering,
+                    pageId: container.id
+                };
                 eval(ejs.render(script, fromRendering));
             } catch (e) {
                 console.error(e);
