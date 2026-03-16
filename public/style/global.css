@@ -315,6 +315,10 @@ a {
     max-width: 100%;
 }
 
+.sectionYScroll {
+    overflow-y: scroll ;
+}
+
 .column {
     display: flex;
     flex-direction: column;
