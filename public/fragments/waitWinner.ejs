@@ -47,7 +47,7 @@
             idAttesaInterval = fragmentInterval(() => {
                 try {
                     const check = attesaView.textContent.split("✨")[1].trim();
-                    if (check === "...") attesaView.textContent = initialText + " ";
+                    if (check === "..") attesaView.textContent = initialText;
                     else attesaView.textContent += ".";
                 } catch {
                     clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
