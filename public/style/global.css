@@ -732,7 +732,7 @@ input:active {
     width: 70%;
     align-items: center;
     justify-content: space-between;
-    overflow-y: hidden;
+    overflow-y: scroll;
 }
 
 .largeSection {
