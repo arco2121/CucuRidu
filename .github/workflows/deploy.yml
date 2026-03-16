@@ -13,28 +13,19 @@ jobs:
           fetch-depth: 0
           lfs: true
 
-      - name: Checkout LFS objects
-        run: git lfs checkout
-
       - name: Push to Hub
         env:
           HF_TOKEN: ${{ secrets.HF_KEY }}
         run: |
-          git config user.name "github-actions"
-          git config user.email "action@github.com"
-
-          # Rimuovi file non necessari
-          rm -rf hosting/ scratch/ LICENSE .github/
-          git add -A
-          git commit -m "Cleanup: removing hosting, scratch and LICENSE" || echo "No changes to commit"
-
-          # Aggiungi HF come remote separato
-          git remote add space https://arco2120:$HF_TOKEN@huggingface.co/spaces/arco2120/cucu_ridu
-
-          # Assicurati che LFS sia configurato per il remote HF
-          git lfs install
-          git config lfs.allowincompletepush false
-
-          # Push LFS objects prima, poi il codice
-          git lfs push space --all
-          git push --force space main
+          pip install huggingface_hub
+          python -c "
+          from huggingface_hub import HfApi
+          api = HfApi()
+          api.upload_folder(
+            folder_path='.',
+            repo_id='arco2120/cucu_ridu',
+            repo_type='space',
+            token='$HF_TOKEN',
+            ignore_patterns=['hosting/*', 'scratch/*', 'LICENSE', '.github/*', '.git/*']
+          )
+          "
