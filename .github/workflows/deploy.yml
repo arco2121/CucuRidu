@@ -32,4 +32,4 @@ jobs:
           git commit -m "Cleanup: removing hosting, scratch and LICENSE.github" || echo "No changes to commit"
           
           git config lfs.allowincompletepush true
-          git push --force https://arco2107:$HF_TOKEN@huggingface.co/spaces/arco2107/cucuridu main
+          git push --force https://arco2120:$HF_TOKEN@huggingface.co/spaces/arco2120/cucu_ridu main
