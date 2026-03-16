@@ -235,7 +235,6 @@
     .wait_players_list {
         width: auto;
         padding: 25px 10px;
-        height: 70%;
     }
 }
 
@@ -377,7 +376,11 @@
 
 @media (min-width: 840px) {
     .game_cards_list {
-        height: 30rem;
+        height: 100%;
+    }
+
+    .game_side_l {
+        height: 100%;
     }
 }
 

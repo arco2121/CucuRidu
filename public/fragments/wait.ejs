@@ -4,21 +4,21 @@
                 <div class="row wait_code_text flex_gap_10">
                     <h4>Codice Stanza: </h4><h4 class="sour_gummy_bold"> <%= stanzaId %></h4>
                 </div>
-                <button class="button btn_smallText btn_style_1 sour_gummy_bold" id="shareButton">Condividi</button>
+                <button class="button btn_smallText btn_style_1 sour_gummy_bold btn_doubleBorder" id="shareButton">Condividi</button>
             </div>
             <div class="column flex_gap_10">
-                <h4 id="attesa"></h4>
                 <% if (interroghi) { %>
-                    <% if (primoRound) { %>
-                        <button class="button btn_mediumText btn_style_2 sour_gummy_bold" id="selectPack">Seleziona Mazzo</button>
+                    <button class="button btn_bigText btn_style_2 sour_gummy_bold btn_doubleBorder" id="startButton"><%= primoRound ? "Inizia" : "Continua" %></button>
+                    <% if(primoRound) {%>
+                        <button class="button btn_mediumText btn_style_3 sour_gummy_bold btn_doubleBorder" id="packsButton">Espansioni</button>
                     <% } %>
-                    <button class="button btn_mediumText btn_style_2 sour_gummy_bold" id="startButton"><%= primoRound ? "Inizia" : "Continua" %></button>
                 <% } %>
             </div>
 
         </div>
         <div class="column wait_players_list flex_gap_15 btn_doubleBorder">
             <h1 class="sour_gummy_bold wait_players_list_title" id="numeroGiocatori">Giocatori presenti: 0</h1>
+            <h4 class="sour_gummy_bold" id="attesa"></h4>
             <div class="wait_players_list_hr"></div>
             <div id="showGiocatori">
 
@@ -34,7 +34,7 @@
     const shareButton = document.getElementById("shareButton");
     const showGiocatori = document.getElementById("showGiocatori");
     const startButton = document.getElementById("startButton");
-    const selectPack = document.getElementById("selectPack");
+    const packsButton = document.getElementById("packsButton");
 
     const idStanza = fromFragments["stanzaId"];
     let idAttesaInterval = null;
@@ -95,8 +95,8 @@
         id: referenceStanza
     }));
 
-    selectPack?.addEventListener("click", () => {
+    packsButton?.addEventListener("click", () => {
         game_section.dispatchEvent(hidePanel);
-        packPanel.dispatchEvent(showPanel);
-    })
+        packsPanel.dispatchEvent(showPanel);
+    });
 </script>

@@ -315,6 +315,10 @@ a {
     max-width: 100%;
 }
 
+.sectionYScroll {
+    overflow-y: scroll ;
+}
+
 .column {
     display: flex;
     flex-direction: column;
@@ -728,7 +732,7 @@ input:active {
     width: 70%;
     align-items: center;
     justify-content: space-between;
-    overflow-y: hidden;
+    overflow-y: scroll;
 }
 
 .largeSection {
@@ -812,7 +816,7 @@ input:active {
     }
 
     .inputSection {
-        width: 90%;
+        width: 95%;
     }
 
     .largeSection {
