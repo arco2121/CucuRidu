@@ -13,7 +13,7 @@
                 <% }) %>
                 <div id="customPack" class="tile">
                     <h4>Personalizzati</h4>
-                    <input type="file" id="inputFile" class="hidden" accept="application/json,.cucuridupack" multiple/>
+                    <input type="file" hidden id="inputFile" accept="application/json" multiple/>
                 </div>
             </div>
             <button id="confirmPacks">Seleziona</button>
@@ -25,6 +25,9 @@
 </div>
 
 <script>
+    socket.off("mazzoAggiunto");
+    socket.off("mazzoErrore");
+
     const confirmPacks = document.getElementById("confirmPacks");
     const sectionDefault = document.querySelector(".game_section");
     const customTile = document.getElementById("customPack");
@@ -107,6 +110,17 @@
     });
 
     exitBtn.addEventListener("click", () => {
+        packPanel.dispatchEvent(hidePanel);
+        sectionDefault.dispatchEvent(showPanel);
+    });
+
+    socket.on("mazzoAggiunto", () => {
+        packPanel.dispatchEvent(hidePanel);
+        sectionDefault.dispatchEvent(showPanel);
+    });
+
+    socket.on("mazzoErrore", (data) => {
+        alert(data.message);
         packPanel.dispatchEvent(hidePanel);
         sectionDefault.dispatchEvent(showPanel);
     });

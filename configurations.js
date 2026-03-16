@@ -473,9 +473,16 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             })
         });
 
-        user.on("aggiungiMazzo", async () => {
-
-        })
+        user.on("aggiungiMazzo", async (data) => {
+            const stanza = await Stanze.get(data['id']);
+            const result = stanza?.modificaMazzo(data["packs"]);
+            if(result)
+                user.emit("mazzoAggiunto");
+            else
+                user.emit("mazzoErrore", {
+                    message: "Mannaggia, mi sa che si userà lo standard hehe"
+                });
+        });
 
         user.on("lasciaStanza", async (data) => {
             try {

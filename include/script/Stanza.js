@@ -206,6 +206,22 @@ class Stanza {
         }
     }
 
+    modificaMazzo(mazzi) {
+        if(this.stato !== StatoStanza.WAIT || this.numeroRound[0] > 0)
+            return false;
+        try {
+            const mazziFrasi = mazzi.map(mazzo => new Mazzo(mazzo, TipoMazzo.FRASI));
+            const mazziCompletamenti = mazzi.map(mazzo => new Mazzo(mazzo, TipoMazzo.COMPLETAMENTI));
+            this.mazzoFrasi.mazzo = Mazzo.unisciMazzi(...mazziFrasi);
+            this.mazzoFrasi.scarto = new Mazzo();
+            this.mazzoCompletamenti.mazzo = Mazzo.unisciMazzi(...mazziCompletamenti);
+            this.mazzoCompletamenti.scarto = new Mazzo();
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
     static trovaDaGiocatore(idGiocatore, Stanze) {
         for (const stanza of Stanze) {
             if (stanza.giocatori.has(idGiocatore)) {
