@@ -23,7 +23,7 @@ jobs:
           api = HfApi()
           api.upload_folder(
             folder_path='.',
-            repo_id='arco2120/cucu_ridu',
+            repo_id='arco2120/cucuridu',
             repo_type='space',
             token='$HF_TOKEN',
             ignore_patterns=['hosting/*', 'scratch/*', 'LICENSE', '.github/*', '.git/*']
