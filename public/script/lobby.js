@@ -185,6 +185,7 @@ window.addEventListener("online", () => {
 document.addEventListener("DOMContentLoaded", () => {
     const game_section = document.getElementById("game_section");
     const pauseMenu = document.getElementById("pauseMenu");
+    const packsPanel = document.getElementById("packsPanel");
     const leaveBtn = document.getElementById("leaveBtn");
     const exitPauseBtn = document.getElementById("exitPauseBtn");
     const menuBtn = document.getElementById("menuBtn");
