@@ -7,69 +7,92 @@
     const audiosCache = {};
     const vibrationPattern = [9, 5, 9];
     const buttons = new Set();
-    const randomSound = () => Math.floor(Math.random() * (2 - 1) + 1);
-    let loadLock = false;
+    const SOUND_COUNT = 1;
+    const randomSound = () => Math.floor(Math.random() * SOUND_COUNT) + 1;
 
     const vibrate = (pattern) => {
         const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
         const permissions = { vibration: true, ...savedSettings };
-        if(permissions["vibration"])
+        if (permissions["vibration"])
             navigator.vibrate(pattern);
     };
+
+    const preloadSounds = async () => {
+        const loads = [];
+        for (let i = 1; i <= SOUND_COUNT; i++) {
+            if (!audiosCache[i]) {
+                loads.push(
+                    fetch("/audio/sound/" + i + ".mp3")
+                        .then(r => r.ok ? r.blob() : Promise.reject())
+                        .then(blob => { audiosCache[i] = URL.createObjectURL(blob); })
+                        .catch(() => {})
+                );
+            }
+        }
+        await Promise.all(loads);
+    };
+
     const playAudio = async (elementToPlay, checkValue = "sound", reverse = false) => {
-        if(reverse) return await elementToPlay.pause();
+        if (reverse) return elementToPlay.pause();
         const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
         const permissions = { audio: true, sound: true, ...savedSettings };
         try {
             switch (checkValue) {
                 case "sound": {
+                    if (!permissions[checkValue]) return;
                     const sound = randomSound();
-                    if(loadLock) return;
-                    if(permissions[checkValue]) {
-                        if(!audiosCache[sound]) {
-                            loadLock = true;
-                            const result = await fetch("/audio/sound/" + sound + ".mp3");
-                            if(!result.ok) throw new Error("audio not found");
-                            audiosCache[sound] = URL.createObjectURL(await result.blob());
-                            loadLock = false;
-                        }
-                        if(elementToPlay.src !== audiosCache[sound])
-                            elementToPlay.src = audiosCache[sound];
-                        elementToPlay.play();
+                    if (!audiosCache[sound]) {
+                        const result = await fetch("/audio/sound/" + sound + ".mp3");
+                        if (!result.ok) throw new Error("audio not found");
+                        audiosCache[sound] = URL.createObjectURL(await result.blob());
                     }
+                    if (elementToPlay.src !== audiosCache[sound])
+                        elementToPlay.src = audiosCache[sound];
+                    elementToPlay.currentTime = 0;
+                    elementToPlay.play();
                     break;
                 }
                 case "audio": {
-                    if(permissions[checkValue]) elementToPlay.play();
+                    if (permissions[checkValue]) elementToPlay.play();
                     else elementToPlay.pause();
+                    break;
                 }
             }
-        } catch(e) {
-            console.log(e)
+        } catch (e) {
+            console.log(e);
         }
     };
 
     (() => {
         const initMusic = async () => {
-            try { await playAudio(musicPlayer, "audio") } catch {}
+            try { await playAudio(musicPlayer, "audio"); } catch {}
         };
+
         const initSound = () => {
-            [...document.querySelectorAll("button"),
+            [
+                ...document.querySelectorAll("button"),
                 ...[...document.querySelectorAll("body *")].filter(element =>
-                    [...element.classList].filter(classe => classe.toString().includes("active_Btn")
-                        || classe.toString().includes("active_Img") || classe.toString().includes("button") ||
-                        classe.toString().includes("shrinks_on_active_for_no_reason")).length > 0 || element.id.toLowerCase().includes("btn"))
+                    [...element.classList].some(c =>
+                        c.includes("active_Btn") || c.includes("active_Img") ||
+                        c.includes("button") || c.includes("shrinks_on_active_for_no_reason")
+                    ) || element.id.toLowerCase().includes("btn")
+                )
             ].forEach(button => {
-                if(!buttons.has(button))
+                if (!buttons.has(button)) {
                     button.addEventListener("click", () => {
                         vibrate(vibrationPattern);
                         playAudio(soundPlayer);
                     });
-                buttons.add(button);
+                    buttons.add(button);
+                }
             });
         };
 
-        document.addEventListener("DOMContentLoaded", () => initSound());
+        document.addEventListener("DOMContentLoaded", () => {
+            preloadSounds();
+            initSound();
+        });
+
         document.addEventListener("fragmentRendered", () => initSound());
 
         document.addEventListener("click", initMusic, { once: true });

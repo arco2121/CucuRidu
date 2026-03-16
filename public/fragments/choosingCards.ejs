@@ -35,8 +35,9 @@
                 <div id="showCards" class="column flex_gap_10 ">
                     <% risposte.forEach((risposta, index) => { %>
                         <div id="<%= index %>" textValue="<%= risposta %>"
-                             class="card risposta game_card game_card_decrated game_card_style_1 sour_gummy_medium">
-                            <%= risposta %>
+                             class="card shrinks_on_active_for_no_reason risposta game_card game_card_decrated game_card_style_1 sour_gummy_medium">
+                            <p id="rispostaText_<%= index %>"><%= risposta %></p>
+
 
                             <div class="game_card_decoration_con game_card_decoration_style_1">
                                 <svg width="20" height="20" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -48,7 +49,7 @@
 
                 </div>
             </div>
-            <button id="sendCards" class="btn_mediumText btn_style_3 sour_gummy_bold btn_doubleBorder">Conferma</button>
+            <button id="sendCards" class="btn_mediumText button btn_style_3 sour_gummy_bold btn_doubleBorder">Conferma</button>
         </div>
     <% } else { %>
         <div class="game_turn_wait_text">
@@ -63,8 +64,8 @@
     const currentQuestion = document.querySelector(".domanda");
     const sendCardsBtn = document.getElementById("sendCards");
     const defaultText = currentQuestion.textContent.trim();
-    const givenAnswers = Array.from({length: parseInt(currentQuestion.id)}, () => null);
-    const maxSlots = (defaultText.match(/_/g) || []).length;
+    const givenAnswers = Array.from({length: parseInt(currentQuestion.id)}, (_) => null);
+    const maxSlots = currentQuestion.id;
 
     const toggleCards = (target) => {
         console.log("target", target.getAttribute("textValue"));
@@ -84,9 +85,10 @@
             let initText = defaultText;
             givenAnswers.filter(answer => answer !== null).forEach(answer => {
                 initText = (initText[0] === "_" || initText[(initText.indexOf("_") - 1)] === ".")
-                    ? initText.replace("_", answer)
-                    : initText.replace("_", answer[0] === "§" ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toLowerCase() + answer.slice(1)));
+                    ? initText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toUpperCase() + answer.slice(1)))
+                    : initText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toLowerCase() + answer.slice(1)));
             });
+            Array.from(bannedSymbols).forEach(letter => initText.replaceAll(letter, ""));
             currentQuestion.textContent = initText;
         } else {
             currentQuestion.textContent = defaultText;
@@ -107,11 +109,10 @@
                 card.classList.remove("selected", "unselected");
             }
         });
-
-        console.log(givenAnswers);
     };
 
     cards.forEach(card => card.addEventListener("click", () => toggleCards(card)));
+    cards.forEach(card => Array.from(bannedSymbols).forEach(letter => document.getElementById("rispostaText_" + card.id).textContent = document.getElementById("rispostaText_" + card.id).textContent.replaceAll(letter, "")))
 
     sendCardsBtn?.addEventListener("click", () => {
         if (givenAnswers.some(ele => ele === null)) {

@@ -13,23 +13,19 @@ jobs:
           fetch-depth: 0
           lfs: true
 
-      - name: Checkout LFS objects
-        run: git lfs checkout
-
       - name: Push to Hub
         env:
           HF_TOKEN: ${{ secrets.HF_KEY }}
         run: |
-          git config user.name "github-actions"
-          git config user.email "action@github.com"
-
-          rm -rf hosting/
-          rm -rf scratch/
-          rm -f LICENSE
-          rm -rf .github/
-          
-          git add .
-          git commit -m "Cleanup: removing hosting, scratch and LICENSE.github" || echo "No changes to commit"
-          
-          git config lfs.allowincompletepush true
-          git push --force https://arco2107:$HF_TOKEN@huggingface.co/spaces/arco2107/cucuridu main
+          pip install huggingface_hub
+          python -c "
+          from huggingface_hub import HfApi
+          api = HfApi()
+          api.upload_folder(
+            folder_path='.',
+            repo_id='arco2120/cucuridu',
+            repo_type='space',
+            token='$HF_TOKEN',
+            ignore_patterns=['hosting/*', 'scratch/*', 'LICENSE', '.github/*', '.git/*']
+          )
+          "
