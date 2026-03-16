@@ -112,7 +112,7 @@
     };
 
     cards.forEach(card => card.addEventListener("click", () => toggleCards(card)));
-    cards.forEach(card => Array.from(bannedSymbols).forEach(letter =>  card.querySelector(".rispostaText_" + card.id).textContent = card.querySelector(".rispostaText_" + card.id).textContent.replaceAll(letter, "")))
+    cards.forEach(card => Array.from(bannedSymbols).forEach(letter => document.getElementById("rispostaText_" + card.id).textContent = document.getElementById("rispostaText_" + card.id).textContent.replaceAll(letter, "")))
 
     sendCardsBtn?.addEventListener("click", () => {
         if (givenAnswers.some(ele => ele === null)) {
