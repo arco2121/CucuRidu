@@ -36,7 +36,8 @@
                     <% risposte.forEach((risposta, index) => { %>
                         <div id="<%= index %>" textValue="<%= risposta %>"
                              class="card shrinks_on_active_for_no_reason risposta game_card game_card_decrated game_card_style_1 sour_gummy_medium">
-                            <%= risposta %>
+                            <p id="rispostaText_<%= index %>"><%= risposta %></p>
+
 
                             <div class="game_card_decoration_con game_card_decoration_style_1">
                                 <svg width="20" height="20" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -111,7 +112,7 @@
     };
 
     cards.forEach(card => card.addEventListener("click", () => toggleCards(card)));
-    cards.forEach(card => Array.from(bannedSymbols).forEach(letter =>  card.textContent = card.textContent.replaceAll(letter, "")))
+    cards.forEach(card => Array.from(bannedSymbols).forEach(letter =>  card.querySelector(".rispostaText_" + card.id).textContent = card.querySelector(".rispostaText_" + card.id).textContent.replaceAll(letter, "")))
 
     sendCardsBtn?.addEventListener("click", () => {
         if (givenAnswers.some(ele => ele === null)) {

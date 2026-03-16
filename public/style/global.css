@@ -769,7 +769,7 @@ input:active {
 }
 
 .active_Img:active {
-    scale: 0.95;
+    scale: 0.9;
     filter: brightness(0.9);
 }
 
@@ -886,7 +886,7 @@ input:active {
  >>> OTHER
 --------------------------------------------------- */
 .shrinks_on_active_for_no_reason:active {
-    scale: 0.9;
+    scale: 0.95;
     filter: brightness(90%);
 }
 
