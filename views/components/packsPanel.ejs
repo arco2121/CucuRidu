@@ -2,13 +2,13 @@
     <div class="floatSection">
         <div class="options_exit_btn upper sour_gummy_extra" >
             <h1 class="panel_title sour_gummy_bold">Seleziona Mazzo</h1>
-            <h1 class="active_Btn" id="exitBtn">X</h1>
+            <h1 class="active_Btn button" id="exitPacksBtn">X</h1>
         </div>
         <div class="options_content column nunito_bold flex_gap_30">
             <div class="row_mobileColumn">
                 <% knownPacks.forEach(pack => { %>
                     <div class="tile defaultPack" pack="<%= pack %>">
-                        <h4><%= pack.charAt(0).toUpperCase() + pack.slice(1) %>></h4>
+                        <h4><%= pack.charAt(0).toUpperCase() + pack.slice(1) %></h4>
                     </div>
                 <% }) %>
                 <div id="customPack" class="tile">
@@ -26,10 +26,10 @@
 
 <script>
     const confirmPacks = document.getElementById("confirmPacks");
-    const sectionDefault = document.querySelector(".sectionToHide");
+    const sectionDefault = document.querySelector(".game_section");
     const customTile = document.getElementById("customPack");
     const inputFile = document.getElementById("inputFile");
-    const exitBtn = document.getElementById("exitBtn");
+    const exitBtn = document.getElementById("exitPacksBtn");
     const tiles = document.querySelectorAll(".tile");
     const packPanel = document.getElementById("selectPacks");
     const packs = [];
@@ -45,9 +45,9 @@
 
     tiles.forEach((tile) => {
         tile.addEventListener("click", () => {
-            if(tile.classList.contains("selectedPack")) {
+            if(!tile.classList.contains("selectedPack")) {
                 if(tile.classList.contains("defaultPack")) standardPacks.add(tile.getAttribute("pack"));
-                tile.classList.remove("selectedPack");
+                tile.classList.add("selectedPack");
             } else {
                 if(tile.classList.contains("defaultPack")) standardPacks.delete(tile.getAttribute("pack"));
                 tile.classList.remove("selectedPack");
@@ -102,7 +102,7 @@
             socket.emit("aggiungiMazzo", {
                 id: referenceStanza,
                 packs: [...standardPacks.values(), ...packs]
-            })
+            });
         }
     });
 

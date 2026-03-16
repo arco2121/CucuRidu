@@ -473,6 +473,10 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             })
         });
 
+        user.on("aggiungiMazzo", async () => {
+
+        })
+
         user.on("lasciaStanza", async (data) => {
             try {
                 const stanzaId = data["id"];

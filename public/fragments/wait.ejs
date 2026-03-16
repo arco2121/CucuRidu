@@ -9,6 +9,9 @@
             <div class="column flex_gap_10">
                 <h4 id="attesa"></h4>
                 <% if (interroghi) { %>
+                    <% if (primoRound) { %>
+                        <button class="button btn_mediumText btn_style_2 sour_gummy_bold" id="selectPack">Seleziona Mazzo</button>
+                    <% } %>
                     <button class="button btn_mediumText btn_style_2 sour_gummy_bold" id="startButton"><%= primoRound ? "Inizia" : "Continua" %></button>
                 <% } %>
             </div>
@@ -31,6 +34,7 @@
     const shareButton = document.getElementById("shareButton");
     const showGiocatori = document.getElementById("showGiocatori");
     const startButton = document.getElementById("startButton");
+    const selectPack = document.getElementById("selectPack");
 
     const idStanza = fromFragments["stanzaId"];
     let idAttesaInterval = null;
@@ -90,4 +94,9 @@
     startButton?.addEventListener("click", () => socket.emit("iniziaTurno", {
         id: referenceStanza
     }));
+
+    selectPack?.addEventListener("click", () => {
+        game_section.dispatchEvent(hidePanel);
+        packPanel.dispatchEvent(showPanel);
+    })
 </script>
