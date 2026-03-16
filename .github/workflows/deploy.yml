@@ -23,13 +23,18 @@ jobs:
           git config user.name "github-actions"
           git config user.email "action@github.com"
 
-          rm -rf hosting/
-          rm -rf scratch/
-          rm -f LICENSE
-          rm -rf .github/
-          
-          git add .
-          git commit -m "Cleanup: removing hosting, scratch and LICENSE.github" || echo "No changes to commit"
-          
-          git config lfs.allowincompletepush true
-          git push --force https://arco2120:$HF_TOKEN@huggingface.co/spaces/arco2120/cucu_ridu main
+          # Rimuovi file non necessari
+          rm -rf hosting/ scratch/ LICENSE .github/
+          git add -A
+          git commit -m "Cleanup: removing hosting, scratch and LICENSE" || echo "No changes to commit"
+
+          # Aggiungi HF come remote separato
+          git remote add space https://arco2120:$HF_TOKEN@huggingface.co/spaces/arco2120/cucu_ridu
+
+          # Assicurati che LFS sia configurato per il remote HF
+          git lfs install
+          git config lfs.allowincompletepush false
+
+          # Push LFS objects prima, poi il codice
+          git lfs push space --all
+          git push --force space main
