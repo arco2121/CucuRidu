@@ -930,3 +930,7 @@ input:active {
 .textAlign_start {
     text-align: start;
 }
+
+.selectable {
+    user-select: all;
+}
