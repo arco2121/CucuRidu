@@ -1,25 +1,33 @@
-<div class="section hidden showByConnectionManager"  id="packsPanel">
-    <div class="floatSection largeSection">
-        <div class="options_exit_btn upper sour_gummy_extra" >
+<div class="section hidden showByConnectionManager" id="packsPanel">
+    <div class="floatSection packs_section btn_doubleBorder">
+        <div class="options_exit_btn upper sour_gummy_extra">
             <h1 class="panel_title sour_gummy_bold">Seleziona Mazzo</h1>
             <h1 class="active_Btn button" id="exitPacksBtn">X</h1>
         </div>
-        <div class="options_content column nunito_bold flex_gap_30">
-            <div class="row_mobileColumn">
-                <% knownPacks.forEach(pack => { %>
-                    <div class="tile defaultPack" pack="<%= pack %>">
-                        <h4><%= pack.charAt(0).toUpperCase() + pack.slice(1) %></h4>
-                    </div>
-                <% }) %>
-                <div id="customPack" class="tile">
-                    <h4>Personalizzati</h4>
-                    <input type="file" hidden id="inputFile" accept="application/json" multiple/>
-                </div>
+        <div class="packs_content column nunito_bold flex_gap_30">
+            <%
+            const sortedPacks = [...knownPacks].sort((a, b) => a === 'standard' ? -1 : b === 'standard' ? 1 : 0);
+            sortedPacks.forEach((pack, index) => {
+                const colorNum = (index % 4) + 1;
+                const isStandard = pack === 'standard' ? 'selectedPack' : '';
+            %>
+            <div class="tile defaultPack normalPack shrinks_on_active_for_no_reason packColor_<%= colorNum %> <%= isStandard %>" pack="<%= pack %>">
+                <img src="/assets/packs/<%= pack %>.jpg" alt="<%= pack %>">
             </div>
-            <button id="confirmPacks">Seleziona</button>
+            <% }) %>
+
+            <div id="customPack" class="tile defaultPack shrinks_on_active_for_no_reason packColor_4">
+                <div class="custom_pack_wrapper">
+                    <img id="customPackImg" src="/assets/packs/personalizzato.jpg" alt="Personalizzati">
+                    <h4 id="customFileName" class="hidden_text sour_gummy_medium">Personalizzati</h4>
+                </div>
+                <input type="file" hidden id="inputFile" accept="application/json" multiple/>
+            </div>
         </div>
-        <div class="options_row options_footer">
-            <h6><a href="/creaMazzo" target="_blank" class="shrinks_on_active_for_no_reason">Scopri come creare un mazzo</a></h6>
+
+        <div class="packs_footer_row packs_footer">
+            <h6 class="packs_footer_link underlined_text"><a href="/creaMazzo" target="_blank" class="sour_gummy_medium shrinks_on_active_for_no_reason">Scopri come creare un mazzo personalizzato</a></h6>
+            <button id="confirmPacks" class="button btn_mediumText btn_style_confirm sour_gummy_bold">Conferma</button>
         </div>
     </div>
 </div>
@@ -32,11 +40,14 @@
     const sectionDefault = document.querySelector(".game_section");
     const customTile = document.getElementById("customPack");
     const inputFile = document.getElementById("inputFile");
+    const customFileName = document.getElementById("customFileName");
+    const customImg = document.getElementById("customPackImg");
     const exitBtn = document.getElementById("exitPacksBtn");
     const tiles = document.querySelectorAll(".tile");
     const packsPanel = document.getElementById("packsPanel");
     const packs = [];
-    let standardPacks = new Set();
+    let standardPacks = new Set(['standard']);
+
     const readText = async (file) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -46,10 +57,17 @@
         });
     };
 
+    const resetCustomView = () => {
+        customImg.src = "/assets/packs/personalizzato.jpg";
+        customFileName.classList.add("hidden_text");
+        customFileName.innerText = "Personalizzati";
+    };
+
     customTile.addEventListener("click", () => {
-        if(customTile.classList.contains("selectedPack")) {
+        if (customTile.classList.contains("selectedPack")) {
             customTile.classList.remove("selectedPack");
-            packs.slice(0, packs.length);
+            packs.length = 0;
+            resetCustomView();
         } else {
             customTile.classList.add("selectedPack");
             inputFile.click();
@@ -57,52 +75,60 @@
     });
 
     tiles.forEach((tile) => {
-        if(tile !== customTile)
+        if (tile !== customTile)
             tile.addEventListener("click", () => {
-                if(!tile.classList.contains("selectedPack")) {
-                    if(tile.classList.contains("defaultPack")) standardPacks.add(tile.getAttribute("pack"));
+                if (!tile.classList.contains("selectedPack")) {
+                    if (tile.classList.contains("defaultPack")) standardPacks.add(tile.getAttribute("pack"));
                     tile.classList.add("selectedPack");
                 } else {
-                    if(tile.classList.contains("defaultPack")) standardPacks.delete(tile.getAttribute("pack"));
+                    if (tile.classList.contains("defaultPack")) standardPacks.delete(tile.getAttribute("pack"));
                     tile.classList.remove("selectedPack");
                 }
             });
     });
 
     inputFile.addEventListener("cancel", () => {
-        packs.slice(0, packs.length);
+        packs.length = 0;
         customTile.classList.remove("selectedPack");
+        resetCustomView();
     });
 
     inputFile.addEventListener("change", async () => {
         const files = Array.from(inputFile.files);
-        if(files.length === 0) {
-            packs.slice(0, packs.length);
+        if (files.length === 0) {
+            packs.length = 0;
             customTile.classList.remove("selectedPack");
+            resetCustomView();
             return;
         }
         try {
             const mazzi = files.map(async (file) => {
-                return { name: file.name, content: await readText(file) };
+                return {name: file.name, content: await readText(file)};
             });
             const risultatiMazzi = await Promise.all(mazzi);
             for (const mazzo of risultatiMazzi) {
                 const check = (mazzo.name.includes(".cucuridupack") || mazzo.name.includes(".json"))
                     && (JSON.parse(mazzo.content)["frasi"] !== null && JSON.parse(mazzo.content)["completamenti"] !== null);
-                if(check)
+                if (check)
                     packs.push(JSON.parse(mazzo.content));
                 else
-                    throw new Error(`Ma ce la fai? Hai una malattia grave? Dei cormosomi di troppo su per il culo? ${mazzo.name} non è un mazzo valido, pirla!`)
+                    throw new Error(`Ma ce la fai? Hai una malattia grave? Dei cormosomi di troppo su per il culo? ${mazzo.name} non è un mazzo valido, pirla!`);
             }
+
+            customFileName.innerText = files.map(f => f.name).join(', ');
+            customFileName.classList.remove("hidden_text");
+            customImg.src = "/assets/packs/personalizzato_empty.jpg";
+
         } catch (error) {
             alert(error.message);
-            packs.slice(0, packs.length);
+            packs.length = 0;
             customTile.classList.remove("selectedPack");
+            resetCustomView();
         }
     });
 
     confirmPacks.addEventListener("click", () => {
-        if(standardPacks.size === 0 && packs.length === 0)
+        if (standardPacks.size === 0 && packs.length === 0)
             alert("Ma porchino il dio piccolino... devi selezionare qualcosa... NO?")
         else {
             socket.emit("aggiungiMazzo", {
@@ -118,13 +144,13 @@
     });
 
     socket.on("mazzoAggiunto", () => {
-        packPanel.dispatchEvent(hidePanel);
+        packsPanel.dispatchEvent(hidePanel);
         sectionDefault.dispatchEvent(showPanel);
     });
 
     socket.on("mazzoErrore", (data) => {
         alert(data.message);
-        packPanel.dispatchEvent(hidePanel);
+        packsPanel.dispatchEvent(hidePanel);
         sectionDefault.dispatchEvent(showPanel);
     });
 </script>
