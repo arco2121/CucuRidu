@@ -191,6 +191,38 @@ body::before {
 /* ---------------------------------------------------
  >>> FONTS AND TEXTS
 --------------------------------------------------- */
+@font-face {
+    font-family: "Nunito";
+    src: url('/assets/fonts/NunitoVariableFont_wght.ttf') format('truetype-variations');
+    font-weight: 200 1000;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Nunito";
+    src: url('/assets/fonts/Nunito-Italic-VariableFont_wght.ttf') format('truetype-variations');
+    font-weight: 200 1000;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Sour Gummy";
+    src: url('/assets/fonts/SourGummy-VariableFont_wdth,wght.ttf') format('truetype-variations');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Sour Gummy";
+    src: url('/assets/fonts/SourGummy-Italic-VariableFont_wdth,wght.ttf') format('truetype-variations');
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+}
+
 .nunito_regular {
     font-family: "Nunito", sans-serif;
     font-optical-sizing: auto;

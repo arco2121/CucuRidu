@@ -4,7 +4,7 @@
             <h1 class="panel_title sour_gummy_bold">Seleziona Mazzo</h1>
             <h1 class="active_Btn button" id="exitPacksBtn">X</h1>
         </div>
-        <div class="packs_content column nunito_bold flex_gap_30">
+        <div class="packs_content column sour_gummy_medium flex_gap_30">
             <%
             const sortedPacks = [...knownPacks].sort((a, b) => a === 'standard' ? -1 : b === 'standard' ? 1 : 0);
             sortedPacks.forEach((pack, index) => {

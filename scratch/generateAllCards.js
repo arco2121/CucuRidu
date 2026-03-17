@@ -1,6 +1,3 @@
-/*
-    Simple script to generate the json resources of the cards from the raw txt file
-*/
 const fs = require('node:fs');
 const { join } = require("node:path");
 
