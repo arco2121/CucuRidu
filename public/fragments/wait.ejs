@@ -29,15 +29,14 @@
 
 <script>
     socket.off("aggiornamentoAttesa");
+
     const numeroGiocatoriCount = document.getElementById("numeroGiocatori");
     const attesaView = document.getElementById("attesa");
     const shareButton = document.getElementById("shareButton");
     const showGiocatori = document.getElementById("showGiocatori");
     const startButton = document.getElementById("startButton");
     const packsButton = document.getElementById("packsButton");
-
     const idStanza = fromFragments["stanzaId"];
-    let idAttesaInterval = null;
 
     socket.on("aggiornamentoAttesa", (data) => {
         const {numeroGiocatori, minimoGiocatori, giocatori} = data || {};
@@ -48,7 +47,6 @@
             if(fromFragments["interroghi"]) attesaView.textContent = "Muoviti a far partire ✨";
             else attesaView.textContent = "Wait per il prossimo turno ✨";
         }
-        updateAttesa();
         renderFragment(showGiocatori, "components/giocatoreRow", {
             giocatori: giocatori
         });
@@ -56,27 +54,6 @@
     socket.emit("aggiornaAttesa", {
         stanzaId: idStanza
     });
-
-    const updateAttesa = () => {
-        try {
-            const initialText = attesaView.textContent;
-            while(idAttesaInterval !== null) {
-                clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
-                idAttesaInterval = null;
-            }
-            idAttesaInterval = fragmentInterval(() => {
-                try {
-                    const check = attesaView.textContent.split("✨")[1].trim();
-                    if (check === "..") attesaView.textContent = initialText;
-                    else attesaView.textContent += ".";
-                } catch {
-                    clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
-                }
-            }, 700, fromFragments["pageId"]);
-        } catch {
-            clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
-        }
-    };
 
     shareButton.addEventListener("click", async () => {
         const shareText = "Muovi il culo ed entra nella stanza per giocare inconcepibile sgorbio nato dall'errare umano che non sei altro :))";

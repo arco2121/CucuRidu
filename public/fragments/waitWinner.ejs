@@ -36,27 +36,4 @@
     socket.emit("aggiornaAttesaRisposta", {
         stanzaId: idStanza
     });
-
-    const updateAttesa = () => {
-        try {
-            const initialText = attesaView.textContent;
-            while(idAttesaInterval !== null) {
-                clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
-                idAttesaInterval = null;
-            }
-            idAttesaInterval = fragmentInterval(() => {
-                try {
-                    const check = attesaView.textContent.split("✨")[1].trim();
-                    if (check === "..") attesaView.textContent = initialText;
-                    else attesaView.textContent += ".";
-                } catch {
-                    clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
-                }
-            }, 700, fromFragments["pageId"]);
-        } catch {
-            clearFragmentInterval(idAttesaInterval, fromFragments["pageId"]);
-        }
-    };
-
-    updateAttesa();
 </script>
