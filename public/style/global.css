@@ -932,5 +932,5 @@ input:active {
 }
 
 .selectable {
-    user-select: all;
+    user-select: text;
 }
