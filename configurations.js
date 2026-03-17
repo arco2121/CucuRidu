@@ -43,7 +43,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
         next();
     };
 
-    app.get("/ping", resumeGame, (req, res) => res.status(200));
+    app.get("/ping", (req, res) => res.status(200));
 
     app.get("/", resumeGame, (req, res) => renderPage(res, "index", {
         icon: getIcon(),
