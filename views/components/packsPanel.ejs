@@ -1,4 +1,4 @@
-<div class="section hidden" id="packsPanel">
+<div class="section hidden showByConnectionManager"  id="packsPanel">
     <div class="floatSection largeSection">
         <div class="options_exit_btn upper sour_gummy_extra" >
             <h1 class="panel_title sour_gummy_bold">Seleziona Mazzo</h1>
@@ -46,25 +46,28 @@
         });
     };
 
-    tiles.forEach((tile) => {
-        tile.addEventListener("click", () => {
-            if(!tile.classList.contains("selectedPack")) {
-                if(tile.classList.contains("defaultPack")) standardPacks.add(tile.getAttribute("pack"));
-                tile.classList.add("selectedPack");
-            } else {
-                if(tile.classList.contains("defaultPack")) standardPacks.delete(tile.getAttribute("pack"));
-                tile.classList.remove("selectedPack");
-            }
-        });
-    });
-
     customTile.addEventListener("click", () => {
         if(customTile.classList.contains("selectedPack")) {
+            customTile.classList.remove("selectedPack");
             packs.slice(0, packs.length);
         } else {
+            customTile.classList.add("selectedPack");
             inputFile.click();
         }
-    })
+    });
+
+    tiles.forEach((tile) => {
+        if(tile !== customTile)
+            tile.addEventListener("click", () => {
+                if(!tile.classList.contains("selectedPack")) {
+                    if(tile.classList.contains("defaultPack")) standardPacks.add(tile.getAttribute("pack"));
+                    tile.classList.add("selectedPack");
+                } else {
+                    if(tile.classList.contains("defaultPack")) standardPacks.delete(tile.getAttribute("pack"));
+                    tile.classList.remove("selectedPack");
+                }
+            });
+    });
 
     inputFile.addEventListener("cancel", () => {
         packs.slice(0, packs.length);
@@ -92,7 +95,7 @@
                     throw new Error(`Ma ce la fai? Hai una malattia grave? Dei cormosomi di troppo su per il culo? ${mazzo.name} non è un mazzo valido, pirla!`)
             }
         } catch (error) {
-            alert(error);
+            alert(error.message);
             packs.slice(0, packs.length);
             customTile.classList.remove("selectedPack");
         }
