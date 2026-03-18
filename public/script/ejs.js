@@ -435,7 +435,7 @@ ejs.renderFile = function () {
                     utils_js_1.default.shallowCopy(opts, viewOpts);
                 }
             }
-            // Express 2 and lower, values set in application.locals, or people who just
+            // Express 2 and lower, values set in app.locals, or people who just
             // want to pass options in their data. NOTE: These values will override
             // anything previously set in settings  or settings['view options']
             utils_js_1.default.shallowCopyFromList(opts, data, _OPTS_PASSABLE_WITH_DATA_EXPRESS);
