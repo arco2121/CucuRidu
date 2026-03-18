@@ -26,6 +26,6 @@ jobs:
             repo_id='arco2120/cucuridu',
             repo_type='space',
             token='$HF_TOKEN',
-            ignore_patterns=['hosting/**', 'scratch/**', 'LICENSE', '.github/**', '.git/**']
+            ignore_patterns=['ignore/**', 'LICENSE', '.github/**', '.git/**']
           )
           "

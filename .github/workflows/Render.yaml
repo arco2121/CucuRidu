@@ -5,8 +5,7 @@ on:
     branches:
       - main
     paths-ignore:
-      - 'hosting/**'
-      - 'scratch/**'
+      - 'ignore/**'
       - 'LICENSE'
       - '.github/**'
       - '.git/**'

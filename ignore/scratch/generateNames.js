@@ -3,7 +3,7 @@ const path = require('node:path');
 
 const generateCombinedJSON = () => {
     const inputFolder = path.join(__dirname, "raw/names");
-    const outputFolder = path.join(__dirname, "../include/names/");
+    const outputFolder = path.join(__dirname, ".../include/names/");
 
     try {
         // Funzione helper per leggere e pulire i file
