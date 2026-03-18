@@ -1,4 +1,4 @@
-const CACHE_NAME = 'v1_cache';
+const CACHE_NAME = 'cucuridu_cache';
 const ASSETS_TO_CACHE = [
     '/',
     '/assets/color.json',
