@@ -3,6 +3,7 @@
 */
 const fs = require('node:fs');
 const {join} = require("node:path");
+
 const generateCards = (group, files) => {
     try {
         for (const file of files) {

@@ -210,8 +210,16 @@ class Stanza {
         if(this.stato !== StatoStanza.WAIT || this.numeroRound[0] > 0)
             return false;
         try {
-            const mazziFrasi = mazzi.map(mazzo => new Mazzo(mazzo, TipoMazzo.FRASI));
-            const mazziCompletamenti = mazzi.map(mazzo => new Mazzo(mazzo, TipoMazzo.COMPLETAMENTI));
+            if(!Mazzo.mazzoAbbastanzaGrande(...mazzi))
+                return false;
+            const mazziFrasi = mazzi.map(mazzo => new Mazzo({
+                pack: mazzo,
+                tipoMazzo: TipoMazzo.FRASI
+            }));
+            const mazziCompletamenti = mazzi.map(mazzo => new Mazzo({
+                pack: mazzo,
+                tipoMazzo: TipoMazzo.COMPLETAMENTI
+            }));
             this.mazzoFrasi.mazzo = Mazzo.unisciMazzi(...mazziFrasi);
             this.mazzoFrasi.scarto = new Mazzo();
             this.mazzoCompletamenti.mazzo = Mazzo.unisciMazzi(...mazziCompletamenti);

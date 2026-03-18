@@ -56,6 +56,12 @@ class Mazzo {
         return temp;
     }
 
+    static mazzoAbbastanzaGrande(...frasiCompletamentiPair) {
+        let occorreze = 0;
+        frasiCompletamentiPair.forEach(mazzo => occorreze += mazzo[0][1] || mazzo["frasi"][1]);
+        return !(frasiCompletamentiPair.filter(mazzo => !(mazzo[0].length || mazzo["frasi"].length > 5 && (3*12 + occorreze*3) >= mazzo[1].length ||mazzo["completamenti"][1])).length > 0);
+    }
+
     toArray() {
         return Array.from(this.carte).flat();
     }

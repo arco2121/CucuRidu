@@ -1,6 +1,9 @@
 const path = require("path");
 const { getIcon, generateName, generatePfp, getAllPfp, getknownPacks } = require(path.join(__dirname, "include/script/generazione"));
 const { Stanza, StatoStanza } = require(path.join(__dirname, "include/script/Stanza"));
+const { generatePacks } = require(path.join(__dirname, "scratch/generatePacks"));
+const { Mazzo } = require(path.join(__dirname, "include/script/Mazzo"));
+const crypto = require('crypto');
 
 /* --- CONFIGURAZIONE ROTTE HTTP (EXPRESS) --- */
 
@@ -124,7 +127,11 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
             serverSession.invalidate(req, req.query?.token);
             res.redirect("/");
         }
-    })
+    });
+
+    app.get("/creaMazzo", (req, res) => renderPage(res, "createPacks", {
+        loadToken: false,
+    }));
 
     app.get("/error", (req, res) => {
         let status = 104;
@@ -140,7 +147,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
             loadToken: false,
             bgm: "Error-Tough_Decisions"
         });
-    })
+    });
 
     app.post("/generateInfo", (req, res) => {
         res.status(200).json({nome: generateName(), pfp: generatePfp()});
@@ -171,6 +178,33 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
     app.post("/deleteGameReference", (req, res) => {
         serverSession.invalidate(req, req.body?.token);
         res.status(200).json({result: true});
+    });
+
+    app.post("/createPack", (req, res) => {
+        const mazzi = req.body || "";
+        const packsPair = JSON.parse(mazzi);
+        const packs = [];
+        for(const pair of packsPair) {
+            const righe = generatePacks(pair);
+            if(Mazzo.mazzoAbbastanzaGrande(righe)) {
+                const mazzoFinale = {
+                    frasi: righe[0],
+                    completamenti: righe[1],
+                    name: righe[2] || "default"
+                };
+                mazzoFinale.hash = crypto.createHash('sha256')
+                    .update(JSON.stringify(mazzoFinale))
+                    .digest('hex');
+                packs.push(mazzoFinale);
+            } else
+                return res.status(400).json({
+                    success: false
+                });
+        }
+        res.status(200).json({
+            success: true,
+            packs: JSON.stringify(packs)
+        })
     });
 
     app.use((req, res) => res.redirect("/error"));

@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm@#!£$%&/";
 
-const generateId = (length, memory) => {
+const generateId = (length, memory = new Set()) => {
     if (!memory) return;
     let code = "";
     const utilize = length <= 7 ? alphabet.slice(0, alphabet.indexOf("0")) : alphabet;
