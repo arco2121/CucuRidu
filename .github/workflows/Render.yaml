@@ -3,7 +3,13 @@ name: Deploy to Render
 on:
   push:
     branches:
-      - main  
+      - main
+    paths-ignore:
+      - 'hosting/**'
+      - 'scratch/**'
+      - 'LICENSE'
+      - '.github/**'
+      - '.git/**'
 
 jobs:
   deploy:
