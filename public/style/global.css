@@ -118,7 +118,7 @@ table {
     -webkit-user-drag: none;
     -ms-overflow-style: none;
     scrollbar-width: none;
-    transition: all ease 0.2s;
+    transition: all ease 0.1s;
     box-sizing: border-box;
 }
 
