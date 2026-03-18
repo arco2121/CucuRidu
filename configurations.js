@@ -1,7 +1,6 @@
 const path = require("path");
-const { getIcon, generateName, generatePfp, getAllPfp, getknownPacks } = require(path.join(__dirname, "include/script/generazione"));
+const { getIcon, generateName, generatePfp, getAllPfp, getknownPacks, translateToPack } = require(path.join(__dirname, "include/script/generazione"));
 const { Stanza, StatoStanza } = require(path.join(__dirname, "include/script/Stanza"));
-const { generatePacks } = require(path.join(__dirname, "scratch/generatePacks"));
 const { Mazzo } = require(path.join(__dirname, "include/script/Mazzo"));
 const crypto = require('crypto');
 
@@ -185,7 +184,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
         const packsPair = JSON.parse(mazzi);
         const packs = [];
         for(const pair of packsPair) {
-            const righe = generatePacks(pair);
+            const righe = translateToPack(pair);
             if(Mazzo.controllaMazzo(righe)) {
                 const mazzoFinale = {
                     frasi: righe[0],

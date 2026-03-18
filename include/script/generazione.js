@@ -47,6 +47,33 @@ const generateName = () => {
     }
 }
 
+const translateToPack = (packs) => {
+    try {
+        const results = [];
+        for (const stringa of packs) {
+            if(typeof stringa !== "string") {
+                results.push(stringa);
+                continue;
+            }
+            const lines = stringa.split("\n");
+            let array = [];
+            for (const line of lines) {
+                const string = line[0]?.toUpperCase() + line.slice(1);
+                const completamenti = (line.match(/_/g) || []).length;
+                array.push(completamenti !== 0 ? [
+                    string,
+                    completamenti,
+                ] : string)
+            }
+            results.push(array);
+        }
+        return results;
+    } catch (error) {
+        console.log(error)
+        return false;
+    }
+};
+
 // Generazione Foto Profilo
 const generatePfp = () => {
     const pfpNumber = 120;
@@ -63,4 +90,4 @@ const getAllPfp = () => {
 
 const getIcon = (defaultIcon) => String("/assets/icon_imgs/" + (defaultIcon ? 1 : Math.floor(Math.random() * (21 - 1) + 1)) + ".png");
 
-module.exports = { generateId, generatePfp, generateName, getIcon, getAllPfp, getknownPacks };
+module.exports = { generateId, generatePfp, generateName, getIcon, getAllPfp, getknownPacks, translateToPack };
