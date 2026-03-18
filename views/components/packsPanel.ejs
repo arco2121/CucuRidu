@@ -10,8 +10,9 @@
             sortedPacks.forEach((pack, index) => {
                 const colorNum = (index % 4) + 1;
                 const isStandard = pack === 'standard' ? 'selectedPack' : '';
+                const segnaStandard = isStandard ? 'standard' : null
             %>
-            <div class="tile defaultPack normalPack shrinks_on_active_for_no_reason packColor_<%= colorNum %> <%= isStandard %>" pack="<%= pack %>">
+            <div class="tile defaultPack normalPack shrinks_on_active_for_no_reason packColor_<%= colorNum %> <%= isStandard %> <%= segnaStandard %>" pack="<%= pack %>">
                 <img src="/assets/packs/<%= pack %>.jpg" alt="<%= pack %>">
             </div>
             <% }) %>
@@ -129,7 +130,7 @@
 
     confirmPacks.addEventListener("click", () => {
         if (standardPacks.size === 0 && packs.length === 0)
-            alert("Ma porchino il dio piccolino... devi selezionare qualcosa... NO?")
+            alert("Ma porchino il dirimpetaio piccolino... devi selezionare qualcosa... NO?")
         else {
             socket.emit("aggiungiMazzo", {
                 id: referenceStanza,
@@ -150,7 +151,11 @@
 
     socket.on("mazzoErrore", (data) => {
         alert(data.message);
-        packsPanel.dispatchEvent(hidePanel);
-        sectionDefault.dispatchEvent(showPanel);
+        tiles.forEach(tile => {
+            tile.classList.remove("selectedPack");
+            if(tile.classList.contains("standard"))
+                tile.click();
+        });
+        inputFile.dispatchEvent(new Event("cancel"));
     });
 </script>

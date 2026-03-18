@@ -73,7 +73,7 @@ socket.on("connect_error", (err) => {
             break;
         }
         default: {
-            navigateWithLoading("/")
+            window.location.replace("/");
         }
     }
 });
@@ -124,12 +124,12 @@ socket.on("aspettaAltri", (data) => {
 
 socket.on("impossibileAggiungersi", (error) => {
     alert(error.message);
-    navigateWithLoading("/partecipaStanza");
+    window.location.replace("/partecipaStanza");
 });
 
 socket.on("errore", (error) => {
     alert(error.message);
-    navigateWithLoading("/");
+    window.location.replace("/");
 });
 
 socket.on("roundIniziato", async (data) => {

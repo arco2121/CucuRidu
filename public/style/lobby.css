@@ -588,6 +588,14 @@
     background-image: linear-gradient(to bottom, var(--background), var(--background-middle));
 }
 
+.tile {
+    transition: all 0.15s ease-in-out;
+}
+
+.tile:active {
+    scale: 0.9;
+}
+
 .defaultPack img {
     width: 100%;
     border-radius: 17px;

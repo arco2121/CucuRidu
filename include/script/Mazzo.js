@@ -13,12 +13,7 @@ class Mazzo {
         this.carte = [];
         if (data) {
             if(typeof data["pack"] === "string") {
-                if(!packsCache[data["pack"]]) {
-                    packsCache[data["pack"]] = {
-                        completamenti : JSON.parse(fs.readFileSync(path.join(__dirname, "../cards/" + data["pack"] + "/completamenti.json"), "utf-8")),
-                        frasi: JSON.parse(fs.readFileSync(path.join(__dirname, "../cards/" + data["pack"] + "/frasi.json"), "utf-8"))
-                    };
-                }
+                Mazzo.recuperaInCache(data["pack"]);
                 const carte = data["tipoMazzo"] === TipoMazzo.COMPLETAMENTI ? packsCache[data["pack"]].completamenti : packsCache[data["pack"]].frasi;
                 this.aggiungiCarte(...carte.map(carta => typeof carta === "string" ? carta.trim() : [carta[0].toString().trim(), carta[1]]));
             } else if(typeof data["pack"] === "object") {
@@ -57,20 +52,27 @@ class Mazzo {
         return temp;
     }
 
-    static controllaMazzo(...frasiCompletamentiPair) {
+    static controllaMazzo(...frasiCompletamenti) {
+        const frasiCompletamentiPair = frasiCompletamenti.map(value => {
+            if(typeof value === "string") {
+                Mazzo.recuperaInCache(value);
+                return packsCache[value];
+            }
+            return value;
+        });
         let occorrenze = frasiCompletamentiPair.reduce((acc, m) => {
             const val = m.frasi ? m.frasi.length : (m[0] ? m[0].length : 0);
             return acc + val;
         }, 0);
 
-        const first = frasiCompletamentiPair.every(mazzo => {
+        const first = frasiCompletamentiPair.some(mazzo => {
             const f = mazzo.frasi || mazzo[0];
             const c = mazzo.completamenti || mazzo[1];
             return f && f.length > 5 && (36 + occorrenze * 3) >= c.length;
         });
         const second = frasiCompletamentiPair.every(mazzo => {
             const { hash: hashOriginale, ...dati } = mazzo;
-            if (!hashOriginale) return false;
+            if (!hashOriginale) return true;
             const datiString = JSON.stringify(dati, Object.keys(dati).sort());
             const hashRicalcolato = crypto.createHash("sha256")
                 .update(datiString)
@@ -79,6 +81,15 @@ class Mazzo {
             return hashOriginale === hashRicalcolato;
         });
         return first && second;
+    }
+
+    static recuperaInCache(data = "") {
+        if(!packsCache[data]) {
+            packsCache[data] = {
+                completamenti : JSON.parse(fs.readFileSync(path.join(__dirname, "../cards/" + data + "/completamenti.json"), "utf-8")),
+                frasi: JSON.parse(fs.readFileSync(path.join(__dirname, "../cards/" + data + "/frasi.json"), "utf-8"))
+            };
+        }
     }
 
     toArray() {
