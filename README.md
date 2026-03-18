@@ -33,7 +33,7 @@ Semplice. Devastante. Adatto a persone con poco senso del pudore e tanta voglia 
 
 ---
 
-## 🎮 Come si gioca (versione breve)
+## Come si gioca
 
 1. Qualcuno **crea una stanza** e manda il codice agli amici
 2. Gli altri **si uniscono** — servono almeno 3 persone (sì, devi avere amici)
@@ -47,7 +47,7 @@ Semplice. Devastante. Adatto a persone con poco senso del pudore e tanta voglia 
 
 ---
 
-## 🃏 Mazzi disponibili
+## Mazzi disponibili
 
 | Mazzo | Descrizione |
 |-------|-------------|
@@ -71,42 +71,6 @@ node app.js
 Il server parte su una porta casuale e te la dice in console. Aprila nel browser e il gioco è fatto.
 
 📖 [Guida completa all'installazione →](https://github.com/arco2121/CucuRidu/wiki/Installazione)
-
----
-
-## 🏗️ Struttura del progetto
-
-```
-CucuRidu/
-├── app.js                  # Entry point
-├── application/
-│   ├── single.js           # Setup server Express + Socket.IO
-│   └── configurations.js   # Route HTTP e logica Socket.IO
-├── include/
-│   ├── cards/              # Mazzi in formato JSON
-│   ├── names/              # Nomi e aggettivi per username casuali
-│   └── script/             # Logica di gioco server-side
-│       ├── Stanza.js       # Gestione stanza e stato partita
-│       ├── Giocatore.js    # Entità giocatore
-│       ├── Mazzo.js        # Gestione mazzi e carte
-│       ├── Session.js      # Sessioni (express-session + JWT)
-│       └── generazione.js  # Utility: ID, nomi, pfp
-├── public/                 # Asset statici, CSS, JS client
-├── views/                  # Template EJS
-└── ignore/                 # Script di sviluppo e raw data
-```
-
-📖 [Documentazione tecnica completa →](https://github.com/arco2121/CucuRidu/wiki/Struttura-Tecnica)
-
----
-
-## 🛠️ Stack tecnologico
-
-- **Backend:** Node.js, Express 5, Socket.IO 4
-- **Template Engine:** EJS
-- **Sessioni:** express-session + JWT
-- **Frontend:** Vanilla JS, CSS custom, EJS client-side
-- **Deploy:** Docker → Render / HuggingFace Spaces
 
 ---
 
