@@ -210,7 +210,7 @@ class Stanza {
         if(this.stato !== StatoStanza.WAIT || this.numeroRound[0] > 0)
             return false;
         try {
-            if(!Mazzo.mazzoAbbastanzaGrande(...mazzi))
+            if(!Mazzo.controllaMazzo(...mazzi))
                 return false;
             const mazziFrasi = mazzi.map(mazzo => new Mazzo({
                 pack: mazzo,

@@ -186,7 +186,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
         const packs = [];
         for(const pair of packsPair) {
             const righe = generatePacks(pair);
-            if(Mazzo.mazzoAbbastanzaGrande(righe)) {
+            if(Mazzo.controllaMazzo(righe)) {
                 const mazzoFinale = {
                     frasi: righe[0],
                     completamenti: righe[1],

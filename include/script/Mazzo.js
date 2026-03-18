@@ -4,6 +4,7 @@ const TipoMazzo = Object.freeze({
 })
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const packsCache = {};
 
 class Mazzo {
@@ -56,10 +57,28 @@ class Mazzo {
         return temp;
     }
 
-    static mazzoAbbastanzaGrande(...frasiCompletamentiPair) {
-        let occorreze = 0;
-        frasiCompletamentiPair.forEach(mazzo => occorreze += mazzo[0][1] || mazzo["frasi"][1]);
-        return !(frasiCompletamentiPair.filter(mazzo => !(mazzo[0].length || mazzo["frasi"].length > 5 && (3*12 + occorreze*3) >= mazzo[1].length ||mazzo["completamenti"][1])).length > 0);
+    static controllaMazzo(...frasiCompletamentiPair) {
+        let occorrenze = frasiCompletamentiPair.reduce((acc, m) => {
+            const val = m.frasi ? m.frasi.length : (m[0] ? m[0].length : 0);
+            return acc + val;
+        }, 0);
+
+        const first = frasiCompletamentiPair.every(mazzo => {
+            const f = mazzo.frasi || mazzo[0];
+            const c = mazzo.completamenti || mazzo[1];
+            return f && f.length > 5 && (36 + occorrenze * 3) >= c.length;
+        });
+        const second = frasiCompletamentiPair.every(mazzo => {
+            const { hash: hashOriginale, ...dati } = mazzo;
+            if (!hashOriginale) return false;
+            const datiString = JSON.stringify(dati, Object.keys(dati).sort());
+            const hashRicalcolato = crypto.createHash("sha256")
+                .update(datiString)
+                .digest("hex");
+
+            return hashOriginale === hashRicalcolato;
+        });
+        return first && second;
     }
 
     toArray() {
