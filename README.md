@@ -54,7 +54,7 @@ Vuoi creare il tuo mazzo? [Qui c'è la guida →](https://github.com/arco2121/Cu
 
 ## 🚀 Installazione locale
 
-### Più consigliato scaricare una delle ultime release
+### Sarebbe meglio scaricare una delle ultime release
 
 ```bash
 git clone https://github.com/arco2121/CucuRidu.git
