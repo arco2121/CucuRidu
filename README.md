@@ -1,6 +1,6 @@
 # Cucu Ridu
 
-> *Il gioco di carte più trash, irriverente e assolutamente necessario d'Italia.*
+> *Un gioco di carte irriverente, storto e assolutamente necessario*
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18-green.svg)](https://nodejs.org)
