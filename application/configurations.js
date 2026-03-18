@@ -22,7 +22,7 @@ const crypto = require('crypto');
 // POST /saveGameReference : Salva l'ID utente e stanza nel server per gestire i refresh di pagina
 // POST /deleteGameReference : Cancella la sessione di gioco (logout)
 /**
- * Configura gli endpoint dell' app Express
+ * Configura gli endpoint dell' application Express
  * @param app
  * @param serverSession
  * @param TEMPORARY_TOKEN

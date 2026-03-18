@@ -6,7 +6,11 @@ const ASSETS_TO_CACHE = [
     '/script/colorConfig.js',
     '/script/ejs.js',
     '/assets/icon.png',
-    '/assets/loading.webp'
+    '/assets/loading.webp',
+    '/assets/fonts/Nunito-Italic-VariableFont_wght.ttf',
+    '/assets/fonts/Nunito-VariableFont_wght.ttf',
+    'assets/fonts/SourGummy-Italic-VariableFont_wdth,wght.ttf',
+    '/assets/fonts/SourGummy-VariableFont_wdth,wght.ttf'
 ];
 
 self.addEventListener('install', (event) => {
