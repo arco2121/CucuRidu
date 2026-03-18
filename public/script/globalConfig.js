@@ -23,6 +23,7 @@ const generateId = (memory) => {
     return code;
 }
 const memory = new Set();
+const wait = async (time) => await new Promise(resolve => setTimeout(resolve, time));
 
 const fragmentsCache = {};
 const renderFragment = async (root, page, params = {}) => {
@@ -33,6 +34,8 @@ const renderFragment = async (root, page, params = {}) => {
             fragmentsCache[page] = await input.text();
         }
         if(!root) return fragmentsCache[page];
+        root.dispatchEvent(hidePanel);
+        await wait(200);
         const header = await renderFragment(null, "header");
         const processed = ejs.render(header, {
             params: params,
@@ -45,6 +48,7 @@ const renderFragment = async (root, page, params = {}) => {
         root.innerHTML = "";
         const fragment = document.createRange().createContextualFragment(processed);
         root.appendChild(fragment);
+        root.dispatchEvent(showPanel);
     } catch (e) {
         console.error(e);
     }

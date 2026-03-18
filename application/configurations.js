@@ -338,7 +338,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 console.log("Stanza creata => " + stanza.id);
             } catch {
                 user.emit("errore", {
-                    message: "Impossibile creare la stanza, non va niente quel porco di un bastardo maledetto del dio cristo impalato su uno spiedino di sushi marcito come l'utero della madonna troia"
+                    message: "Impossibile creare la stanza, non va niente porcaccio al catamarano ubriaco"
                 });
             }
         });
@@ -403,7 +403,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     });
                 else
                     user.emit("aspettaAltri", {
-                        message: "Girl non ci sono chatbot ai che fingano di scoparti qui. Go touch some grass or smt"
+                        message: "Girl non ci sono chatbot ai che fingano di esserti amico. Go touch some grass e non fare come Calipso"
                     });
             } catch (e) {
                 console.log(e)
@@ -427,7 +427,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 }
                 else {
                     user.emit("giaRegistrata", {
-                        message: "Non puoi rispondere 2 volte dio coltivatore di carote in un campo di reclusione ucraino"
+                        message: "Non puoi rispondere 2 volte giuseppino coltivatore di carote in un campo di reclusione ucraino"
                     });
                 }
             } catch (e) {
@@ -513,7 +513,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 user.emit("mazzoAggiunto");
             else
                 user.emit("mazzoErrore", {
-                    message: "Mannaggia, mi sa che si userà lo standard hehe"
+                    message: "Mannaggia, mi sa che al server non sono piaciuti :("
                 });
         });
 
