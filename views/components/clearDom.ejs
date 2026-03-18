@@ -2,7 +2,7 @@
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/script/serviceWorker.js')
-                .then(reg => console.log('Service Worker hehe!'))
+                .then(() => console.log('Service Worker hehe!'))
                 .catch(err => console.log('Errore registrazione:', err));
         });
     }
