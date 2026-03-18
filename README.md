@@ -94,17 +94,3 @@ Fatti da loro con amore, caffè e probabilmente troppo tempo libero.
 ## 📄 Licenza
 
 Distribuito sotto licenza [Apache 2.0](LICENSE). Usalo, forkalo, rompilo — ma citaci almeno.
-
-
----
-title: Cucuridu
-emoji: ✨️
-colorFrom: yellow
-colorTo: green
-sdk: docker
-app_port: 7860
-pinned: true
-license: apache-2.0
-short_description: Silly card game similar to Coco Rido✨
-allow_custom_scripts: true
----
