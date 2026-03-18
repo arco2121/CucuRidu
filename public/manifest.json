@@ -1,0 +1,15 @@
+{
+  "name": "Cucu Ridu",
+  "short_name": "cucuridu",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFEA8F",
+  "theme_color": "#ADFF7D",
+  "icons": [
+    {
+      "src": "/assets/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
