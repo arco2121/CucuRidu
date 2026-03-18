@@ -1,0 +1,145 @@
+.section {
+    justify-content: start;
+    padding: 40px 10px;
+    overflow-y: scroll;
+}
+
+.create_outer_con {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.create_section {
+    width: 98%;
+    border-radius: 25px;
+    padding: 10px;
+    margin: 5px 0;
+    font-family: "Sour Gummy", sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.create_con {
+    width: 100%;
+}
+
+.create_uploads_con {
+    align-items: center;
+    margin-top: 20px;
+}
+
+.create_section_style_1 {
+    border: solid 5px var(--background-variant-outline);
+    background: var(--background-variant);
+    background-image: linear-gradient(to bottom, var(--background-variant), var(--background-variant-middle));
+    color: var(--background-variant-outline);
+}
+
+.create_section_style_2 {
+    border: solid 5px var(--accent-color-2-outline);
+    background: var(--accent-color-2);
+    background-image: linear-gradient(to bottom, var(--accent-color-2), var(--accent-color-2-middle));
+    color: var(--accent-color-2-outline);
+}
+
+.create_guide_con {
+    padding: 20px 10px;
+    overflow-y: scroll;
+}
+
+.create_guide_con h2 {
+    font-size: 1.6rem;
+}
+
+.create_guide_con h3 {
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+}
+
+.create_guide_con p {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.create_guide_con hr {
+    border: none;
+    border-top: 5px dotted var(--background-variant-outline);
+    width: 95%;
+    color: transparent;
+    margin: 0;
+}
+
+.create_guide_con ul {
+    list-style-type: disc;
+    margin-left: 20px;
+}
+
+.create_guide_con li {
+    margin-bottom: 5px;
+}
+
+.upload_tiles_con {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.upload_tile {
+    flex: 1;
+    min-width: 140px;
+    cursor: pointer;
+    border-radius: 15px;
+    overflow: hidden;
+    border: solid 3px var(--accent-color-2-outline);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.upload_tile:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.upload_tile img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+}
+
+.upload_tile span {
+    padding: 8px 0;
+    font-size: 1.1rem;
+    color: var(--accent-color-2-outline);
+}
+
+.tiles_grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+@media (min-width: 940px) {
+    .create_outer_con {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        gap: 30px;
+    }
+
+    .create_uploads_con {
+        justify-content: center;
+        margin-top: 0;
+    }
+
+    .tiles_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+    }
+}
