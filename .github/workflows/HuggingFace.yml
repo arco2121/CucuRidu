@@ -13,6 +13,15 @@ jobs:
           fetch-depth: 0
           lfs: true
 
+      - name: Swap README for Hugging Face
+        run: |
+          if [ -f "README_HF.md" ]; then
+            cp README_HF.md README.md
+          else
+            echo "Errore: README_HF.md non trovato!"
+            exit 1
+          fi
+
       - name: Push to Hub
         env:
           HF_TOKEN: ${{ secrets.HF_KEY }}
