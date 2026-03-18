@@ -1,4 +1,4 @@
-name: Hugging Face Hosting
+name: Deploy to Hugging Face
 on:
   push:
     branches: [main]
