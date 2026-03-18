@@ -92,6 +92,9 @@ table {
     --loadingScreen-background: linear-gradient(to right bottom, rgba(255, 156, 156, 1) 0%, rgba(255, 233, 122, 1) 25%, rgba(221, 255, 143, 1) 50%, rgba(193, 255, 240, 1) 75%, rgba(222, 193, 255, 1) 100%);
     --loadingScreen-accent: #ffe8ee;
 
+    --selection-backgorund: #ee9aab;
+    --selection-text: #4d2d32;
+
 
     /* Static Colors */
     --accent-color-confirm: #aaff75;
@@ -325,6 +328,24 @@ a {
 .panel_title {
     font-size: 2rem;
     color: var(--background-variant-outline);
+}
+
+::selection {
+    background-color: var(--accent-color-1-middle);
+    color: var(--accent-color-1-outline);
+    -webkit-text-fill-color: var(--text-color-dark);
+}
+
+::-moz-selection {
+    background-color: var(--accent-color-2-middle);
+    color: var(--accent-color-2-outline);
+    -webkit-text-fill-color: var(--text-color-dark);
+}
+
+::-webkit-selection {
+    background-color: var(--accent-color-3-middle);
+    color: var(--accent-color-3-outline);
+    -webkit-text-fill-color: var(--text-color-dark);
 }
 
 
