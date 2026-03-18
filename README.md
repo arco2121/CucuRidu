@@ -17,19 +17,18 @@ Semplice. Devastante. Adatto a persone con poco senso del pudore e tanta voglia 
 
 > ⚠️ **Avviso sul contenuto**
 >
-> Le carte di Cucu Ridu sono volutamente eccessive, irriverenti e spesso politicamente scorrettissime. È umorismo nero e assurdo. Se sei facilmente offendibile, questo gioco probabilmente non fa per te — e probabilmente neanche questa wiki. Sii consapevole, e soprattutto non prenderti sul serio.
+> Tutto è molto frizzantino quindi, preparati (oppure usa il mazzo **SAFE**)
 
 ---
 
-## ✨ Funzionalità
+## Funzionalità
 
-- 🌐 **Multiplayer in tempo reale** — WebSocket, nessun refresh, nessuna pietà
-- 🎨 **Tema grafico randomico** ad ogni partita — 9 palette di colori, mai uguale a prima
-- 🎵 **Musica e suoni** — disattivabili per chi non li merita
-- 📦 **Espansioni ufficiali** — più mazzi, più danni
-- 🃏 **Mazzi personalizzati** — crea le tue carte, condividi i tuoi traumi
-- 🔄 **Riconnessione automatica** — perché la connessione cade sempre nel momento peggiore
-- 📱 **PWA** — installabile su mobile, così ce l'hai sempre in tasca
+-  **Multiplayer in tempo reale** — WebSocket, nessun refresh, nessuna pietà
+-  **Tema grafico randomico** ad ogni partita — 9 palette di colori, mai uguale a prima
+-  **Musica e suoni** — disattivabili per chi non li merita
+-  **Espansioni ufficiali** — più mazzi, più danni
+-  **Mazzi personalizzati** — crea le tue carte, condividi i tuoi traumi
+-  **Riconnessione automatica** — perché la connessione cade sempre nel momento peggiore
 
 ---
 
@@ -47,19 +46,15 @@ Semplice. Devastante. Adatto a persone con poco senso del pudore e tanta voglia 
 
 ---
 
-## Mazzi disponibili
-
-| Mazzo | Descrizione |
-|-------|-------------|
-| **Standard** | Il mazzo base. Centinaia di carte. Nessun freno |
-| **Melanie Martinez** | Per i fan della cantante. Molto di nicchia, molto pesante |
-| **Cinesi XXX** | Mini espansione. Piccola ma vivace |
+## Mazzi Personalizzabili
 
 Vuoi creare il tuo mazzo? [Qui c'è la guida →](https://github.com/arco2121/CucuRidu/wiki/Mazzi-Personalizzati)
 
 ---
 
 ## 🚀 Installazione locale
+
+### Più consigliato scaricare una delle ultime release
 
 ```bash
 git clone https://github.com/arco2121/CucuRidu.git
