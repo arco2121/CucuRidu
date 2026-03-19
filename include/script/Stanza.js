@@ -78,7 +78,6 @@ class Stanza {
 
         if(this.giocatori.size < this.minimoGiocatori) {
             this.stato = StatoStanza.WAIT;
-            this.numeroRound[0] = Math.max(0, this.numeroRound[0] - 1);
             Array.from(this.round.risposte?.entries() || []).forEach(([key, value]) => {
                 this.trovaGiocatore(key)?.aggiungiMano(...value);
             });
