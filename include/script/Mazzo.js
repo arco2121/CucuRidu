@@ -68,7 +68,7 @@ class Mazzo {
         const first = frasiCompletamentiPair.some(mazzo => {
             const f = mazzo.frasi || mazzo[0];
             const c = mazzo.completamenti || mazzo[1];
-            return f && f.length > 5 && (36 + occorrenze * 3) >= c.length;
+            return f && f.length > 5 && (33 + occorrenze * 3) >= c.length;
         });
         const second = frasiCompletamentiPair.every(mazzo => {
             const { hash: hashOriginale, ...dati } = mazzo;
