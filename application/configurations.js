@@ -488,8 +488,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
 
             server.to(data["stanzaId"]).emit("aggiornamentoAttesa", {
                 numeroGiocatori: Stanza?.giocatori.size,
-                minimoGiocatori: Stanza.minimoGiocatori,
-                giocatori: Stanza.classifica().map(giocatore => giocatore.adaptToClient())
+                minimoGiocatori: Stanza?.minimoGiocatori,
+                giocatori: Stanza?.classifica().map(giocatore => giocatore.adaptToClient())
             })
         });
 
@@ -502,7 +502,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
 
             server.to(data["stanzaId"]).emit("aggiornamentoAttesaRisposta", {
                 numeroGiocatori: Stanza?.round.risposte.size,
-                giocatori: Array.from(Stanza.round.risposte.keys()).map(giocatore => Stanza.trovaGiocatore(giocatore).adaptToClient())
+                giocatori: Array.from(Stanza?.round.risposte.keys()).map(giocatore => Stanza.trovaGiocatore(giocatore).adaptToClient())
             })
         });
 
