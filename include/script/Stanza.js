@@ -144,7 +144,7 @@ class Stanza {
             return this.terminaPartita();
         this.controllaMazzi(this.round.domanda[1]);
         for (const giocatore of this.giocatori.values())
-            if(giocatore.mazzo.carte.length === 0) giocatore.aggiungiMano(...this.mazzoCompletamenti.mazzo.prendiCarte(12));
+            if(giocatore.mazzo.carte.length === 0) giocatore.aggiungiMano(...this.mazzoCompletamenti.mazzo.prendiCarte(11));
         if(chiStaChidedendo === this.round.chiStaInterrogando) {
             this.stato = StatoStanza.CHOOSING_CARDS;
             return true;
