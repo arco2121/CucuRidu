@@ -141,7 +141,8 @@ socket.on("roundIniziato", async (data) => {
     await renderFragment(base, "choosingCards", {
         domanda: domanda,
         risposte: !referenceGiocatore.interrogationRole ? referenceGiocatore.mazzo : null,
-        chiStaInterrogando: chiStaInterrogando
+        chiStaInterrogando: chiStaInterrogando,
+        animation: !isLoadScreen()
     });
 });
 
@@ -163,6 +164,7 @@ socket.on("sceltaVincitore", async (data) => {
         domanda: domanda,
         risposte: risposte,
         chiStaInterrogando: chiInterroga,
+        animation: !isLoadScreen(),
         staiInterrogando: chiInterroga.id === referenceGiocatore.id
     });
 });
@@ -173,6 +175,7 @@ socket.on("fineTurno", async (data) => {
     await renderFragment(base, "showWinner", {
         domanda: domanda,
         risposte: risposte,
+        animation: !isLoadScreen(),
         interroghi: vincitore.id === referenceGiocatore.id,
         vincitore: vincitore
     });
