@@ -27,11 +27,16 @@ class Mazzo {
         for(const carta of carte) this.carte.push(carta);
     }
 
-    shuffle() {
-        for (let i = this.carte.length - 1; i > 0; i--) {
+    static shuffle(array = []) {
+        for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [this.carte[i], this.carte[j]] = [this.carte[j], this.carte[i]];
+            [array[i], array[j]] = [array[j], array[i]];
         }
+        return array;
+    }
+
+    shuffle() {
+        Mazzo.shuffle(this.carte);
     }
 
     prendiCarte(numeroCarte) {
