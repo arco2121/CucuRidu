@@ -1,6 +1,5 @@
 const CACHE_NAME = 'cucuridu_cache';
 const ASSETS_TO_CACHE = [
-    '/',
     '/assets/color.json',
     '/style/global.css',
     '/script/config/colorConfig.js',
@@ -9,7 +8,7 @@ const ASSETS_TO_CACHE = [
     '/assets/loading.webp',
     '/assets/fonts/Nunito-Italic-VariableFont_wght.ttf',
     '/assets/fonts/Nunito-VariableFont_wght.ttf',
-    'assets/fonts/SourGummy-Italic-VariableFont_wdth,wght.ttf',
+    '/assets/fonts/SourGummy-Italic-VariableFont_wdth,wght.ttf',
     '/assets/fonts/SourGummy-VariableFont_wdth,wght.ttf'
 ];
 
