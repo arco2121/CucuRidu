@@ -36,7 +36,7 @@
 
     let questionText = domandaAttuale.textContent;
     risposte.forEach(answer => {
-        questionText = (questionText[0] === "_" || questionText[(questionText.indexOf("_") - 1)] === ".")
+        questionText = (questionText[0] === "_" || questionText[1] === "_" || questionText[(questionText.indexOf("_") - 1)] === ".")
             ? questionText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toUpperCase() + answer.slice(1)))
             : questionText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toLowerCase() + answer.slice(1)));
     });
