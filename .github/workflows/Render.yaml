@@ -9,6 +9,7 @@ on:
       - 'LICENSE'
       - '.github/**'
       - '.git/**'
+      - 'install.py'
 
 jobs:
   deploy:
