@@ -35,10 +35,25 @@
     winnerText.textContent = `✦ ${vincitore.username} ha vinto il round ✦`;
 
     let questionText = domandaAttuale.textContent;
-    risposte.forEach(answer => {
-        questionText = (questionText[0] === "_" || questionText[1] === "_" || questionText[(questionText.indexOf("_") - 1)] === ".")
-            ? questionText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toUpperCase() + answer.slice(1)))
-            : questionText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toLowerCase() + answer.slice(1)));
+    risposte.forEach(entry => {
+        const underscoreIndex = questionText.indexOf("_");
+        if (underscoreIndex === -1) return;
+
+        const charBefore = questionText[underscoreIndex - 1];
+        const charTwoBefore = questionText[underscoreIndex - 2];
+
+        const shouldBeUppercase =
+            underscoreIndex === 0 ||
+            charBefore === "." ||
+            (charBefore === " " && charTwoBefore === ".");
+
+        let cleanEntry = bannedSymbols.includes(entry[0]) ? entry.slice(1) : entry;
+
+        const finalWord = shouldBeUppercase
+            ? cleanEntry.charAt(0).toUpperCase() + cleanEntry.slice(1)
+            : cleanEntry.toLowerCase();
+
+        questionText = questionText.replace("_", finalWord);
     });
     Array.from(bannedSymbols).forEach(letter => questionText.replaceAll(letter, ""));
     domandaAttuale.textContent = questionText;

@@ -10,6 +10,12 @@ const showPanel = new Event("showPanel", {
 const hidePanel = new Event("hidePanel", {
     bubbles: true
 });
+const showOpacity = new Event("showOpacity", {
+    bubbles: true
+});
+const hideOpacity = new Event("hideOpacity", {
+    bubbles: true
+});
 const showPanelCond = new Event("showPanelCond", {
     bubbles: true
 });
@@ -47,5 +53,13 @@ const fragmentRendered = new Event("fragmentRendered");
         setTimeout(() => {
             if(panel.classList.contains("visible")) panel.classList.remove('hidden')
         }, timeOut);
+    });
+    document.addEventListener('hideOpacity', (e) => {
+        const section = e.target;
+        section.classList.replace('appear', 'disappear');
+    });
+    document.addEventListener("showOpacity", (e) => {
+        const panel = e.target;
+        panel.classList.replace('disappear', 'appear');
     });
 })();

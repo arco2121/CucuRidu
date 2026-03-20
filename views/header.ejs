@@ -14,12 +14,12 @@
     <title>Cucu Ridu</title>
 </head>
 <body>
-    <script type="module" src="/script/colorConfig.js"></script>
+    <script type="module" src="/script/config/colorConfig.js"></script>
     <%- include("components/loadScreen") %>
-    <script src="/script/ejs.js"></script>
-    <script src="/script/globalConfig.js"></script>
-    <script src="/script/eventsConfig.js"></script>
-    <script src="/script/midleChecks.js"></script>
+    <script src="/script/config/ejs.js"></script>
+    <script src="/script/config/globalConfig.js"></script>
+    <script src="/script/config/eventsConfig.js"></script>
+    <script src="/script/config/midleChecks.js"></script>
     <%- include("components/manageBack") %>
     <%- include(page, params) %>
     <%- include("components/audioManager", { bgm: params.bgm || "GameMusic-Candy_Bazaar" }) %>

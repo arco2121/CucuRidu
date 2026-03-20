@@ -27,6 +27,10 @@ const wait = async (time) => await new Promise(resolve => setTimeout(resolve, ti
 
 const fragmentsCache = {};
 const renderFragment = async (root, page, params = {}) => {
+    params = {
+        animation: true,
+        ...params
+    };
     try {
         if(!fragmentsCache[page]) {
             const input = await fetch("/fragments/" + page + ".ejs");
@@ -34,8 +38,10 @@ const renderFragment = async (root, page, params = {}) => {
             fragmentsCache[page] = await input.text();
         }
         if(!root) return fragmentsCache[page];
-        root.dispatchEvent(hidePanel);
-        await wait(200);
+        if(params.animation) {
+            root.dispatchEvent(hideOpacity);
+            await wait(170);
+        }
         const header = await renderFragment(null, "header");
         const processed = ejs.render(header, {
             params: params,
@@ -48,7 +54,7 @@ const renderFragment = async (root, page, params = {}) => {
         root.innerHTML = "";
         const fragment = document.createRange().createContextualFragment(processed);
         root.appendChild(fragment);
-        root.dispatchEvent(showPanel);
+        if(params.animation) root.dispatchEvent(showOpacity);
     } catch (e) {
         console.error(e);
     }

@@ -83,10 +83,25 @@
 
         if (currentAnswersCount > 0) {
             let initText = defaultText;
-            givenAnswers.filter(answer => answer !== null).forEach(answer => {
-                initText = (initText[0] === "_" || initText[1] === "_" || initText[(initText.indexOf("_") - 1)] === ".")
-                    ? initText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toUpperCase() + answer.slice(1)))
-                    : initText.replace("_", bannedSymbols.includes(answer[0]) ? (answer[1].toUpperCase() + answer.slice(2)) : (answer[0].toLowerCase() + answer.slice(1)));
+            givenAnswers.filter(answer => answer !== null).forEach(entry => {
+                const underscoreIndex = initText.indexOf("_");
+                if (underscoreIndex === -1) return;
+
+                const charBefore = initText[underscoreIndex - 1];
+                const charTwoBefore = initText[underscoreIndex - 2];
+
+                const shouldBeUppercase =
+                    underscoreIndex === 0 ||
+                    charBefore === "." ||
+                    (charBefore === " " && charTwoBefore === ".");
+
+                let cleanEntry = bannedSymbols.includes(entry[0]) ? entry.slice(1) : entry;
+
+                const finalWord = shouldBeUppercase
+                    ? cleanEntry.charAt(0).toUpperCase() + cleanEntry.slice(1)
+                    : cleanEntry.toLowerCase();
+
+                initText = initText.replace("_", finalWord);
             });
             Array.from(bannedSymbols).forEach(letter => initText.replaceAll(letter, ""));
             currentQuestion.textContent = initText;

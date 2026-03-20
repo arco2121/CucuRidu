@@ -94,10 +94,12 @@ socket.on("confermaStanza", (data) => {
         })
     }).then((response) => response.json().then(async (result) => {
         if(result?.result) {
+            console.log(primoRound)
             await renderFragment(base, "wait", {
                 stanzaId: referenceStanza,
-                interroghi: interroghi || false,
-                primoRound: primoRound || true
+                interroghi: interroghi,
+                primoRound: primoRound,
+                animation: !isLoadScreen()
             });
             if(result.fallback) {
                 const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
