@@ -129,6 +129,10 @@
     min-width: 100%;
 }
 
+.wait_players_list_2 {
+    height: unset;
+}
+
 .wait_players_list_hr {
     width: 90%;
     border-bottom: dotted 4px var(--background-variant-outline);
