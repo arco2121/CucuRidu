@@ -18,11 +18,21 @@ self.addEventListener('install', (event) => {
             return cache.addAll(ASSETS_TO_CACHE);
         })
     );
+    self.skipWaiting(); // Forza l'attivazione immediata
 });
 
 self.addEventListener('fetch', (event) => {
+    // 1. IGNORA le richieste per le pagine (HTML/Navigazione)
+    // Se è una navigazione, non facciamo nulla: il browser gestirà l'offline standard.
+    if (event.request.mode === 'navigate') {
+        return; 
+    }
+
+    // 2. GESTISCI solo gli asset specifici (immagini, font, css, json)
     event.respondWith(
         caches.match(event.request).then((response) => {
+            // Se lo abbiamo in cache (perché messo in ASSETS_TO_CACHE o salvato prima), usalo.
+            // Altrimenti vai in rete.
             return response || fetch(event.request);
         })
     );
