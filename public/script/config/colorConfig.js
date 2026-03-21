@@ -40,6 +40,8 @@ setCSS('--background', bgMain.normal);
 setCSS('--background-dark', bgMain.dark);
 setCSS('--background-middle', bgMain.middle);
 setCSS('--background-outline', bgMain.outline);
+setAttribute("theme-color", bgMain.normal);
+setAttribute("theme-color", bgMain.dark, '(prefers-color-scheme: dark)');
 
 setCSS('--background-variant', bgVariant.normal);
 setCSS('--background-variant-middle', bgVariant.middle);
