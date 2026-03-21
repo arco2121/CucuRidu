@@ -23,12 +23,25 @@ const accentsMap = {
 
 // --- 3. ASSIGNMENT ---
 const setCSS = (name, value) => document.documentElement.style.setProperty(name, value);
+const setAttribute = (name, color, media = "") => {
+    let metaThemeColor = document.querySelector("meta[name=" + name + "]");
+    if (!metaThemeColor) {
+        metaThemeColor = document.createElement("meta");
+        metaThemeColor.name = name;
+        document.head.appendChild(metaThemeColor);
+    }
+
+    metaThemeColor.setAttribute("content", color);
+    if(media) metaThemeColor.setAttribute("media", media);
+};
 
 // > BACKGROUNDS
 setCSS('--background', bgMain.normal);
 setCSS('--background-dark', bgMain.dark);
 setCSS('--background-middle', bgMain.middle);
 setCSS('--background-outline', bgMain.outline);
+setAttribute("theme-color", bgMain.normal);
+setAttribute("theme-color", bgMain.dark, '(prefers-color-scheme: dark)');
 
 setCSS('--background-variant', bgVariant.normal);
 setCSS('--background-variant-middle', bgVariant.middle);

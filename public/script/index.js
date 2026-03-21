@@ -15,3 +15,4 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.dispatchEvent(preventBack);
+exitFrom = true;

@@ -213,3 +213,4 @@ document.addEventListener("fragmentRendered", () => {
 })
 
 document.dispatchEvent(preventBack);
+exitFrom = true;

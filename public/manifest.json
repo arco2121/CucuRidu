@@ -1,10 +1,10 @@
 {
   "name": "Cucu Ridu",
-  "short_name": "cucuridu",
+  "short_name": "Cucu Ridu",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FFEA8F",
-  "theme_color": "#ADFF7D",
+  "background_color": "#ee9aab",
+  "theme_color": "#ee9aab",
   "icons": [
     {
       "src": "/assets/icon.png",

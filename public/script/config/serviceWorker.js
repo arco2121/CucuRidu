@@ -1,6 +1,6 @@
-const CACHE_NAME = 'cucuridu_cache';
+const CACHE_NAME = 'cucuridu_cache_v1';
 const ASSETS_TO_CACHE = [
-    '/assets/color.json',
+    '/assets/colors.json',
     '/style/global.css',
     '/script/config/colorConfig.js',
     '/script/config/ejs.js',
@@ -26,7 +26,6 @@ self.addEventListener('fetch', (event) => {
         return; 
     }
 
-    
     event.respondWith(
         caches.match(event.request).then((response) => {
             return response || fetch(event.request);

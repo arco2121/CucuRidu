@@ -1,6 +1,7 @@
 <script>
     document.body.style.overscrollBehaviorX = "none";
     const preventBack = new CustomEvent("activatePreventBack");
+    let exitFrom = false;
     (() => {
         let oneConfirm = false;
         let active = false;
@@ -41,6 +42,10 @@
             const conferma = confirm(confirmMessgaes[Math.floor(Math.random()*confirmMessgaes.length)]);
             if (conferma) {
                 oneConfirm = !oneConfirm;
+                if(exitFrom) {
+                    close();
+                    return;
+                }
                 history.back();
             } else history.pushState({ page: 1 }, null, window.location.pathname);
         });
