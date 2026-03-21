@@ -142,7 +142,7 @@ html {
 }
 
 body {
-    background-color: var(--background-dark);
+    background-color: var(--background);
     background-image: linear-gradient(to bottom, var(--background), var(--background-dark));
     line-height: 1;
     height: 100dvh;

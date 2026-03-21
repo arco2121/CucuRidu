@@ -63,31 +63,7 @@
 
     const updateQuestion = () => {
         const currentSelection = allAnswers[currentIndex];
-        let questionText = defaultText;
-
-        // currentSelection[1] dovrebbe essere l'array delle parole da inserire
-        currentSelection[1].forEach(entry => {
-            const underscoreIndex = questionText.indexOf("_");
-            if (underscoreIndex === -1) return;
-
-            const charBefore = questionText[underscoreIndex - 1];
-            const charTwoBefore = questionText[underscoreIndex - 2];
-
-            const shouldBeUppercase =
-                underscoreIndex === 0 ||
-                charBefore === "." ||
-                (charBefore === " " && charTwoBefore === ".");
-
-            let cleanEntry = bannedSymbols.includes(entry[0]) ? entry.slice(1) : entry;
-
-            const finalWord = shouldBeUppercase
-                ? cleanEntry.charAt(0).toUpperCase() + cleanEntry.slice(1)
-                : cleanEntry.toLowerCase();
-
-            questionText = questionText.replace("_", finalWord);
-        });
-        Array.from(bannedSymbols).forEach(letter => questionText.replaceAll(letter, ""));
-        currentQuestion.textContent = questionText;
+        currentQuestion.textContent = fillBlanks(defaultText, currentSelection[1]);
         answer_index.textContent = currentIndex + 1 + "/" + allAnswers.length;
     };
 
