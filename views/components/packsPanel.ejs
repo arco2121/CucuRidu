@@ -13,7 +13,7 @@
                 const segnaStandard = isStandard ? 'standard' : null
             %>
             <div class="tile defaultPack normalPack shrinks_on_active_for_no_reason packColor_<%= colorNum %> <%= isStandard %> <%= segnaStandard %>" pack="<%= pack %>">
-                <img src="/assets/packs/<%= pack %>.jpg" alt="<%= pack %>">
+                <img onerror="this.src = '/assets/packs/personalizzato_empty.jpg'" src="/assets/packs/<%= pack %>.jpg" alt="<%= pack %>">
             </div>
             <% }) %>
 
