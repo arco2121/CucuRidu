@@ -1,31 +1,4 @@
 const base = document.getElementById("landpoint");
-const fillBlanks = (templateText, replacements) => {
-    let index = 0;
-    replacements = replacements.filter(rep => rep !== null);
-    console.log(replacements);
-
-    return templateText.replace(/_/g, (match, offset, fullString) => {
-        if (index >= replacements.length) return match;
-
-        let word = replacements[index];
-        console.log(word, index)
-        index++;
-
-        if (word.startsWith("§")) {
-            const cleanedWord = word.slice(1);
-            return cleanedWord.charAt(0).toUpperCase() + cleanedWord.slice(1).toLowerCase();
-        }
-        const textBefore = fullString.slice(0, offset);
-
-        const isStartOfSentence = textBefore.trim().length === 0 || /[.!?]\s*$/.test(textBefore);
-
-        if (isStartOfSentence) {
-            return word;
-        } else {
-            return word.charAt(0).toLowerCase() + word.slice(1);
-        }
-    });
-};
 const socket = io({
     auth: {
         validation: fromBackEnd["token"],
