@@ -94,7 +94,6 @@ socket.on("confermaStanza", (data) => {
         })
     }).then((response) => response.json().then(async (result) => {
         if(result?.result) {
-            console.log(primoRound)
             await renderFragment(base, "wait", {
                 stanzaId: referenceStanza,
                 interroghi: interroghi,
