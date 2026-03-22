@@ -55,9 +55,10 @@ const translateToPack = (packs) => {
                 results.push(stringa);
                 continue;
             }
-            const lines = stringa.split("\n");
+            const lines = stringa.split(/\r?\n/).filter(line => line.trim() !== "");
             let array = [];
-            for (const line of lines) {
+            for (let line of lines) {
+                line = line.trim();
                 const string = line[0]?.toUpperCase() + line.slice(1);
                 const completamenti = (line.match(/_/g) || []).length;
                 array.push(completamenti !== 0 ? [

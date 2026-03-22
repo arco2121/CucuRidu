@@ -22,8 +22,11 @@ document.addEventListener("DOMContentLoaded", () => {
     inputFrasi.addEventListener("change", () => {
         const files = Array.from(inputFrasi.files);
         if (files.length === 0) return;
-        if (files.filter(mazzo => !mazzo.name.includes("_frasi.txt")).length > 0)
-            throw new Error(`Ma ce la fai? Hai una malattia grave? Dei cormosomi di troppo su per il culo? Alcuni non sono file validi, pirla!`);
+        if (files.filter(mazzo => !mazzo.name.includes("_frasi.txt")).length > 0) {
+            alert(`Ma ce la fai? Hai una malattia grave? Dei cormosomi di troppo su per il culo? Alcuni non sono file validi, pirla!`);
+            packsFrasi.splice(0, packsFrasi.length);
+            return;
+        }
         packsFrasi.push(...files);
     });
     inputFrasi.addEventListener("cancel", () => {
@@ -33,8 +36,11 @@ document.addEventListener("DOMContentLoaded", () => {
     inputCompletamenti.addEventListener("change", () => {
         const files = Array.from(inputCompletamenti.files);
         if (files.length === 0) return;
-        if (files.filter(mazzo => !mazzo.name.includes("_completamenti.txt")).length > 0)
-            throw new Error(`Ma ce la fai? Hai una malattia grave? Dei cormosomi di troppo su per il culo? Alcuni non sono file validi, pirla!`);
+        if (files.filter(mazzo => !mazzo.name.includes("_completamenti.txt")).length > 0) {
+            alert(`Ma ce la fai? Hai una malattia grave? Dei cormosomi di troppo su per il sedere? Alcuni non sono file validi, pirla!`);
+            packsCompletamenti.splice(0, packsCompletamenti.length);
+            return;
+        }
         packsCompletamenti.push(...files);
     });
     inputCompletamenti.addEventListener("cancel", () => {
@@ -43,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     caricaMazzi.addEventListener("click", async () => {
         try {
-            if (packsCompletamenti.length !== packsFrasi.length)
+            if (packsCompletamenti.length !== packsFrasi.length || packsCompletamenti.length + packsFrasi.length === 0)
                 throw new Error("Teso, magari il numero di ambo frasi e completamenti deve essere uguale");
 
             const risultatiMazzi = [];
@@ -51,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const name = pack.name.split("_")[0];
                 const file = packsCompletamenti.find(file => file.name.startsWith(name));
 
-                if (!file) throw new Error("A quanto pare alcuni mazzi non hanno i completamenti :(");
+                if (!file) throw new Error("A quanto pare alcuni mazzi non hanno i completamenti con lo stesso nome delle frasi :(");
 
                 risultatiMazzi.push([
                     await readText(pack),
@@ -63,6 +69,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const json = await (await fetch("/createPack", {
                 method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify(risultatiMazzi)
             })).json();
 
@@ -70,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const mazzi = JSON.parse(json.packs);
             for (const pack of mazzi) {
-                const blob = new Blob([pack], {type: "application/json"});
+                const blob = new Blob([JSON.stringify(pack)], {type: "application/json"});
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement("a");
                 link.href = url;

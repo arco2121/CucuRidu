@@ -180,8 +180,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
     });
 
     app.post("/createPack", (req, res) => {
-        const mazzi = req.body || "";
-        const packsPair = JSON.parse(mazzi);
+        const packsPair = req.body || "";
         const packs = [];
         for(const pair of packsPair) {
             const righe = translateToPack(pair);
@@ -189,21 +188,22 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
                 const mazzoFinale = {
                     frasi: righe[0],
                     completamenti: righe[1],
-                    name: righe[2] || "default"
+                    name: righe[2][0] || "default"
                 };
-                mazzoFinale.hash = crypto.createHash('sha256')
-                    .update(JSON.stringify(mazzoFinale))
+                const datiString = JSON.stringify(mazzoFinale, Object.keys(mazzoFinale).sort());
+                const hash = crypto.createHash('sha256')
+                    .update(datiString)
                     .digest('hex');
-                packs.push(mazzoFinale);
+                packs.push({...mazzoFinale, hash: hash});
             } else
-                return res.status(400).json({
+                return res.json({
                     success: false
                 });
         }
-        res.status(200).json({
+        res.json({
             success: true,
             packs: JSON.stringify(packs)
-        })
+        });
     });
 
     app.use((req, res) => res.redirect("/error"));

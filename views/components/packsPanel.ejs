@@ -59,18 +59,18 @@
     };
 
     const resetCustomView = () => {
+        customTile.classList.remove("selectedPack");
         customImg.src = "/assets/packs/personalizzato.jpg";
         customFileName.classList.add("hidden_text");
         customFileName.innerText = "Personalizzati";
+        inputFile.value = "";
     };
 
     customTile.addEventListener("click", () => {
         if (customTile.classList.contains("selectedPack")) {
-            customTile.classList.remove("selectedPack");
-            packs.length = 0;
+            packs.splice(0, packs.length);
             resetCustomView();
         } else {
-            customTile.classList.add("selectedPack");
             inputFile.click();
         }
     });
@@ -79,26 +79,25 @@
         if (tile !== customTile)
             tile.addEventListener("click", () => {
                 if (!tile.classList.contains("selectedPack")) {
-                    if (tile.classList.contains("defaultPack")) standardPacks.add(tile.getAttribute("pack"));
+                    if (tile.classList.contains("normalPack")) standardPacks.add(tile.getAttribute("pack"));
                     tile.classList.add("selectedPack");
                 } else {
-                    if (tile.classList.contains("defaultPack")) standardPacks.delete(tile.getAttribute("pack"));
+                    if (tile.classList.contains("normalPack")) standardPacks.delete(tile.getAttribute("pack"));
                     tile.classList.remove("selectedPack");
                 }
             });
     });
 
     inputFile.addEventListener("cancel", () => {
-        packs.length = 0;
-        customTile.classList.remove("selectedPack");
+        packs.splice(0, packs.length);
         resetCustomView();
     });
 
     inputFile.addEventListener("change", async () => {
         const files = Array.from(inputFile.files);
+        packs.splice(0, packs.length);
         if (files.length === 0) {
-            packs.length = 0;
-            customTile.classList.remove("selectedPack");
+            packs.splice(0, packs.length);
             resetCustomView();
             return;
         }
@@ -108,22 +107,20 @@
             });
             const risultatiMazzi = await Promise.all(mazzi);
             for (const mazzo of risultatiMazzi) {
-                const check = (mazzo.name.includes(".cucuridupack") || mazzo.name.includes(".json"))
-                    && (JSON.parse(mazzo.content)["frasi"] !== null && JSON.parse(mazzo.content)["completamenti"] !== null);
+                const check = mazzo.name.includes(".json") && JSON.parse(mazzo.content)["frasi"] !== null && JSON.parse(mazzo.content)["completamenti"] !== null;
                 if (check)
                     packs.push(JSON.parse(mazzo.content));
                 else
                     throw new Error(`Ma ce la fai? Hai una malattia grave? Dei cormosomi di troppo su per il culo? ${mazzo.name} non è un mazzo valido, pirla!`);
             }
-
+            customTile.classList.add("selectedPack");
             customFileName.innerText = files.map(f => f.name).join(', ');
             customFileName.classList.remove("hidden_text");
             customImg.src = "/assets/packs/personalizzato_empty.jpg";
 
         } catch (error) {
             alert(error.message);
-            packs.length = 0;
-            customTile.classList.remove("selectedPack");
+            packs.splice(0, packs.length);
             resetCustomView();
         }
     });
@@ -152,10 +149,13 @@
     socket.on("mazzoErrore", (data) => {
         alert(data.message);
         tiles.forEach(tile => {
+            if (tile !== customTile) {
             tile.classList.remove("selectedPack");
             if(tile.classList.contains("standard"))
                 tile.click();
+            }
         });
-        inputFile.dispatchEvent(new Event("cancel"));
+        packs.splice(0, packs.length);
+        resetCustomView();
     });
 </script>
