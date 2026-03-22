@@ -550,17 +550,6 @@ a {
     fill: var(--accent-color-3-outline); !important;
 }
 
-.btn_style_4 {
-    border: solid 4px var(--accent-color-1-outline);
-    background: var(--accent-color-1);
-    background-image: linear-gradient(to bottom, var(--accent-color-1), var(--accent-color-1-middle));
-    color: var(--accent-color-1-outline);
-}
-
-.btn_style_4 svg path {
-    fill: var(--accent-color-1-outline); !important;
-}
-
 .btn_style_confirm {
     border: solid 6px var(--accent-color-confirm-outline);
     background: var(--accent-color-confirm);
