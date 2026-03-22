@@ -9,7 +9,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     joinRoom.addEventListener("click", () => navigateWithLoading("/partecipaStanza"));
     createRoom.addEventListener("click", () => navigateWithLoading("/creaStanza"));
-    rules.addEventListener("click", () => navigateWithLoading("https://github.com/arco2121/CucuRidu/wiki/Come-Giocare"));
+    rules.addEventListener("click", () => {
+        const link = document.createElement("a");
+        link.target = "_blank";
+        link.href = "https://github.com/arco2121/CucuRidu/wiki/Come-Giocare";
+        link.click();
+    }));
     optionsBtn.addEventListener("click", () => {
         sectionDefault.dispatchEvent(hidePanel);
         optionPanel.dispatchEvent(showPanel);
