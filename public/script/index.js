@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
         link.target = "_blank";
         link.href = "https://github.com/arco2121/CucuRidu/wiki/Come-Giocare";
         link.click();
-    }));
+    });
     optionsBtn.addEventListener("click", () => {
         sectionDefault.dispatchEvent(hidePanel);
         optionPanel.dispatchEvent(showPanel);
