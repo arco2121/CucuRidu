@@ -132,6 +132,10 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
         loadToken: false,
     }));
 
+    app.get("/offline", (req, res) => renderPage(res, "offline", {
+        loadToken: false,
+    }));
+
     app.get("/error", (req, res) => {
         let status = 104;
         let message = "Questa pagina non esiste, brutta sottospecie di spermatozoo di elefante con la disfunzione erettile";
@@ -196,11 +200,11 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
                     .digest('hex');
                 packs.push({...mazzoFinale, hash: hash});
             } else
-                return res.json({
+                return res.status(400).json({
                     success: false
                 });
         }
-        res.json({
+        res.status(200).json({
             success: true,
             packs: JSON.stringify(packs)
         });

@@ -180,6 +180,11 @@ socket.on("fineTurno", async (data) => {
     });
 });
 
+window.addEventListener("online", () => {
+    if(!socket.connected)
+        socket.connect();
+});
+
 document.addEventListener("DOMContentLoaded", () => {
     const game_section = document.getElementById("game_section");
     const pauseMenu = document.getElementById("pauseMenu");
