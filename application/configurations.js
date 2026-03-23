@@ -160,6 +160,10 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
         res.status(200).json({nome: generateName(), pfp: generatePfp()});
     });
 
+    app.post("/ping", (req, res) => {
+        res.status(200).json({available: true});
+    });
+
     app.post("/doRoomExists", async (req, res) => {
         const {roomId} = req.body;
         const stato = Boolean(await Stanze.has(roomId) && await Stanze.get(roomId).stato !== StatoStanza.END);
