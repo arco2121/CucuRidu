@@ -32,7 +32,13 @@ const singleApp = () => {
     });
 
 //App Config
-    app.use(express.static(path.join(__dirname, "../public")));
+    app.use(express.static(path.join(__dirname, "../public"), {
+        setHeaders: (res, path) => {
+            if (path.endsWith('serviceWorker.js')) {
+                res.setHeader('Cache-Control', 'no-cache');
+            }
+        }
+    }));
     app.set("view engine", "ejs");
     app.set('trust proxy', 1);
     app.use(express.urlencoded({extended: true}));

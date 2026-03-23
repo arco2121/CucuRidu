@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     rules.addEventListener("click", () => {
         const link = document.createElement("a");
         link.target = "_blank";
-        link.href = "https://github.com/arco2121/CucuRidu/wiki/Come-Giocare";
+        link.href = "https://github.com/arco2121/CucuRidu/wiki/Regole";
         link.click();
     });
     optionsBtn.addEventListener("click", () => {

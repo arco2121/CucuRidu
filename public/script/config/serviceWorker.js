@@ -19,6 +19,7 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
+            console.log('SW: Pre-caching assets...');
             return cache.addAll(ASSETS_TO_CACHE);
         })
     );
@@ -31,6 +32,7 @@ self.addEventListener('activate', (event) => {
             return Promise.all(
                 cacheNames.map((cache) => {
                     if (cache !== CACHE_NAME) {
+                        console.log('SW: Cancellazione vecchia cache:', cache);
                         return caches.delete(cache);
                     }
                 })
@@ -41,22 +43,34 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+    const url = new URL(event.request.url);
+
+    if (url.pathname.match(/\.(ogg|mp3|mp4)$/) || event.request.method !== 'GET') {
+        return;
+    }
     if (event.request.mode === 'navigate') {
         event.respondWith(
-            fetch(event.request).catch(() => caches.match(OFFLINE_URL))
+            fetch(event.request).catch(() => {
+                return caches.match(OFFLINE_URL);
+            })
         );
         return;
     }
+
     event.respondWith(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.match(event.request).then((response) => {
-                const fetchPromise = fetch(event.request).then((networkResponse) => {
-                    if (networkResponse.ok) {
-                        cache.put(event.request, networkResponse.clone());
-                    }
-                    return networkResponse;
-                }).catch(() => response);
-                return response || fetchPromise;
+            return cache.match(event.request).then((cachedResponse) => {
+                const fetchPromise = fetch(event.request)
+                    .then((networkResponse) => {
+                        if (networkResponse && networkResponse.status === 200) {
+                            cache.put(event.request, networkResponse.clone());
+                        }
+                        return networkResponse;
+                    })
+                    .catch(() => {
+                        return cachedResponse || new Response('Offline', { status: 503 });
+                    });
+                return cachedResponse || fetchPromise;
             });
         })
     );

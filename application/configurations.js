@@ -136,6 +136,10 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
         loadToken: false,
     }));
 
+    app.get('/serviceWorker', (req, res) => {
+        res.sendFile(path.resolve(__dirname, '../public/script/config/serviceWorker.js'));
+    });
+
     app.get("/error", (req, res) => {
         let status = 104;
         let message = "Questa pagina non esiste, brutta sottospecie di spermatozoo di elefante con la disfunzione erettile";
