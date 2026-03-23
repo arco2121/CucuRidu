@@ -42,7 +42,7 @@ Semplice. Devastante. Adatto a persone con poco senso del pudore e tanta voglia 
 6. Chi vince il round diventa il prossimo interrogante
 7. Quando finiscono le carte, vince chi ha più punti — e meno dignità
 
-📖 [Regole complete nella Wiki →](https://github.com/arco2121/CucuRidu/wiki/Come-Giocare)
+📖 [Regole complete nella Wiki →](https://github.com/arco2121/CucuRidu/wiki/Regole)
 
 ---
 
