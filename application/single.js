@@ -25,7 +25,8 @@ const singleApp = () => {
 
     const server = new Server(httpServer, {
         cors: {
-            methods: ["GET", "POST"]
+            methods: ["GET", "POST"],
+            origin: "*"
         },
         pingInterval: 15000,
         pingTimeout: 10000
