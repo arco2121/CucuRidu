@@ -7,12 +7,12 @@ const echo = (str) => document.body.innerText += str;
 
 (async () => {
     for(const link of HOSTS) {
-        const responce = await (await fetch(link + "ping"), {
+        const responce = await (await fetch(link + "ping", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             }
-        }).json();
+        })).json();
         if(responce["available"] === true) {
             window.location.replace(link + path);
             return;
