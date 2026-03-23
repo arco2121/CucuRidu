@@ -72,6 +72,9 @@ socket.on("connect_error", (err) => {
             window.location.replace("/error?alreadyConnected=true");
             break;
         }
+        case "xhr poll error" : {
+            break;
+        }
         default: {
             window.location.replace("/");
         }
