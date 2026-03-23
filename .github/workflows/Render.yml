@@ -10,6 +10,7 @@ on:
       - '.github/**'
       - '.git/**'
       - 'install.py'
+  workflow_dispatch:
 
 jobs:
   deploy:
