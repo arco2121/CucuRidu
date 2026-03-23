@@ -4,23 +4,6 @@ const { Stanza, StatoStanza } = require(path.join(__dirname, "/include/script/St
 const { Mazzo } = require(path.join(__dirname, "/include/script/Mazzo"));
 const crypto = require('crypto');
 
-/* --- CONFIGURAZIONE ROTTE HTTP (EXPRESS) --- */
-
-// Helper: renderizza la pagina iniettando icone, parametri e musica di sottofondo (bgm)
-// resumeGame: Middleware che riconnette l'utente se ha già una sessione attiva
-
-// GET / : Home page (Index)
-// GET /partecipaStanza/:codiceStanza : Accesso diretto tramite link (manda al profilo)
-// GET /partecipaStanza : Gestisce l'ingresso in una stanza (mostra form o salva dati sessione)
-// GET /creaStanza : Inizia la procedura per creare una nuova stanza
-// GET /game : La rotta principale di gioco. Valida i dati e carica la Lobby o il tavolo di gioco
-
-/* --- ENDPOINT PER CHIAMATE AJAX (POST) --- */
-
-// POST /generateInfo : Ritorna un oggetto {nome, pfp} randomici per il frontend
-// POST /doRoomExists : Verifica se un ID stanza esiste ed è ancora attiva (non finita)
-// POST /saveGameReference : Salva l'ID utente e stanza nel server per gestire i refresh di pagina
-// POST /deleteGameReference : Cancella la sessione di gioco (logout)
 /**
  * Configura gli endpoint dell' application Express
  * @param app
@@ -221,32 +204,6 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
     app.use((req, res) => res.redirect("/error"));
 };
 
-/* --- CONFIGURAZIONE LOGICA REAL-TIME (SOCKET.IO) --- */
-
-// emitStatoStanza: Sincronizza il frontend con lo stato del gioco (WAIT, CHOOSING_CARDS, CHOOSING_WINNER, END)
-// socket.use: Middleware di autenticazione. Verifica il token e gestisce la riconnessione automatica
-
-/* --- GESTIONE EVENTI IN ENTRATA (CLIENT -> SERVER) --- */
-
-// creaStanza: Crea una stanza, assegna il ruolo di Master e notifica la lobby
-// partecipaStanza: Aggiunge un nuovo giocatore alla stanza esistente (se c'è posto)
-// iniziaTurno: (Solo Interrogante) Avvia il round, distribuisce la domanda o chiude la partita se finita
-// inviaRisposta: Riceve gli indici delle carte scelte dal giocatore
-// scegliVincitore: (Solo Interrogante) Riceve l'ID del giocatore che ha vinto il round
-// terminaPartita: (Solo Master) Forza la chiusura della stanza per tutti
-// aggiornaAttesa / listaGiocatori: Richieste manuali per aggiornare la lista partecipanti nella UI
-// lasciaStanza: Gestisce l'uscita volontaria o l'espulsione di un utente
-// disconnect: Gestisce la caduta di connessione (aspetta un breve periodo prima di eliminare il player)
-
-/* --- EVENTI IN USCITA (SERVER -> CLIENT) --- */
-
-// confermaStanza: Inviato dopo l'unione corretta, contiene i dati del giocatore (pfp, nome, id)
-// aggiornamentoAttesa: Notifica cambiamenti nel numero di giocatori in lobby
-// roundIniziato: Invia la domanda del round a tutti i partecipanti
-// sceltaVincitore: Invia le risposte anonime all'interrogante per la valutazione
-// fineTurno: Comunica a tutti chi ha vinto il round e mostra il riepilogo
-// partitaTerminata: Invia la classifica finale a tutti i partecipanti
-// stanzaChiusa: Notifica che la stanza non è più disponibile
 /**
  * Configura gli endpoint del ServerIO
  * @param server
@@ -329,7 +286,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         user.on("creaStanza", async (data) => {
             try {
                 const { username, pfp } = data;
-                const stanza = new Stanza(username, pfp, generationMemory);
+                const stanza = await new Stanza().init(username, pfp, generationMemory);
                 await Stanze.set(stanza.id, stanza);
                 user.join(stanza.id);
                 user.data.referenceGiocatore = stanza.master;
@@ -380,6 +337,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 server.to(stanzaId).emit("listaGiocatoriAggiornamento", {
                     giocatori: Stanza.classifica().map(giocatore => giocatore.adaptToClient())
                 });
+                await Stanze.set(stanzaId, Stanza);
                 console.log("Giocatore aggiunto a Stanza => " + stanzaId);
             } catch (e) {
                 console.log(e)
@@ -395,9 +353,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     server.to(stanzaId).emit("partitaTerminata", {
                         classifica: result
                     });
-                    for(const id of Stanza.giocatoriPassati.values()) generationMemory.delete(id);
+                    for(const id of Stanza.giocatoriPassati.values()) await generationMemory.delete(id);
                     await Stanze.delete(stanzaId);
-                    generationMemory.delete(stanzaId);
+                    await generationMemory.delete(stanzaId);
                     server.socketsLeave(stanzaId);
                     console.log("Stanza " + stanzaId + " chiusa");
                 }
@@ -417,6 +375,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     user.emit("aspettaAltri", {
                         message: "Girl non ci sono chatbot ai che fingano di esserti amico. Go touch some grass e non fare come Calipso"
                     });
+
+                await Stanze.set(stanzaId, Stanza);
             } catch (e) {
                 console.log(e)
             }
@@ -442,6 +402,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                         message: "Non puoi rispondere 2 volte giuseppino coltivatore di carote in un campo di reclusione ucraino"
                     });
                 }
+                await Stanze.set(stanzaId, Stanza);
             } catch (e) {
                 console.log(e)
             }
@@ -470,6 +431,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                         message: "Aspetta e spera che tutti quanti rispondano (tanto ti ghostano perchè gli stai sul cazzo)"
                     });
                 }
+                await Stanze.set(stanzaId, Stanza);
             } catch (e) {
                 console.log(e)
             }
@@ -484,9 +446,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     server.to(stanzaId).emit("partitaTerminata", {
                         classifica: result
                     });
-                    for(const id of Stanza.giocatoriPassati.values()) generationMemory.delete(id);
+                    for(const id of Stanza.giocatoriPassati.values()) await generationMemory.delete(id);
                     await Stanze.delete(stanzaId);
-                    generationMemory.delete(stanzaId);
+                    await generationMemory.delete(stanzaId);
                     server.socketsLeave(stanzaId);
                     console.log("Stanza eliminata => " + stanzaId);
                 }
@@ -536,6 +498,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 const stanza = await Stanze.get(stanzaId);
                 const result = stanza.eliminaGiocatore(giocatoreId);
                 if(result) {
+                    await Stanze.set(stanzaId, stanza);
                     let deleted = false;
                     await Stanza.pulisciStanza((id) => {
                         server.to(id).emit("stanzaChiusa");
@@ -571,9 +534,10 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             const stanza = await Stanze.get(stanzaId);
             if (giocatore && stanzaId) {
                 giocatore.online = false;
-                setTimeout(() => {
+                setTimeout(async () => {
                     if (stanza && !giocatore.isOnline() && stanza.trovaGiocatore(giocatore.id)) {
                         stanza.eliminaGiocatore(giocatore.id);
+                        await Stanze.set(stanzaId, stanza);
                         console.log("Giocatore eliminato da Stanza => " + stanzaId);
                         server.in(stanzaId).fetchSockets().then(sockets => {
                             for(const socket of sockets) {

@@ -12,7 +12,7 @@ const { createClient } = require("@supabase/supabase-js");
 const { ClusterStanze } = require(path.join(__dirname, "/include/script/ClusterStanze"));
 const { ClusterMemory } = require(path.join(__dirname, "/include/script/ClusterMemory"));
 
-const clusterApp = (allowedOrigins) => {
+const clusterApp = async (allowedOrigins) => {
     const timeout = 3600000;
 
     const url = 'https://rgghtuapygsrudncfqny.supabase.co';
@@ -29,11 +29,11 @@ const clusterApp = (allowedOrigins) => {
 
     const app = express();
     const httpServer = createServer(app);
-    const serverSession = new Session(generationMemory, timeout);
+    const serverSession = await new Session(timeout).init(generationMemory);
     const port = 7860;
 
     const Stanze = new ClusterStanze(database);
-    const TEMPORARY_TOKEN = generateId(64, generationMemory);
+    const TEMPORARY_TOKEN = await generateId(64, generationMemory);
 
     const server = new Server(httpServer, {
         cors: {

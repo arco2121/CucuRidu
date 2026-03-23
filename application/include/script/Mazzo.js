@@ -100,6 +100,16 @@ class Mazzo {
     toArray() {
         return Array.from(this.carte).flat();
     }
+
+    toJSON() {
+        return { carte: this.carte };
+    }
+
+    static fromJSON(data) {
+        const mazzo = new Mazzo();
+        mazzo.carte = data.carte || [];
+        return mazzo;
+    }
 }
 
 module.exports = { Mazzo, TipoMazzo };

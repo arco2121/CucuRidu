@@ -8,21 +8,21 @@ const { Session } = require(path.join(__dirname, "/include/script/Session"));
 const { generateId } = require(path.join(__dirname, "/include/script/generazione"));
 const { appConfig, serverConfig } = require(path.join(__dirname, "configurations"));
 
-const singleApp = (allowedOrigins) => {
+const singleApp = async (allowedOrigins) => {
     //Configuration
     const timeout = 3600000;
     const generationMemory = new Set();
 
     const app = express();
     const httpServer = createServer(app);
-    const serverSession = new Session(generationMemory, timeout);
+    const serverSession = await new Session(timeout).init(generationMemory);
 
     const host = "http://localhost:";
     const local = process.env.NODE_ENV !== "production";
     const port = !local ? 7860 : 0
 
     const Stanze = new Map();
-    const TEMPORARY_TOKEN = generateId(64, generationMemory);
+    const TEMPORARY_TOKEN = await generateId(64, generationMemory);
 
     const server = new Server(httpServer, {
         cors: {
@@ -46,16 +46,17 @@ const singleApp = (allowedOrigins) => {
     app.set('trust proxy', 1);
     app.use(express.urlencoded({extended: true}));
     app.use(express.json());
-    if(!local) app.use(cors({
-        origin: (origin, callback) => {
-            if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-                callback(null, true);
-            } else {
-                callback(new Error('Non consentito dalla policy CORS'));
-            }
-        },
-        credentials: true
-    }));
+    if(!local)
+        app.use(cors({
+            origin: (origin, callback) => {
+                if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+                    callback(null, true);
+                } else {
+                    callback(new Error('Non consentito dalla policy CORS'));
+                }
+            },
+            credentials: true
+        }));
     app.use(serverSession.setupSession({
         resave: false,
         saveUninitialized: true,

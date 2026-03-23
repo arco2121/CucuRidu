@@ -18,7 +18,7 @@ class ClusterStanze {
             .maybeSingle();
 
         if (error || !data) return null;
-        return Stanza.fromJSON(data[this.valueField]);
+        return await Stanza.fromJSON(data[this.valueField]);
     }
 
     async set(key, value) {
@@ -60,13 +60,27 @@ class ClusterStanze {
         if (error) throw error;
     }
 
-    async values() {
+    async keys() {
+        const { data, error } = await this.supabase
+            .from(this.table)
+            .select(this.keyField);
+
+        if (error || !data) return [];
+
+        return data.map(item => item[this.keyField]);
+    }
+
+    async entries() {
         const { data, error } = await this.supabase
             .from(this.table)
             .select(`${this.keyField}, ${this.valueField}`);
 
-        if (error) return [];
-        return data.map(item => Stanza.fromJSON(item[this.valueField]));
+        if (error || !data) return [];
+
+        return Promise.all(data.map(async (item) => [
+            item[this.keyField],
+            await Stanza.fromJSON(item[this.valueField])
+        ]));
     }
 
     async size() {

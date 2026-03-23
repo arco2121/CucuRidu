@@ -11,13 +11,11 @@ const { generateId } = require(path.join(__dirname, '/generazione'));
 
 class Stanza {
 
-    constructor(username, pfp, memory, minimoGiocatori = 3) {
-        this.id = typeof memory === "string" ? memory : generateId(6, memory);
+    constructor(minimoGiocatori = 3) {
         this.giocatori = new Map();
         this.giocatoriPassati = new Set();
         this.stato = StatoStanza.WAIT;
         this.minimoGiocatori = minimoGiocatori;
-        this.master = new Giocatore(username, pfp, memory, true, true);
         this.mazzoCompletamenti = {
             mazzo: new Mazzo({
                 pack: "standard",
@@ -32,6 +30,11 @@ class Stanza {
             }),
             scarto: new Mazzo()
         }
+    }
+
+    async init(username, pfp, memory) {
+        this.id = typeof memory === "string" ? memory : await generateId(6, memory);
+        this.master = await new Giocatore(username, pfp, true, true).init(memory);
         this.round = {
             domanda: null,
             risposte: null,
@@ -39,12 +42,13 @@ class Stanza {
         }
         this.giocatori.set(this.master.id, this.master);
         this.numeroRound = [0, this.giocatori.size];
+        return this;
     }
 
-    aggiungiGiocatore(username, pfp, memory) {
+    async aggiungiGiocatore(username, pfp, memory) {
         if(this.stato !== StatoStanza.WAIT)
             return false;
-        const giocatore = new Giocatore(username, pfp, memory);
+        const giocatore = await new Giocatore(username, pfp).init(memory);
         let maxOccorrenze = 0;
         this.mazzoFrasi.mazzo.carte.map(carta => carta[1]).forEach(occorrenza => {
             if(!isNaN(parseInt(occorrenza))) maxOccorrenze += parseInt(occorrenza)
@@ -248,9 +252,9 @@ class Stanza {
         const check = async (stanzaId) => {
             const stanza = await Stanze.get(stanzaId);
             if(stanza?.stato === StatoStanza.END || stanza?.giocatori.size === 0 && stanza?.giocatoriPassati.size > 0) {
-                for (const id of stanza.giocatoriPassati.values()) memory.delete(id);
+                for (const id of stanza.giocatoriPassati.values()) await memory.delete(id);
                 await Stanze.delete(stanza.id);
-                memory.delete(stanza.id);
+                await memory.delete(stanza.id);
                 callback(stanza.id);
             }
         };
@@ -263,6 +267,49 @@ class Stanza {
             numeroGiocatori: this.giocatori.size,
             stato: Object.keys(StatoStanza).filter(chiave => StatoStanza[chiave] === this.stato)[0]
         })
+    }
+
+    toJSON() {
+        return {
+            id: this.id,
+            stato: this.stato,
+            minimoGiocatori: this.minimoGiocatori,
+            numeroRound: this.numeroRound,
+            giocatori: Array.from(this.giocatori.entries()),
+            giocatoriPassati: Array.from(this.giocatoriPassati),
+            masterId: this.master ? this.master.id : null,
+            mazzoCompletamenti: this.mazzoCompletamenti,
+            mazzoFrasi: this.mazzoFrasi,
+            round: {
+                ...this.round,
+                risposte: this.round.risposte ? Array.from(this.round.risposte.entries()) : null
+            }
+        };
+    }
+
+    static async fromJSON(data) {
+        const s = await new Stanza(data.minimoGiocatori).init(null, null, data.id);
+
+        s.stato = data.stato;
+        s.numeroRound = data.numeroRound;
+        s.giocatori = new Map(data.giocatori.map(([id, gData]) => [id, Giocatore.fromJSON(gData)]));
+        s.giocatoriPassati = new Set(data.giocatoriPassati);
+        s.master = s.giocatori.get(data.masterId);
+
+        const ripristinaMazzo = (obj) => ({
+            mazzo: Mazzo.fromJSON(obj.mazzo),
+            scarto: Mazzo.fromJSON(obj.scarto)
+        });
+        s.mazzoCompletamenti = ripristinaMazzo(data.mazzoCompletamenti);
+        s.mazzoFrasi = ripristinaMazzo(data.mazzoFrasi);
+
+        s.round = {
+            domanda: data.round.domanda,
+            chiStaInterrogando: data.round.chiStaInterrogando,
+            risposte: data.round.risposte ? new Map(data.round.risposte) : new Map()
+        };
+
+        return s;
     }
 }
 

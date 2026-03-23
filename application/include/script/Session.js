@@ -9,8 +9,12 @@ class Session {
     constructor(memory, timeout = 3600000) {
         this.timeout = timeout;
         this.blackList = new Map();
-        this.tokenKey = generateId(64, memory);
         setInterval(() => this._clearBlackList(), timeout);
+    }
+
+    async init(memory) {
+        this.tokenKey = await generateId(64, memory);
+        return this;
     }
 
     setupSession(config = {}) {
