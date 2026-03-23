@@ -7,7 +7,7 @@ const allowedOrigins = [
     'https://arco2120-cucuridu.hf.space'
 ];
 
-const onCluster = process.env.USE_CLUSTER === "true";
+const onCluster = process.env.USE_CLUSTER === "true" && process.env.NODE_ENV === "production";
 
 if(!onCluster) singleApp(allowedOrigins);
 else clusterApp(allowedOrigins);

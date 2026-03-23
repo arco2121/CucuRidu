@@ -46,7 +46,7 @@ const singleApp = (allowedOrigins) => {
     app.set('trust proxy', 1);
     app.use(express.urlencoded({extended: true}));
     app.use(express.json());
-    app.use(cors({
+    if(!local) app.use(cors({
         origin: (origin, callback) => {
             if (!origin || allowedOrigins.indexOf(origin) !== -1) {
                 callback(null, true);
