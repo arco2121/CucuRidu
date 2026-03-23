@@ -18,10 +18,10 @@ const generateCards = (group, files) => {
                     completamenti,
                 ] : string)
             }
-            fs.mkdirSync(join(__dirname, "..", "../include/cards/" + group + "/"), {
+            fs.mkdirSync(join(__dirname, "..", "../application/include/cards/" + group + "/"), {
                 recursive: true,
             });
-            fs.writeFileSync(join(__dirname, "..", "../include/cards/" + group + "/" + file.replace(".txt", ".json")), JSON.stringify(array));
+            fs.writeFileSync(join(__dirname, "..", "../application/include/cards/" + group + "/" + file.replace(".txt", ".json")), JSON.stringify(array));
         }
         return true;
     } catch (error) {

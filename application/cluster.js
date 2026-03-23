@@ -3,14 +3,14 @@ const path = require("path");
 const { Server } = require("socket.io");
 const express = require("express");
 const cors = require("cors");
-const { Session } = require(path.join(__dirname, "../include/script/Session"));
-const { generateId } = require(path.join(__dirname, "../include/script/generazione"));
+const { Session } = require(path.join(__dirname, "/include/script/Session"));
+const { generateId } = require(path.join(__dirname, "/include/script/generazione"));
 const { appConfig, serverConfig } = require(path.join(__dirname, "configurations"));
 const { Pool } = require("pg");
 const { createAdapter } = require("@socket.io/postgres-adapter");
 const { createClient } = require("@supabase/supabase-js");
-const { ClusterStanze } = require(path.join(__dirname, "../include/script/ClusterStanze"));
-const { ClusterMemory } = require(path.join(__dirname, "../include/script/ClusterMemory"));
+const { ClusterStanze } = require(path.join(__dirname, "/include/script/ClusterStanze"));
+const { ClusterMemory } = require(path.join(__dirname, "/include/script/ClusterMemory"));
 
 const clusterApp = (allowedOrigins) => {
     const timeout = 3600000;

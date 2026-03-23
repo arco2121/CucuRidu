@@ -9,7 +9,7 @@ const pingHost = async (host) => {
     const timeoutId = setTimeout(() => controller.abort(), 7000);
     try {
         const response = await fetch(host + "/ping", {
-            method: 'head',
+            method: 'HEAD',
             mode: "cors",
             signal: controller.signal
         });

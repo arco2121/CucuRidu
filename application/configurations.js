@@ -1,7 +1,7 @@
 const path = require("path");
-const { getIcon, generateName, generatePfp, getAllPfp, getknownPacks, translateToPack } = require(path.join(__dirname, "../include/script/generazione"));
-const { Stanza, StatoStanza } = require(path.join(__dirname, "../include/script/Stanza"));
-const { Mazzo } = require(path.join(__dirname, "../include/script/Mazzo"));
+const { getIcon, generateName, generatePfp, getAllPfp, getknownPacks, translateToPack } = require(path.join(__dirname, "/include/script/generazione"));
+const { Stanza, StatoStanza } = require(path.join(__dirname, "/include/script/Stanza"));
+const { Mazzo } = require(path.join(__dirname, "/include/script/Mazzo"));
 const crypto = require('crypto');
 
 /* --- CONFIGURAZIONE ROTTE HTTP (EXPRESS) --- */

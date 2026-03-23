@@ -29,7 +29,7 @@ const generateCards = () => {
                     ] : string);
                 }
 
-                const outputDir = join(__dirname, "..", "../include/cards/" + group + "/");
+                const outputDir = join(__dirname, "..", "../application/include/cards/" + group + "/");
                 fs.mkdirSync(outputDir, {
                     recursive: true,
                 });
