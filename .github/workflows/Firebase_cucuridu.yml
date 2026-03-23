@@ -21,6 +21,6 @@ jobs:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_KEY }}'
           channelId: live
-          projectId: cucu-ridu
+          projectId: cucuridu21
 
           entryPoint: ./ignore/hosting/cucuridu.web.app/
