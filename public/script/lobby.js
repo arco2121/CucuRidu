@@ -75,6 +75,9 @@ socket.on("connect_error", (err) => {
         case "xhr poll error" : {
             break;
         }
+        case "websocket error" : {
+            break;
+        }
         default: {
             window.location.replace("/");
         }

@@ -6,8 +6,21 @@ const allowedOrigins = [
     'https://cucuridu.onrender.com',
     'https://arco2120-cucuridu.hf.space'
 ];
-
+const attempt = (operation, fallback) => {
+    try { return operation(); }
+    catch (err) { fallback(err); }
+};
 const onCluster = process.env.USE_CLUSTER === "true" && process.env.NODE_ENV === "production";
 
-if(!onCluster) singleApp(allowedOrigins);
-else clusterApp(allowedOrigins);
+const initApp = () => {
+    if(!onCluster) return singleApp(allowedOrigins);
+    attempt(() => clusterApp(allowedOrigins), (err) => {
+        console.warn("Cluster failed => " + err.message);
+        singleApp(allowedOrigins);
+    });
+};
+
+attempt(initApp, (err) => {
+    console.error("InitApp failed => " + err.message);
+    process.exit(1);
+});
