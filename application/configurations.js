@@ -160,8 +160,8 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
         res.status(200).json({nome: generateName(), pfp: generatePfp()});
     });
 
-    app.post("/ping", (req, res) => {
-        res.status(200).json({available: true});
+    app.head("/ping", (req, res) => {
+        res.status(200).end();
     });
 
     app.post("/doRoomExists", async (req, res) => {
