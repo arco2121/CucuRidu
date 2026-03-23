@@ -4,11 +4,12 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'ignore/hosting/cucuridu.web.app/**'
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout del repository
         uses: actions/checkout@v4
@@ -20,4 +21,5 @@ jobs:
           firebaseServiceAccount: '${{ secrets.FIREBASE_KEY }}'
           channelId: live
           projectId: cucu-ridu
+
           entryPoint: ./ignore/hosting/cucuridu.web.app/
