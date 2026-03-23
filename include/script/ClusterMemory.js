@@ -1,6 +1,3 @@
-const path = require('path');
-const { Stanza } = require(path.join(__dirname, 'Stanza'));
-
 class ClusterMemory {
 
     constructor(client, setName) {
