@@ -3,14 +3,20 @@ const { createServer } = require("node:http");
 const path = require("path");
 const { Server } = require("socket.io");
 const express = require("express");
+const cors = require("cors");
 const { Session } = require(path.join(__dirname, "../include/script/Session"));
 const { generateId } = require(path.join(__dirname, "../include/script/generazione"));
 const { appConfig, serverConfig } = require(path.join(__dirname, "configurations"));
 
 const singleApp = () => {
-//Configuration
+    //Configuration
     const timeout = 3600000;
     const generationMemory = new Set();
+    const allowedOrigins = [
+        "https://cucuridu.web.app",
+        'https://cucuridu.onrender.com/',
+        'https://arco2120-cucuridu.hf.space/'
+    ];
 
     const app = express();
     const httpServer = createServer(app);
@@ -26,13 +32,14 @@ const singleApp = () => {
     const server = new Server(httpServer, {
         cors: {
             methods: ["GET", "POST"],
-            origin: "*"
+            origin: allowedOrigins,
+            credentials: true,
         },
         pingInterval: 15000,
         pingTimeout: 10000
     });
 
-//App Config
+    //App Config
     app.use(express.static(path.join(__dirname, "../public"), {
         setHeaders: (res, path) => {
             if (path.endsWith('serviceWorker.js')) {
@@ -44,6 +51,16 @@ const singleApp = () => {
     app.set('trust proxy', 1);
     app.use(express.urlencoded({extended: true}));
     app.use(express.json());
+    app.use(cors({
+        origin: function (origin, callback) {
+            if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+                callback(null, true);
+            } else {
+                callback(new Error('Non consentito dalla policy CORS'));
+            }
+        },
+        credentials: true
+    }));
     app.use(serverSession.setupSession({
         resave: false,
         saveUninitialized: true,
@@ -55,17 +72,17 @@ const singleApp = () => {
     }));
     appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze);
 
-//ServerIO Config
+    //ServerIO Config
     serverConfig(server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout);
 
-//Listening
+    //Listening
     const listening = httpServer.listen(port, (error) => {
         const listeningPort = httpServer.address().port;
         console.log(`Cucu Ridu lanciato => ${local ? host + listeningPort : listeningPort}`);
         if (error) console.log(error.message);
     });
 
-//Terminate
+    //Terminate
     const terminate = (server, serverIo, Stanze) => {
         for (const id of Stanze.keys()) serverIo.to(id).emit("stanzaChiusa");
         serverIo.close();
