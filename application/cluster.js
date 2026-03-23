@@ -14,11 +14,11 @@ const { ClusterMemory } = require(path.join(__dirname, "../include/script/Cluste
 
 const clusterApp = (allowedOrigins) => {
     const timeout = 3600000;
-    const generationMemory = new ClusterMemory();
 
     const url = 'https://rgghtuapygsrudncfqny.supabase.co';
     const databaseKey = process.env.DATABASE_KEY || '';
     const database = createClient(url, databaseKey);
+    const generationMemory = new ClusterMemory(database, 'cluster');
 
     const poolString = `postgresql://postgres.rgghtuapygsrudncfqny:${process.env.DATABASE_PASSWORD || ''}@aws-1-eu-west-1.pooler.supabase.com:6543/postgres`;
     const pool = new Pool({
