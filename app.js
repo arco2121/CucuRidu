@@ -6,21 +6,25 @@ const allowedOrigins = [
     'https://cucuridu.onrender.com',
     'https://arco2120-cucuridu.hf.space'
 ];
-const attempt = (operation, fallback) => {
-    try { return operation(); }
-    catch (err) { fallback(err); }
+const attempt = async (operation, fallback) => {
+    try { return await operation();}
+    catch (err) {return await fallback(err);}
 };
 const onCluster = process.env.USE_CLUSTER === "true" && process.env.NODE_ENV === "production";
 
-const initApp = () => {
-    if(!onCluster) return singleApp(allowedOrigins);
-    attempt(() => clusterApp(allowedOrigins), (err) => {
-        console.warn("Cluster failed => " + err.message);
-        singleApp(allowedOrigins);
-    });
+const initApp = async () => {
+    if (!onCluster) return await singleApp(allowedOrigins);
+
+    await attempt(
+        () => clusterApp(allowedOrigins),
+        async (err) => {
+            console.warn("Cluster failed => " + err.message);
+            await singleApp(allowedOrigins);
+        }
+    );
 };
 
-attempt(initApp, (err) => {
+initApp().catch((err) => {
     console.error("InitApp failed => " + err.message);
     process.exit(1);
 });
