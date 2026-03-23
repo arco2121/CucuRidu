@@ -8,15 +8,10 @@ const { Session } = require(path.join(__dirname, "../include/script/Session"));
 const { generateId } = require(path.join(__dirname, "../include/script/generazione"));
 const { appConfig, serverConfig } = require(path.join(__dirname, "configurations"));
 
-const singleApp = () => {
+const singleApp = (allowedOrigins) => {
     //Configuration
     const timeout = 3600000;
     const generationMemory = new Set();
-    const allowedOrigins = [
-        "https://cucuridu.web.app",
-        'https://cucuridu.onrender.com/',
-        'https://arco2120-cucuridu.hf.space/'
-    ];
 
     const app = express();
     const httpServer = createServer(app);
