@@ -1,4 +1,3 @@
-//Import
 const { createServer } = require("node:http");
 const path = require("path");
 const { Server } = require("socket.io");
@@ -7,21 +6,33 @@ const cors = require("cors");
 const { Session } = require(path.join(__dirname, "../include/script/Session"));
 const { generateId } = require(path.join(__dirname, "../include/script/generazione"));
 const { appConfig, serverConfig } = require(path.join(__dirname, "configurations"));
+const { Pool } = require("pg");
+const { createAdapter } = require("@socket.io/postgres-adapter");
+const { createClient } = require("@supabase/supabase-js");
+const { ClusterStanze } = require(path.join(__dirname, "../include/script/ClusterStanze"));
+const { ClusterMemory } = require(path.join(__dirname, "../include/script/ClusterMemory"));
 
-const singleApp = (allowedOrigins) => {
-    //Configuration
+const clusterApp = (allowedOrigins) => {
     const timeout = 3600000;
-    const generationMemory = new Set();
+    const generationMemory = new ClusterMemory();
+
+    const url = 'https://rgghtuapygsrudncfqny.supabase.co';
+    const databaseKey = process.env.DATABASE_KEY || '';
+    const database = createClient(url, databaseKey);
+
+    const poolString = `postgresql://postgres.rgghtuapygsrudncfqny:${process.env.DATABASE_PASSWORD || ''}@aws-1-eu-west-1.pooler.supabase.com:6543/postgres`;
+    const pool = new Pool({
+        connectionString: poolString,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
+    });
 
     const app = express();
     const httpServer = createServer(app);
     const serverSession = new Session(generationMemory, timeout);
+    const port = 7860;
 
-    const host = "http://localhost:";
-    const local = process.env.NODE_ENV !== "production";
-    const port = !local ? 7860 : 0
-
-    const Stanze = new Map();
+    const Stanze = new ClusterStanze(database);
     const TEMPORARY_TOKEN = generateId(64, generationMemory);
 
     const server = new Server(httpServer, {
@@ -33,8 +44,8 @@ const singleApp = (allowedOrigins) => {
         pingInterval: 15000,
         pingTimeout: 10000
     });
+    server.adapter(createAdapter(pool));
 
-    //App Config
     app.use(express.static(path.join(__dirname, "../public"), {
         setHeaders: (res, path) => {
             if (path.endsWith('serviceWorker.js')) {
@@ -60,24 +71,21 @@ const singleApp = (allowedOrigins) => {
         resave: false,
         saveUninitialized: true,
         cookie: {
-            secure: !local,
-            sameSite: !local ? 'none' : null,
+            secure: true,
+            sameSite: 'none',
             maxAge: timeout
         }
     }));
     appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze);
 
-    //ServerIO Config
     serverConfig(server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout);
 
-    //Listening
     const listening = httpServer.listen(port, (error) => {
         const listeningPort = httpServer.address().port;
         console.log(`Cucu Ridu lanciato => ${local ? host + listeningPort : listeningPort}`);
         if (error) console.log(error.message);
     });
 
-    //Terminate
     const terminate = (server, serverIo, Stanze) => {
         for (const id of Stanze.keys()) serverIo.to(id).emit("stanzaChiusa");
         serverIo.close();
@@ -98,4 +106,4 @@ const singleApp = (allowedOrigins) => {
     process.on('SIGTERM', () => terminate(listening, server, Stanze));
 };
 
-module.exports = singleApp;
+module.exports = clusterApp;

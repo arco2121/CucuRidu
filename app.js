@@ -1,5 +1,6 @@
 const path = require("path");
 const singleApp = require(path.join(__dirname, "/application/single"));
+const clusterApp = require(path.join(__dirname, "/application/cluster"));
 const allowedOrigins = [
     "https://cucuridu.web.app",
     'https://cucuridu.onrender.com',
@@ -9,3 +10,4 @@ const allowedOrigins = [
 const onCluster = process.env.USE_CLUSTER === "true";
 
 if(!onCluster) singleApp(allowedOrigins);
+else clusterApp(allowedOrigins);
