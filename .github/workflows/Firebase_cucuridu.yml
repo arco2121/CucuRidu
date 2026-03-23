@@ -12,12 +12,11 @@ jobs:
     steps:
       - name: Checkout del repository
         uses: actions/checkout@v4
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Build Project
-        run: npm run build
+      - name: Install and Build
+        run: |
+          npm install
+          npm run build
+        working-directory: ./ignore/hosting/cucuridu.web.app/
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
