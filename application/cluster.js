@@ -10,17 +10,21 @@ const { Pool } = require("pg");
 const { createAdapter } = require("@socket.io/postgres-adapter");
 const { createClient } = require("@supabase/supabase-js");
 const { ClusterStanze } = require(path.join(__dirname, "/include/script/ClusterStanze"));
-const { ClusterMemory } = require(path.join(__dirname, "/include/script/ClusterMemory"));
+const { ClusterSet } = require(path.join(__dirname, "/include/script/ClusterSet"));
 
 const clusterApp = async (allowedOrigins) => {
     const timeout = 3600000;
 
-    const url = 'https://rgghtuapygsrudncfqny.supabase.co';
-    const databaseKey = process.env.DATABASE_KEY || '';
-    const database = createClient(url, databaseKey);
-    const generationMemory = new ClusterMemory(database, 'cluster');
+    const key = process.env.DATABASE_KEY;
+    const password = process.env.DATABASE_PASSWORD;
+    const poolString = process.env.DATABASE_POOL?.replace("[PASSWORD]", password || "");
+    if(!key || !poolString || !password) throw new Error("Chiavi per il server mancanti");
 
-    const poolString = `postgresql://postgres.rgghtuapygsrudncfqny:${process.env.DATABASE_PASSWORD || ''}@aws-1-eu-west-1.pooler.supabase.com:6543/postgres`;
+    const url = 'https://rgghtuapygsrudncfqny.supabase.co';
+    const databaseKey = key || '';
+    const database = createClient(url, databaseKey);
+    const generationMemory = new ClusterSet(database, 'memory', 'cluster');
+
     const pool = new Pool({
         connectionString: poolString,
         idleTimeoutMillis: 30000,
@@ -30,7 +34,10 @@ const clusterApp = async (allowedOrigins) => {
     const app = express();
     const httpServer = createServer(app);
     const serverSession = await new Session(timeout).init(generationMemory);
-    const port = 7860;
+
+    const host = "http://localhost:";
+    const local = process.env.ON_PLATFORM !== "true";
+    const port = !local ? 7860 : 0
 
     const Stanze = new ClusterStanze(database);
     const TEMPORARY_TOKEN = await generateId(64, generationMemory);
@@ -57,16 +64,17 @@ const clusterApp = async (allowedOrigins) => {
     app.set('trust proxy', 1);
     app.use(express.urlencoded({extended: true}));
     app.use(express.json());
-    app.use(cors({
-        origin: (origin, callback) => {
-            if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-                callback(null, true);
-            } else {
-                callback(new Error('Non consentito dalla policy CORS'));
-            }
-        },
-        credentials: true
-    }));
+    if(!local)
+        app.use(cors({
+            origin: (origin, callback) => {
+                if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+                    callback(null, true);
+                } else {
+                    callback(new Error('Non consentito dalla policy CORS'));
+                }
+            },
+            credentials: true
+        }));
     app.use(serverSession.setupSession({
         resave: false,
         saveUninitialized: true,
@@ -82,12 +90,12 @@ const clusterApp = async (allowedOrigins) => {
 
     const listening = httpServer.listen(port, (error) => {
         const listeningPort = httpServer.address().port;
-        console.log(`Cucu Ridu lanciato => ${local ? host + listeningPort : listeningPort}`);
+        console.log(`Cucu Ridu (CLUSTER) lanciato => ${local ? host + listeningPort : listeningPort}`);
         if (error) console.log(error.message);
     });
 
-    const terminate = (server, serverIo, Stanze) => {
-        for (const id of Stanze.keys()) serverIo.to(id).emit("stanzaChiusa");
+    const terminate = async (server, serverIo, Stanze) => {
+        for (const id of await Stanze.keys()) serverIo.to(id).emit("stanzaChiusa");
         serverIo.close();
 
         server.close(() => {
@@ -102,8 +110,8 @@ const clusterApp = async (allowedOrigins) => {
         }, 10000);
     };
 
-    process.on('SIGINT', () => terminate(listening, server, Stanze));
-    process.on('SIGTERM', () => terminate(listening, server, Stanze));
+    process.on('SIGINT', async () => await terminate(listening, server, Stanze));
+    process.on('SIGTERM', async () => await terminate(listening, server, Stanze));
 };
 
 module.exports = clusterApp;

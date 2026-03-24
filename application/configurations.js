@@ -316,7 +316,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             try {
                 const stanzaId = data["id"];
                 const Stanza = await Stanze.get(stanzaId);
-                user.data.referenceGiocatore = Stanza.aggiungiGiocatore(data["username"], data["pfp"], generationMemory);
+                user.data.referenceGiocatore = await Stanza.aggiungiGiocatore(data["username"], data["pfp"], generationMemory);
                 if(user.data.referenceGiocatore === false) {
                     user.emit("impossibileAggiungersi", {
                         message: "Impossibile aggiungersi alla stanza, le regole giustamente non ammettono schifi umani"
@@ -467,9 +467,13 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             })
         });
 
-        user.on("listaGiocatori", async (data) => user.emit("listaGiocatoriAggiornamento", {
-            giocatori: await Stanze.get(data["stanzaId"])?.classifica().map(giocatore => giocatore.adaptToClient())
-        }));
+        user.on("listaGiocatori", async (data) => {
+            const Stanza = await Stanze.get(data["stanzaId"]);
+
+            user.emit("listaGiocatoriAggiornamento", {
+                giocatori: Stanza?.classifica().map(giocatore => giocatore.adaptToClient())
+            });
+        });
 
         user.on("aggiornaAttesaRisposta", async (data) => {
             const Stanza = await Stanze.get(data["stanzaId"]);
@@ -529,8 +533,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         });
 
         user.on("disconnect", async () => {
-            const stanzaId = Stanza.trovaDaGiocatore(user.data.referenceGiocatore?.id, await Stanze.values());
-            const giocatore = await Stanze.get(stanzaId)?.trovaGiocatore(user.data.referenceGiocatore?.id);
+            const stanze = await Stanze.values();
+            const stanzaId = Stanza.trovaDaGiocatore(user.data.referenceGiocatore?.id, stanze);
+            const giocatore = (await Stanze.get(stanzaId))?.trovaGiocatore(user.data.referenceGiocatore?.id);
             const stanza = await Stanze.get(stanzaId);
             if (giocatore && stanzaId) {
                 giocatore.online = false;

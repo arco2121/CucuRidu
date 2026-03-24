@@ -1,8 +1,8 @@
-class ClusterMemory {
+class ClusterSet {
 
-    constructor(client, setName) {
+    constructor(client, table = "memory", setName) {
         this.supabase = client;
-        this.table = "memory";
+        this.table = table;
         this.setName = setName;
     }
 
@@ -67,4 +67,4 @@ class ClusterMemory {
     }
 }
 
-module.exports = { ClusterMemory };
+module.exports = { ClusterSet };

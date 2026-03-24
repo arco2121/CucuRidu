@@ -15,7 +15,7 @@ class Giocatore {
     }
 
     async init(memory) {
-        this.id = await generateId(32, memory);
+        this.id = typeof memory === "string" ? memory : await generateId(32, memory);
         return this;
     }
 

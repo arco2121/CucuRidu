@@ -5,9 +5,9 @@ class ClusterStanze {
 
     constructor(client) {
         this.supabase = client;
-        this.table = "Stanze";
+        this.table = "stanze";
         this.keyField = "stanza_Id";
-        this.valueField = "JSONB";
+        this.valueField = "stanza";
     }
 
     async get(key) {
@@ -24,7 +24,7 @@ class ClusterStanze {
     async set(key, value) {
         const jsonToMerge = value?.toJSON ? value.toJSON() : value;
 
-        const { error } = await this.supabase.rpc('upsert_stanza_merge', {
+        const { error } = await this.supabase.rpc('update_stanza', {
             target_id: key,
             new_json: jsonToMerge
         });
@@ -70,7 +70,7 @@ class ClusterStanze {
         return data.map(item => item[this.keyField]);
     }
 
-    async entries() {
+    async values() {
         const { data, error } = await this.supabase
             .from(this.table)
             .select(`${this.keyField}, ${this.valueField}`);

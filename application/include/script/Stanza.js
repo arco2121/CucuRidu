@@ -11,7 +11,7 @@ const { generateId } = require(path.join(__dirname, '/generazione'));
 
 class Stanza {
 
-    constructor(minimoGiocatori = 3) {
+    constructor(minimoGiocatori = 2) {
         this.giocatori = new Map();
         this.giocatoriPassati = new Set();
         this.stato = StatoStanza.WAIT;
@@ -165,7 +165,8 @@ class Stanza {
     aggiungiRisposta(giocatoreId, ...indexCarte) {
         if(this.stato === StatoStanza.CHOOSING_CARDS && this.giocatori.has(giocatoreId)
             && !this.round.risposte.has(giocatoreId)) {
-            this.round.risposte.set(giocatoreId, this.trovaGiocatore(giocatoreId).prendiMano(...indexCarte));
+            const carte = this.trovaGiocatore(giocatoreId).prendiMano(...indexCarte);
+            this.round.risposte.set(giocatoreId, carte);
             if(this.round.risposte.size === (this.giocatori.size - 1)) {
                 this.stato = StatoStanza.CHOOSING_WINNER;
                 return [

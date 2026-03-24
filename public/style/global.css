@@ -801,7 +801,7 @@ input:active {
 }
 
 .appear {
-    display: flex;
+    display: block;
     animation: appearup 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 

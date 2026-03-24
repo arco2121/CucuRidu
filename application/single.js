@@ -18,7 +18,7 @@ const singleApp = async (allowedOrigins) => {
     const serverSession = await new Session(timeout).init(generationMemory);
 
     const host = "http://localhost:";
-    const local = process.env.NODE_ENV !== "production";
+    const local = process.env.ON_PLATFORM !== "true";
     const port = !local ? 7860 : 0
 
     const Stanze = new Map();
@@ -74,7 +74,7 @@ const singleApp = async (allowedOrigins) => {
     //Listening
     const listening = httpServer.listen(port, (error) => {
         const listeningPort = httpServer.address().port;
-        console.log(`Cucu Ridu lanciato => ${local ? host + listeningPort : listeningPort}`);
+        console.log(`Cucu Ridu (SINGLE) lanciato => ${local ? host + listeningPort : listeningPort}`);
         if (error) console.log(error.message);
     });
 

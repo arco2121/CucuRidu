@@ -44,10 +44,14 @@ class Mazzo {
         return this.carte.splice(0, numeroCarte);
     }
 
-    prendiCarteByIndex(...indexCarte) {
-        const result = indexCarte.map(index => this.carte[index]);
-        indexCarte.forEach(index => this.carte[index] = null);
-        this.carte = this.carte.filter(carta => carta !== null);
+    prendiCarteByIndex(...indici) {
+        const indiciOrdinati = [...indici].sort((a, b) => b - a);
+        const result = indici.map(i => this.carte[i]);
+        indiciOrdinati.forEach(i => {
+            if (i >= 0 && i < this.carte.length) {
+                this.carte.splice(i, 1);
+            }
+        });
         return result;
     }
 
