@@ -200,7 +200,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const codiceStanzaPause = document.getElementById("codiceStanzaPause");
 
     leaveBtn.addEventListener("click", () => socket.emit("lasciaStanza", {
-        id: referenceStanza
+        id: referenceStanza,
+        giocatore: referenceGiocatore.id
     }));
 
     exitPauseBtn.addEventListener("click", () => {

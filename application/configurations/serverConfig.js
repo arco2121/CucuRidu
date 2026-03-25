@@ -294,7 +294,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         user.on("lasciaStanza", async (data) => {
             try {
                 const stanzaId = data["id"];
-                const giocatoreId = data["giocatore"] || user.data.referenceGiocatore.id;
+                const giocatoreId = data["giocatore"] || user.data.referenceGiocatore?.id;
                 const stanza = await Stanze.get(stanzaId);
                 const result = stanza.eliminaGiocatore(giocatoreId);
                 if(result) {
