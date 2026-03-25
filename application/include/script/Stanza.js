@@ -267,7 +267,7 @@ class Stanza {
                 for (const id of stanza.giocatoriPassati.values()) await memory.delete(id);
                 await Stanze.delete(stanza.id);
                 await memory.delete(stanza.id);
-                callback(stanza.id);
+                await callback(stanza.id);
             }
         };
         if(stanzeId.length === 0) for (const stanzaId of await Stanze.keys()) await check(stanzaId);

@@ -6,7 +6,8 @@ const express = require("express");
 const cors = require("cors");
 const { Session } = require(path.join(__dirname, "/include/script/Session"));
 const { generateId } = require(path.join(__dirname, "/include/script/generazione"));
-const { appConfig, serverConfig } = require(path.join(__dirname, "configurations"));
+const appConfig = require(path.join(__dirname, "/configurations/appConfig"));
+const serverConfig = require(path.join(__dirname, "/configurations/serverConfig"));
 
 const singleApp = async (allowedOrigins) => {
     //Configuration
