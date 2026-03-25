@@ -91,7 +91,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
     app.get("/game", async (req, res) => {
         const check = ["nome", "pfp", "stanzaId", "userId"];
         const {nome, pfp, stanzaId, userId} = serverSession.validate(check, req.session.storeData, req.query?.token);
-        if (userId && stanzaId && await Stanze.has(stanzaId) && await Stanze.get(stanzaId).trovaGiocatore(userId))
+        if (userId && stanzaId && await Stanze.has(stanzaId) && (await Stanze.get(stanzaId)).trovaGiocatore(userId))
             renderPage(res, "lobby", {
                 userId: userId,
                 stanzaId: stanzaId,
