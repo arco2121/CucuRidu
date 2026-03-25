@@ -2,10 +2,12 @@
   "name": "Cucu Ridu",
   "short_name": "Cucu Ridu",
   "start_url": "/",
-  "display": "minimal-ui",
+  "display": "standalone",
   "background_color": "#ee9aab",
   "theme_color": "#ee9aab",
   "orientation": "natural",
+  "categories": ["game", "braindead"],
+  "description": "Un gioco di carte irriverente, storto e assolutamente necessario",
   "icons": [
     {
       "src": "/assets/icon.png",
