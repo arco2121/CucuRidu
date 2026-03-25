@@ -23,7 +23,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
     const resumeGame = async (req, res, next) => {
         const { userId, stanzaId } = serverSession.get(req, req.query?.token);
         const redirecting = req.query?.token ? "?token=" + req.query.token : "";
-        if(userId && await Stanze.get(stanzaId) && await Stanze.get(stanzaId).trovaGiocatore(userId)) return res.redirect("/game" + redirecting);
+        if(userId && await Stanze.get(stanzaId) && (await Stanze.get(stanzaId)).trovaGiocatore(userId)) return res.redirect("/game" + redirecting);
         req.deleteToken = !!req.query?.token;
         next();
     };
