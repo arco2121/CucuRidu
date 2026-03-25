@@ -5,7 +5,7 @@ const fromBackEnd = (() => {
 })();
 
 const utilize = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm";
-const bannedSymbols = "§";
+const bannedSymbols = "§$";
 const generateId = (memory) => {
     let code = "";
     do {
@@ -34,7 +34,7 @@ const fillBlanks = (templateText, replacements) => {
         console.log(word, index)
         index++;
 
-        if (word.startsWith("§")) {
+        if (bannedSymbols.split("").some(symbol => word.startsWith(symbol))) {
             const cleanedWord = word.slice(1);
             return cleanedWord.charAt(0).toUpperCase() + cleanedWord.slice(1).toLowerCase();
         }
