@@ -52,7 +52,7 @@ class Mazzo {
                 this.carte.splice(i, 1);
             }
         });
-        return result;
+        return result.map(c => Array.isArray(c) ? c[0] : c);
     }
 
     static unisciMazzi(...mazzi) {
@@ -99,10 +99,6 @@ class Mazzo {
                 frasi: JSON.parse(fs.readFileSync(path.join(__dirname, "../cards/" + data + "/frasi.json"), "utf-8"))
             };
         }
-    }
-
-    toArray() {
-        return Array.from(this.carte).flat();
     }
 
     toJSON() {

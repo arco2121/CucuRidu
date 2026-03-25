@@ -202,7 +202,7 @@ class Stanza {
             chiStaInterrogando: vincitoreRound.id
         }
         this.numeroRound[0] += 1;
-        return [vincitoreRound.adaptToClient(), domanda, risposte] || false;
+        return [vincitoreRound.toJSON(), domanda, risposte] || false;
     }
 
     controllaMazzi(spaziNecessari) {

@@ -35,19 +35,6 @@ class Giocatore {
         return this.online;
     }
 
-    adaptToClient() {
-        return {
-            id: this.id,
-            username: this.username,
-            mazzo: this.mazzo.toArray(),
-            pfp: this.pfp,
-            masterRole: this.masterRole,
-            interrogationRole: this.interrogationRole,
-            punti: this.punti,
-            aaaaa: "aaaaa"
-        }
-    }
-
     toJSON() {
         return {
             id: this.id,

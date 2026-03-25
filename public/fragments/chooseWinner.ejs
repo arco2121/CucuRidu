@@ -63,7 +63,8 @@
 
     const updateQuestion = () => {
         const currentSelection = allAnswers[currentIndex];
-        currentQuestion.textContent = fillBlanks(defaultText, currentSelection[1]);
+        const risposte = [].concat(currentSelection[1]).map(c => Array.isArray(c) ? c[0] : String(c));
+        currentQuestion.textContent = fillBlanks(defaultText, risposte);
         answer_index.textContent = currentIndex + 1 + "/" + allAnswers.length;
     };
 

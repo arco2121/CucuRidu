@@ -224,7 +224,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         switch (Stanza.stato) {
             case StatoStanza.WAIT : {
                 socket.emit("confermaStanza", {
-                    reference: socket.data.referenceGiocatore.adaptToClient(),
+                    reference: socket.data.referenceGiocatore.toJSON(),
                     stanzaId: Stanza.id,
                     primoRound: Stanza.numeroRound[0] === 0,
                     interroghi: Stanza.round.chiStaInterrogando === socket.data.referenceGiocatore.id
@@ -242,9 +242,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     socket.emit("rispostaRegistrata");
                 else
                     socket.emit("roundIniziato", {
-                        chiStaInterrogando: Stanza.trovaGiocatore(Stanza.round.chiStaInterrogando).adaptToClient(),
+                        chiStaInterrogando: Stanza.trovaGiocatore(Stanza.round.chiStaInterrogando).toJSON(),
                         domanda: Stanza.round.domanda,
-                        reference: socket.data.referenceGiocatore.adaptToClient(),
+                        reference: socket.data.referenceGiocatore.toJSON(),
                         stanza: Stanza.id
                     });
                 return next();
@@ -253,8 +253,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 socket.emit("sceltaVincitore", {
                     risposte: Array.from(Stanza.round.risposte.entries()),
                     domanda: Stanza.round.domanda,
-                    chiInterroga: Stanza.trovaGiocatore(Stanza.round.chiStaInterrogando).adaptToClient(),
-                    reference: socket.data.referenceGiocatore.adaptToClient(),
+                    chiInterroga: Stanza.trovaGiocatore(Stanza.round.chiStaInterrogando).toJSON(),
+                    reference: socket.data.referenceGiocatore.toJSON(),
                     stanza: Stanza.id
                 });
                 return next();
@@ -292,17 +292,17 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 user.data.referenceGiocatore = stanza.master;
                 user.emit("confermaStanza", {
                     stanzaId: stanza.id,
-                    reference: user.data.referenceGiocatore.adaptToClient(),
+                    reference: user.data.referenceGiocatore.toJSON(),
                     primoRound: stanza.numeroRound[0] === 0,
                     interroghi: stanza.round.chiStaInterrogando === user.data.referenceGiocatore.id
                 });
                 server.to(stanza.id).emit("aggiornamentoAttesa", {
                     numeroGiocatori: stanza.giocatori.size,
                     minimoGiocatori: stanza.minimoGiocatori,
-                    giocatori: stanza.classifica().map(giocatore => giocatore.adaptToClient())
+                    giocatori: stanza.classifica().map(giocatore => giocatore.toJSON())
                 });
                 server.to(stanza.id).emit("listaGiocatoriAggiornamento", {
-                    giocatori: stanza.classifica().map(giocatore => giocatore.adaptToClient())
+                    giocatori: stanza.classifica().map(giocatore => giocatore.toJSON())
                 });
                 console.log("Stanza creata => " + stanza.id);
             } catch {
@@ -325,17 +325,17 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 }
                 user.join(stanzaId);
                 user.emit("confermaStanza", {
-                    reference: user.data.referenceGiocatore.adaptToClient(),
+                    reference: user.data.referenceGiocatore.toJSON(),
                     interroghi: Stanza.round.chiStaInterrogando === user.data.referenceGiocatore.id,
                     primoRound: Stanza.numeroRound[0] === 0
                 });
                 server.to(stanzaId).emit("aggiornamentoAttesa", {
                     numeroGiocatori: Stanza.giocatori.size,
                     minimoGiocatori: Stanza.minimoGiocatori,
-                    giocatori: Stanza.classifica().map(giocatore => giocatore.adaptToClient())
+                    giocatori: Stanza.classifica().map(giocatore => giocatore.toJSON())
                 });
                 server.to(stanzaId).emit("listaGiocatoriAggiornamento", {
-                    giocatori: Stanza.classifica().map(giocatore => giocatore.adaptToClient())
+                    giocatori: Stanza.classifica().map(giocatore => giocatore.toJSON())
                 });
                 await Stanze.set(stanzaId, Stanza);
                 console.log("Giocatore aggiunto a Stanza => " + stanzaId);
@@ -365,9 +365,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                         for(const socket of sockets) {
                             socket.data.referenceGiocatore = Stanza.trovaGiocatore(socket.data.referenceGiocatore.id);
                             socket.emit("roundIniziato", {
-                                chiStaInterrogando: Stanza.trovaGiocatore(round.chiStaInterrogando).adaptToClient(),
+                                chiStaInterrogando: Stanza.trovaGiocatore(round.chiStaInterrogando).toJSON(),
                                 domanda: round.domanda,
-                                reference: socket.data.referenceGiocatore.adaptToClient()
+                                reference: socket.data.referenceGiocatore.toJSON()
                             });
                         }
                     });
@@ -392,7 +392,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     server.to(stanzaId).emit("sceltaVincitore", {
                         domanda: result[0],
                         risposte: result[1],
-                        chiInterroga: Stanza.trovaGiocatore(result[2]).adaptToClient(),
+                        chiInterroga: Stanza.trovaGiocatore(result[2]).toJSON(),
                     });
                 } else if(result) {
                     user.emit("rispostaRegistrata");
@@ -422,7 +422,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                                 vincitore: result[0],
                                 domanda: result[1],
                                 risposte: result[2],
-                                reference: socket.data.referenceGiocatore.adaptToClient()
+                                reference: socket.data.referenceGiocatore.toJSON()
                             });
                         }
                     });
@@ -463,7 +463,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             server.to(data["stanzaId"]).emit("aggiornamentoAttesa", {
                 numeroGiocatori: Stanza?.giocatori.size,
                 minimoGiocatori: Stanza?.minimoGiocatori,
-                giocatori: Stanza?.classifica().map(giocatore => giocatore.adaptToClient())
+                giocatori: Stanza?.classifica().map(giocatore => giocatore.toJSON())
             })
         });
 
@@ -471,7 +471,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             const Stanza = await Stanze.get(data["stanzaId"]);
 
             user.emit("listaGiocatoriAggiornamento", {
-                giocatori: Stanza?.classifica().map(giocatore => giocatore.adaptToClient())
+                giocatori: Stanza?.classifica().map(giocatore => giocatore.toJSON())
             });
         });
 
@@ -480,7 +480,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
 
             server.to(data["stanzaId"]).emit("aggiornamentoAttesaRisposta", {
                 numeroGiocatori: Stanza?.round.risposte.size,
-                giocatori: Array.from(Stanza?.round.risposte.keys()).map(giocatore => Stanza.trovaGiocatore(giocatore).adaptToClient())
+                giocatori: Array.from(Stanza?.round.risposte.keys()).map(giocatore => Stanza.trovaGiocatore(giocatore).toJSON())
             })
         });
 
