@@ -145,7 +145,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             try {
                 const stanzaId = data["id"];
                 const Stanza = await Stanze.get(stanzaId);
-                const result = Stanza.iniziaTurno(user.data.referenceGiocatore.id);
+                const result = Stanza.iniziaTurno(user.data.referenceGiocatore?.id);
                 if(typeof result === "object") {
                     server.to(stanzaId).emit("partitaTerminata", {
                         classifica: result

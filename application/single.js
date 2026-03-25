@@ -32,7 +32,10 @@ const singleApp = async (allowedOrigins) => {
             credentials: true,
         },
         pingInterval: 15000,
-        pingTimeout: 10000
+        pingTimeout: 10000,
+        connectionStateRecovery: {
+            skipMiddlewares: true,
+        }
     });
 
     //App Config
