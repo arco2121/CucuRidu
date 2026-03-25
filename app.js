@@ -11,7 +11,7 @@ const attempt = async (operation, fallback) => {
     try { return await operation();}
     catch (err) {return await fallback(err);}
 };
-const onCluster = process.env.USE_CLUSTER === "true" || process.env.ON_PLATFORM === "true";
+const onCluster = process.env.USE_CLUSTER === "true" && process.env.ON_PLATFORM === "true";
 
 const initApp = async () => {
     if (!onCluster) return await singleApp(allowedOrigins);
