@@ -276,7 +276,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         } = serverSession.validate(checks, socket.handshake.auth, socket.handshake.auth?.token)
         if (validation !== TEMPORARY_TOKEN) return next(new Error("INVALID_KEY"));
         if (!stanzaId) return next();
-        const exist = await Stanze.get(stanzaId)?.trovaGiocatoreAnchePassato(userId);
+        const exist = (await Stanze.get(stanzaId))?.trovaGiocatoreAnchePassato(userId);
         if (exist === null) return next();
         if (!exist) return next(new Error("SESSION_EXPIRED"));
         if (exist.online === true) return next(new Error("ALREADY_CONNECTED"));
