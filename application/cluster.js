@@ -50,7 +50,7 @@ const clusterApp = async (allowedOrigins) => {
         pingInterval: 15000,
         pingTimeout: 10000,
         connectionStateRecovery: {
-            skipMiddlewares: true,
+            skipMiddlewares: false,
         }
     });
     server.adapter(createAdapter(pool));
