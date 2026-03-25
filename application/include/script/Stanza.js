@@ -171,7 +171,7 @@ class Stanza {
                 this.stato = StatoStanza.CHOOSING_WINNER;
                 return [
                     this.round.domanda,
-                    Mazzo.shuffle([...Array.from(this.round.risposte.entries())]),
+                    [...Array.from(this.round.risposte.entries())],
                     this.round.chiStaInterrogando
                 ];
             }
