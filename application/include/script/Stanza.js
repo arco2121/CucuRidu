@@ -171,7 +171,7 @@ class Stanza {
                 this.stato = StatoStanza.CHOOSING_WINNER;
                 return [
                     this.round.domanda,
-                    Mazzo.shuffle(Array.from(this.round.risposte.entries())),
+                    Mazzo.shuffle([...Array.from(this.round.risposte.entries())]),
                     this.round.chiStaInterrogando
                 ];
             }
@@ -182,27 +182,38 @@ class Stanza {
 
     scegliVincitore(chiStaChiedendo, idGiocatore) {
         if(this.stato !== StatoStanza.CHOOSING_WINNER ||
-            this.round.risposte.size !== (this.giocatori.size - 1) || chiStaChiedendo !== this.round.chiStaInterrogando) return false;
-        this.stato = StatoStanza.WAIT;
-        const vincitoreRound = this.trovaGiocatore(idGiocatore);
-        vincitoreRound.punti++;
-        this.controllaMazzi(this.round.domanda[1]);
-        for (const giocatore of this.giocatori.values())
-            giocatore.aggiungiMano(this.mazzoCompletamenti.mazzo.prendiCarte(this.round.domanda[1]));
-        this.mazzoCompletamenti.scarto.aggiungiCarte(...Array.from(this.round.risposte.values()).flatMap(x => x));
-        this.mazzoFrasi.scarto.aggiungiCarte(this.round.domanda);
-        const risposte = this.round.risposte.get(idGiocatore);
-        const domanda = this.round.domanda;
+            this.round.risposte.size !== (this.giocatori.size - 1) ||
+            chiStaChiedendo !== this.round.chiStaInterrogando || !this.round.risposte.has(idGiocatore)) return false;
 
-        vincitoreRound.interrogationRole = true;
+        const risposte = this.round.risposte.get(idGiocatore);
+        const vincitoreRound = this.trovaGiocatore(idGiocatore);
+        const domandaScartata = this.round.domanda;
+
+        this.stato = StatoStanza.WAIT;
+
+        if (vincitoreRound) {
+            vincitoreRound.punti++;
+            vincitoreRound.interrogationRole = true;
+        }
+
+        this.controllaMazzi(domandaScartata[1]);
+
+        for (const giocatore of this.giocatori.values())
+            giocatore.aggiungiMano(this.mazzoCompletamenti.mazzo.prendiCarte(domandaScartata[1]));
+
+        this.mazzoCompletamenti.scarto.aggiungiCarte(...Array.from(this.round.risposte.values()).flat());
+        this.mazzoFrasi.scarto.aggiungiCarte(domandaScartata);
+
         this.trovaGiocatore(this.round.chiStaInterrogando).interrogationRole = false;
+
         this.round = {
             domanda: this.mazzoFrasi.mazzo.prendiCarte(1)[0],
             risposte: new Map(),
-            chiStaInterrogando: vincitoreRound.id
+            chiStaInterrogando: idGiocatore
         }
         this.numeroRound[0] += 1;
-        return [vincitoreRound.toJSON(), domanda, risposte] || false;
+
+        return [vincitoreRound.toJSON(), domandaScartata, risposte];
     }
 
     controllaMazzi(spaziNecessari) {

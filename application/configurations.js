@@ -394,9 +394,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                         risposte: result[1],
                         chiInterroga: Stanza.trovaGiocatore(result[2]).toJSON(),
                     });
-                } else if(result) {
+                } else if(result)
                     user.emit("rispostaRegistrata");
-                }
                 else {
                     user.emit("giaRegistrata", {
                         message: "Non puoi rispondere 2 volte giuseppino coltivatore di carote in un campo di reclusione ucraino"
@@ -428,7 +427,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     });
                 } else {
                     user.emit("errore", {
-                        message: "Aspetta e spera che tutti quanti rispondano (tanto ti ghostano perchè gli stai sul cazzo)"
+                        message: "Aspetta e spera che tutti quanti rispondano, selezionane un'altro (tanto ti ghostano perchè gli stai sul cabbo)"
                     });
                 }
                 await Stanze.set(stanzaId, Stanza);
