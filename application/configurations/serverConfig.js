@@ -80,6 +80,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
     });
 
     server.on("connection", async (user) => {
+
         user.on("creaStanza", async (data) => {
             try {
                 const { username, pfp } = data;
@@ -294,7 +295,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         user.on("lasciaStanza", async (data) => {
             try {
                 const stanzaId = data["id"];
-                const giocatoreId = data["giocatore"];
+                const giocatoreId = data["giocatore"] || user.data.referenceGiocatore?.id;
                 console.log(giocatoreId)
                 const stanza = await Stanze.get(stanzaId);
                 const result = stanza?.eliminaGiocatore(giocatoreId);
@@ -316,10 +317,10 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                             persona.leave(stanzaId);
                         }
                     });
-                    server.in(stanzaId).fetchSockets().then(sockets => {
+                    server.in(stanzaId).fetchSockets().then(async (sockets) => {
                         for(const socket of sockets) {
                             socket.data.referenceGiocatore = stanza.giocatori.get(socket.data.referenceGiocatore.id);
-                            emitStatoStanza(stanzaId, socket);
+                            await emitStatoStanza(stanzaId, socket);
                         }
                     });
                     console.log("Giocatore eliminato da Stanza => " + stanzaId);

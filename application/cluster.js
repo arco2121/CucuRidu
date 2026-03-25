@@ -50,6 +50,7 @@ const clusterApp = async (allowedOrigins) => {
         pingInterval: 15000,
         pingTimeout: 10000,
         connectionStateRecovery: {
+            maxDisconnectionDuration: timeout/120,
             skipMiddlewares: false,
         }
     });
