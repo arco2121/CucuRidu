@@ -2,7 +2,7 @@
   "name": "Cucu Ridu",
   "short_name": "Cucu Ridu",
   "start_url": "/",
-  "display": "standalone",
+  "display": "minimal-ui",
   "background_color": "#ee9aab",
   "theme_color": "#ee9aab",
   "orientation": "natural",
