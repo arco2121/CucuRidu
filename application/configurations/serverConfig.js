@@ -295,8 +295,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             try {
                 const stanzaId = data["id"];
                 const giocatoreId = data["giocatore"] || user.data.referenceGiocatore?.id;
+                console.log(giocatoreId)
                 const stanza = await Stanze.get(stanzaId);
-                const result = stanza.eliminaGiocatore(giocatoreId);
+                const result = stanza?.eliminaGiocatore(giocatoreId);
                 if(result) {
                     await Stanze.set(stanzaId, stanza);
                     let deleted = false;
