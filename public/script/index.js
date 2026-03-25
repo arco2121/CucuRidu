@@ -19,6 +19,9 @@ document.addEventListener("DOMContentLoaded", () => {
         sectionDefault.dispatchEvent(hidePanel);
         optionPanel.dispatchEvent(showPanel);
     });
+
+    if(fromBackEnd["openSettings"])
+        optionsBtn.click();
 });
 
 document.dispatchEvent(preventBack);

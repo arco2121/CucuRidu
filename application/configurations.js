@@ -28,11 +28,15 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
         next();
     };
 
-    app.get("/", resumeGame, (req, res) => renderPage(res, "index", {
-        icon: getIcon(),
-        deleteToken: req.deleteToken,
-        bgm: "MainMenu-City_Stroll"
-    }));
+    app.get("/", resumeGame, (req, res) => {
+        const { openSettings } = req.query;
+        renderPage(res, "index", {
+            icon: getIcon(),
+            deleteToken: req.deleteToken,
+            bgm: "MainMenu-City_Stroll",
+            openSettings: openSettings === "true"
+        });
+    });
     app.get(['/home', '/index'], (req, res) => res.redirect('/'));
 
     app.get("/partecipaStanza/:codiceStanza", resumeGame, (req, res) => {

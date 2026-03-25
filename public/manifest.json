@@ -5,11 +5,57 @@
   "display": "standalone",
   "background_color": "#ee9aab",
   "theme_color": "#ee9aab",
+  "orientation": "natural",
   "icons": [
     {
       "src": "/assets/icon.png",
       "sizes": "1280x1280",
       "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/icon.png",
+      "sizes": "1280x1280",
+      "type": "image/png",
+      "label": "Home - Cucu Ridu"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Crea Stanza",
+      "short_name": "Crea Stanza",
+      "description": "Crea una stanza per giocare",
+      "url": "/creaStanza",
+      "icons": [
+        {
+          "src": "/assets/pencil.png",
+          "sizes": "200x200"
+        }
+      ]
+    },
+    {
+      "name": "Unisciti",
+      "short_name": "Unisciti",
+      "description": "Unisciti ad una stanza per giocare",
+      "url": "/partecipaStanza",
+      "icons": [
+        {
+          "src": "/assets/pencil.png",
+          "sizes": "200x200"
+        }
+      ]
+    },
+    {
+      "name": "Opzioni",
+      "short_name": "Opzioni",
+      "url": "/?openSettings=true",
+      "icons": [
+        {
+          "src": "/assets/pencil.png",
+          "sizes": "200x200"
+        }
+      ]
     }
   ]
 }
