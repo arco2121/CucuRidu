@@ -1,6 +1,6 @@
 class ClusterSet {
 
-    constructor(client, table = "memory", setName) {
+    constructor(client, setName, table = "memory",) {
         this.supabase = client;
         this.table = table;
         this.setName = setName;
@@ -21,7 +21,6 @@ class ClusterSet {
         const { data, error } = await this.supabase
             .from(this.table)
             .select("item_id")
-            .eq("set_name", this.setName)
             .eq("item_id", String(item))
             .maybeSingle();
 
@@ -51,7 +50,6 @@ class ClusterSet {
         const { data, error } = await this.supabase
             .from(this.table)
             .select("item_id")
-            .eq("set_name", this.setName);
 
         if (error || !data) return [];
         return data.map(row => row.item_id);

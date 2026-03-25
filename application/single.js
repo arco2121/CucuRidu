@@ -85,11 +85,14 @@ const singleApp = async (allowedOrigins) => {
 
         server.close(() => {
             Stanze.clear();
+            generationMemory.clear();
             console.error('Chiusura normale');
             process.exit(0);
         });
 
         setTimeout(() => {
+            Stanze.clear();
+            generationMemory.clear();
             console.error('Chiusura forzata');
             process.exit(1);
         }, 10000);

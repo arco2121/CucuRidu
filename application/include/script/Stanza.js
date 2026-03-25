@@ -253,7 +253,7 @@ class Stanza {
 
     static trovaDaGiocatore(idGiocatore, Stanze) {
         for (const stanza of Stanze) {
-            if (stanza.giocatori.has(idGiocatore)) {
+            if (stanza.giocatori?.has(idGiocatore)) {
                 return stanza.id;
             }
         }

@@ -16,19 +16,17 @@ const clusterApp = async (allowedOrigins) => {
     const timeout = 3600000;
 
     const key = process.env.DATABASE_KEY;
+    const url = process.env.DATABASE_URL;
     const password = process.env.DATABASE_PASSWORD;
     const poolString = process.env.DATABASE_POOL?.replace("[PASSWORD]", password || "");
-    if(!key || !poolString || !password) throw new Error("Chiavi per il server mancanti");
+    if(!key || !url || !poolString || !password) throw new Error("Chiavi per il server mancanti");
 
-    const url = 'https://rgghtuapygsrudncfqny.supabase.co';
-    const databaseKey = key || '';
-    const database = createClient(url, databaseKey);
-    const generationMemory = new ClusterSet(database, 'memory', 'cluster');
-
+    const database = createClient(url, key);
+    const generationMemory = new ClusterSet(database, await generateId(64));
     const pool = new Pool({
         connectionString: poolString,
-        idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 2000,
+        idleTimeoutMillis: timeout/100,
+        connectionTimeoutMillis: timeout/1000,
     });
 
     const app = express();
@@ -94,24 +92,26 @@ const clusterApp = async (allowedOrigins) => {
         if (error) console.log(error.message);
     });
 
-    const terminate = async (server, serverIo, Stanze) => {
-        for (const id of await Stanze.keys()) serverIo.to(id).emit("stanzaChiusa");
+    const terminate = (server, serverIo, Stanze) => {
+        for (const id of Stanze.tempKeys()) serverIo.to(id).emit("stanzaChiusa");
         serverIo.close();
-
-        server.close(() => {
-            Stanze.clear();
+        server.close(async () => {
+            await Stanze.clear();
+            await generationMemory.clear();
             console.error('Chiusura normale');
             process.exit(0);
         });
 
-        setTimeout(() => {
+        setTimeout(async () => {
+            await Stanze.clear();
+            await generationMemory.clear();
             console.error('Chiusura forzata');
             process.exit(1);
         }, 10000);
     };
 
-    process.on('SIGINT', async () => await terminate(listening, server, Stanze));
-    process.on('SIGTERM', async () => await terminate(listening, server, Stanze));
+    process.on('SIGINT',  () => terminate(listening, server, Stanze));
+    process.on('SIGTERM', () => terminate(listening, server, Stanze));
 };
 
 module.exports = clusterApp;

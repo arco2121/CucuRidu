@@ -6,6 +6,7 @@ class ClusterStanze {
     constructor(client) {
         this.supabase = client;
         this.table = "stanze";
+        this.temporary = new Set();
         this.keyField = "stanza_Id";
         this.valueField = "stanza";
     }
@@ -28,6 +29,8 @@ class ClusterStanze {
             target_id: key,
             new_json: jsonToMerge
         });
+
+        this.temporary.add(key);
 
         if (error) throw error;
     }
@@ -52,12 +55,8 @@ class ClusterStanze {
     }
 
     async clear() {
-        const { error } = await this.supabase
-            .from(this.table)
-            .delete()
-            .neq(this.keyField, "_placeholder_");
-
-        if (error) throw error;
+        for(const key of this.temporary.keys()) await this.delete(key);
+        this.temporary.clear();
     }
 
     async keys() {
@@ -68,6 +67,10 @@ class ClusterStanze {
         if (error || !data) return [];
 
         return data.map(item => item[this.keyField]);
+    }
+
+    tempKeys() {
+        return Array.from(this.temporary.keys());
     }
 
     async values() {
