@@ -12,7 +12,7 @@ const attempt = async (operation, fallback) => {
     try { return await operation();}
     catch (err) {return await fallback(err);}
 };
-const cluster = process.env.USE_CLUSTER === "true" && process.env.ON_PLATFORM === "true";
+const cluster = process.env.USE_CLUSTER === "true" || process.env.ON_PLATFORM === "true";
 const local = process.env.ON_PLATFORM !== "true" ? "http://localhost:" : false;
 const port = !local ? 7860 : 0
 

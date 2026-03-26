@@ -15,8 +15,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
     const emitStatoStanza = async (stanzaId, socket, next = () => {}) => {
         const Stanza = await Stanze.get(stanzaId);
         if (!Stanza) return next();
-        socket.join(stanzaId);
-        //console.log(`Stanza ${stanzaId} => ${Stanza.toString()}`)
+
         if(!socket.data.referenceGiocatore) return next();
 
         switch (Stanza.stato) {
@@ -61,6 +60,18 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         next();
     };
 
+    const cleanUp = async () => {
+        try {
+            await Stanza.pulisciStanza((id) => {
+                server.to(id).emit("stanzaChiusa");
+                server.socketsLeave(id);
+                console.log("Stanza eliminata => " + id);
+            }, generationMemory, Stanze);
+        } catch (err) { console.error(err); }finally {
+            setTimeout(cleanUp, timeout/30/60);
+        }
+    };
+
     server.use(async (socket, next) => {
         const checks = ["validation", "stanzaId", "userId"];
         const {
@@ -78,6 +89,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         exist.online = true;
         await Stanze.set(stanzaId, stanza);
         socket.data.referenceGiocatore = exist;
+        socket.join(stanzaId);
         await emitStatoStanza(stanzaId, socket, next);
     });
 
@@ -105,7 +117,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     giocatori: stanza.classifica().map(giocatore => giocatore.toJSON())
                 });
                 console.log("Stanza creata => " + stanza.id);
-            } catch {
+            } catch(e) {
+                console.log(e)
                 user.emit("errore", {
                     message: "Impossibile creare la stanza, non va niente porcaccio al catamarano ubriaco"
                 });
@@ -298,19 +311,10 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             try {
                 const stanzaId = data["id"];
                 const giocatoreId = data["giocatore"] || user.data.referenceGiocatore?.id;
-                console.log(giocatoreId)
                 const stanza = await Stanze.get(stanzaId);
                 const result = stanza?.eliminaGiocatore(giocatoreId);
                 if(result) {
                     await Stanze.set(stanzaId, stanza);
-                    let deleted = false;
-                    await Stanza.pulisciStanza((id) => {
-                        server.to(id).emit("stanzaChiusa");
-                        server.socketsLeave(id);
-                        console.log("Stanza eliminata => " + id);
-                        deleted = true;
-                    }, generationMemory, Stanze, stanzaId);
-                    if(deleted) return;
                     server.in(stanzaId).fetchSockets().then(sockets => {
                         const persona = sockets.find(socket =>
                             socket.data?.referenceGiocatore.id === giocatoreId);
@@ -357,18 +361,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         });
     });
 
-    //Pulizia stanze automatica
-    setInterval(async () => {
-        try {
-            await Stanza.pulisciStanza((id) => {
-                server.to(id).emit("stanzaChiusa");
-                server.socketsLeave(id);
-                console.log("Stanza eliminata => " + id);
-            }, generationMemory, Stanze);
-        } catch(err) {
-            console.error(err);
-        }
-    }, timeout/30/60);
+    cleanUp();
 };
 
 module.exports = serverConfig;

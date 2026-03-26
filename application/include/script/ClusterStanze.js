@@ -28,7 +28,7 @@ class ClusterStanze {
         const { error } = await this.supabase.rpc('update_stanza', {
             target_id: key,
             new_json: jsonToMerge,
-            machine_id: this.machine_id
+            id_of_machine: this.machine_id
         });
 
         if (error) throw error;
@@ -39,7 +39,6 @@ class ClusterStanze {
             .from(this.table)
             .delete()
             .eq(this.keyField, key)
-            .eq("machine_id", this.machine_id);
 
         if (error) throw error;
     }
