@@ -25,7 +25,7 @@ const pingHost = async (host) => {
         const fastestHost = await Promise.any(HOSTS.map(pingHost));
         window.location.replace(fastestHost + path);
     } catch (e) {
-        document.body.innerText = "Nessun server disponibile. Riprova più tardi.";
+        document.body.innerText = "Nessun server disponibile. Prova a ricaricare.";
         console.error("Tutti gli host sono offline", e);
     }
 })();

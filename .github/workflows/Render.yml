@@ -10,7 +10,6 @@ on:
       - '.github/**'
       - '.git/**'
       - 'install.py'
-      - '.envXample'
   workflow_dispatch:
 
 jobs:

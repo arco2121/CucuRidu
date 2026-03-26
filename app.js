@@ -1,4 +1,5 @@
-require('dotenv').config();
+const fs = require('fs');
+require('dotenv').config({ path: fs.existsSync('.env') ? '.env' : '.envXample' });
 const path = require("path");
 const singleApp = require(path.join(__dirname, "/application/single"));
 const clusterApp = require(path.join(__dirname, "/application/cluster"));
@@ -11,16 +12,18 @@ const attempt = async (operation, fallback) => {
     try { return await operation();}
     catch (err) {return await fallback(err);}
 };
-const onCluster = process.env.USE_CLUSTER === "true" && process.env.ON_PLATFORM === "true";
+const cluster = process.env.USE_CLUSTER === "true" && process.env.ON_PLATFORM === "true";
+const local = process.env.ON_PLATFORM !== "true" ? "http://localhost:" : false;
+const port = !local ? 7860 : 0
 
 const initApp = async () => {
-    if (!onCluster) return await singleApp(allowedOrigins);
+    if (!cluster) return await singleApp(local, port, allowedOrigins);
 
     await attempt(
-        () => clusterApp(allowedOrigins),
+        () => clusterApp(local, port, allowedOrigins),
         async (err) => {
             console.warn("Cluster failed => " + err.message);
-            await singleApp(allowedOrigins);
+            await singleApp(local, port, allowedOrigins);
         }
     );
 };

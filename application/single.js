@@ -9,18 +9,11 @@ const { generateId } = require(path.join(__dirname, "/include/script/generazione
 const appConfig = require(path.join(__dirname, "/configurations/appConfig"));
 const serverConfig = require(path.join(__dirname, "/configurations/serverConfig"));
 
-const singleApp = async (allowedOrigins) => {
-    //Configuration
-    const timeout = 3600000;
+const singleApp = async (local, port, allowedOrigins, timeout = 3600000) => {
     const generationMemory = new Set();
-
     const app = express();
     const httpServer = createServer(app);
     const serverSession = await new Session(timeout).init(generationMemory);
-
-    const host = "http://localhost:";
-    const local = process.env.ON_PLATFORM !== "true";
-    const port = !local ? 7860 : 0
 
     const Stanze = new Map();
     const TEMPORARY_TOKEN = await generateId(64, generationMemory);
@@ -79,7 +72,7 @@ const singleApp = async (allowedOrigins) => {
     //Listening
     const listening = httpServer.listen(port, (error) => {
         const listeningPort = httpServer.address().port;
-        console.log(`Cucu Ridu (SINGLE) lanciato => ${local ? host + listeningPort : listeningPort}`);
+        console.log(`Cucu Ridu (SINGLE) lanciato => ${local ? local + listeningPort : listeningPort}`);
         if (error) console.log(error.message);
     });
 

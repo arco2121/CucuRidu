@@ -13,9 +13,7 @@ const { createClient } = require("@supabase/supabase-js");
 const { ClusterStanze } = require(path.join(__dirname, "/include/script/ClusterStanze"));
 const { ClusterSet } = require(path.join(__dirname, "/include/script/ClusterSet"));
 
-const clusterApp = async (allowedOrigins) => {
-    const timeout = 3600000;
-
+const clusterApp = async (local, port, allowedOrigins, timeout = 3600000) => {
     const key = process.env.DATABASE_KEY;
     const url = process.env.DATABASE_URL;
     const password = process.env.DATABASE_PASSWORD;
@@ -33,10 +31,6 @@ const clusterApp = async (allowedOrigins) => {
     const app = express();
     const httpServer = createServer(app);
     const serverSession = await new Session(timeout).init(generationMemory);
-
-    const host = "http://localhost:";
-    const local = process.env.ON_PLATFORM !== "true";
-    const port = !local ? 7860 : 0
 
     const Stanze = new ClusterStanze(database);
     const TEMPORARY_TOKEN = await generateId(64, generationMemory);
@@ -93,7 +87,7 @@ const clusterApp = async (allowedOrigins) => {
 
     const listening = httpServer.listen(port, (error) => {
         const listeningPort = httpServer.address().port;
-        console.log(`Cucu Ridu (CLUSTER) lanciato => ${local ? host + listeningPort : listeningPort}`);
+        console.log(`Cucu Ridu (CLUSTER) lanciato => ${local ? local + listeningPort : listeningPort}`);
         if (error) console.log(error.message);
     });
 
