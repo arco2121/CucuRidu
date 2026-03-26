@@ -1,6 +1,6 @@
 //Works only if using the cluster
-const cleanStanzeOnCluster = () => {
-    const cleanUpIfOld = async (Stanze, timeout) => {
+const cleanStanzeOnCluster = (Stanze, timeout = 3600000) => {
+    const cleanUpIfOld = async () => {
         try {
            await Stanze.checkOld();
         } catch (err) { console.error(err); } finally {

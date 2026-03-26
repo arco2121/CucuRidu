@@ -22,4 +22,4 @@ jobs:
 
       - name: Trigger Render Deploy
         run: |
-          curl -f ${{ secrets.RENDER_KEY }}
+          curl -f "${{ secrets.RENDER_KEY }}&clear_cache=do"
