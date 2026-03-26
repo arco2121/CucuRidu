@@ -1,5 +1,8 @@
-const fs = require('fs');
-require('dotenv').config({ path: fs.existsSync('.env') ? '.env' : '.envXample' });
+require('dotenv').config({
+    path: ['.envXample', '.env'],
+    quiet: true,
+    override: true
+});
 const path = require("path");
 const singleApp = require(path.join(__dirname, "/application/single"));
 const clusterApp = require(path.join(__dirname, "/application/cluster"));
