@@ -1,14 +1,28 @@
-<audio preload="auto" loop id="musicAudio" src="/audio/background/<%= bgm %>.ogg" class="hidden"></audio>
+<div id="audio-init-data" data-bgm="/audio/background/<%= bgm %>.ogg" class="hidden"></div>
 <audio preload="none" id="soundAudio" class="hidden"></audio>
 
 <script>
-    const musicPlayer = document.getElementById("musicAudio");
-    const soundPlayer = document.getElementById("soundAudio");
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+
+    let bgmSource = null;
+    let bgmBuffer = null;
+
     const audiosCache = {};
     const vibrationPattern = [9, 5, 9];
     const buttons = new Set();
     const SOUND_COUNT = 1;
     const randomSound = () => Math.floor(Math.random() * SOUND_COUNT) + 1;
+
+    const fetchAndDecode = async (url) => {
+        try {
+            const response = await fetch(url);
+            const arrayBuffer = await response.arrayBuffer();
+            return await audioCtx.decodeAudioData(arrayBuffer);
+        } catch (e) {
+            return null;
+        }
+    };
 
     const vibrate = (pattern) => {
         const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
@@ -18,43 +32,64 @@
     };
 
     const preloadSounds = async () => {
+        const bgmUrl = "/audio/background/<%= bgm %>.ogg";
+        fetchAndDecode(bgmUrl).then(buffer => { bgmBuffer = buffer; });
+
         const loads = [];
         for (let i = 1; i <= SOUND_COUNT; i++) {
             if (!audiosCache[i]) {
                 loads.push(
-                    fetch("/audio/sound/" + i + ".mp3")
-                        .then(r => r.ok ? r.blob() : Promise.reject())
-                        .then(blob => { audiosCache[i] = URL.createObjectURL(blob); })
-                        .catch(() => {})
+                    fetchAndDecode("/audio/sound/" + i + ".mp3")
+                        .then(buffer => { if(buffer) audiosCache[i] = buffer; })
                 );
             }
         }
         await Promise.all(loads);
     };
 
-    const playAudio = async (elementToPlay, checkValue = "sound", reverse = false) => {
-        if (reverse) return elementToPlay.pause();
+    const playAudio = async (checkValue = "sound", reverse = false) => {
         const savedSettings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
         const permissions = { audio: true, sound: true, ...savedSettings };
+
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+
         try {
             switch (checkValue) {
                 case "sound": {
-                    if (!permissions[checkValue]) return;
+                    if (!permissions[checkValue] || reverse) return;
+
                     const sound = randomSound();
-                    if (!audiosCache[sound]) {
-                        const result = await fetch("/audio/sound/" + sound + ".mp3");
-                        if (!result.ok) throw new Error("audio not found");
-                        audiosCache[sound] = URL.createObjectURL(await result.blob());
+                    let buffer = audiosCache[sound];
+
+                    if (!buffer) {
+                        buffer = await fetchAndDecode("/audio/sound/" + sound + ".mp3");
+                        if (buffer) audiosCache[sound] = buffer;
                     }
-                    if (elementToPlay.src !== audiosCache[sound])
-                        elementToPlay.src = audiosCache[sound];
-                    elementToPlay.currentTime = 0;
-                    elementToPlay.play();
+
+                    if (buffer) {
+                        const source = audioCtx.createBufferSource();
+                        source.buffer = buffer;
+                        source.connect(audioCtx.destination);
+                        source.start(0);
+                    }
                     break;
                 }
                 case "audio": {
-                    if (permissions[checkValue]) elementToPlay.play();
-                    else elementToPlay.pause();
+                    if (reverse || !permissions[checkValue]) {
+                        if (bgmSource) {
+                            bgmSource.stop();
+                            bgmSource = null;
+                        }
+                        return;
+                    }
+
+                    if (bgmSource || !bgmBuffer) return;
+
+                    bgmSource = audioCtx.createBufferSource();
+                    bgmSource.buffer = bgmBuffer;
+                    bgmSource.loop = true;
+                    bgmSource.connect(audioCtx.destination);
+                    bgmSource.start(0);
                     break;
                 }
             }
@@ -65,7 +100,7 @@
 
     (() => {
         const initMusic = async () => {
-            try { await playAudio(musicPlayer, "audio"); } catch {}
+            try { await playAudio("audio"); } catch {}
         };
 
         const initSound = () => {
@@ -81,7 +116,7 @@
                 if (!buttons.has(button)) {
                     button.addEventListener("click", () => {
                         vibrate(vibrationPattern);
-                        playAudio(soundPlayer);
+                        playAudio("sound");
                     });
                     buttons.add(button);
                 }
@@ -98,8 +133,8 @@
         document.addEventListener("click", initMusic, { once: true });
 
         document.addEventListener("visibilitychange", () => {
-            if (document.hidden) playAudio(musicPlayer, "audio", true);
-            else playAudio(musicPlayer, "audio");
+            if (document.hidden) playAudio("audio", true);
+            else playAudio("audio");
         });
 
         window.addEventListener("pageshow", (event) => {

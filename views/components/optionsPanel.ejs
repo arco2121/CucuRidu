@@ -85,7 +85,7 @@
         // Event Listeners
         musicBtn.addEventListener("click", async (e) => {
             toggleSetting(e, "audio");
-            await playAudio(musicPlayer, "audio");
+            await playAudio("audio");
         });
         soundBtn.addEventListener("click", (e) => toggleSetting(e, "sound"));
         vibrationBtn.addEventListener("click", (e) => toggleSetting(e, "vibration"));
