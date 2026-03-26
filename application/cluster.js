@@ -7,6 +7,7 @@ const { Session } = require(path.join(__dirname, "/include/script/Session"));
 const { generateId } = require(path.join(__dirname, "/include/script/generazione"));
 const appConfig = require(path.join(__dirname, "/configurations/appConfig"));
 const serverConfig = require(path.join(__dirname, "/configurations/serverConfig"));
+const cleanClusterStanze = require(path.join(__dirname, "/configurations/cleanStanzeOnCluster"));
 const { Pool } = require("pg");
 const { createAdapter } = require("@socket.io/postgres-adapter");
 const { createClient } = require("@supabase/supabase-js");
@@ -84,6 +85,7 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
     appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze);
 
     serverConfig(server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout);
+    cleanClusterStanze(Stanze, timeout);
 
     const listening = httpServer.listen(port, (error) => {
         const listeningPort = httpServer.address().port;

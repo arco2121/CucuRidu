@@ -34,6 +34,11 @@ class ClusterStanze {
         if (error) throw error;
     }
 
+    async checkOld() {
+        const { error } = await this.supabase.rpc('delete_old_stanze');
+        if (error) throw error;
+    }
+
     async delete(key) {
         const { error } = await this.supabase
             .from(this.table)
