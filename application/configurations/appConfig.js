@@ -17,7 +17,6 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
         params: params,
         page: page,
         headerIcon: getIcon(true),
-        knownOrigin: process.env.HOSTING || null
     });
 
     const resumeGame = async (req, res, next) => {

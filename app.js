@@ -1,5 +1,7 @@
+const envFiles = {};
 require('dotenv').config({
-    path: ['.envXample', '.env'],
+    path: ['.envXample', '.ENV'],
+    processEnv: envFiles,
     quiet: true,
     override: true
 });
@@ -15,14 +17,18 @@ const attempt = async (operation, fallback) => {
     try { return await operation();}
     catch (err) {return await fallback(err);}
 };
-const cluster = process.env.USE_CLUSTER === "true" || process.env.ON_PLATFORM === "true";
-const local = process.env.ON_PLATFORM !== "true" ? "http://localhost:" : false;
+const ENV = {
+    ...envFiles,
+    ...process.env
+};
+const cluster = ENV.USE_CLUSTER === "true";
+const local = ENV.ON_PLATFORM !== "true" ? "http://localhost:" : false;
 const port = !local ? 7860 : 0
 
 const initApp = async () => {
     if (!cluster) return await singleApp(local, port, allowedOrigins);
     await attempt(
-        () => clusterApp(local, port, allowedOrigins),
+        () => clusterApp(local, port, allowedOrigins, ENV),
         async (err) => {
             console.warn("Cluster failed => " + err.message);
             await singleApp(local, port, allowedOrigins);

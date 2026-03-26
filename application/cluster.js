@@ -13,11 +13,11 @@ const { createClient } = require("@supabase/supabase-js");
 const { ClusterStanze } = require(path.join(__dirname, "/include/script/ClusterStanze"));
 const { ClusterSet } = require(path.join(__dirname, "/include/script/ClusterSet"));
 
-const clusterApp = async (local, port, allowedOrigins, timeout = 3600000) => {
-    const key = process.env.DATABASE_KEY;
-    const url = process.env.DATABASE_URL;
-    const password = process.env.DATABASE_PASSWORD;
-    const poolString = process.env.DATABASE_POOL?.replace("[PASSWORD]", password || "");
+const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 3600000) => {
+    const key = env.DATABASE_KEY;
+    const url = env.DATABASE_URL;
+    const password = env.DATABASE_PASSWORD;
+    const poolString = env.DATABASE_POOL?.replace("[PASSWORD]", password || "");
     if(!key || !url || !poolString || !password) throw new Error("Chiavi per il server mancanti");
 
     const database = createClient(url, key);
