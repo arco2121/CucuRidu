@@ -91,8 +91,8 @@ const clusterApp = async (local, port, allowedOrigins, timeout = 3600000) => {
         if (error) console.log(error.message);
     });
 
-    const terminate = (server, serverIo, Stanze) => {
-        for (const id of Stanze.tempKeys()) serverIo.to(id).emit("stanzaChiusa");
+    const terminate = async (server, serverIo, Stanze) => {
+        for (const id of await Stanze.deletionKeys()) serverIo.to(id).emit("stanzaChiusa");
         serverIo.close();
         server.close(async () => {
             await Stanze.clear();
@@ -109,8 +109,8 @@ const clusterApp = async (local, port, allowedOrigins, timeout = 3600000) => {
         }, 10000);
     };
 
-    process.on('SIGINT',  () => terminate(listening, server, Stanze));
-    process.on('SIGTERM', () => terminate(listening, server, Stanze));
+    process.on('SIGINT',  async () => await terminate(listening, server, Stanze));
+    process.on('SIGTERM', async () => await terminate(listening, server, Stanze));
 };
 
 module.exports = clusterApp;

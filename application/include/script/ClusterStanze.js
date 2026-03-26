@@ -3,11 +3,11 @@ const { Stanza } = require(path.join(__dirname, 'Stanza'));
 
 class ClusterStanze {
 
-    constructor(client) {
+    constructor(client, machine_id) {
         this.supabase = client;
         this.table = "stanze";
-        this.temporary = new Set();
         this.keyField = "stanza_Id";
+        this.machine_id = machine_id;
         this.valueField = "stanza";
     }
 
@@ -27,10 +27,9 @@ class ClusterStanze {
 
         const { error } = await this.supabase.rpc('update_stanza', {
             target_id: key,
-            new_json: jsonToMerge
+            new_json: jsonToMerge,
+            machine_id: this.machine_id
         });
-
-        this.temporary.add(key);
 
         if (error) throw error;
     }
@@ -39,7 +38,8 @@ class ClusterStanze {
         const { error } = await this.supabase
             .from(this.table)
             .delete()
-            .eq(this.keyField, key);
+            .eq(this.keyField, key)
+            .eq("machine_id", this.machine_id);
 
         if (error) throw error;
     }
@@ -55,8 +55,12 @@ class ClusterStanze {
     }
 
     async clear() {
-        for(const key of this.temporary.keys()) await this.delete(key);
-        this.temporary.clear();
+        const { error } = await this.supabase
+            .from(this.table)
+            .delete()
+            .eq("machine_id", this.machine_id);
+
+        if (error) throw error;
     }
 
     async keys() {
@@ -69,8 +73,15 @@ class ClusterStanze {
         return data.map(item => item[this.keyField]);
     }
 
-    tempKeys() {
-        return Array.from(this.temporary.keys());
+    async deletionKeys() {
+        const { data, error } = await this.supabase
+            .from(this.table)
+            .select(this.keyField)
+            .eq("machine_id", this.machine_id);
+
+        if (error || !data) return [];
+
+        return data.map(item => item[this.keyField]);
     }
 
     async values() {
