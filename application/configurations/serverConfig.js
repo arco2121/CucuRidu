@@ -15,6 +15,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
     const emitStatoStanza = async (stanzaId, socket, next = () => {}) => {
         const Stanza = await Stanze.get(stanzaId);
         if (!Stanza) return next();
+        socket.join(stanzaId);
         //console.log(`Stanza ${stanzaId} => ${Stanza.toString()}`)
         if(!socket.data.referenceGiocatore) return next();
 
@@ -69,17 +70,18 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         } = serverSession.validate(checks, socket.handshake.auth, socket.handshake.auth?.token)
         if (validation !== TEMPORARY_TOKEN) return next(new Error("INVALID_KEY"));
         if (!stanzaId) return next();
-        const exist = (await Stanze.get(stanzaId))?.trovaGiocatoreAnchePassato(userId);
+        const stanza = await Stanze.get(stanzaId);
+        const exist = stanza?.trovaGiocatoreAnchePassato(userId);
         if (exist === null) return next();
         if (!exist) return next(new Error("SESSION_EXPIRED"));
         if (exist.online === true) return next(new Error("ALREADY_CONNECTED"));
         exist.online = true;
+        await Stanze.set(stanzaId, stanza);
         socket.data.referenceGiocatore = exist;
-        socket.join(stanzaId);
         await emitStatoStanza(stanzaId, socket, next);
     });
 
-    server.on("connection", async (user) => {
+    server.on("connection", (user) => {
 
         user.on("creaStanza", async (data) => {
             try {

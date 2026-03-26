@@ -12,26 +12,24 @@ let referenceGiocatore;
 let referenceStanza = "";
 
 const lasciaStanza = () => {
+    const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
+    const token = settings["savingToken"];
+    settings["savingToken"] = null;
+    localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
+
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), 5000);
+
     fetch("/deleteGameReference", {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: "include",
+        signal: controller.signal,
         body: JSON.stringify({
-            token: JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}")["savingToken"] || null
+            token: token || null
         })
-    }).then(async (response) => {
-        const result = (await response.json())["result"];
-        if(result) {
-            const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
-            localStorage.setItem("cucuRiduSettings", JSON.stringify({
-                ...settings,
-                savingToken: null
-            }));
-        }
-        navigateWithLoading("/");
-    });
+    }).catch(err => console.error(err))
+        .finally(() => navigateWithLoading("/"));
 };
 
 //Endpoints
@@ -58,6 +56,15 @@ socket.on("connect", () => {
 
 socket.on("disconnect", () => document.dispatchEvent(stateDisconnected));
 
+socket.on("reconnect", () => document.dispatchEvent(stateConnected));
+
+socket.on("reconnect_attempt", () => document.dispatchEvent(stateDisconnected));
+
+socket.on("reconnect_failed", () => {
+    alert("Impossibile riconnettersi al server, STACCA STACCA!");
+    lasciaStanza();
+});
+
 socket.on("connect_error", (err) => {
     switch(err.message) {
         case "SESSION_EXPIRED" : {
@@ -73,9 +80,11 @@ socket.on("connect_error", (err) => {
             break;
         }
         case "xhr poll error" : {
+            document.dispatchEvent(stateDisconnected);
             break;
         }
         case "websocket error" : {
+            document.dispatchEvent(stateDisconnected);
             break;
         }
         default: {
