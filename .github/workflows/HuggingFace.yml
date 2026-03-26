@@ -35,6 +35,6 @@ jobs:
             repo_id='arco2120/cucuridu',
             repo_type='space',
             token='$HF_TOKEN',
-            ignore_patterns=['ignore/**', 'LICENSE', '.github/**', '.git/**', 'install.py']
+            ignore_patterns=['ignore/**', 'LICENSE', '.github/**', '.git/**', 'install.py', '.envXample']
           )
           "
