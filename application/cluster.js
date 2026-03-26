@@ -32,7 +32,7 @@ const clusterApp = async (local, port, allowedOrigins, timeout = 3600000) => {
     const httpServer = createServer(app);
     const serverSession = await new Session(timeout).init(generationMemory);
 
-    const Stanze = new ClusterStanze(database);
+    const Stanze = new ClusterStanze(database, await generateId(64));
     const TEMPORARY_TOKEN = await generateId(64, generationMemory);
 
     const server = new Server(httpServer, {
