@@ -10,6 +10,7 @@ on:
       - '.github/**'
       - '.git/**'
       - 'install.py'
+      - 'README_HF.md'
   workflow_dispatch:
 
 jobs:
