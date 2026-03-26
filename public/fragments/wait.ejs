@@ -13,6 +13,9 @@
                         <button class="button btn_mediumText btn_style_3 sour_gummy_bold btn_doubleBorder" id="packsButton">Espansioni</button>
                     <% } %>
                 <% } %>
+                <% if(!primoRound && seiMaster) { %>
+                    <button class="button btn_bigText btn_style_1 sour_gummy_bold btn_doubleBorder" id="chiudiButton">Termina</button>
+                <% } %>
             </div>
 
         </div>
@@ -35,6 +38,7 @@
     const shareButton = document.getElementById("shareButton");
     const showGiocatori = document.getElementById("showGiocatori");
     const startButton = document.getElementById("startButton");
+    const chiudiButton = document.getElementById("chiudiButton");
     const packsButton = document.getElementById("packsButton");
     const idStanza = fromFragments["stanzaId"];
 
@@ -69,6 +73,10 @@
     });
 
     startButton?.addEventListener("click", () => socket.emit("iniziaTurno", {
+        id: referenceStanza
+    }));
+
+    chiudiButton?.addEventListener("click", () => socket.emit("terminaPartita", {
         id: referenceStanza
     }));
 

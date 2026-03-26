@@ -11,7 +11,7 @@ const { generateId } = require(path.join(__dirname, '/generazione'));
 
 class Stanza {
 
-    constructor(minimoGiocatori = 2) {
+    constructor(minimoGiocatori = 3) {
         this.giocatori = new Map();
         this.giocatoriPassati = new Set();
         this.stato = StatoStanza.WAIT;
@@ -130,7 +130,7 @@ class Stanza {
     }
 
     classifica() {
-        return Array.from(this.giocatori.values() || [])?.sort((a, b) => b.punti - a.punti)
+        return [...Array.from(this.giocatori.values() || [])?.sort((a, b) => b.punti - a.punti)];
     }
 
     iniziaTurno(chiStaChidedendo) {

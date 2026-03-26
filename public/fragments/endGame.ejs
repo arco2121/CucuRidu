@@ -1,0 +1,41 @@
+<div class="flex_gap_30 game_main_con">
+    <div class="column sour_gummy_regular flex_gap_30 wait_code_con">
+        <div class="winner_profile_con flex_gap_20 textAlign_center">
+            <img class="winner_pfp btn_doubleBorder active_Img" src="<%= primoPosto[0].pfp %>" alt="pfp" id="displayPfp">
+            <h4 id="winnerText" class="sour_gummy_bold">
+                <% if(primoPosto.length === 1) { %>
+                    ✦ <%= primoPosto[0].username %> ha vinto il round con <%= puntiMassimi %> punt<%= puntiMassimi === 1 ? "o" : "i"%> ✦
+
+                <% } else { %>
+                    ✦<%= " " %>
+                    <% for(const giocatore of primoPosto) { %>
+                        <%= giocatore.id === idPrimoGiocatore ? "" : " e " %><%= giocatore.username %>
+                    <% } %>
+                    <%= " " %>hanno vinto il round con <%= puntiMassimi %> punt<%= puntiMassimi === 1 ? "o" : "i"%> ✦
+
+                <% } %>
+            </h4>
+        </div>
+
+        <div class="column wait_players_list flex_gap_15 btn_doubleBorder">
+            <h1 class="sour_gummy_bold wait_players_list_title" id="numeroGiocatori">Classifica:</h1>
+            <h4 class="sour_gummy_bold" id="attesa"></h4>
+            <div class="wait_players_list_hr"></div>
+            <div class="appear" id="showGiocatori">
+
+            </div>
+        </div>
+        <button id="tornaHome" class="button btn_mediumText btn_style_1 sour_gummy_bold btn_doubleBorder">Esci</button>
+    </div>
+</div>
+
+<script>
+    const tornaHome = document.getElementById("tornaHome");
+    const showGiocatori = document.getElementById("showGiocatori");
+
+    renderFragment(showGiocatori, "components/giocatoreRow", {
+        giocatori: fromFragments["classifica"]
+    });
+
+    tornaHome.addEventListener("click", () => lasciaStanza());
+</script>

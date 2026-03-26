@@ -67,7 +67,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 server.socketsLeave(id);
                 console.log("Stanza eliminata => " + id);
             }, generationMemory, Stanze);
-        } catch (err) { console.error(err); }finally {
+        } catch (err) { console.error(err); } finally {
             setTimeout(cleanUp, timeout/30/60);
         }
     };
@@ -94,7 +94,6 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
     });
 
     server.on("connection", (user) => {
-
         user.on("creaStanza", async (data) => {
             try {
                 const { username, pfp } = data;
@@ -164,7 +163,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 const result = Stanza.iniziaTurno(user.data.referenceGiocatore?.id);
                 if(typeof result === "object") {
                     server.to(stanzaId).emit("partitaTerminata", {
-                        classifica: result
+                        classifica: result.map(giocatore => giocatore.toJSON())
                     });
                     for(const id of Stanza.giocatoriPassati.values()) await generationMemory.delete(id);
                     await Stanze.delete(stanzaId);
@@ -256,7 +255,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 const result = Stanza.terminaPartita(user.data.referenceGiocatore.id);
                 if(result) {
                     server.to(stanzaId).emit("partitaTerminata", {
-                        classifica: result
+                        classifica: result.map(giocatore => giocatore.toJSON())
                     });
                     for(const id of Stanza.giocatoriPassati.values()) await generationMemory.delete(id);
                     await Stanze.delete(stanzaId);
@@ -314,7 +313,6 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 const stanza = await Stanze.get(stanzaId);
                 const result = stanza?.eliminaGiocatore(giocatoreId);
                 if(result) {
-                    await Stanze.set(stanzaId, stanza);
                     server.in(stanzaId).fetchSockets().then(sockets => {
                         const persona = sockets.find(socket =>
                             socket.data?.referenceGiocatore.id === giocatoreId);
@@ -323,6 +321,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                             persona.leave(stanzaId);
                         }
                     });
+                    await Stanze.set(stanzaId, stanza);
                     server.in(stanzaId).fetchSockets().then(async (sockets) => {
                         for(const socket of sockets) {
                             socket.data.referenceGiocatore = stanza.giocatori.get(socket.data.referenceGiocatore.id);
@@ -345,9 +344,10 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 giocatore.online = false;
                 await Stanze.set(stanzaId, stanza);
                 setTimeout(async () => {
-                    if (stanza && !giocatore.isOnline() && stanza.trovaGiocatore(giocatore.id)) {
-                        stanza.eliminaGiocatore(giocatore.id);
-                        await Stanze.set(stanzaId, stanza);
+                    const stanzaDopo = await Stanze.get(stanzaId);
+                    const giocatoreDopo = stanzaDopo?.trovaGiocatore(user.data.referenceGiocatore?.id);
+                    if (stanzaDopo && stanzaDopo.trovaGiocatore(giocatore.id) && !giocatoreDopo.isOnline()) {
+                        stanzaDopo.eliminaGiocatore(giocatore.id);
                         console.log("Giocatore eliminato da Stanza => " + stanzaId);
                         server.in(stanzaId).fetchSockets().then(sockets => {
                             for(const socket of sockets) {
@@ -355,6 +355,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                                 emitStatoStanza(stanzaId, socket);
                             }
                         });
+                        await Stanze.set(stanzaId, stanzaDopo);
                     }
                 }, timeout/60);
             }
