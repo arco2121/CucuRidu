@@ -6,10 +6,19 @@ const MemoryStore = require('memorystore')(session)
 
 class Session {
 
-    constructor(memory, timeout = 3600000) {
+    constructor(timeout = 3600000, blacklist = new Map()) {
         this.timeout = timeout;
-        this.blackList = new Map();
-        setInterval(() => this._clearBlackList(), timeout);
+        this.blackList = blacklist;
+        const clearBlacklist = async () => {
+            try {
+                await this._clearBlackList();
+            } catch (error) { console.error(error.message); }
+            finally {
+                setTimeout(clearBlacklist, timeout);
+            }
+        };
+
+        clearBlacklist();
     }
 
     async init(memory) {
@@ -34,11 +43,11 @@ class Session {
         return jwt.sign({ ...data }, this.tokenKey, { expiresIn: seconds });
     }
 
-    get(req, token = null) {
+    async get(req, token = null) {
         if (req?.session?.storeData)
             return req.session.storeData;
         if (token) {
-            if (this.blackList.has(token)) return {};
+            if (await this.blackList.has(token)) return {};
             try {
                 return jwt.verify(token, this.tokenKey);
             } catch {
@@ -48,11 +57,11 @@ class Session {
         return {};
     }
 
-    invalidate(req, token) {
+    async invalidate(req, token) {
         if (req?.session)
             req.session.destroy();
         if (token)
-            this.blackList.set(token, Date.now() + this.timeout);
+            await this.blackList.set(token, Date.now() + this.timeout);
     }
 
     validate(keys, ...sources) {
@@ -76,10 +85,10 @@ class Session {
         return result;
     }
 
-    _clearBlackList() {
+    async _clearBlackList() {
         const now = Date.now();
-        for (const [token, expiry] of this.blackList.entries()) {
-            if (now > expiry) this.blackList.delete(token);
+        for (const [token, expiry] of await this.blackList.entries()) {
+            if (now > expiry) await this.blackList.delete(token);
         }
     }
 }

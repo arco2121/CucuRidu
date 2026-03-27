@@ -1,13 +1,13 @@
 const path = require('path');
 const { Stanza } = require(path.join(__dirname, 'Stanza'));
+const { ClusterMap } = require(path.join(__dirname, 'ClusterMap'));
 
-class ClusterStanze {
+class ClusterStanze extends ClusterMap {
 
     constructor(client, machine_id) {
-        this.supabase = client;
+        super(client, machine_id);
         this.table = "stanze";
         this.keyField = "stanza_Id";
-        this.machine_id = machine_id;
         this.valueField = "stanza";
     }
 
@@ -39,45 +39,12 @@ class ClusterStanze {
         if (error) throw error;
     }
 
-    async delete(key) {
-        const { error } = await this.supabase
-            .from(this.table)
-            .delete()
-            .eq(this.keyField, key)
-
-        if (error) throw error;
-    }
-
-    async has(key) {
-        const { data, error } = await this.supabase
-            .from(this.table)
-            .select(this.keyField)
-            .eq(this.keyField, key)
-            .maybeSingle();
-
-        return !!data;
-    }
-
-    async clear() {
-        const { error } = await this.supabase
-            .from(this.table)
-            .delete()
-            .eq("machine_id", this.machine_id);
-
-        if (error) throw error;
-    }
-
-    async keys() {
-        const { data, error } = await this.supabase
-            .from(this.table)
-            .select(this.keyField);
-
-        if (error || !data) return [];
-
-        return data.map(item => item[this.keyField]);
-    }
 
     async values() {
+        return (await this.entries()).map(entry => entry[1]);
+    }
+
+    async entries() {
         const { data, error } = await this.supabase
             .from(this.table)
             .select(`${this.keyField}, ${this.valueField}`);
@@ -88,14 +55,6 @@ class ClusterStanze {
             item[this.keyField],
             await Stanza.fromJSON(item[this.valueField])
         ]));
-    }
-
-    async size() {
-        const { count, error } = await this.supabase
-            .from(this.table)
-            .select('*', { count: 'exact', head: true })
-
-        return error ? 0 : count;
     }
 }
 

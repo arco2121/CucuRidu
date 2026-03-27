@@ -14,6 +14,7 @@ const { ClusterStanze } = require(path.join(__dirname, "/include/script/ClusterS
 const { ClusterSet } = require(path.join(__dirname, "/include/script/ClusterSet"));
 const { Stanza } = require(path.join(__dirname, "/include/script/Stanza"));
 const { cleanUpStanze } = require(path.join(__dirname, "/configurations/clusterExtensions"));
+const { ClusterMap } = require(path.join(__dirname, "/include/script/ClusterMap"));
 
 const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 3600000) => {
     const key = env.DATABASE_KEY;
@@ -29,12 +30,13 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
         idleTimeoutMillis: timeout/100,
         connectionTimeoutMillis: timeout/1000,
     });
+    const machineId = await generateId(64);
 
     const app = express();
     const httpServer = createServer(app);
-    const serverSession = await new Session(timeout).init(generationMemory);
+    const serverSession = await new Session(timeout, new ClusterMap(database, machineId)).init(generationMemory);
 
-    const Stanze = new ClusterStanze(database, await generateId(64));
+    const Stanze = new ClusterStanze(database, machineId);
     const TEMPORARY_TOKEN = await generateId(64, generationMemory);
 
     const server = new Server(httpServer, {
@@ -78,8 +80,8 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
         resave: false,
         saveUninitialized: true,
         cookie: {
-            secure: true,
-            sameSite: 'none',
+            secure: !local,
+            sameSite: !local ? 'none' : null,
             maxAge: timeout
         }
     }));

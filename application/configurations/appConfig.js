@@ -20,7 +20,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
     });
 
     const resumeGame = async (req, res, next) => {
-        const { userId, stanzaId } = serverSession.get(req, req.query?.token);
+        const { userId, stanzaId } = await serverSession.get(req, req.query?.token);
         const redirecting = req.query?.token ? "?token=" + req.query.token : "";
         if(userId && (await Stanze.get(stanzaId))?.trovaGiocatore(userId)) return res.redirect("/game" + redirecting);
         req.deleteToken = !!req.query?.token;
@@ -89,7 +89,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
 
     app.get("/game", async (req, res) => {
         const check = ["nome", "pfp", "stanzaId", "userId"];
-        const {nome, pfp, stanzaId, userId} = serverSession.validate(check, req.session.storeData, req.query?.token);
+        const {nome, pfp, stanzaId, userId} = await serverSession.validate(check, req.session.storeData, req.query?.token);
         if (userId && stanzaId && await Stanze.has(stanzaId) && (await Stanze.get(stanzaId)).trovaGiocatore(userId))
             renderPage(res, "lobby", {
                 userId: userId,
@@ -109,7 +109,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
                 bgm: "GameMusic-Candy_Bazaar"
             });
         } else {
-            serverSession.invalidate(req, req.query?.token);
+            await serverSession.invalidate(req, req.query?.token);
             res.redirect("/");
         }
     });
@@ -156,7 +156,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
         res.status(200).json({result: stato});
     })
 
-    app.post("/saveGameReference", (req, res) => {
+    app.post("/saveGameReference", async (req, res) => {
         const {userId, stanzaId} = req.body || {};
         if (userId && stanzaId) {
             const token = serverSession.set(req, {
@@ -168,12 +168,12 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
                 fallback: token
             });
         }
-        serverSession.invalidate(req);
+        await serverSession.invalidate(req);
         res.status(406).json({result: false});
     });
 
-    app.post("/deleteGameReference", (req, res) => {
-        serverSession.invalidate(req, req.body?.token);
+    app.post("/deleteGameReference", async (req, res) => {
+        await serverSession.invalidate(req, req.body?.token);
         res.status(200).json({result: true});
     });
 
