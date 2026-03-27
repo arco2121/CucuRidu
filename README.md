@@ -73,7 +73,7 @@ Il server parte su una porta casuale e te la dice in console. Aprila nel browser
 
 Pull request benvenute. Per modifiche grosse, apri prima una issue così ne parliamo da persone civili.
 
-Per aggiungere carte al mazzo standard: [guida contribuire →](https://github.com/arco2121/CucuRidu/wiki/Contribuire-al-Mazzo-Standard)
+Per aggiungere carte al mazzo standard: [Come contribuire →](https://github.com/arco2121/CucuRidu/wiki/Contribuire-al-Mazzo-Standard)
 
 ---
 
