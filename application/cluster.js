@@ -33,8 +33,9 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
     const machineId = await generateId(64);
 
     const app = express();
+    const sessionsMap = new ClusterMap(database, machineId);
     const httpServer = createServer(app);
-    const serverSession = await new Session(timeout, new ClusterMap(database, machineId)).init(generationMemory);
+    const serverSession = await new Session(timeout, sessionsMap).init(generationMemory);
 
     const Stanze = new ClusterStanze(database, machineId);
     const TEMPORARY_TOKEN = await generateId(64, generationMemory);
@@ -105,7 +106,8 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
 
         server.close(async () => {
             await Stanze.clear();
-            await generationMemory.clear();
+            await generationMemory.clear()
+            await sessionsMap.clear();
             console.error('Chiusura normale');
             process.exit(0);
         });
@@ -113,6 +115,7 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
         setTimeout(async () => {
             await Stanze.clear();
             await generationMemory.clear();
+            await sessionsMap.clear();
             console.error('Chiusura forzata');
             process.exit(1);
         }, 10000);
