@@ -1,5 +1,5 @@
 //Works only if using the cluster
-const cleanStanzeOnCluster = (Stanze, timeout = 3600000) => {
+const cleanUpStanze = (Stanze, timeout = 3600000) => {
     const cleanUpIfOld = async () => {
         try {
            await Stanze.checkOld();
@@ -11,4 +11,4 @@ const cleanStanzeOnCluster = (Stanze, timeout = 3600000) => {
     cleanUpIfOld();
 };
 
-module.exports = cleanStanzeOnCluster;
+module.exports = { cleanUpStanze };

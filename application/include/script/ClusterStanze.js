@@ -77,17 +77,6 @@ class ClusterStanze {
         return data.map(item => item[this.keyField]);
     }
 
-    async deletionKeys() {
-        const { data, error } = await this.supabase
-            .from(this.table)
-            .select(this.keyField)
-            .eq("machine_id", this.machine_id);
-
-        if (error || !data) return [];
-
-        return data.map(item => item[this.keyField]);
-    }
-
     async values() {
         const { data, error } = await this.supabase
             .from(this.table)

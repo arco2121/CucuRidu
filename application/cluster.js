@@ -7,12 +7,13 @@ const { Session } = require(path.join(__dirname, "/include/script/Session"));
 const { generateId } = require(path.join(__dirname, "/include/script/generazione"));
 const appConfig = require(path.join(__dirname, "/configurations/appConfig"));
 const serverConfig = require(path.join(__dirname, "/configurations/serverConfig"));
-const cleanClusterStanze = require(path.join(__dirname, "/configurations/cleanStanzeOnCluster"));
 const { Pool } = require("pg");
 const { createAdapter } = require("@socket.io/postgres-adapter");
 const { createClient } = require("@supabase/supabase-js");
 const { ClusterStanze } = require(path.join(__dirname, "/include/script/ClusterStanze"));
 const { ClusterSet } = require(path.join(__dirname, "/include/script/ClusterSet"));
+const { Stanza } = require(path.join(__dirname, "../include/script/Stanza"));
+const { cleanUpStanze } = require(path.join(__dirname, "/configurations/clusterExtensions"));
 
 const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 3600000) => {
     const key = env.DATABASE_KEY;
@@ -85,7 +86,6 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
     appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze);
 
     serverConfig(server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout);
-    cleanClusterStanze(Stanze, timeout);
 
     const listening = httpServer.listen(port, (error) => {
         const listeningPort = httpServer.address().port;
@@ -94,8 +94,13 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
     });
 
     const terminate = async (server, serverIo, Stanze) => {
-        for (const id of await Stanze.deletionKeys()) serverIo.to(id).emit("stanzaChiusa");
+        await Stanza.pulisciStanza((id) => {
+            server.to(id).emit("stanzaChiusa");
+            server.socketsLeave(id);
+            console.log("Stanza eliminata => " + id);
+        }, generationMemory, Stanze);
         serverIo.close();
+
         server.close(async () => {
             await Stanze.clear();
             await generationMemory.clear();
