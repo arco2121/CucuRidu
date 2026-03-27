@@ -12,7 +12,7 @@ const { createAdapter } = require("@socket.io/postgres-adapter");
 const { createClient } = require("@supabase/supabase-js");
 const { ClusterStanze } = require(path.join(__dirname, "/include/script/ClusterStanze"));
 const { ClusterSet } = require(path.join(__dirname, "/include/script/ClusterSet"));
-const { Stanza } = require(path.join(__dirname, "../include/script/Stanza"));
+const { Stanza } = require(path.join(__dirname, "/include/script/Stanza"));
 const { cleanUpStanze } = require(path.join(__dirname, "/configurations/clusterExtensions"));
 
 const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 3600000) => {
