@@ -1,3 +1,5 @@
+let deactivateMenu = false;
+
 document.addEventListener("DOMContentLoaded", () => {
     const game_section = document.getElementById("game_section");
     const pauseMenu = document.getElementById("pauseMenu");
@@ -17,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     menuBtn.addEventListener("click", () => {
+        if(deactivateMenu) return;
         socket.emit("listaGiocatori", {
             stanzaId: referenceStanza
         });

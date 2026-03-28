@@ -87,13 +87,15 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         if (!exist) return next(new Error("SESSION_EXPIRED"));
         if (exist.online === true) return next(new Error("ALREADY_CONNECTED"));
         exist.online = true;
+        socket.join(stanzaId);
         await Stanze.set(stanzaId, stanza);
         socket.data.referenceGiocatore = exist;
-        socket.join(stanzaId);
         await emitStatoStanza(stanzaId, socket, next);
     });
 
-    server.on("connection", (user) => {
+    server.on("connection", async (user) => {
+        await emitStatoStanza(Stanza.trovaDaGiocatore(user.data.referenceGiocatore?.id, await Stanze.values()), user);
+
         user.on("creaStanza", async (data) => {
             try {
                 const { username, pfp } = data;

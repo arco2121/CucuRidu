@@ -46,7 +46,7 @@ class Mazzo {
 
     prendiCarteByIndex(...indici) {
         const indiciOrdinati = [...indici].sort((a, b) => b - a);
-        const result = indici.map(i => this.carte[i]);
+        const result = [...indici.map(i => this.carte[i])];
         indiciOrdinati.forEach(i => {
             if (i >= 0 && i < this.carte.length) {
                 this.carte.splice(i, 1);
@@ -75,9 +75,9 @@ class Mazzo {
         }, 0);
 
         const first = frasiCompletamentiPair.some(mazzo => {
-            const f = mazzo.frasi || mazzo[0];
-            const c = mazzo.completamenti || mazzo[1];
-            return f && f.length > 5 && (33 + occorrenze * 3) >= c.length;
+            const c = mazzo.frasi || mazzo[0];
+            const f = mazzo.completamenti || mazzo[1];
+            return (f && f.length > 5) && ((33 + occorrenze * 3) >= c.length);
         });
         const second = frasiCompletamentiPair.every(mazzo => {
             const { hash: hashOriginale, ...dati } = mazzo;
@@ -89,6 +89,7 @@ class Mazzo {
 
             return hashOriginale === hashRicalcolato;
         });
+
         return first && second;
     }
 
