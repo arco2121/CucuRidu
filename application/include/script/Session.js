@@ -7,10 +7,11 @@ const pgSession = require('connect-pg-simple')(session);
 
 class Session {
 
-    constructor(timeout = 3600000, blacklist = new Map(), pool = false) {
+    constructor(timeout = 3600000, token, blacklist = new Map(), pool = false) {
         this.timeout = timeout;
         this.pool = pool;
         this.blackList = blacklist;
+        this.tokenKey = token;
         const clearBlacklist = async () => {
             try {
                 await this._clearBlackList();
@@ -23,19 +24,14 @@ class Session {
         clearBlacklist();
     }
 
-    async init(memory) {
-        this.tokenKey = await generateId(64, memory);
-        return this;
-    }
-
     setupSession(config = {}) {
         const store = this.pool ? new pgSession({
             pool: this.pool,
             tableName: 'sessions',
             createTableIfMissing: true,
-            pruneSessionInterval: this.timeout/100
+            pruneSessionInterval: this.timeout/1000
         }) : new MemoryStore({
-            checkPeriod: this.timeout/100
+            checkPeriod: this.timeout/1000
         });
 
         return session({

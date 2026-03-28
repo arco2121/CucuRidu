@@ -39,7 +39,7 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
     const app = express();
     const sessionsMap = new ClusterMap(database, machineId);
     const httpServer = createServer(app);
-    const serverSession = await new Session(timeout, sessionsMap, pool).init(generationMemory);
+    const serverSession = new Session(timeout, env.JWTKEY || await generateId(64, generationMemory), sessionsMap, pool);
 
     const Stanze = new ClusterStanze(database, machineId);
     const TEMPORARY_TOKEN = await generateId(64, generationMemory);

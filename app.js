@@ -26,12 +26,12 @@ const local = ENV.ON_PLATFORM !== "true" ? "http://localhost:" : false;
 const port = !local ? 7860 : 0
 
 const initApp = async () => {
-    if (!cluster) return await singleApp(local, port, allowedOrigins);
+    if (!cluster) return await singleApp(local, port, allowedOrigins, ENV);
     await attempt(
         () => clusterApp(local, port, allowedOrigins, ENV),
         async (err) => {
             console.warn("Cluster failed => " + err.message);
-            await singleApp(local, port, allowedOrigins);
+            await singleApp(local, port, allowedOrigins, ENV);
         }
     );
 };

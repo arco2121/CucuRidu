@@ -17,7 +17,7 @@ CREATE TABLE public.stanze (
     stanza jsonb DEFAULT '{}'::jsonb,
     machine_id text NOT NULL,
     updated_at timestamp with time zone DEFAULT now(),
-    CONSTRAINT stanze_pkey PRIMARY KEY ("stanza_Id", machine_id)
+    CONSTRAINT stanze_pkey PRIMARY KEY ("stanza_Id")
 );
 
 CREATE TABLE public.items (
@@ -25,7 +25,7 @@ CREATE TABLE public.items (
     value jsonb DEFAULT '{}'::jsonb,
     machine_id text NOT NULL,
     updated_at timestamp with time zone DEFAULT now(),
-    CONSTRAINT items_pkey PRIMARY KEY ("item_id", machine_id)
+    CONSTRAINT items_pkey PRIMARY KEY ("item_id")
 );
 
 CREATE OR REPLACE FUNCTION update_stanza(target_id text, new_json jsonb, id_of_machine text)
@@ -33,7 +33,7 @@ RETURNS void AS $$
 BEGIN
 INSERT INTO public.stanze ("stanza_Id", "stanza", "machine_id", "updated_at")
 VALUES (target_id, new_json, id_of_machine, now())
-    ON CONFLICT ("stanza_Id", "machine_id")
+    ON CONFLICT ("stanza_Id")
     DO UPDATE SET
     "stanza" = "stanze"."stanza" || EXCLUDED."stanza",
                "updated_at" = now();
@@ -45,7 +45,7 @@ RETURNS void AS $$
 BEGIN
 INSERT INTO public.items ("id_item", "value", "machine_id", "updated_at")
 VALUES (target_id, new_json, id_of_machine, now())
-    ON CONFLICT ("id_item", "machine_id")
+    ON CONFLICT ("id_item")
     DO UPDATE SET
     "value" = "items"."value" || EXCLUDED."value",
                "updated_at" = now();
