@@ -9,10 +9,9 @@
             const sortedPacks = [...knownPacks].sort((a, b) => a === 'standard' ? -1 : b === 'standard' ? 1 : 0);
             sortedPacks.forEach((pack, index) => {
                 const colorNum = (index % 4) + 1;
-                const isStandard = pack === 'standard' ? 'selectedPack' : '';
-                const segnaStandard = isStandard ? 'standard' : null
+                const segnaStandard = pack === 'standard' ? 'standard' : null
             %>
-            <div class="tile defaultPack normalPack shrinks_on_active_for_no_reason packColor_<%= colorNum %> <%= isStandard %> <%= segnaStandard %>" pack="<%= pack %>">
+            <div class="tile defaultPack normalPack shrinks_on_active_for_no_reason packColor_<%= colorNum %> <%= segnaStandard %>" pack="<%= pack %>">
                 <img onerror="this.src = '/assets/packs/personalizzato_empty.jpg'" src="/assets/packs/<%= pack %>.jpg" alt="<%= pack %>">
             </div>
             <% }) %>
@@ -47,7 +46,7 @@
     const tiles = document.querySelectorAll(".tile");
     const packsPanel = document.getElementById("packsPanel");
     const packs = [];
-    let standardPacks = new Set(['standard']);
+    let standardPacks = new Set();
 
     const readText = async (file) => {
         return new Promise((resolve, reject) => {
@@ -76,7 +75,7 @@
     });
 
     tiles.forEach((tile) => {
-        if (tile !== customTile)
+        if (tile !== customTile) {
             tile.addEventListener("click", () => {
                 if (!tile.classList.contains("selectedPack")) {
                     if (tile.classList.contains("normalPack")) standardPacks.add(tile.getAttribute("pack"));
@@ -86,6 +85,10 @@
                     tile.classList.remove("selectedPack");
                 }
             });
+
+            if(tile.classList.contains("standard"))
+                tile.click();
+        }
     });
 
     inputFile.addEventListener("cancel", () => {
