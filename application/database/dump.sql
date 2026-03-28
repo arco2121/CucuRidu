@@ -3,6 +3,7 @@
 DROP TABLE IF EXISTS public.memory CASCADE;
 DROP TABLE IF EXISTS public.stanze CASCADE;
 DROP TABLE IF EXISTS public.items CASCADE;
+DROP TABLE IF EXISTS session CASCADE;
 
 CREATE TABLE public.memory (
     set_name text NOT NULL,

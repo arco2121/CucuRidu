@@ -36,6 +36,6 @@ jobs:
             repo_type='space',
             token='$HF_TOKEN',
             delete_patterns='*',
-            ignore_patterns=['ignore/**', 'LICENSE', '.github/**', '.git/**', 'install.py', 'README_HF.md']
+            ignore_patterns=['ignore/**', 'LICENSE', '.github/**', '.git/**', 'install.py', 'README_HF.md', '.envXample']
           )
           "

@@ -20,22 +20,26 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
     const key = env.DATABASE_KEY;
     const url = env.DATABASE_URL;
     const password = env.DATABASE_PASSWORD;
-    const poolString = env.DATABASE_POOL?.replace("[PASSWORD]", password || "");
-    if(!key || !url || !poolString || !password) throw new Error("Chiavi per il server mancanti");
+    if(!key || !url || !password) throw new Error("Chiavi per il server mancanti");
+    const poolStringForAdapter = env.DATABASE_POOL_ADAPTER?.replace("[PASSWORD]", encodeURIComponent(password));
+    const poolStringForSessions = env.DATABASE_POOL_SESSION?.replace("[PASSWORD]", encodeURIComponent(password));
 
+    const machineId = await generateId(64);
     const database = createClient(url, key);
-    const generationMemory = new ClusterSet(database, await generateId(64));
-    const pool = new Pool({
-        connectionString: poolString,
+    const generationMemory = new ClusterSet(database, machineId);
+    const adapter = new Pool({
+        connectionString: poolStringForAdapter,
         idleTimeoutMillis: timeout/100,
         connectionTimeoutMillis: timeout/1000,
     });
-    const machineId = await generateId(64);
+    const pool = new Pool({
+        connectionString: poolStringForSessions
+    });
 
     const app = express();
     const sessionsMap = new ClusterMap(database, machineId);
     const httpServer = createServer(app);
-    const serverSession = await new Session(timeout, sessionsMap).init(generationMemory);
+    const serverSession = await new Session(timeout, sessionsMap, pool).init(generationMemory);
 
     const Stanze = new ClusterStanze(database, machineId);
     const TEMPORARY_TOKEN = await generateId(64, generationMemory);
@@ -53,7 +57,7 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
             skipMiddlewares: false,
         }
     });
-    server.adapter(createAdapter(pool));
+    server.adapter(createAdapter(adapter));
 
     app.use(express.static(path.join(__dirname, "../public"), {
         setHeaders: (res, path) => {
@@ -89,6 +93,7 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
     appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze);
 
     serverConfig(server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout);
+    cleanUpStanze(Stanze, timeout);
 
     const listening = httpServer.listen(port, (error) => {
         const listeningPort = httpServer.address().port;

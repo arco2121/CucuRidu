@@ -3,11 +3,13 @@ const jwt = require('jsonwebtoken');
 const path = require("path");
 const { generateId } = require(path.join(__dirname, "/generazione"));
 const MemoryStore = require('memorystore')(session)
+const pgSession = require('connect-pg-simple')(session);
 
 class Session {
 
-    constructor(timeout = 3600000, blacklist = new Map()) {
+    constructor(timeout = 3600000, blacklist = new Map(), pool = false) {
         this.timeout = timeout;
+        this.pool = pool;
         this.blackList = blacklist;
         const clearBlacklist = async () => {
             try {
@@ -27,12 +29,19 @@ class Session {
     }
 
     setupSession(config = {}) {
+        const store = this.pool ? new pgSession({
+            pool: this.pool,
+            tableName: 'sessions',
+            createTableIfMissing: true,
+            pruneSessionInterval: this.timeout/100
+        }) : new MemoryStore({
+            checkPeriod: this.timeout/100
+        });
+
         return session({
             ...config,
             secret: this.tokenKey,
-            store: new MemoryStore({
-                checkPeriod: this.timeout
-            }),
+            store
         });
     }
 
