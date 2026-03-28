@@ -78,7 +78,7 @@ const translateToPack = (packs) => {
 const generatePfp = () => {
     const pfpNumber = 121;
     const pfpPath = '/assets/pfps/';
-    let rdmNumber = Math.floor(Math.random() * ((pfpNumber + 1) - 1) + 1);
+    let rdmNumber = Math.floor(Math.random() * (pfpNumber - 1) + 1);
     return pfpPath + rdmNumber + ".jpg";
 }
 
