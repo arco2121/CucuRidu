@@ -5,8 +5,8 @@
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioCtx = new AudioContext();
 
-    let bgmSource = null;
-    let bgmBuffer = null;
+    let bgmSource = null, bgmBuffer = null;
+    let bgmStartTime = 0, bgmPausedAt = 0;
 
     const audiosCache = {};
     const vibrationPattern = [9, 5, 9];
@@ -77,19 +77,20 @@
                 case "audio": {
                     if (reverse || !permissions[checkValue]) {
                         if (bgmSource) {
+                            bgmPausedAt = Math.max(0, (audioCtx.currentTime - bgmStartTime + bgmPausedAt) % bgmBuffer.duration);
                             bgmSource.stop();
                             bgmSource = null;
                         }
                         return;
                     }
-
                     if (bgmSource || !bgmBuffer) return;
-
                     bgmSource = audioCtx.createBufferSource();
                     bgmSource.buffer = bgmBuffer;
                     bgmSource.loop = true;
                     bgmSource.connect(audioCtx.destination);
-                    bgmSource.start(0);
+
+                    bgmStartTime = audioCtx.currentTime;
+                    bgmSource.start(0, bgmPausedAt);
                     break;
                 }
             }
