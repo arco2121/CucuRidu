@@ -130,7 +130,6 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             try {
                 const stanzaId = data["id"];
                 const Stanza = await Stanze.get(stanzaId);
-                console.log(Stanza)
                 user.data.referenceGiocatore = await Stanza.aggiungiGiocatore(data["username"], data["pfp"], generationMemory);
                 if(user.data.referenceGiocatore === false) {
                     user.emit("impossibileAggiungersi", {

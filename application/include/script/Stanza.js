@@ -11,7 +11,7 @@ const { generateId } = require(path.join(__dirname, '/generazione'));
 
 class Stanza {
 
-    constructor(minimoGiocatori = 3) {
+    constructor(minimoGiocatori = 2) {
         this.giocatori = new Map();
         this.giocatoriPassati = new Set();
         this.stato = StatoStanza.WAIT;
@@ -84,6 +84,7 @@ class Stanza {
 
         if(this.giocatori.size < this.minimoGiocatori) {
             this.stato = StatoStanza.WAIT;
+            this.numeroRound[0] = Math.max(0, this.numeroRound[0] - 1);
             Array.from(this.round.risposte?.entries() || []).forEach(([key, value]) => {
                 this.trovaGiocatore(key)?.aggiungiMano(...value);
             });
@@ -165,8 +166,11 @@ class Stanza {
     aggiungiRisposta(giocatoreId, ...indexCarte) {
         if(this.stato === StatoStanza.CHOOSING_CARDS && this.giocatori.has(giocatoreId)
             && !this.round.risposte.has(giocatoreId)) {
-            const carte = this.trovaGiocatore(giocatoreId).prendiMano(...indexCarte);
-            this.round.risposte.set(giocatoreId, [...carte]);
+            const giocatore = this.trovaGiocatore(giocatoreId);
+            console.log(giocatore.mazzo);
+            const carte = giocatore.prendiMano(...indexCarte);
+            console.log(giocatore.mazzo);
+            this.round.risposte.set(giocatoreId, carte);
             if(this.round.risposte.size === (this.giocatori.size - 1)) {
                 this.stato = StatoStanza.CHOOSING_WINNER;
                 return [
@@ -199,7 +203,7 @@ class Stanza {
         this.controllaMazzi(domandaScartata[1]);
 
         for (const giocatore of this.giocatori.values())
-            giocatore.aggiungiMano(this.mazzoCompletamenti.mazzo.prendiCarte(domandaScartata[1]));
+            giocatore.aggiungiMano(...this.mazzoCompletamenti.mazzo.prendiCarte(domandaScartata[1]));
 
         this.mazzoCompletamenti.scarto.aggiungiCarte(...Array.from(this.round.risposte.values()).flat());
         this.mazzoFrasi.scarto.aggiungiCarte(domandaScartata);

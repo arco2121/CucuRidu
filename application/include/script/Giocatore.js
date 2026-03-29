@@ -11,7 +11,7 @@ class Giocatore {
         this.online = true;
         this.masterRole = role;
         this.interrogationRole = interrogating;
-        this.mazzo = new Mazzo(TipoMazzo.COMPLETAMENTI);
+        this.mazzo = new Mazzo();
     }
 
     async init(memory) {
@@ -49,7 +49,7 @@ class Giocatore {
     }
 
     static fromJSON(data) {
-        const g = new Giocatore(data.username, data.pfp, null);
+        const g = new Giocatore(data.username, data.pfp);
         Object.assign(g, data);
         g.mazzo = Mazzo.fromJSON(data.mazzo);
         return g;

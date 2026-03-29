@@ -46,7 +46,7 @@ class Mazzo {
 
     prendiCarteByIndex(...indici) {
         const indiciOrdinati = [...indici].sort((a, b) => b - a);
-        const result = [...indici.map(i => this.carte[i])];
+        const result = indici.map(i => this.carte[i]);
         indiciOrdinati.forEach(i => {
             if (i >= 0 && i < this.carte.length) {
                 this.carte.splice(i, 1);
@@ -103,7 +103,7 @@ class Mazzo {
     }
 
     toJSON() {
-        return { carte: this.carte };
+        return { carte: [...this.carte] };
     }
 
     static fromJSON(data) {

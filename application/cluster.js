@@ -54,7 +54,7 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
         pingTimeout: 10000,
         connectionStateRecovery: {
             maxDisconnectionDuration: timeout/120,
-            skipMiddlewares: false,
+            skipMiddlewares: true,
         }
     });
     server.adapter(createAdapter(adapter));

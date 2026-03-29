@@ -30,7 +30,8 @@
         const {numeroGiocatori, giocatori} = data || {};
         numeroGiocatoriCount.textContent = numeroGiocatoriCount.textContent.split(":")[0] + ": " + numeroGiocatori;
         renderFragment(showGiocatori, "components/giocatoreRow", {
-            giocatori: giocatori
+            giocatori: giocatori,
+            animation: false
         });
     });
     socket.emit("aggiornaAttesaRisposta", {
