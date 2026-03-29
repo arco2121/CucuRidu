@@ -96,7 +96,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
     });
 
     server.on("connection", (user) => {
-        console.log("Giocatore connesso => " + user.recovered);
+        console.log("Giocatore connesso");
         (async () => await emitStatoStanza(user.data.referenceStanza, user))();
 
         user.on("creaStanza", async (data) => {
@@ -318,7 +318,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 const stanza = await Stanze.get(stanzaId);
                 const result = stanza?.eliminaGiocatore(giocatoreId);
                 if(result) {
-                    const sockets = server.in(stanzaId).fetchSockets();
+                    const sockets = await server.in(stanzaId).fetchSockets();
                     const persona = sockets.find(socket =>
                         socket.data?.referenceGiocatore.id === giocatoreId);
                     if(persona) {
