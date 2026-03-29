@@ -93,6 +93,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
     });
 
     server.on("connection", (user) => {
+        console.log(user.recovered, user.data.referenceGiocatore);
         (async () => {
             if(!user.data.referenceGiocatore?.id) return;
 
