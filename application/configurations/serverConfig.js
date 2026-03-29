@@ -97,7 +97,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
 
     server.on("connection", (user) => {
         console.log("Giocatore connesso => " + user.data);
-        (async () => emitStatoStanza(user.data.referenceStanza, user))();
+        emitStatoStanza(user.data.referenceStanza, user);
 
         user.on("creaStanza", async (data) => {
             try {
