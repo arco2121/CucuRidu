@@ -16,7 +16,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         const Stanza = await Stanze.get(stanzaId);
         if (!Stanza) return;
 
-        for(const socket of sockets) {
+        await Promise.all(sockets.map(socket => {
             if(!socket.data.referenceGiocatore) return;
 
             switch (Stanza.stato) {
@@ -27,13 +27,13 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                         primoRound: Stanza.numeroRound[0] === 0,
                         interroghi: Stanza.round.chiStaInterrogando === socket.data.referenceGiocatore.id
                     });
-                    return;
+                    break;
                 }
                 case StatoStanza.END : {
                     socket.emit("stanzaChiusa");
                     socket.data.referenceGiocatore = null;
                     socket.leave(stanzaId);
-                    return;
+                    break;
                 }
                 case StatoStanza.CHOOSING_CARDS : {
                     if(Stanza.round.risposte.has(socket.data.referenceGiocatore.id))
@@ -45,7 +45,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                             reference: socket.data.referenceGiocatore.toJSON(),
                             stanza: Stanza.id
                         });
-                    return;
+                    break;
                 }
                 case StatoStanza.CHOOSING_WINNER : {
                     socket.emit("sceltaVincitore", {
@@ -55,10 +55,10 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                         reference: socket.data.referenceGiocatore.toJSON(),
                         stanza: Stanza.id
                     });
-                    return;
+                    break;
                 }
             }
-        }
+        }));
     };
 
     const cleanUp = async () => {
@@ -69,7 +69,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 console.log("Stanza eliminata => " + id);
             }, generationMemory, Stanze);
         } catch (err) { console.error(err); } finally {
-            setTimeout(cleanUp, timeout/30/60);
+            setTimeout(cleanUp, timeout/60);
         }
     };
 
@@ -96,8 +96,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
     });
 
     server.on("connection", (user) => {
-        console.log("Giocatore connesso => " + user.data);
-        emitStatoStanza(user.data.referenceStanza, user);
+        console.log("Giocatore connesso => " + user.recovered);
+        (async () => await emitStatoStanza(user.data.referenceStanza, user))();
 
         user.on("creaStanza", async (data) => {
             try {
@@ -187,7 +187,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                                 reference: socket.data.referenceGiocatore.toJSON()
                             });
                         }
-                    });
+                    }).catch(err => console.log(err));
                 else
                     user.emit("aspettaAltri", {
                         message: "Girl non ci sono chatbot ai che fingano di esserti amico. Go touch some grass e non fare come Calipso"
@@ -241,7 +241,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                                 reference: socket.data.referenceGiocatore.toJSON()
                             });
                         }
-                    });
+                    }).catch(err => console.log(err));
                 } else {
                     user.emit("errore", {
                         message: "Aspetta e spera che tutti quanti rispondano, selezionane un'altro (tanto ti ghostano perchè gli stai sul cabbo)"
@@ -319,7 +319,6 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 const stanza = await Stanze.get(stanzaId);
                 const result = stanza?.eliminaGiocatore(giocatoreId);
                 if(result) {
-
                     server.in(stanzaId).fetchSockets().then(sockets => {
                         const persona = sockets.find(socket =>
                             socket.data?.referenceGiocatore.id === giocatoreId);
@@ -327,11 +326,11 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                             persona.emit("stanzaLasciata");
                             persona.leave(stanzaId);
                         }
-                    });
+                    }).catch(err => console.log(err));
                     await Stanze.set(stanzaId, stanza);
-                    server.in(stanzaId).fetchSockets().then(sockets => {
+                    server.in(stanzaId).fetchSockets().then(async (sockets) => {
                         for(const socket of sockets) socket.data.referenceGiocatore = stanza.giocatori.get(socket.data.referenceGiocatore.id);
-                        emitStatoStanza(stanzaId, sockets);
+                        await emitStatoStanza(stanzaId, sockets);
                     });
                     console.log("Giocatore eliminato da Stanza => " + stanzaId);
                 }
@@ -341,30 +340,37 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         });
 
         user.on("disconnect", async () => {
-            console.log("Giocatore disconnesso temporaneamente => " + user.data.referenceGiocatore?.id);
-            const stanzaId = user.data.referenceStanza ?? await (async () => {
-                const stanze = await Stanze.values();
-                return Stanza.trovaDaGiocatore(user.data.referenceGiocatore?.id, stanze);
-            })();
-            const stanza = await Stanze.get(stanzaId);
-            const giocatore = stanza?.trovaGiocatore(user.data.referenceGiocatore?.id);
-            if (giocatore && stanzaId) {
-                giocatore.online = false;
-                await Stanze.set(stanzaId, stanza);
-                setTimeout(async () => {
-                    const stanzaDopo = await Stanze.get(stanzaId);
-                    const giocatoreDopo = stanzaDopo?.trovaGiocatore(user.data.referenceGiocatore?.id);
-                    if (stanzaDopo && stanzaDopo.trovaGiocatore(giocatore.id) && !giocatoreDopo.isOnline()) {
-                        user.leave(stanzaId);
-                        stanzaDopo.eliminaGiocatore(giocatore.id);
-                        console.log("Giocatore eliminato da Stanza => " + stanzaId);
-                        server.in(stanzaId).fetchSockets().then(sockets => {
-                            for(const socket of sockets) socket.data.referenceGiocatore = stanza.giocatori.get(socket.data.referenceGiocatore.id);
-                            emitStatoStanza(stanzaId, sockets);
-                        });
-                        await Stanze.set(stanzaId, stanzaDopo);
+            const giocatoreId = user.data.referenceGiocatore?.id;
+            const stanzaId = user.data.referenceStanza;
+
+            if (!giocatoreId || !stanzaId) return;
+            try {
+                const stanza = await Stanze.get(stanzaId);
+                if (stanza) {
+                    const giocatore = stanza.trovaGiocatore(giocatoreId);
+                    if (giocatore) {
+                        giocatore.online = false;
+                        await Stanze.set(stanzaId, stanza);
                     }
-                }, timeout/60);
+                }
+                setTimeout(async () => {
+                    try {
+                        const stanzaDopo = await Stanze.get(stanzaId);
+                        if (stanzaDopo && !stanzaDopo.isOnline(giocatoreId)) {
+                            stanzaDopo.eliminaGiocatore(giocatoreId);
+                            const sockets = await server.in(stanzaId).fetchSockets();
+                            for (const s of sockets) {
+                                s.data.referenceGiocatore = stanzaDopo.giocatori.get(s.data.referenceGiocatore.id);
+                            }
+                            await emitStatoStanza(stanzaId, ...sockets);
+                            await Stanze.set(stanzaId, stanzaDopo);
+                        }
+                    } catch (innerError) {
+                        console.error("Errore nel timeout disconnessione:", innerError);
+                    }
+                }, timeout / 60);
+            } catch (e) {
+                console.error("Errore generale disconnect:", e);
             }
         });
     });
