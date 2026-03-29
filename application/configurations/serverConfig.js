@@ -17,7 +17,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         if (!Stanza) return;
 
         await Promise.all(sockets.map(socket => {
-            if(!socket.data.referenceGiocatore) return;
+            if(!socket.data?.referenceGiocatore) return;
 
             switch (Stanza.stato) {
                 case StatoStanza.WAIT : {
