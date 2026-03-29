@@ -176,18 +176,18 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     server.socketsLeave(stanzaId);
                     console.log("Stanza " + stanzaId + " chiusa");
                 }
-                else if(result)
-                    server.in(stanzaId).fetchSockets().then(sockets => {
-                        const round = Stanza.round;
-                        for(const socket of sockets) {
-                            socket.data.referenceGiocatore = Stanza.trovaGiocatore(socket.data.referenceGiocatore.id);
-                            socket.emit("roundIniziato", {
-                                chiStaInterrogando: Stanza.trovaGiocatore(round.chiStaInterrogando).toJSON(),
-                                domanda: round.domanda,
-                                reference: socket.data.referenceGiocatore.toJSON()
-                            });
-                        }
-                    }).catch(err => console.log(err));
+                else if(result) {
+                    const sockets = await server.in(stanzaId).fetchSockets();
+                    const round = Stanza.round;
+                    for (const socket of sockets) {
+                        socket.data.referenceGiocatore = Stanza.trovaGiocatore(socket.data.referenceGiocatore.id);
+                        socket.emit("roundIniziato", {
+                            chiStaInterrogando: Stanza.trovaGiocatore(round.chiStaInterrogando).toJSON(),
+                            domanda: round.domanda,
+                            reference: socket.data.referenceGiocatore.toJSON()
+                        });
+                    }
+                }
                 else
                     user.emit("aspettaAltri", {
                         message: "Girl non ci sono chatbot ai che fingano di esserti amico. Go touch some grass e non fare come Calipso"
@@ -231,17 +231,16 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 const Stanza = await Stanze.get(stanzaId);
                 const result = Stanza.scegliVincitore(user.data.referenceGiocatore.id, vincitore);
                 if(result) {
-                    server.in(stanzaId).fetchSockets().then(sockets => {
-                        for(const socket of sockets) {
-                            socket.data.referenceGiocatore = Stanza.trovaGiocatore(socket.data.referenceGiocatore.id);
-                            socket.emit("fineTurno", {
-                                vincitore: result[0],
-                                domanda: result[1],
-                                risposte: result[2],
-                                reference: socket.data.referenceGiocatore.toJSON()
-                            });
-                        }
-                    }).catch(err => console.log(err));
+                    const sockets = server.in(stanzaId).fetchSockets();
+                    for (const socket of sockets) {
+                        socket.data.referenceGiocatore = Stanza.trovaGiocatore(socket.data.referenceGiocatore.id);
+                        socket.emit("fineTurno", {
+                            vincitore: result[0],
+                            domanda: result[1],
+                            risposte: result[2],
+                            reference: socket.data.referenceGiocatore.toJSON()
+                        });
+                    }
                 } else {
                     user.emit("errore", {
                         message: "Aspetta e spera che tutti quanti rispondano, selezionane un'altro (tanto ti ghostano perchè gli stai sul cabbo)"
@@ -319,19 +318,16 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 const stanza = await Stanze.get(stanzaId);
                 const result = stanza?.eliminaGiocatore(giocatoreId);
                 if(result) {
-                    server.in(stanzaId).fetchSockets().then(sockets => {
-                        const persona = sockets.find(socket =>
-                            socket.data?.referenceGiocatore.id === giocatoreId);
-                        if(persona) {
-                            persona.emit("stanzaLasciata");
-                            persona.leave(stanzaId);
-                        }
-                    }).catch(err => console.log(err));
+                    const sockets = server.in(stanzaId).fetchSockets();
+                    const persona = sockets.find(socket =>
+                        socket.data?.referenceGiocatore.id === giocatoreId);
+                    if(persona) {
+                        persona.emit("stanzaLasciata");
+                        persona.leave(stanzaId);
+                    }
+                    for(const socket of sockets) socket.data.referenceGiocatore = stanza.giocatori.get(socket.data.referenceGiocatore.id);
+                    await emitStatoStanza(stanzaId, ...sockets);
                     await Stanze.set(stanzaId, stanza);
-                    server.in(stanzaId).fetchSockets().then(async (sockets) => {
-                        for(const socket of sockets) socket.data.referenceGiocatore = stanza.giocatori.get(socket.data.referenceGiocatore.id);
-                        await emitStatoStanza(stanzaId, sockets);
-                    });
                     console.log("Giocatore eliminato da Stanza => " + stanzaId);
                 }
             } catch (e) {
