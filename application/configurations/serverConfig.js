@@ -87,20 +87,15 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         if (!exist) return next(new Error("SESSION_EXPIRED"));
         if (exist.online === true) return next(new Error("ALREADY_CONNECTED"));
         exist.online = true;
+        socket.join(stanzaId);
         await Stanze.set(stanzaId, stanza);
         socket.data.referenceGiocatore = exist;
-        await emitStatoStanza(stanzaId, socket, next);
+        socket.data.referenceStanza = stanzaId;
+        next();
     });
 
     server.on("connection", (user) => {
-        console.log(user.recovered, user.data.referenceGiocatore);
-        (async () => {
-            if(!user.data.referenceGiocatore?.id) return;
-
-            const stanzaId = Stanza.trovaDaGiocatore(user.data.referenceGiocatore?.id, await Stanze.values());
-            user.join(stanzaId);
-            await emitStatoStanza(stanzaId, user);
-        })();
+        (async () => emitStatoStanza(user.referenceStanza, user))();
 
         user.on("creaStanza", async (data) => {
             try {
@@ -316,8 +311,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
 
         user.on("lasciaStanza", async (data) => {
             try {
-                const stanzaId = data["id"];
-                const giocatoreId = data["giocatore"] || user.data.referenceGiocatore?.id;
+                const stanzaId = data["id"] ?? user.data.referenceStanza;
+                const giocatoreId = data["giocatore"] ?? user.data.referenceGiocatore?.id;
                 const stanza = await Stanze.get(stanzaId);
                 const result = stanza?.eliminaGiocatore(giocatoreId);
                 if(result) {
@@ -344,8 +339,11 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         });
 
         user.on("disconnect", async () => {
-            const stanze = await Stanze.values();
-            const stanzaId = Stanza.trovaDaGiocatore(user.data.referenceGiocatore?.id, stanze);
+            console.log("Giocatore disconnesso temporaneamente => " + user.data.referenceGiocatore?.id);
+            const stanzaId = user.data.referenceStanza ?? await (async () => {
+                const stanze = await Stanze.values();
+                return Stanza.trovaDaGiocatore(user.data.referenceGiocatore?.id, stanze);
+            })();
             const stanza = await Stanze.get(stanzaId);
             const giocatore = stanza?.trovaGiocatore(user.data.referenceGiocatore?.id);
             if (giocatore && stanzaId) {
@@ -370,7 +368,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         });
     });
 
-    cleanUp();
+    (async () => cleanUp())();
 };
 
 module.exports = serverConfig;
