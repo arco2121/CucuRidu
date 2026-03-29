@@ -69,7 +69,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 console.log("Stanza eliminata => " + id);
             }, generationMemory, Stanze);
         } catch (err) { console.error(err); } finally {
-            setTimeout(cleanUp, timeout/60);
+            setTimeout(cleanUp, timeout/30/60);
         }
     };
 
@@ -97,8 +97,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
 
     server.on("connection", (user) => {
         console.log("Giocatore connesso");
-        if(user.data?.referenceStanza)
-           user.join(user.data?.referenceStanza);
+        
         (async () => await emitStatoStanza(user.data.referenceStanza, user))();
 
         user.on("creaStanza", async (data) => {
