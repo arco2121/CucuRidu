@@ -314,16 +314,14 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         user.on("lasciaStanza", async (data) => {
             try {
                 const stanzaId = data["id"] ?? user.data.referenceStanza;
-                console.log("Giocatore ha abbandonato la Stanza => " + stanzaId);
                 const giocatoreId = data["giocatore"] ?? user.data.referenceGiocatore?.id;
                 const stanza = await Stanze.get(stanzaId);
                 const result = stanza?.eliminaGiocatore(giocatoreId);
                 if(result) {
+                    user.emit("stanzaLasciata");
+                    console.log("Giocatore ha abbandonato la Stanza => " + stanzaId);
+                    user.leave(stanzaId);
                     const sockets = await server.in(stanzaId).fetchSockets();
-                    const persona = sockets.find(socket =>
-                        socket.data?.referenceGiocatore.id === giocatoreId);
-                    persona?.emit("stanzaLasciata");
-                    persona?.leave(stanzaId);
                     for(const socket of sockets) socket.data.referenceGiocatore = stanza.giocatori.get(socket.data.referenceGiocatore.id);
                     const stanzaNuova = await Stanze.set(stanzaId, stanza);
                     await emitStatoStanza(stanzaNuova, ...sockets);
