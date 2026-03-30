@@ -127,6 +127,7 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
     };
 
     process.on('SIGINT',  async () => await terminate(listening, server, Stanze));
+    process.on('SIGKILL',  async () => await terminate(listening, server, Stanze));
     process.on('SIGTERM', async () => await terminate(listening, server, Stanze));
 };
 
