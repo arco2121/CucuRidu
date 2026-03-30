@@ -274,7 +274,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         });
 
         user.on("aggiornaAttesa", async (data) => {
-            const Stanza = await Stanze.get(data["stanzaId"]);
+            const Stanza = await Stanze.get(data["stanzaId"] || user.data?.referenceStanza);
 
             server.to(data["stanzaId"]).emit("aggiornamentoAttesa", {
                 numeroGiocatori: Stanza?.giocatori.size,
@@ -284,7 +284,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         });
 
         user.on("listaGiocatori", async (data) => {
-            const Stanza = await Stanze.get(data["stanzaId"]);
+            const Stanza = await Stanze.get(data["stanzaId"] || user.data?.referenceStanza);
 
             user.emit("listaGiocatoriAggiornamento", {
                 giocatori: Stanza?.classifica().map(giocatore => giocatore.toJSON())
@@ -292,8 +292,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         });
 
         user.on("aggiornaAttesaRisposta", async (data) => {
-            const Stanza = await Stanze.get(data["stanzaId"]);
-
+            const Stanza = await Stanze.get(data["stanzaId"] || user.data?.referenceStanza);
             server.to(data["stanzaId"]).emit("aggiornamentoAttesaRisposta", {
                 numeroGiocatori: Stanza?.round.risposte.size,
                 giocatori: Array.from(Stanza?.round.risposte.keys()).map(giocatore => Stanza.trovaGiocatore(giocatore).toJSON())
