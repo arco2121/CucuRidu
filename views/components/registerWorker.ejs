@@ -1,0 +1,10 @@
+<script>
+    const registerWorker =  () => {
+        if (!('serviceWorker' in navigator)) return;
+        navigator.serviceWorker.register('/worker', {scope: '/'})
+            .then(() => console.log("Il worker sta workando :)"))
+            .catch(err => console.log(err));
+    };
+
+    window.addEventListener('load', registerWorker);
+</script>

@@ -3,6 +3,8 @@ const { getIcon, generateName, generatePfp, getAllPfp, getknownPacks, translateT
 const { StatoStanza } = require(path.join(__dirname, "../include/script/Stanza"));
 const { Mazzo } = require(path.join(__dirname, "../include/script/Mazzo"));
 const crypto = require('crypto');
+const express = require("express");
+const cors = require("cors");
 
 /**
  * Configura gli endpoint dell' application Express
@@ -10,13 +12,16 @@ const crypto = require('crypto');
  * @param serverSession
  * @param TEMPORARY_TOKEN
  * @param Stanze
+ * @param allowedOrigins
+ * @param local
+ * @param timeout
  */
-const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
+const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout) => {
 
     const renderPage = (res, page, params = {}) => res.render("header", {
         params: params,
         page: page,
-        headerIcon: getIcon(true),
+        headerIcon: getIcon(true)
     });
 
     const resumeGame = async (req, res, next) => {
@@ -26,6 +31,29 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
         req.deleteToken = !!req.query?.token;
         next();
     };
+
+    app.use(express.static(path.join(__dirname, "..", "../public")));
+    app.set("view engine", "ejs");
+    app.set('trust proxy', 1);
+    app.use(express.urlencoded({extended: true}));
+    app.use(express.json());
+    if(!local)
+        app.use(cors({
+            origin: (origin, callback) => {
+                if (!origin || allowedOrigins.indexOf(origin) !== -1) callback(null, true);
+                else callback(new Error('Non consentito dalla policy CORS'));
+            },
+            credentials: true
+        }));
+    app.use(serverSession.setupSession({
+        resave: false,
+        saveUninitialized: true,
+        cookie: {
+            secure: !local,
+            sameSite: !local ? 'none' : null,
+            maxAge: timeout
+        }
+    }));
 
     app.get("/", resumeGame, (req, res) => {
         const { openSettings } = req.query;
@@ -122,8 +150,12 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze) => {
         loadToken: false,
     }));
 
-    app.get('/serviceWorker', (req, res) => {
-        res.sendFile(path.resolve(__dirname, '..', '../public/script/config/serviceWorker.js'));
+    app.get('/worker', (req, res) => {
+        res.setHeader('Content-Type', 'application/javascript');
+        res.setHeader('Cache-Control', 'no-cache, proxy-revalidate');
+        res.setHeader('Service-Worker-Allowed', '/');
+
+        res.sendFile(path.resolve(__dirname, '..', '../public/script/config/worker.js'));
     });
 
     app.get("/error", (req, res) => {

@@ -2,7 +2,6 @@ const { createServer } = require("node:http");
 const path = require("path");
 const { Server } = require("socket.io");
 const express = require("express");
-const cors = require("cors");
 const { Session } = require(path.join(__dirname, "/include/script/Session"));
 const { generateId } = require(path.join(__dirname, "/include/script/generazione"));
 const appConfig = require(path.join(__dirname, "/configurations/appConfig"));
@@ -59,38 +58,7 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
     });
     server.adapter(createAdapter(adapter));
 
-    app.use(express.static(path.join(__dirname, "../public"), {
-        setHeaders: (res, path) => {
-            if (path.endsWith('serviceWorker.js')) {
-                res.setHeader('Cache-Control', 'no-cache');
-            }
-        }
-    }));
-    app.set("view engine", "ejs");
-    app.set('trust proxy', 1);
-    app.use(express.urlencoded({extended: true}));
-    app.use(express.json());
-    if(!local)
-        app.use(cors({
-            origin: (origin, callback) => {
-                if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-                    callback(null, true);
-                } else {
-                    callback(new Error('Non consentito dalla policy CORS'));
-                }
-            },
-            credentials: true
-        }));
-    app.use(serverSession.setupSession({
-        resave: false,
-        saveUninitialized: true,
-        cookie: {
-            secure: !local,
-            sameSite: !local ? 'none' : null,
-            maxAge: timeout
-        }
-    }));
-    appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze);
+    appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout);
 
     serverConfig(server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout);
     cleanUpStanze(Stanze, timeout);

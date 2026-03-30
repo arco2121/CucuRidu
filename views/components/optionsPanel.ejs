@@ -17,6 +17,10 @@
                 <label class="menu_row_title text_color_normal sour_gummy_regular">Vibrazione:</label>
                 <button id="vibrationbtn" class="button btn_toggle btn_style_critical sour_gummy_extra">On</button>
             </div>
+            <div class="options_row">
+                <label class="menu_row_title text_color_normal sour_gummy_regular">Notifiche:</label>
+                <button id="notificationbtn" class="button btn_toggle btn_style_critical sour_gummy_extra">Off</button>
+            </div>
         </div>
         <div class="options_row options_footer">
 
@@ -48,6 +52,7 @@
         const soundBtn = document.getElementById("soundbtn");
         const exitOptionsBtn = document.getElementById("exitOptionsBtn");
         const vibrationBtn = document.getElementById("vibrationbtn");
+        const notificationBtn = document.getElementById("notificationbtn");
         const sectionDefault = document.querySelector(".sectionToHide");
         const updateButtonUI = (btn, isOn) => {
             btn.textContent = isOn ? "On" : "Off";
@@ -60,9 +65,9 @@
             }
         };
 
-        const toggleSetting = (event, property) => {
+        const toggleSetting = (event, property, value = null) => {
             const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
-            settings[property] = !settings[property];
+            settings[property] = value ? (value && !settings[property]) : !settings[property];
             localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
             updateButtonUI(event.currentTarget, settings[property]);
         };
@@ -73,11 +78,13 @@
             if (settings.audio === undefined) settings.audio = true;
             if (settings.sound === undefined) settings.sound = true;
             if (settings.vibration === undefined) settings.vibration = true;
+            if (settings.notifications === undefined) settings.notifications = false;
             localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
 
             updateButtonUI(musicBtn, !!settings["audio"]);
             updateButtonUI(soundBtn, !!settings["sound"]);
             updateButtonUI(vibrationBtn, !!settings["vibration"]);
+            updateButtonUI(notificationBtn, !!settings["notifications"]);
         };
 
         initSettingsUI();
@@ -89,6 +96,8 @@
         });
         soundBtn.addEventListener("click", (e) => toggleSetting(e, "sound"));
         vibrationBtn.addEventListener("click", (e) => toggleSetting(e, "vibration"));
+
+        notificationBtn.addEventListener("click", async (e) => toggleSetting(e, "notifications", await concediPermesso()));
         exitOptionsBtn.addEventListener("click", () => {
             optionPanel.dispatchEvent(hidePanel);
             sectionDefault.dispatchEvent(showPanel);

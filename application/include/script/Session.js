@@ -1,7 +1,5 @@
 const session = require('express-session');
 const jwt = require('jsonwebtoken');
-const path = require("path");
-const { generateId } = require(path.join(__dirname, "/generazione"));
 const MemoryStore = require('memorystore')(session)
 const pgSession = require('connect-pg-simple')(session);
 
