@@ -12,7 +12,13 @@
                 const segnaStandard = pack === 'standard' ? 'standard' : null
             %>
             <div class="tile defaultPack normalPack shrinks_on_active_for_no_reason packColor_<%= colorNum %> <%= segnaStandard %>" pack="<%= pack %>">
-                <img onerror="this.src = '/assets/packs/personalizzato_empty.jpg'" src="/assets/packs/<%= pack %>.jpg" alt="<%= pack %>">
+                <img alt="<%= pack %>" onerror="
+                    this.src = '/assets/packs/personalizzato_empty.jpg';
+                    const helper = document.createElement('h4');
+                    const text = this.getAttribute('alt');
+                    helper.innerText = text[0].toUpperCase() + text.slice(1);
+                    this.parentNode.appendChild(helper);
+                " src="/assets/packs/<%= pack %>.jpg" >
             </div>
             <% }) %>
 

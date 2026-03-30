@@ -73,7 +73,7 @@ socket.on("connect_error", (err) => {
             return lasciaStanza();
         }
         case "INVALID_KEY" : {
-            alert("La chiave per la connessione al server è sbagliata o scaduta");
+            alert("Impossibile riconnettersi al server, STACCA STACCA!");
             return lasciaStanza();
         }
         case "ALREADY_CONNECTED" : {

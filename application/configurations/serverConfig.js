@@ -334,9 +334,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
 
         user.on("disconnect", async () => {
             const giocatoreId = user.data.referenceGiocatore?.id;
-            const stanzaId = user.data.referenceStanza;
-
-            if (!giocatoreId || !stanzaId) return;
+            let stanzaId = user.data?.referenceStanza;
+            if (!giocatoreId) return;
+            if(!stanzaId) stanzaId = Stanza.trovaDaGiocatore(giocatoreId, await Stanze.values());
             try {
                 user.leave(stanzaId);
                 const stanza = await Stanze.get(stanzaId);

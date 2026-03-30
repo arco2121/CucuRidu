@@ -1121,6 +1121,13 @@ input:active {
     scale: 0.9;
 }
 
+.tile h4 {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+}
+
 .defaultPack img {
     width: 100%;
     border-radius: 17px;
