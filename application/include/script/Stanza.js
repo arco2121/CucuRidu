@@ -167,9 +167,7 @@ class Stanza {
         if(this.stato === StatoStanza.CHOOSING_CARDS && this.giocatori.has(giocatoreId)
             && !this.round.risposte.has(giocatoreId)) {
             const giocatore = this.trovaGiocatore(giocatoreId);
-            console.log(giocatore.mazzo);
             const carte = giocatore.prendiMano(...indexCarte);
-            console.log(giocatore.mazzo);
             this.round.risposte.set(giocatoreId, carte);
             if(this.round.risposte.size === (this.giocatori.size - 1)) {
                 this.stato = StatoStanza.CHOOSING_WINNER;

@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.addEventListener("fragmentRendered", () => {
     if(isLoadScreen()) document.dispatchEvent(unloadScreen);
-})
+});
 
 document.dispatchEvent(preventBack);
 exitFrom = true;

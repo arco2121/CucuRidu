@@ -6,6 +6,7 @@ const socket = io({
         userId: fromBackEnd["userId"],
         token: JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}")["savingToken"] || null
     },
+    tryAllTransports: true,
     transports: ["websocket", "polling"]
 });
 let referenceGiocatore;
