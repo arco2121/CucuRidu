@@ -97,7 +97,6 @@ const singleApp = async (local, port, allowedOrigins, env = {}, timeout = 360000
     };
 
     process.on('SIGINT', () => terminate(listening, server, Stanze));
-    process.on('SIGKILL', () => terminate(listening, server, Stanze));
     process.on('SIGTERM', () => terminate(listening, server, Stanze));
 };
 
