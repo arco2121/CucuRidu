@@ -3,7 +3,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 jobs:
   deploy:
     runs-on: ubuntu-latest
