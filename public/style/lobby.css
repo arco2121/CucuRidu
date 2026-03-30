@@ -17,6 +17,7 @@
     height: 100%;
     align-items: stretch;
     flex-direction: column;
+    overflow-y: scroll;
 }
 
 #landpoint {
