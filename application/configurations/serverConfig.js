@@ -322,10 +322,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     const sockets = await server.in(stanzaId).fetchSockets();
                     const persona = sockets.find(socket =>
                         socket.data?.referenceGiocatore.id === giocatoreId);
-                    if(persona) {
-                        persona.emit("stanzaLasciata");
-                        persona.leave(stanzaId);
-                    }
+                    persona?.emit("stanzaLasciata");
+                    persona?.leave(stanzaId);
                     for(const socket of sockets) socket.data.referenceGiocatore = stanza.giocatori.get(socket.data.referenceGiocatore.id);
                     const stanzaNuova = await Stanze.set(stanzaId, stanza);
                     await emitStatoStanza(stanzaNuova, ...sockets);
