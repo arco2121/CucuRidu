@@ -13,7 +13,7 @@ const { Stanza, StatoStanza } = require(path.join(__dirname, "../include/script/
 const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout = 3600000) => {
 
     const emitStatoStanza = async (stanzaId, ...sockets) => {
-        const Stanza = await Stanze.get(stanzaId);
+        const Stanza = typeof stanzaId === "string" ? await Stanze.get(stanzaId) : stanzaId;
         if (!Stanza) return;
 
         await Promise.all(sockets.map(socket => {
@@ -327,8 +327,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                         persona.leave(stanzaId);
                     }
                     for(const socket of sockets) socket.data.referenceGiocatore = stanza.giocatori.get(socket.data.referenceGiocatore.id);
-                    await emitStatoStanza(stanzaId, ...sockets);
-                    await Stanze.set(stanzaId, stanza);
+                    const stanzaNuova = await Stanze.set(stanzaId, stanza);
+                    await emitStatoStanza(stanzaNuova, ...sockets);
                     console.log("Giocatore eliminato da Stanza => " + stanzaId);
                 }
             } catch (e) {
@@ -354,14 +354,15 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 setTimeout(async () => {
                     try {
                         const stanzaDopo = await Stanze.get(stanzaId);
-                        if (stanzaDopo && !stanzaDopo.isOnline(giocatoreId)) {
+                        const giocatoreDopo = stanzaDopo?.trovaGiocatore(giocatoreId);
+                        if (stanzaDopo && giocatoreDopo && !giocatoreDopo.isOnline(giocatoreId)) {
                             stanzaDopo.eliminaGiocatore(giocatoreId);
                             const sockets = await server.in(stanzaId).fetchSockets();
                             for (const s of sockets) {
                                 s.data.referenceGiocatore = stanzaDopo.giocatori.get(s.data.referenceGiocatore.id);
                             }
-                            await emitStatoStanza(stanzaId, ...sockets);
-                            await Stanze.set(stanzaId, stanzaDopo);
+                            const nuova = await Stanze.set(stanzaId, stanzaDopo);
+                            await emitStatoStanza(nuova, ...sockets);
                         }
                     } catch (innerError) {
                         console.error("Errore nel timeout disconnessione:", innerError);

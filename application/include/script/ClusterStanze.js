@@ -32,6 +32,8 @@ class ClusterStanze extends ClusterMap {
         });
 
         if (error) throw error;
+
+        return value;
     }
 
     async checkOld() {
