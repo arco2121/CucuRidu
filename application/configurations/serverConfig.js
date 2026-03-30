@@ -232,7 +232,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 const Stanza = await Stanze.get(stanzaId);
                 const result = Stanza.scegliVincitore(user.data.referenceGiocatore.id, vincitore);
                 if(result) {
-                    const sockets = server.in(stanzaId).fetchSockets();
+                    const sockets = await server.in(stanzaId).fetchSockets();
                     for (const socket of sockets) {
                         socket.data.referenceGiocatore = Stanza.trovaGiocatore(socket.data.referenceGiocatore.id);
                         socket.emit("fineTurno", {

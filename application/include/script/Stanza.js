@@ -11,7 +11,7 @@ const { generateId } = require(path.join(__dirname, '/generazione'));
 
 class Stanza {
 
-    constructor(minimoGiocatori = 2) {
+    constructor(minimoGiocatori = 3) {
         this.giocatori = new Map();
         this.giocatoriPassati = new Set();
         this.stato = StatoStanza.WAIT;
@@ -200,8 +200,10 @@ class Stanza {
 
         this.controllaMazzi(domandaScartata[1]);
 
-        for (const giocatore of this.giocatori.values())
-            giocatore.aggiungiMano(...this.mazzoCompletamenti.mazzo.prendiCarte(domandaScartata[1]));
+        for (const giocatore of this.giocatori.values()) {
+            if(giocatore.id !== chiStaChiedendo)
+                giocatore.aggiungiMano(...this.mazzoCompletamenti.mazzo.prendiCarte(domandaScartata[1]));
+        }
 
         this.mazzoCompletamenti.scarto.aggiungiCarte(...Array.from(this.round.risposte.values()).flat());
         this.mazzoFrasi.scarto.aggiungiCarte(domandaScartata);

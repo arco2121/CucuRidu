@@ -4,14 +4,14 @@
             <img class="winner_pfp btn_doubleBorder active_Img" src="<%= primoPosto[0].pfp %>" alt="pfp" id="displayPfp">
             <h4 id="winnerText" class="sour_gummy_bold">
                 <% if(primoPosto.length === 1) { %>
-                    ✦ <%= primoPosto[0].username %> ha vinto il round con <%= puntiMassimi %> punt<%= puntiMassimi === 1 ? "o" : "i"%> ✦
+                    ✦ <%= primoPosto[0].username %> ha vinto la partita con <%= puntiMassimi %> punt<%= puntiMassimi === 1 ? "o" : "i"%> ✦
 
                 <% } else { %>
                     ✦<%= " " %>
                     <% for(const giocatore of primoPosto) { %>
                         <%= giocatore.id === idPrimoGiocatore ? "" : " e " %><%= giocatore.username %>
                     <% } %>
-                    <%= " " %>hanno vinto il round con <%= puntiMassimi %> punt<%= puntiMassimi === 1 ? "o" : "i"%> ✦
+                    <%= " " %>hanno vinto la partita con <%= puntiMassimi %> punt<%= puntiMassimi === 1 ? "o" : "i"%> ✦
 
                 <% } %>
             </h4>
