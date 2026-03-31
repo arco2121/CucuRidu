@@ -81,7 +81,7 @@
     updateQuestion();
 
     confirmBtn?.addEventListener("click", () => {
-        socket.emit("scegliVincitore", {
+        emit("scegliVincitore", {
             id: referenceStanza,
             vincitore: allAnswers[currentIndex][0]
         });

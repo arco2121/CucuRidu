@@ -39,8 +39,8 @@
 </div>
 
 <script>
-    socket.off("mazzoAggiunto");
-    socket.off("mazzoErrore");
+    off("mazzoAggiunto");
+    off("mazzoErrore");
 
     const confirmPacks = document.getElementById("confirmPacks");
     const sectionDefault = document.getElementById("game_section");
@@ -138,7 +138,7 @@
         if (standardPacks.size === 0 && packs.length === 0)
             alert("Ma porchino il dirimpetaio piccolino... devi selezionare qualcosa... NO?")
         else {
-            socket.emit("aggiungiMazzo", {
+            emit("aggiungiMazzo", {
                 id: referenceStanza,
                 packs: [...standardPacks.values(), ...packs]
             });
@@ -150,12 +150,12 @@
         sectionDefault.dispatchEvent(showPanel);
     });
 
-    socket.on("mazzoAggiunto", () => {
+    on("mazzoAggiunto", () => {
         packsPanel.dispatchEvent(hidePanel);
         sectionDefault.dispatchEvent(showPanel);
     });
 
-    socket.on("mazzoErrore", (data) => {
+    on("mazzoErrore", (data) => {
         alert(data.message);
         tiles.forEach(tile => {
             if (tile !== customTile) {

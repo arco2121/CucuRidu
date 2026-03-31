@@ -31,7 +31,7 @@
 </div>
 
 <script>
-    socket.off("aggiornamentoAttesa");
+    off("aggiornamentoAttesa");
 
     const numeroGiocatoriCount = document.getElementById("numeroGiocatori");
     const attesaView = document.getElementById("attesa");
@@ -42,7 +42,7 @@
     const packsButton = document.getElementById("packsButton");
     const idStanza = fromFragments["stanzaId"];
 
-    socket.on("aggiornamentoAttesa", (data) => {
+    on("aggiornamentoAttesa", (data) => {
         const {numeroGiocatori, minimoGiocatori, giocatori} = data || {};
         numeroGiocatoriCount.textContent = numeroGiocatoriCount.textContent.split(":")[0] + ": " + numeroGiocatori;
         if(numeroGiocatori < minimoGiocatori)
@@ -57,7 +57,7 @@
         });
     });
 
-    socket.emit("aggiornaAttesa", {
+    emit("aggiornaAttesa", {
         stanzaId: idStanza
     });
 
@@ -74,11 +74,11 @@
         else await navigator.clipboard.writeText(idStanza).then(() => alert(copytext)).catch(_ => alert(failText));
     });
 
-    startButton?.addEventListener("click", () => socket.emit("iniziaTurno", {
+    startButton?.addEventListener("click", () => emit("iniziaTurno", {
         id: referenceStanza
     }));
 
-    chiudiButton?.addEventListener("click", () => socket.emit("terminaPartita", {
+    chiudiButton?.addEventListener("click", () => emit("terminaPartita", {
         id: referenceStanza
     }));
 

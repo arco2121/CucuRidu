@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const menuBtn = document.getElementById("menuBtn");
     const codiceStanzaPause = document.getElementById("codiceStanzaPause");
 
-    leaveBtn.addEventListener("click", () => socket.emit("lasciaStanza", {
+    leaveBtn.addEventListener("click", () => emit("lasciaStanza", {
         id: referenceStanza,
         giocatore: referenceGiocatore.id
     }));
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     menuBtn.addEventListener("click", () => {
         if(deactivateMenu) return;
-        socket.emit("listaGiocatori", {
+        emit("listaGiocatori", {
             stanzaId: referenceStanza
         });
         game_section.dispatchEvent(hidePanel);

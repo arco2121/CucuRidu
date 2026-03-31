@@ -1,4 +1,20 @@
+const controller = new Worker('/script/lobbyController.js');
 const base = document.getElementById("landpoint");
+
+const receivers = {};
+const on = (event = "default", callback = () => {}) => receivers[event] = callback;
+const emit = (event = "deafult", params = {}) => controller.postMessage({
+    type: event,
+    params: params
+});
+const off = (event) => receivers[event] = null;
+controller.onmessage = (event) => {
+    const { event: eventName, params } = event.data;
+    if (receivers[eventName]) receivers[eventName](params);
+};
+
+let referenceGiocatore;
+let referenceStanza = "";
 const notificationMessage = [
     "Allora... pensi di continuare a giocare o cosa?",
     "Muovi quel culo che stanno andando avanti senza di te",
@@ -6,19 +22,6 @@ const notificationMessage = [
     "Vuoi davvero competere con gli Ipad Kid? CONCENTRATI SUL GIOCO!",
     "Se non vuoi giocare davvero basta uscire sai"
 ];
-const socket = io({
-    auth: {
-        validation: fromBackEnd["token"],
-        stanzaId: fromBackEnd["stanzaId"],
-        userId: fromBackEnd["userId"],
-        token: JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}")["savingToken"] || null
-    },
-    tryAllTransports: true,
-    transports: ["websocket", "polling"]
-});
-let referenceGiocatore;
-let referenceStanza = "";
-
 const lasciaStanza = () => {
     const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
     const token = settings["savingToken"];
@@ -40,19 +43,19 @@ const lasciaStanza = () => {
         .finally(() => navigateWithLoading("/"));
 };
 
-//Endpoints
-socket.on("connect", () => {
+//Listeners
+on("connect", () => {
     document.dispatchEvent(stateConnected);
     switch (fromBackEnd["action"]) {
         case "Crea": {
-            socket.emit("creaStanza", {
+            emit("creaStanza", {
                 username: fromBackEnd["nome"],
                 pfp: fromBackEnd["pfp"]
             });
             break;
         }
         case "Partecipa": {
-            socket.emit("partecipaStanza", {
+            emit("partecipaStanza", {
                 username: fromBackEnd["nome"],
                 id: fromBackEnd["stanzaId"],
                 pfp: fromBackEnd["pfp"]
@@ -62,18 +65,18 @@ socket.on("connect", () => {
     fromBackEnd["action"] = null;
 });
 
-socket.on("disconnect", () => document.dispatchEvent(stateDisconnected));
+on("disconnect", () => document.dispatchEvent(stateDisconnected));
 
-socket.on("reconnect", () => document.dispatchEvent(stateConnected));
+on("reconnect", () => document.dispatchEvent(stateConnected));
 
-socket.on("reconnect_attempt", () => document.dispatchEvent(stateDisconnected));
+on("reconnect_attempt", () => document.dispatchEvent(stateDisconnected));
 
-socket.on("reconnect_failed", () => {
+on("reconnect_failed", () => {
     alert("Impossibile riconnettersi al server, STACCA STACCA!");
     lasciaStanza();
 });
 
-socket.on("connect_error", (err) => {
+on("connect_error", (err) => {
     switch(err.message) {
         case "SESSION_EXPIRED" : {
             alert("La tua sessione è scaduta o la stanza è stata chiusa. Come al solito in ritardo");
@@ -101,12 +104,12 @@ socket.on("connect_error", (err) => {
     }
 });
 
-socket.onAny(async () => {
+on("any", async () => {
     if(document.hidden)
         await sendNotifica("Cucu Ridu", notificationMessage[Math.floor(Math.random()*notificationMessage.length)])
 });
 
-socket.on("confermaStanza", async (data) => {
+on("confermaStanza", async (data) => {
     const { reference, interroghi, primoRound } = data;
     referenceStanza = data["stanzaId"] || fromBackEnd["stanzaId"];
     referenceGiocatore = new GiocatoreInterface(reference);
@@ -137,28 +140,28 @@ socket.on("confermaStanza", async (data) => {
     }
 });
 
-socket.on("stanzaLasciata", lasciaStanza);
+on("stanzaLasciata", lasciaStanza);
 
-socket.on("stanzaChiusa", () => {
+on("stanzaChiusa", () => {
     alert("NOOOOOOO, la chiusura della stanza NOOOOOOO");
     lasciaStanza();
 });
 
-socket.on("aspettaAltri", (data) => {
+on("aspettaAltri", (data) => {
     alert(data.message);
 });
 
-socket.on("impossibileAggiungersi", (error) => {
+on("impossibileAggiungersi", (error) => {
     alert(error.message);
     window.location.replace("/partecipaStanza");
 });
 
-socket.on("errore", (error) => {
+on("errore", (error) => {
     alert(error.message);
     window.location.replace("/");
 });
 
-socket.on("roundIniziato", async (data) => {
+on("roundIniziato", async (data) => {
     const { chiStaInterrogando, stanza, reference, domanda } = data;
     if(reference) referenceGiocatore = new GiocatoreInterface(reference);
     if(stanza) referenceStanza = stanza
@@ -170,17 +173,17 @@ socket.on("roundIniziato", async (data) => {
     });
 });
 
-socket.on("rispostaRegistrata", async () => {
+on("rispostaRegistrata", async () => {
     await renderFragment(base, "waitWinner", {
         stanzaId: referenceStanza
     });
 });
 
-socket.on("giaRegistrata", (data) => {
+on("giaRegistrata", (data) => {
     alert(data.message);
 });
 
-socket.on("sceltaVincitore", async (data) => {
+on("sceltaVincitore", async (data) => {
     const { reference, stanza, domanda, chiInterroga, risposte } = data;
     if(reference) referenceGiocatore = new GiocatoreInterface(reference);
     if(stanza) referenceStanza = stanza
@@ -193,7 +196,7 @@ socket.on("sceltaVincitore", async (data) => {
     });
 });
 
-socket.on("fineTurno", async (data) => {
+on("fineTurno", async (data) => {
     const { reference, vincitore, domanda, risposte } = data;
     if(reference) referenceGiocatore = new GiocatoreInterface(reference);
     await renderFragment(base, "showWinner", {
@@ -205,7 +208,7 @@ socket.on("fineTurno", async (data) => {
     });
 });
 
-socket.on("partitaTerminata", async (data) => {
+on("partitaTerminata", async (data) => {
     const { classifica } = data;
     const puntiMassimi = classifica[0]?.punti || 0;
     await renderFragment(base, "endGame", {
@@ -214,4 +217,14 @@ socket.on("partitaTerminata", async (data) => {
         puntiMassimi: puntiMassimi,
         idPrimoGiocatore: classifica[0].id
     });
+});
+
+controller.postMessage({
+    type: "init",
+    params: {
+        validation: fromBackEnd["token"],
+        stanzaId: fromBackEnd["stanzaId"],
+        userId: fromBackEnd["userId"],
+        token: JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}")["savingToken"] || null
+    }
 });

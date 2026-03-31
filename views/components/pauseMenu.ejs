@@ -31,11 +31,11 @@
 </div>
 
 <script>
-    socket.off("listaGiocatori");
+    off("listaGiocatori");
     const optionsBtn = document.getElementById("optionsBtn");
     const showGiocatoriPause = document.getElementById("showGiocatoriPause");
 
-    socket.on("listaGiocatoriAggiornamento", (data) => {
+    on("listaGiocatoriAggiornamento", (data) => {
         const { giocatori = [] } = data || {};
 
         renderFragment(showGiocatoriPause, "components/giocatorePauseRow", {

@@ -75,18 +75,19 @@
 
         const initSettingsUI = async () => {
             const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
+            const permesso = await concediPermesso();
 
             if (settings.audio === undefined) settings.audio = true;
             if (settings.sound === undefined) settings.sound = true;
             if (settings.vibration === undefined) settings.vibration = true;
             if (settings.notifications === undefined) settings.notifications = false;
+            if(permesso === false) settings.notifications = false;
             localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
 
             updateButtonUI(musicBtn, !!settings["audio"]);
             updateButtonUI(soundBtn, !!settings["sound"]);
             updateButtonUI(vibrationBtn, !!settings["vibration"]);
-            const permesso = Boolean(await concediPermesso());
-            toggleSetting(null, settings["notifications"], permesso);
+            updateButtonUI(notificationBtn, settings["notifications"] && Boolean(permesso));
         };
 
         await initSettingsUI();

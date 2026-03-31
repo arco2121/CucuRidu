@@ -19,7 +19,6 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         await Promise.all(sockets.map(socket => {
             switch (Stanza.stato) {
                 case StatoStanza.WAIT : {
-                    console.log("PERCHEEEEEE")
                     socket.emit("confermaStanza", {
                         reference: socket.data?.referenceGiocatore?.toJSON(),
                         stanzaId: Stanza.id,

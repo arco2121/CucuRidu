@@ -122,7 +122,7 @@
             alert("Finisci di selezionare le risposte, mongolo");
             return;
         }
-        socket.emit("inviaRisposta", {
+        emit("inviaRisposta", {
             id: referenceStanza,
             indexCarte: givenAnswerIndices
         });

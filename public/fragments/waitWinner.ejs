@@ -19,14 +19,14 @@
 </div>
 
 <script>
-    socket.off("aggiornamentoAttesaRisposta");
+    off("aggiornamentoAttesaRisposta");
     const attesaView = document.getElementById("attesa");
     const numeroGiocatoriCount = document.getElementById("numeroGiocatori");
     const showGiocatori = document.getElementById("showGiocatori");
     const idStanza = fromFragments["stanzaId"];
     let idAttesaInterval = null;
 
-    socket.on("aggiornamentoAttesaRisposta", (data) => {
+    on("aggiornamentoAttesaRisposta", (data) => {
         const {numeroGiocatori, giocatori} = data || {};
         numeroGiocatoriCount.textContent = numeroGiocatoriCount.textContent.split(":")[0] + ": " + numeroGiocatori;
         renderFragment(showGiocatori, "components/giocatoreRow", {
@@ -34,7 +34,7 @@
             animation: false
         });
     });
-    socket.emit("aggiornaAttesaRisposta", {
+    emit("aggiornaAttesaRisposta", {
         stanzaId: idStanza
     });
 </script>
