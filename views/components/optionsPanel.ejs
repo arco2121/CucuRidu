@@ -100,7 +100,7 @@
         vibrationBtn.addEventListener("click", (e) => toggleSetting(e, "vibration"));
 
         notificationBtn.addEventListener("click", async () => {
-            let permesso = await concediPermesso();
+            const permesso = await concediPermesso();
             if(permesso === false) alert("Non so se hai notato che il permesso lo hai disattivato TU!");
             toggleSetting(notificationBtn, "notifications", Boolean(permesso));
             const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
