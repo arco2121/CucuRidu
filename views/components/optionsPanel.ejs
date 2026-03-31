@@ -47,7 +47,7 @@
 
 <script>
     const optionPanel = document.getElementById("settings");
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
         const musicBtn = document.getElementById("musicbtn");
         const soundBtn = document.getElementById("soundbtn");
         const exitOptionsBtn = document.getElementById("exitOptionsBtn");
@@ -68,12 +68,12 @@
 
         const toggleSetting = (event, property, value = null) => {
             const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
-            settings[property] = value ? (value && !settings[property]) : !settings[property];
+            settings[property] = value !== null ? (value && !settings[property]) : !settings[property];
             localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
-            updateButtonUI(event.currentTarget, settings[property]);
+            updateButtonUI(event?.currentTarget ?? event, settings[property]);
         };
 
-        const initSettingsUI = () => {
+        const initSettingsUI = async () => {
             const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
 
             if (settings.audio === undefined) settings.audio = true;
@@ -82,13 +82,14 @@
             if (settings.notifications === undefined) settings.notifications = false;
             localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
 
-            updateButtonUI(musicBtn, !!settings["audio"]);
-            updateButtonUI(soundBtn, !!settings["sound"]);
-            updateButtonUI(vibrationBtn, !!settings["vibration"]);
-            updateButtonUI(notificationBtn, !!settings["notifications"]);
+            updateButtonUI(musicBtn, settings["audio"]);
+            updateButtonUI(soundBtn, settings["sound"]);
+            updateButtonUI(vibrationBtn, settings["vibration"]);
+            const permesso = Boolean(await concediPermesso());
+            toggleSetting(null, settings["notifications"], permesso);
         };
 
-        initSettingsUI();
+        await initSettingsUI();
 
         // Event Listeners
         musicBtn.addEventListener("click", async (e) => {
@@ -98,11 +99,12 @@
         soundBtn.addEventListener("click", (e) => toggleSetting(e, "sound"));
         vibrationBtn.addEventListener("click", (e) => toggleSetting(e, "vibration"));
 
-        notificationBtn?.addEventListener("click", async (e) => {
-            const permesso = await concediPermesso();
-            toggleSetting(e, "notifications", permesso);
+        notificationBtn.addEventListener("click", async () => {
+            let permesso = await concediPermesso();
+            if(permesso === false) alert("Non so se hai notato che il permesso lo hai disattivato TU!");
+            toggleSetting(notificationBtn, "notifications", Boolean(permesso));
+            const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
             if(fromBackEnd["notifications"]) {
-               const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
                if(settings.notifications) await concediPush();
                else await revocaPush();
             }

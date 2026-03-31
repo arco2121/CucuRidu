@@ -75,7 +75,7 @@
             ? Notification.permission
             : await Notification.requestPermission();
 
-        return permesso === "granted";
+        return permesso === "granted" ? true : (permesso === "default" ? 0 : false);
     };
 
     const sendNotifica = async (title, message, url = "") => {
