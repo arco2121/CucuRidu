@@ -17,12 +17,11 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         if (!Stanza) return;
 
         await Promise.all(sockets.map(socket => {
-            if(!socket.data?.referenceGiocatore) return;
-
             switch (Stanza.stato) {
                 case StatoStanza.WAIT : {
+                    console.log("PERCHEEEEEE")
                     socket.emit("confermaStanza", {
-                        reference: socket.data.referenceGiocatore.toJSON(),
+                        reference: socket.data?.referenceGiocatore?.toJSON(),
                         stanzaId: Stanza.id,
                         primoRound: Stanza.numeroRound[0] === 0,
                         interroghi: Stanza.round.chiStaInterrogando === socket.data.referenceGiocatore.id
@@ -36,13 +35,13 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     break;
                 }
                 case StatoStanza.CHOOSING_CARDS : {
-                    if(Stanza.round.risposte.has(socket.data.referenceGiocatore.id))
+                    if(Stanza.round.risposte.has(socket.data?.referenceGiocatore.id))
                         socket.emit("rispostaRegistrata");
                     else
                         socket.emit("roundIniziato", {
                             chiStaInterrogando: Stanza.trovaGiocatore(Stanza.round.chiStaInterrogando).toJSON(),
                             domanda: Stanza.round.domanda,
-                            reference: socket.data.referenceGiocatore.toJSON(),
+                            reference: socket.data?.referenceGiocatore?.toJSON(),
                             stanza: Stanza.id
                         });
                     break;
@@ -52,7 +51,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                         risposte: Array.from(Stanza.round.risposte.entries()),
                         domanda: Stanza.round.domanda,
                         chiInterroga: Stanza.trovaGiocatore(Stanza.round.chiStaInterrogando).toJSON(),
-                        reference: socket.data.referenceGiocatore.toJSON(),
+                        reference: socket.data?.referenceGiocatore?.toJSON(),
                         stanza: Stanza.id
                     });
                     break;
@@ -276,7 +275,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         user.on("aggiornaAttesa", async (data) => {
             const Stanza = await Stanze.get(data["stanzaId"] || user.data?.referenceStanza);
 
-            server.to(data["stanzaId"]).emit("aggiornamentoAttesa", {
+            user.emit("aggiornamentoAttesa", {
                 numeroGiocatori: Stanza?.giocatori.size,
                 minimoGiocatori: Stanza?.minimoGiocatori,
                 giocatori: Stanza?.classifica().map(giocatore => giocatore.toJSON())
@@ -293,7 +292,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
 
         user.on("aggiornaAttesaRisposta", async (data) => {
             const Stanza = await Stanze.get(data["stanzaId"] || user.data?.referenceStanza);
-            server.to(data["stanzaId"]).emit("aggiornamentoAttesaRisposta", {
+            user.emit("aggiornamentoAttesaRisposta", {
                 numeroGiocatori: Stanza?.round.risposte.size,
                 giocatori: Array.from(Stanza?.round.risposte.keys()).map(giocatore => Stanza.trovaGiocatore(giocatore).toJSON())
             })
@@ -323,7 +322,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     const sockets = await server.in(stanzaId).fetchSockets();
                     for(const socket of sockets) socket.data.referenceGiocatore = stanza.giocatori.get(socket.data.referenceGiocatore.id);
                     const stanzaNuova = await Stanze.set(stanzaId, stanza);
-                    await emitStatoStanza(stanzaNuova, ...sockets);
+                    const stanzona = stanzaNuova instanceof Stanza ? stanzaNuova : (stanzaNuova[stanzaId] ?? null);
+                    await emitStatoStanza(stanzona ?? stanzaId, ...sockets);
                     console.log("Giocatore eliminato da Stanza => " + stanzaId);
                 }
             } catch (e) {
@@ -357,7 +357,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                                 s.data.referenceGiocatore = stanzaDopo.giocatori.get(s.data.referenceGiocatore.id);
                             }
                             const nuova = await Stanze.set(stanzaId, stanzaDopo);
-                            await emitStatoStanza(nuova, ...sockets);
+                            const stanzona = nuova instanceof Stanza ? nuova : (nuova[stanzaId] ?? null);
+                            await emitStatoStanza(stanzona ?? stanzaId, ...sockets);
                         }
                     } catch (innerError) {
                         console.error("Errore nel timeout disconnessione:", innerError);

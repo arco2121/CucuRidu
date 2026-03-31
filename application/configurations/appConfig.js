@@ -15,11 +15,17 @@ const cors = require("cors");
  * @param allowedOrigins
  * @param local
  * @param timeout
+ * @param pagesOptions
  */
-const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout) => {
+const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout = 3600000, pagesOptions = {
+    notifications: false
+}) => {
 
     const renderPage = (res, page, params = {}) => res.render("header", {
-        params: params,
+        params: {
+            ...pagesOptions,
+            ...params
+        },
         page: page,
         headerIcon: getIcon(true)
     });

@@ -55,6 +55,7 @@
         const notificationBtn = document.getElementById("notificationbtn");
         const sectionDefault = document.querySelector(".sectionToHide");
         const updateButtonUI = (btn, isOn) => {
+            if(!btn) return;
             btn.textContent = isOn ? "On" : "Off";
             if(isOn) {
                 btn.classList.add("btn_style_confirm");
@@ -97,7 +98,15 @@
         soundBtn.addEventListener("click", (e) => toggleSetting(e, "sound"));
         vibrationBtn.addEventListener("click", (e) => toggleSetting(e, "vibration"));
 
-        notificationBtn.addEventListener("click", async (e) => toggleSetting(e, "notifications", await concediPermesso()));
+        notificationBtn?.addEventListener("click", async (e) => {
+            const permesso = await concediPermesso();
+            toggleSetting(e, "notifications", permesso);
+            if(fromBackEnd["notifications"]) {
+               const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
+               if(settings.notifications) await concediPush();
+               else await revocaPush();
+            }
+        });
         exitOptionsBtn.addEventListener("click", () => {
             optionPanel.dispatchEvent(hidePanel);
             sectionDefault.dispatchEvent(showPanel);

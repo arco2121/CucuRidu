@@ -1,4 +1,11 @@
 const base = document.getElementById("landpoint");
+const notificationMessage = [
+    "Allora... pensi di continuare a giocare o cosa?",
+    "Muovi quel culo che stanno andando avanti senza di te",
+    "A sto punto fatti due domande, datti due risposte e tirati due sberle",
+    "Vuoi davvero competere con gli Ipad Kid? CONCENTRATI SUL GIOCO!",
+    "Se non vuoi giocare davvero basta uscire sai"
+];
 const socket = io({
     auth: {
         validation: fromBackEnd["token"],
@@ -94,11 +101,16 @@ socket.on("connect_error", (err) => {
     }
 });
 
-socket.on("confermaStanza", (data) => {
+socket.onAny(async () => {
+    if(document.hidden)
+        await sendNotifica("Cucu Ridu", notificationMessage[Math.floor(Math.random()*notificationMessage.length)])
+});
+
+socket.on("confermaStanza", async (data) => {
     const { reference, interroghi, primoRound } = data;
     referenceStanza = data["stanzaId"] || fromBackEnd["stanzaId"];
     referenceGiocatore = new GiocatoreInterface(reference);
-    fetch("/saveGameReference", {
+    const result = await (await fetch("/saveGameReference", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -108,25 +120,21 @@ socket.on("confermaStanza", (data) => {
             userId: referenceGiocatore.id,
             stanzaId: referenceStanza
         })
-    }).then((response) => response.json().then(async (result) => {
-        if(result?.result) {
-            await renderFragment(base, "wait", {
-                stanzaId: referenceStanza,
-                interroghi: interroghi,
-                primoRound: primoRound,
-                seiMaster: referenceGiocatore.masterRole,
-                animation: !isLoadScreen()
-            });
-            if(result.fallback) {
-                const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
-                localStorage.setItem("cucuRiduSettings", JSON.stringify({
-                    ...settings,
-                    savingToken: result.fallback
-                }));
-            }
-        }
-        else navigateWithLoading("/");
-    }));
+    })).json();
+    await renderFragment(base, "wait", {
+        stanzaId: referenceStanza,
+        interroghi: interroghi,
+        primoRound: primoRound,
+        seiMaster: referenceGiocatore.masterRole,
+        animation: !isLoadScreen()
+    });
+    if(result.fallback) {
+        const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
+        localStorage.setItem("cucuRiduSettings", JSON.stringify({
+            ...settings,
+            savingToken: result.fallback
+        }));
+    }
 });
 
 socket.on("stanzaLasciata", lasciaStanza);

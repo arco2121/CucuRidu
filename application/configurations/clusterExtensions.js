@@ -14,7 +14,38 @@ const cleanUpStanze = (Stanze, timeout = 3600000) => {
     cleanUpIfOld();
 };
 
-const notificationsConfig = (app, database, memory, env = {}) => {
+const notificationsConfig = (app, database, memory, env = {}, timeout = 3600000) => {
+
+    const sendNotification = async (payload, callback = () => {}, ...toWho) => {
+        const promises = toWho.map(async (s) => {
+            try {
+                await webpush.sendNotification(s.subscription, payload);
+            } catch (err) {
+                await database.from('push_subscriptions').delete().eq("id", s.id);
+                console.log(`Sottoscrizione rimossa per ID: ${s.id}`);
+                callback();
+            }
+        });
+        await Promise.all(promises);
+    }
+
+    const broadReminder = async () => {
+      try {
+          const { data: subs } = await database.from('push_subscriptions').select('*');
+          const payload = JSON.stringify({
+              title: "Cucu Ridu",
+              body: "Non per essere petulante, ma se vuoi fare una partita ricordati che esisto",
+              url: "/",
+              actions: [
+                  { action: 'open', title: 'Gioca' }
+              ]
+          });
+          await sendNotification(payload, null, ...subs)
+      } catch (error) { console.log(error.message); } finally {
+          setTimeout(broadReminder, timeout*3);
+      }
+    };
+
     webpush.setVapidDetails('mailto:devcolombara@gmail.com', env.NOTIFICATION_PUBLIC, env.NOTIFICATION_PRIVATE);
 
     app.post('/registraNotifica', async (req, res) => {
@@ -52,23 +83,10 @@ const notificationsConfig = (app, database, memory, env = {}) => {
 
     app.post('/inviaBroadcast', async (req, res) => {
         const { data: subs } = await database.from('push_subscriptions').select('*');
-        const { title, body } = req.body || { title: "Default", body: "Default body" };
-        const payload = JSON.stringify({ title, body });
+        const { title, body, url, actions } = req.body || { title: "Default", body: "Default body" };
+        const payload = JSON.stringify({ title: title, body: body, url: url, actions: actions });
 
-        const promises = subs.map(async (s) => {
-            try {
-                await webpush.sendNotification(s.subscription, payload);
-            } catch (err) {
-                if (err.statusCode === 410 || err.statusCode === 404) {
-                    await database.from('push_subscriptions').delete().eq("id", s.id);
-                    console.log(`Sottoscrizione rimossa per ID: ${s.id}`);
-                } else {
-                    console.error("Errore invio push:", err.endpoint);
-                }
-            }
-        });
-
-        await Promise.all(promises);
+        await sendNotification(payload, null, ...subs);
         res.json({ success: true });
     });
 
@@ -78,8 +96,9 @@ const notificationsConfig = (app, database, memory, env = {}) => {
     });
 
     app.post("/inviaSingola", async (req, res) => {
-        const { titolo, corpo, who } = req.body;
+        const { title, body, who, actions, url } = req.body;
         if (!who) return res.status(400).json({ success: false });
+        const payload = JSON.stringify({ title: title, body: body, url: url, actions: actions });
 
         const { data: sub } = await database
             .from('push_subscriptions')
@@ -89,17 +108,12 @@ const notificationsConfig = (app, database, memory, env = {}) => {
 
         if (!sub) return res.status(404).json({ success: false, error: "User not subscribed" });
 
-        try {
-            const payload = JSON.stringify({ title: titolo, body: corpo });
-            await webpush.sendNotification(sub.subscription, payload);
-            res.json({ success: true });
-        } catch (err) {
-            if (err.statusCode === 410) {
-                await database.from('push_subscriptions').delete().eq("id", sub.id);
-            }
+        await sendNotification(payload, () => {
             res.status(500).json({ success: false, error: "Push failed" });
-        }
+        }, sub);
     });
+
+    (async () => broadReminder())();
 };
 
 module.exports = { cleanUpStanze, notificationsConfig };

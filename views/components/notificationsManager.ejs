@@ -1,6 +1,6 @@
 <script>
     const notificationsKey = fromBackEnd["notificationsKey"];
-    const settingsToCeck = JSON.parse(localStorage.getItem("cucuRiduSettings") || {});
+    const settingsToCeck = JSON.parse(localStorage.getItem("cucuRiduSettings") || '{}');
     let clientId = settings["clientId"];
     if(!clientId)
         fetch("/ottieniClientId", {
@@ -84,7 +84,7 @@
             body: message,
             icon: "/assets/error_icon.png",
             renotify: true,
-
+            tag: 'cucuridu'
         });
         notifica.onclick = () => {
             window.focus();
