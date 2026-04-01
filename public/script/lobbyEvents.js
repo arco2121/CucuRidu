@@ -106,7 +106,7 @@ on("connect_error", (err) => {
 
 on("any", async () => {
     if(document.hidden)
-        await sendNotifica("Cucu Ridu", notificationMessage[Math.floor(Math.random()*notificationMessage.length)])
+        await sendNotifica("Cucu Ridu", notificationMessage[Math.floor(Math.random()*notificationMessage.length)]);
 });
 
 on("confermaStanza", async (data) => {

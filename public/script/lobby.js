@@ -15,8 +15,9 @@ const stayAlive = () => {
         oscillator.connect(gainNode);
         gainNode.connect(aliver.destination);
         oscillator.start();
+        console.log("Aliver partito");
     } catch (e) {
-        console.error("Errore attivazione Alivet:", e);
+        console.error("Errore attivazione Aliver:", e);
     }
 };
 
