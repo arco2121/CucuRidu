@@ -273,7 +273,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         user.on("aggiornaAttesa", async (data) => {
             const Stanza = await Stanze.get(data["stanzaId"] || user.data?.referenceStanza);
 
-            user.emit("aggiornamentoAttesa", {
+            server.to(data["stanzaId"] || user.data?.referenceStanza).emit("aggiornamentoAttesa", {
                 numeroGiocatori: Stanza?.giocatori.size,
                 minimoGiocatori: Stanza?.minimoGiocatori,
                 giocatori: Stanza?.classifica().map(giocatore => giocatore.toJSON())
@@ -283,14 +283,15 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         user.on("listaGiocatori", async (data) => {
             const Stanza = await Stanze.get(data["stanzaId"] || user.data?.referenceStanza);
 
-            user.emit("listaGiocatoriAggiornamento", {
+            server.to(data["stanzaId"] || user.data?.referenceStanza).emit("listaGiocatoriAggiornamento", {
                 giocatori: Stanza?.classifica().map(giocatore => giocatore.toJSON())
             });
         });
 
         user.on("aggiornaAttesaRisposta", async (data) => {
             const Stanza = await Stanze.get(data["stanzaId"] || user.data?.referenceStanza);
-            user.emit("aggiornamentoAttesaRisposta", {
+
+            server.to(data["stanzaId"] || user.data?.referenceStanza).emit("aggiornamentoAttesaRisposta", {
                 numeroGiocatori: Stanza?.round.risposte.size,
                 giocatori: Array.from(Stanza?.round.risposte.keys()).map(giocatore => Stanza.trovaGiocatore(giocatore).toJSON())
             })
