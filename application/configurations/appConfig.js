@@ -192,7 +192,10 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         }
 
         try {
-            const smStream = new SitemapStream({ hostname: 'https://cucuridu.web.app' });
+            const protocol = req.protocol;
+            const host = req.get('host');
+            const url = `${protocol}://${host}`;
+            const smStream = new SitemapStream({ hostname: url });
             const pipeline = smStream.pipe(createGzip());
 
             smStream.write({ url: '/', changefreq: 'daily', priority: 1.0 });
