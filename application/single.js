@@ -25,10 +25,10 @@ const singleApp = async (local, port, allowedOrigins, env = {}, timeout = 360000
         },
         pingInterval: 15000,
         pingTimeout: 10000,
-        connectionStateRecovery: {
+        /*connectionStateRecovery: {
             maxDisconnectionDuration: timeout/120,
             skipMiddlewares: true,
-        }
+        }*/
     });
 
     //App Config
