@@ -3,7 +3,8 @@
 DROP TABLE IF EXISTS public.memory CASCADE;
 DROP TABLE IF EXISTS public.stanze CASCADE;
 DROP TABLE IF EXISTS public.items CASCADE;
-DROP TABLE IF EXISTS session CASCADE;
+DROP TABLE IF EXISTS public.push_subscriptions CASCADE;
+DROP TABLE IF EXISTS sessions CASCADE;
 
 CREATE TABLE public.memory (
     set_name text NOT NULL,
@@ -27,6 +28,15 @@ CREATE TABLE public.items (
     updated_at timestamp with time zone DEFAULT now(),
     CONSTRAINT items_pkey PRIMARY KEY ("item_id")
 );
+
+CREATE TABLE public.push_subscriptions (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    client_Id text NOT NULL,
+    subscription jsonb DEFAULT '{}'::jsonb,
+    endpoint text NOT NULL UNIQUE
+);
+CREATE INDEX IF NOT EXISTS idx_push_subs_client_id ON public.push_subscriptions(client_Id);
 
 CREATE OR REPLACE FUNCTION update_stanza(target_id text, new_json jsonb, id_of_machine text)
 RETURNS void AS $$

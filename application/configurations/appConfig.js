@@ -22,7 +22,6 @@ const { createGzip } = require('zlib');
 const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout = 3600000, pagesOptions = {
     notifications: false
 }) => {
-    let sitemap;
 
     const renderPage = (res, page, params = {}) => res.render("header", {
         params: {
@@ -187,11 +186,6 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     app.get('/sitemap', async (req, res) => {
         res.header('Content-Type', 'application/xml');
         res.header('Content-Encoding', 'gzip');
-        if (sitemap) {
-            res.send(sitemap);
-            return;
-        }
-
         try {
             const protocol = req.protocol;
             const host = req.get('host');
@@ -205,8 +199,8 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
             smStream.write({ url: '/creaMazzo', changefreq: 'daily', priority: 0.5 });
 
             smStream.end();
-            streamToPromise(pipeline).then(sm => sitemap = sm);
             pipeline.pipe(res).on('error', (e) => { throw e });
+
         } catch (e) {
             console.error(e);
             res.status(500).end();
