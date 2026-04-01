@@ -5,6 +5,8 @@ const { Mazzo } = require(path.join(__dirname, "../include/script/Mazzo"));
 const crypto = require('crypto');
 const express = require("express");
 const cors = require("cors");
+const { SitemapStream, streamToPromise } = require('sitemap');
+const { createGzip } = require('zlib');
 
 /**
  * Configura gli endpoint dell' application Express
@@ -167,6 +169,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     app.get("/error", (req, res) => {
         let status = 104;
         let message = "Questa pagina non esiste, brutta sottospecie di spermatozoo di elefante con la disfunzione erettile";
+
         if (req.query["alreadyConnected"]) {
             status = 420;
             message = "Allora signora, si scanti fora e torni alla pagina del gioco";
@@ -178,6 +181,32 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
             loadToken: false,
             bgm: "Error-Tough_Decisions"
         });
+    });
+
+    app.get('/sitemap', async (req, res) => {
+        res.header('Content-Type', 'application/xml');
+        res.header('Content-Encoding', 'gzip');
+        if (sitemap) {
+            res.send(sitemap);
+            return;
+        }
+
+        try {
+            const smStream = new SitemapStream({ hostname: 'https://cucuridu.web.app' });
+            const pipeline = smStream.pipe(createGzip());
+
+            smStream.write({ url: '/', changefreq: 'daily', priority: 1.0 });
+            smStream.write({ url: '/partecipaStanza', changefreq: 'daily', priority: 0.5 });
+            smStream.write({ url: '/creaStanza', changefreq: 'daily', priority: 0.5 });
+            smStream.write({ url: '/creaMazzo', changefreq: 'daily', priority: 0.5 });
+
+            smStream.end();
+            streamToPromise(pipeline).then(sm => sitemap = sm);
+            pipeline.pipe(res).on('error', (e) => { throw e });
+        } catch (e) {
+            console.error(e);
+            res.status(500).end();
+        }
     });
 
     app.post("/generateInfo", (req, res) => {
