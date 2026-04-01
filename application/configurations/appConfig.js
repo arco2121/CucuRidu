@@ -22,6 +22,7 @@ const { createGzip } = require('zlib');
 const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout = 3600000, pagesOptions = {
     notifications: false
 }) => {
+    let sitemap;
 
     const renderPage = (res, page, params = {}) => res.render("header", {
         params: {
