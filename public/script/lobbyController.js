@@ -9,15 +9,8 @@ const lobbyController = (event = {}) => {
                 auth: event.params,
                 transports: ["websocket", "polling"],
                 reconnection: true,
-                reconnectionAttempts: Infinity,
                 reconnectionDelay: 500,
-                pingTimeout: 20000,
-                pingInterval: 25000,
-                autoConnect: false,
-                connectionStateRecovery: {
-                    maxDisconnectionDuration: 60 * 1000,
-                    skipMiddlewares: true,
-                }
+                autoConnect: false
             });
 
             socket.on("connect", () => postMessage({ event: "connect", params: null }));

@@ -50,11 +50,7 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
             credentials: true,
         },
         pingInterval: 15000,
-        pingTimeout: 10000,
-        connectionStateRecovery: {
-            maxDisconnectionDuration: timeout/120,
-            skipMiddlewares: true,
-        }
+        pingTimeout: 10000
     });
     server.adapter(createAdapter(adapter));
 
@@ -62,9 +58,9 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
         notifications: true,
         notificationsKey: env.NOTIFICATION_PUBLIC
     });
+    notificationsConfig(app, database, generationMemory, env, timeout);
 
     serverConfig(server, serverSession, env.JWTKEY || TEMPORARY_TOKEN, Stanze, generationMemory, timeout);
-    notificationsConfig(app, database, generationMemory, env, timeout);
     cleanUpStanze(Stanze, timeout);
 
     const listening = httpServer.listen(port, (error) => {
