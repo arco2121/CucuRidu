@@ -7,14 +7,17 @@ const lobbyController = (event = {}) => {
             console.log("Initializing...");
             socket = io({
                 auth: event.params,
-                tryAllTransports: true,
                 transports: ["websocket", "polling"],
                 reconnection: true,
                 reconnectionAttempts: Infinity,
-                reconnectionDelay: 1000,
-                pingTimeout: 60000,
+                reconnectionDelay: 500,
+                pingTimeout: 20000,
                 pingInterval: 25000,
-                autoConnect: true,
+                autoConnect: false,
+                connectionStateRecovery: {
+                    maxDisconnectionDuration: 60 * 1000,
+                    skipMiddlewares: true,
+                }
             });
 
             socket.on("connect", () => postMessage({ event: "connect", params: null }));
@@ -30,9 +33,9 @@ const lobbyController = (event = {}) => {
             socket.on("connect_error", (err) => postMessage({ event: "connect_error", params: err }));
 
             socket.onAny((tag, ...args) => {
-                const data = (args.length > 0 && typeof args[0] === 'object') ? args[0] : args[0];
-                postMessage({ event: tag, params: data });
+                const data = (args.length === 1 && typeof args[0] === 'object') ? args[0] : Object.assign({}, ...args);
                 postMessage({ event: "any", params: null });
+                postMessage({ event: tag, params: data });
             });
 
             socket.connect();
