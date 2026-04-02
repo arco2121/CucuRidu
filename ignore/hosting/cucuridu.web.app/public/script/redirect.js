@@ -22,6 +22,7 @@ const pingHost = async (host) => {
 
 (async () => {
     try {
+        if(path === "/sitemap") return;
         const fastestHost = await Promise.any(HOSTS.map(pingHost));
         window.location.replace(fastestHost + path);
     } catch (e) {
