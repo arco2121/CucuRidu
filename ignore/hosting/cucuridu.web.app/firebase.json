@@ -11,6 +11,10 @@
       {
         "source": "**",
         "destination": "/index.html"
+      },
+      {
+        "source": "/sitemap",
+        "destination": "/sitemap.xml"
       }
     ]
   }
