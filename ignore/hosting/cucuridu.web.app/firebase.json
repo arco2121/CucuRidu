@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site" : "cucuridu",
+    "site": "cucuridu",
     "public": "public",
     "ignore": [
       "firebase.json",
@@ -9,12 +9,12 @@
     ],
     "rewrites": [
       {
-        "source": "**",
-        "destination": "/index.html"
-      },
-      {
         "source": "/sitemap",
         "destination": "/sitemap.xml"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
       }
     ]
   }
