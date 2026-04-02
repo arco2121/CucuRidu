@@ -9,7 +9,7 @@ const stayAlive = () => {
 
         const oscillator = aliver.createOscillator();
         const gainNode = aliver.createGain();
-        gainNode.gain.value = 0.001;
+        gainNode.gain.value = 0.00001;
         oscillator.type = 'sine';
         oscillator.frequency.setValueAtTime(440, aliver.currentTime);
         oscillator.connect(gainNode);
