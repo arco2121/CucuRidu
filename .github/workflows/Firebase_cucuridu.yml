@@ -18,10 +18,14 @@ jobs:
       - name: Checkout del repository
         uses: actions/checkout@v4
 
-       - name: Fetch existing sitemap
+      - name: Fetch existing sitemap
         run: |
-          mkdir -p ignore/hosting/cucuridu.web.app/public
-          curl -f -sL https://cucuridu.web.app/sitemap.xml -o ignore/hosting/cucuridu.web.app/public/sitemap.xml || echo "Sitemap non trovata, salto lo step"
+          cd ignore/hosting/cucuridu.web.app/
+          mkdir -p public
+          curl -L -s https://cucuridu.web.app/sitemap -o public/sitemap.xml
+          if grep -q "<html" public/sitemap.xml; then
+            rm public/sitemap.xml
+          fi
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
