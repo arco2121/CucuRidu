@@ -18,15 +18,6 @@ jobs:
       - name: Checkout del repository
         uses: actions/checkout@v4
 
-      - name: Fetch existing sitemap
-        run: |
-          cd ignore/hosting/cucuridu.web.app/
-          mkdir -p public
-          curl -L -s https://cucuridu.onrender.com/sitemap -o public/sitemap.xml
-          if grep -q "<html" public/sitemap.xml; then
-            rm public/sitemap.xml
-          fi
-
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
