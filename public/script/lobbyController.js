@@ -3,6 +3,11 @@ let socket = null;
 
 const lobbyController = (event = {}) => {
     switch (event.type) {
+        case 'socketId': {
+            postMessage('socketId', socket.id);
+            break;
+        }
+
         case "init": {
             console.log("Initializing...");
             socket = io({

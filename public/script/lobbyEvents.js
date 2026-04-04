@@ -1,8 +1,12 @@
 const controller = new Worker('/script/lobbyController.js');
 const base = document.getElementById("landpoint");
 
+//Controller
 const receivers = {};
-const on = (event = "default", callback = () => {}) => receivers[event] = callback;
+const on = (event = "default", callback = (data) => {}) => {
+    if(!receivers[event]) receivers[event] = [];
+    receivers[event].push(callback);
+};
 const emit = (event = "deafult", params = {}) => controller.postMessage({
     type: event,
     params: params
@@ -10,9 +14,11 @@ const emit = (event = "deafult", params = {}) => controller.postMessage({
 const off = (event) => receivers[event] = null;
 controller.onmessage = (event) => {
     const { event: eventName, params } = event.data;
-    if (receivers[eventName]) receivers[eventName](params);
+    if (receivers[eventName])
+        for(const call of receivers[eventName]) call(params);
 };
 
+//Utility
 let referenceGiocatore;
 let referenceStanza = "";
 const notificationMessage = [
@@ -45,6 +51,7 @@ const lasciaStanza = () => {
 
 //Listeners
 on("connect", () => {
+    emit('socketId');
     document.dispatchEvent(stateConnected);
     switch (fromBackEnd["action"]) {
         case "Crea": {
