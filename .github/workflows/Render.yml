@@ -9,7 +9,6 @@ on:
       - 'LICENSE'
       - '.github/**'
       - '.git/**'
-      - 'install.py'
       - 'README_HF.md'
       - '.envXample'
   workflow_dispatch:
