@@ -12,18 +12,19 @@
     <link rel="stylesheet" href="/style/<%= page %>.css">
     <link rel="icon" href="/assets/icon.png">
     <title>Cucu Ridu</title>
+    <script src="/script/config/legacyBridge.js"></script>
 </head>
 <body>
-    <script type="module" src="/script/config/colorConfig.js"></script>
-    <%- include("components/registerWorker") %>
+    <script src="/script/config/colorConfig.js"></script>
     <%- include("components/loadScreen") %>
+    <script src="/script/config/registerWorker.js"></script>
     <script src="/script/config/ejs.js"></script>
     <script src="/script/config/globalConfig.js"></script>
     <script src="/script/config/eventsConfig.js"></script>
     <script src="/script/config/midleChecks.js"></script>
-    <%- include("components/manageBack") %>
+    <script src="/script/config/manageBack.js"></script>
     <%- include(page, params) %>
     <%- include("components/audioManager", { bgm: params.bgm || "GameMusic-Candy_Bazaar" }) %>
-    <%- include("components/clearDom") %>
+    <script src="/script/config/clearDom.js"></script>
 </body>
 </html>
