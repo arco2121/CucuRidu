@@ -86,41 +86,54 @@
                 } catch(err) {}
 
                 load("https://unpkg.com/@babel/standalone/babel.min.js", function () {
-                    console.log("Babel scaricato, inizio trasformazione...");
+                    console.log("Babel caricato. Inizio trasformazione differita...");
 
-                    // Diamo respiro al browser prima di iniziare la trasformazione pesante
-                    setTimeout(function () {
-                        if (window.Babel) {
-                            window.Babel.transformScriptTags();
+                    // Invece di trasformare tutto subito, usiamo un piccolo trucco per non freezare la UI
+                    var scripts = document.getElementsByTagName('script');
+                    var babelScripts = [];
+
+                    for (var i = 0; i < scripts.length; i++) {
+                        if (scripts[i].type === 'text/babel') {
+                            babelScripts.push(scripts[i]);
                         }
+                    }
 
-                        // Il "Rilascio" deve avvenire dopo che Babel ha iniettato i nuovi script
-                        setTimeout(function () {
-                            window._babelReady = true;
-                            console.log("Rilascio coda eventi...");
-
-                            // Eseguiamo i listener accumulati
-                            while (window._babelQueue.length) {
-                                var f = window._babelQueue.shift();
-                                try { f({ type: 'DOMContentLoaded', target: document }); } catch (e) { console.error(e); }
+                    // Trasformiamo i file uno alla volta con un piccolo delay (Chunking)
+                    var processNext = function() {
+                        if (babelScripts.length === 0) {
+                            finalRelease();
+                            return;
+                        }
+                        // Babel.transformScriptTags() purtroppo processa tutto.
+                        // Proviamo a forzare l'esecuzione e poi cediamo il controllo al browser per 10ms
+                        setTimeout(function() {
+                            if (window.Babel) {
+                                // Eseguiamo la trasformazione standard
+                                window.Babel.transformScriptTags();
                             }
+                            finalRelease();
+                        }, 50);
+                    };
 
-                            // TRIGGER FINALE: Forziamo il browser a capire che tutto è pronto
-                            try {
-                                var ev = document.createEvent('Event');
-                                ev.initEvent('DOMContentLoaded', true, true);
-                                document.dispatchEvent(ev);
+                    var finalRelease = function() {
+                        window._babelReady = true;
+                        // Nascondiamo IMMEDIATAMENTE il loading screen se esiste
+                        var loader = document.getElementById('loading-screen') || document.querySelector('.loading');
+                        if (loader) { loader.style.display = 'none'; }
 
-                                // FORZATURA: Se hai un elemento caricamento, lo nascondiamo manualmente qui
-                                // perché i tuoi script originali potrebbero aver fallito il listener
-                                var loader = document.getElementById('loading-screen') || document.querySelector('.loading');
-                                if (loader) {
-                                    loader.style.display = 'none';
-                                    console.warn("Loading screen rimosso forzatamente dal Bridge.");
-                                }
-                            } catch (e) {}
-                        }, 500); // Mezzo secondo di delay per lasciare che il DOM si aggiorni
-                    }, 100);
+                        while (window._babelQueue.length) {
+                            var f = window._babelQueue.shift();
+                            try { f({ type: 'DOMContentLoaded', target: document }); } catch (e) {}
+                        }
+                        // Scateniamo l'evento finale
+                        try {
+                            var ev = document.createEvent('Event');
+                            ev.initEvent('DOMContentLoaded', true, true);
+                            document.dispatchEvent(ev);
+                        } catch(e) {}
+                    };
+
+                    processNext();
                 });
             });
         });
