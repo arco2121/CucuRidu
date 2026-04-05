@@ -1,6 +1,6 @@
 (function () {
     var useOld = false;
-    try { new Function("() => {}"); } catch { useOld = true; }
+    try { new Function("() => {}"); } catch(e) { useOld = true; }
     var path = window.location.pathname;
     var HOSTS = [
         'https://cucuridu.onrender.com',
