@@ -7,7 +7,6 @@ const ASSETS_TO_CACHE = [
     '/style/global.css',
     '/script/config/colorConfig.js',
     '/script/config/ejs.js',
-    '/script/config/legacyBridge.js',
     '/script/config/eventsConfig.js',
     '/script/config/manageBack.js',
     '/script/config/clearDom.js',

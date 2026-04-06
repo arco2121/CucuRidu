@@ -1,5 +1,5 @@
+<script src="<%= scripts %>/views/notificationsManager.js"></script>
 <%- include("components/connectionManager") %>
-<%- include("components/notificationsManager") %>
 <%- include("components/optionsPanel") %>
 <div class="game_section visible showByConnectionManager" id="game_section">
     <div id="navbar_con" class="wait_navbar">
@@ -13,9 +13,9 @@
     <div class="appear" id="landpoint"></div>
 </div>
 
-<script src="/script/GiocatoreInterface.js"></script>
-<script src="/script/lobbyEvents.js"></script>
-<script src="/script/lobby.js"></script>
+<script src="<%= scripts %>/GiocatoreInterface.js"></script>
+<script src="<%= scripts %>/pages/lobbyEvents.js"></script>
+<script src="<%= scripts %>/pages/lobby.js"></script>
 
 <%- include("components/pauseMenu") %>
 <%- include("components/packsPanel") %>

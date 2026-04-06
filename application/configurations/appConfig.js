@@ -23,14 +23,22 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     notifications: false
 }) => {
 
-    const renderPage = (res, page, params = {}) => res.render("header", {
-        params: {
-            ...pagesOptions,
-            ...params
-        },
-        page: page,
-        headerIcon: getIcon(true)
-    });
+    const renderPage = (req, res, page, params = {}) => {
+        const filter = /MSIE|Trident|webOS|LG Browser|Tizen|SamsungBrowser\/[1-9]\.|Opera Mini|Chrome\/([1-6][0-9])\.|Firefox\/([1-5][0-9])\.|Version\/([1-9]|10|11)(\.[0-9]+)? Safari\/|iPhone OS ([1-9]|10|11|12)_|Android [1-7]\./i;
+        const target = (req.headers['user-agent'] || "");
+        const test = filter.test(target) ? "/script_digst" : "/script";
+
+        res.render("header", {
+            params: {
+                ...pagesOptions,
+                ...params,
+                scripts: test
+            },
+            page: page,
+            scripts: test,
+            headerIcon: getIcon(true)
+        });
+    }
 
     const resumeGame = async (req, res, next) => {
         const { userId, stanzaId } = await serverSession.get(req, req.query?.token);
@@ -65,7 +73,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
 
     app.get("/", resumeGame, (req, res) => {
         const { openSettings } = req.query;
-        renderPage(res, "index", {
+        renderPage(req, res, "index", {
             icon: getIcon(),
             deleteToken: req.deleteToken,
             bgm: "MainMenu-City_Stroll",
@@ -76,7 +84,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
 
     app.get("/partecipaStanza/:codiceStanza", resumeGame, (req, res) => {
         const stanza = req.params["codiceStanza"];
-        if (stanza) renderPage(res, "profile", {
+        if (stanza) renderPage(req, res, "profile", {
             stanza: stanza,
             setOfPfp: getAllPfp(),
             deleteToken: req.deleteToken,
@@ -96,12 +104,12 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
                 bgm: "Choosing_Menu-Feeling_Good"
             });
             res.redirect("/game?token=" + token);
-        } else if (stanza) renderPage(res, "profile", {
+        } else if (stanza) renderPage(req, res, "profile", {
             stanza: stanza,
             setOfPfp: getAllPfp(),
             deleteToken: req.deleteToken,
             bgm: "Choosing_Menu-Feeling_Good"
-        }); else renderPage(res, "join", {
+        }); else renderPage(req, res, "join", {
             bgm: "Choosing_Menu-Feeling_Good",
             deleteToken: req.deleteToken
         });
@@ -116,7 +124,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
                 bgm: "Choosing_Menu-Feeling_Good"
             });
             res.redirect("/game?token=" + token);
-        } else renderPage(res, "profile", {
+        } else renderPage(req, res, "profile", {
             setOfPfp: getAllPfp(),
             deleteToken: req.deleteToken,
             bgm: "Choosing_Menu-Feeling_Good"
@@ -127,7 +135,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         const check = ["nome", "pfp", "stanzaId", "userId"];
         const {nome, pfp, stanzaId, userId} = await serverSession.validate(check, req.session.storeData, req.query?.token);
         if (userId && stanzaId && await Stanze.has(stanzaId) && (await Stanze.get(stanzaId)).trovaGiocatore(userId))
-            renderPage(res, "lobby", {
+            renderPage(req, res, "lobby", {
                 userId: userId,
                 stanzaId: stanzaId,
                 token: TEMPORARY_TOKEN,
@@ -135,7 +143,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
                 bgm: "GameMusic-Candy_Bazaar"
             });
         else if (nome && pfp) {
-            renderPage(res, "lobby", {
+            renderPage(req, res, "lobby", {
                 nome: nome,
                 pfp: pfp,
                 stanzaId: stanzaId,
@@ -150,11 +158,11 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         }
     });
 
-    app.get("/creaMazzo", (req, res) => renderPage(res, "createPacks", {
+    app.get("/creaMazzo", (req, res) => renderPage(req, res, "createPacks", {
         loadToken: false,
     }));
 
-    app.get("/offline", (req, res) => renderPage(res, "offline", {
+    app.get("/offline", (req, res) => renderPage(req, res, "offline", {
         loadToken: false,
     }));
 
@@ -174,7 +182,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
             status = 420;
             message = "Allora signora, si scanti fora e torni alla pagina del gioco";
         }
-        renderPage(res, "error", {
+        renderPage(req, res, "error", {
             error: status,
             icon: getIcon(),
             message: message,

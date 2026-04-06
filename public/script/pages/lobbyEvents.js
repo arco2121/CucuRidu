@@ -1,4 +1,4 @@
-const controller = new Worker('/script/lobbyController.js');
+const controller = new Worker(fromBackEnd["scripts"] + '/pages/lobbyController.js');
 const base = document.getElementById("landpoint");
 
 const receivers = {};

@@ -4,11 +4,7 @@
         <h1 class="title sour_gummy_bold">Errore <%= error %></h1>
         <h3 class="sour_gummy_medium"><%= message %></h3>
         <br>
-        <button class="button btn_mediumText btn_style_3 sour_gummy_bold" onclick="window.location.replace('/')">Torna alla home</button>
+        <button class="button btn_mediumText btn_style_3 sour_gummy_bold" id="home">Torna alla home</button>
     </div>
 </div>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        document.dispatchEvent(unloadScreen);
-    });
-</script>
+<script src="<%= scripts %>/pages/error.js"></script>

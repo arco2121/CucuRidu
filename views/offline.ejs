@@ -1,9 +1,3 @@
 <%- include("components/connectionManager") %>
 
-<script>
-    document.dispatchEvent(unloadScreen);
-    document.addEventListener("DOMContentLoaded", () => {
-        document.dispatchEvent(stateDisconnected);
-        toggleConnectionState();
-    });
-</script>
+<script src="<%= scripts %>/pages/offline.js"></script>
