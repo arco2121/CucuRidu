@@ -1,3 +1,9 @@
+window.onerror = function(message, source, lineno, colno, error) {
+    alert("ERRORE: " + message + " a riga: " + lineno);
+    return true;
+};
+
+
 document.addEventListener("DOMContentLoaded", () => {
     document.dispatchEvent(unloadScreen);
 
