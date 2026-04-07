@@ -6,4 +6,8 @@
     <script src="https://cdn.jsdelivr.net/npm/classlist-polyfill@1.2.0/src/index.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/url-polyfill@1.1.12/url-polyfill.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/nodelist-foreach-polyfill@1.2.0/index.min.js"></script>
+
+    <script src="<%= scripts %>/config/legacySupport.js"></script>
 <% } %>
+
+<noscript><%- include("error", { error: 2096, message: "Javascript not supported" })%></noscript>
