@@ -33,3 +33,16 @@ if (!testElement.classList.contains("b")) {
         }
     };
 }
+
+//Logging
+window.onerror = function(message, source, lineno, colno, error) {
+    var fileName = source ? source.split('/').pop() : "Script sconosciuto";
+
+    alert(
+        "FILE: " + fileName + "\n" +
+        "ERRORE: " + message + "\n" +
+        "RIGA: " + lineno + "\n" +
+        "COLONNA: " + colno
+    );
+    return true;
+};

@@ -1,17 +1,3 @@
-window.onerror = function(message, source, lineno, colno, error) {
-    // Estraiamo solo il nome del file dal percorso completo (source)
-    var fileName = source ? source.split('/').pop() : "Script sconosciuto";
-
-    alert(
-        "FILE: " + fileName + "\n" +
-        "ERRORE: " + message + "\n" +
-        "RIGA: " + lineno + "\n" +
-        "COLONNA: " + colno
-    );
-    return true;
-};
-
-
 document.addEventListener("DOMContentLoaded", () => {
     document.dispatchEvent(unloadScreen);
 
