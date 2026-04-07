@@ -26,5 +26,7 @@
     <%- include(page, params) %>
     <%- include("components/audioManager", { bgm: params.bgm || "GameMusic-Candy_Bazaar" }) %>
     <script src="<%= scripts %>/config/clearDom.js"></script>
+    
+    <noscript><%- include("error", { error: 2096, message: "Javascript not supported" })%></noscript>
 </body>
 </html>
