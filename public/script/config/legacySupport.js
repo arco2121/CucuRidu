@@ -8,7 +8,7 @@ if (!Element.prototype.remove) {
 // 2. AudioContext
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-// 3. Custom Events (new Event / new CustomEvent)
+// 3. Custom Events
 (function () {
     if (typeof window.CustomEvent === "function") return false;
     function CustomEvent(event, params) {
@@ -33,6 +33,8 @@ if (!testElement.classList.contains("b")) {
         }
     };
 }
+
+alert("DIOOOOO")
 
 //Logging
 window.onerror = function(message, source, lineno, colno, error) {
