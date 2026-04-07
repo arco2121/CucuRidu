@@ -1,14 +1,14 @@
-// 1. Metodo .remove()
+//Remove
 if (!Element.prototype.remove) {
     Element.prototype.remove = function() {
         if (this.parentNode) this.parentNode.removeChild(this);
     };
 }
 
-// 2. AudioContext
+//AudioContext
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-// 3. Custom Events
+//Custom Events
 (function () {
     if (typeof window.CustomEvent === "function") return false;
     function CustomEvent(event, params) {
@@ -22,7 +22,7 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext;
     window.Event = CustomEvent;
 })();
 
-// 4. ClassList (il tuo codice che avevi già)
+//ClassList
 var testElement = document.createElement("_");
 testElement.classList.add("a", "b");
 if (!testElement.classList.contains("b")) {
@@ -33,8 +33,6 @@ if (!testElement.classList.contains("b")) {
         }
     };
 }
-
-alert("DIOOOOO")
 
 //Logging
 window.onerror = function(message, source, lineno, colno, error) {

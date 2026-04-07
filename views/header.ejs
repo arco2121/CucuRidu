@@ -14,58 +14,6 @@
     <title>Cucu Ridu</title>
 </head>
 <body>
-<script>
-    // Forza la riparazione PRIMA di ogni altra cosa
-    (function() {
-        console.log("Inizio riparazione manuale...");
-
-        // 1. Ripara .remove()
-        if (!Element.prototype.remove) {
-            Element.prototype.remove = function() {
-                if (this.parentNode) this.parentNode.removeChild(this);
-            };
-        }
-
-        // 2. Ripara AudioContext
-        window.AudioContext = window.AudioContext || window.webkitAudioContext || function() {
-            this.createBufferSource = function() {};
-            this.decodeAudioData = function() {};
-        };
-
-        // 3. Ripara CustomEvent e Event (per l'errore "Invalid Argument")
-        try {
-            new CustomEvent('test');
-        } catch (e) {
-            var CustomEventPolyfill = function (event, params) {
-                params = params || { bubbles: false, cancelable: false, detail: undefined };
-                var evt = document.createEvent('CustomEvent');
-                evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-                return evt;
-            };
-            CustomEventPolyfill.prototype = window.Event.prototype;
-            window.CustomEvent = CustomEventPolyfill;
-            window.Event = CustomEventPolyfill;
-        }
-
-        // 4. Ripara classList (versione super compatibile)
-        if (!("classList" in document.documentElement)) {
-            // Se manca proprio classList (molto raro ma possibile su vecchie TV)
-            // qui servirebbe un polyfill esterno pesante, ma solitamente basta
-            // gestire gli argomenti multipli come hai già fatto.
-        }
-
-        var t = document.createElement("_");
-        t.classList.add("a", "b");
-        if (!t.classList.contains("b")) {
-            var a = DOMTokenList.prototype.add;
-            DOMTokenList.prototype.add = function() {
-                for (var i = 0; i < arguments.length; i++) a.call(this, arguments[i]);
-            };
-        }
-
-        console.log("Riparazione completata.");
-    })();
-</script>
     <%- include("components/legacySupport") %>
     <script src="<%= scripts %>/config/colorConfig.js"></script>
     <%- include("components/loadScreen") %>
