@@ -1,4 +1,6 @@
 <% if(legacy) { %>
+    <script src="<%= scripts %>/config/legacySupport.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/3.36.0/minified.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/regenerator-runtime@0.14.1/runtime.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/whatwg-fetch@3.6.20/dist/fetch.umd.js"></script>
@@ -7,5 +9,5 @@
     <script src="https://cdn.jsdelivr.net/npm/url-polyfill@1.1.12/url-polyfill.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/nodelist-foreach-polyfill@1.2.0/index.min.js"></script>
 
-    <script src="<%= scripts %>/config/legacySupport.js"></script>
+    <link rel="stylesheet" href="/style/legacySupport.css">
 <% } %>

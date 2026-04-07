@@ -11,10 +11,10 @@
     <link rel="stylesheet" href="/style/global.css">
     <link rel="stylesheet" href="/style/<%= page %>.css">
     <link rel="icon" href="/assets/icon.png">
+    <%- include("components/legacySupport") %>
     <title>Cucu Ridu</title>
 </head>
 <body>
-    <%- include("components/legacySupport") %>
     <script src="<%= scripts %>/config/colorConfig.js"></script>
     <%- include("components/loadScreen") %>
     <script src="<%= scripts %>/config/registerWorker.js"></script>

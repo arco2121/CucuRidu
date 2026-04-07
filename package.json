@@ -1,6 +1,6 @@
 {
   "name": "cucuridu",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Un gioco di carte irriverente, storto e assolutamente necessario",
   "keywords": [
     "js",
@@ -20,7 +20,7 @@
   "type": "commonjs",
   "main": "app.js",
   "scripts": {
-    "build": "babel public/script -d public/script_dist --copy-files",
+    "build": "babel public/script -d public/script_legacy --copy-files",
     "start": "npm run build && node app.js",
     "dev": "npx babel public/script -w -d public/script_dist & nodemon app.js"
   },

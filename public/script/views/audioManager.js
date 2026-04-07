@@ -1,5 +1,10 @@
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-const audioCtx = new AudioContext();
+const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+const audioCtx = AudioContextClass ? new AudioContextClass() : {
+    state: 'suspended',
+    resume: function() { return Promise.resolve(); },
+    decodeAudioData: function() { return Promise.resolve(); },
+    createBufferSource: function() { return { connect: function() {}, start: function() {}, stop: function() {} }; }
+};
 let bgmSource = null, bgmBuffer = null;
 let bgmStartTime = 0, bgmPausedAt = 0;
 
