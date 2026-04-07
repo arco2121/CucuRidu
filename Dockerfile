@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 7860
 
 # Comando per avviare il sito
-CMD [ "node", "app.js" ]
+CMD [ "npm", "start" ]

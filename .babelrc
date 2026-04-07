@@ -1,0 +1,22 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "chrome": "50",
+          "ie": "11",
+          "safari": "10",
+          "browsers": [
+            "> 0.25%",
+            "not dead",
+            "chrome >= 50",
+            "samsung >= 4",
+            "opera >= 40"
+          ]
+        },
+        "useBuiltIns": false
+      }
+    ]
+  ]
+}

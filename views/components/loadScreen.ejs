@@ -1,6 +1,10 @@
 <div class="loadingscreen">
     <div class="loading_container">
-        <img loading="eager" fetchpriority="high" class="loading_img" src="/assets/loading.webp" alt="loadingScreen">
+        <picture>
+            <source srcset="/assets/loading.webp" type="image/webp">
+            <source srcset="/assets/icon.png" type="image/png">
+            <img src="/assets/icon.png" class="loading_img" loading="eager" fetchpriority="high" alt="loadingScreen">
+        </picture>
         <h5 class="sour_gummy_bold_italic text_color_dark loading_text" id="textLoading">Caricando...</h5>
     </div>
 </div>
