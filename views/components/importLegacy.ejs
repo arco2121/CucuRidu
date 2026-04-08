@@ -1,0 +1,15 @@
+<% if(legacy) { %>
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            var fileName = source ? source.split('/').pop() : "Script sconosciuto";
+            var message = "FILE: " + fileName + "\n" +
+                "ERRORE: " + message + "\n" +
+                "RIGA: " + lineno + "\n" +
+                "COLONNA: " + colno;
+            alert(message);
+            console.error(message);
+            return true;
+        };
+    </script>
+    <script src="<%= scripts %>/config/importLegacy.js"></script>
+<% } %>

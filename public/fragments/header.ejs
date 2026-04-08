@@ -2,42 +2,4 @@
 <meta name="rawFragment_<%= id %>" content="<%= JSON.stringify(data) %>">
 <div id="<%= id %>" class="fragment"></div>
 
-<script>
-    (() => {
-        const fromRendering = (() => {
-            const data = document.querySelector("meta[name='dataFromFragment_<%= id %>']").getAttribute("content");
-            document.querySelector("meta[name='dataFromFragment_<%= id %>']").remove();
-            return JSON.parse(data);
-        })();
-        const raw = (() => {
-            const data = document.querySelector("meta[name='rawFragment_<%= id %>']").getAttribute("content");
-            document.querySelector("meta[name='rawFragment_<%= id %>']").remove();
-            return JSON.parse(data);
-        })();
-        const container = document.getElementById("<%= id %>");
-        const scriptRegex = /<script\b[^>]*>([\s\S]*?)<\/script>/gim;
-        const scripts = [];
-
-        const html = raw.replace(scriptRegex, (match, scriptContent) => {
-            if (scriptContent.trim()) {
-                scripts.push(scriptContent.trim());
-            }
-            return "";
-        });
-
-        container.innerHTML = ejs.render(html, fromRendering);
-        scripts.forEach(script => {
-            try {
-                const fromFragments = {
-                    ...fromRendering,
-                    pageId: container.id
-                };
-                eval(ejs.render(script, fromRendering));
-            } catch (e) {
-                console.error(e);
-            }
-        });
-
-        document.currentScript?.remove();
-    })();
-</script>
+<script name="<%= id %>" src="<%= scripts %>/fragments/header.js"></script>

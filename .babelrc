@@ -15,7 +15,8 @@
             "opera >= 40"
           ]
         },
-        "useBuiltIns": false
+        "useBuiltIns": false,
+        "modules": false
       }
     ]
   ]

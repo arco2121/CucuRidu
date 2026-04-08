@@ -334,15 +334,15 @@
 }
 
 .game_card_decoration_style_1 svg path {
-    fill: var(--accent-color-1-outline); !important;
+    fill: var(--accent-color-1-outline) !important;
 }
 
 .game_card_decoration_style_2 svg path {
-    fill: var(--accent-color-2-outline); !important;
+    fill: var(--accent-color-2-outline) !important;
 }
 
 .game_card_decoration_style_3 svg path {
-    fill: var(--accent-color-3-outline); !important;
+    fill: var(--accent-color-3-outline) !important;
 }
 
 .game_card_style_1 {

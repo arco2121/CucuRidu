@@ -17,4 +17,5 @@ COPY . .
 EXPOSE 7860
 
 # Comando per avviare il sito
+CMD [ "npm", "run", "build" ]
 CMD [ "npm", "start" ]

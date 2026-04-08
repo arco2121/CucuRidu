@@ -69,9 +69,17 @@ const renderFragment = async (root, page, params = {}) => {
             root.dispatchEvent(hideOpacity);
             await wait(170);
         }
+        const paths = {
+            scripts: fromBackEnd["scripts"],
+            styles: fromBackEnd["styles"]
+        };
         const header = await renderFragment(null, "header");
         const processed = ejs.render(header, {
-            params: params,
+            params: {
+                ...params,
+                ...paths
+            },
+            ...paths,
             data: fragmentsCache[page],
             id: generateId(memory)
         });
