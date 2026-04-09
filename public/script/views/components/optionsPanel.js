@@ -25,24 +25,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         updateButtonUI(event?.currentTarget ?? event, settings[property]);
     };
 
-    const initSettingsUI = async () => {
+    const initSettingsUI = () => {
         const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
-        const permesso = await concediPermesso();
-
         if (settings.audio === undefined) settings.audio = true;
         if (settings.sound === undefined) settings.sound = true;
         if (settings.vibration === undefined) settings.vibration = true;
-        if (settings.notifications === undefined) settings.notifications = Boolean(permesso);
-        if(permesso === false) settings.notifications = false;
-        localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
 
         updateButtonUI(musicBtn, !!settings["audio"]);
         updateButtonUI(soundBtn, !!settings["sound"]);
         updateButtonUI(vibrationBtn, !!settings["vibration"]);
-        updateButtonUI(notificationBtn, settings["notifications"] && Boolean(permesso));
+        localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
+
+        (async () => {
+            const settingsAfter = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
+            const permesso = await concediPermesso();
+            if (settings.notifications === undefined) settingsAfter.notifications = Boolean(permesso);
+            if (permesso === false) settingsAfter.notifications = false;
+            localStorage.setItem("cucuRiduSettings", JSON.stringify(settingsAfter));
+            updateButtonUI(notificationBtn, settingsAfter["notifications"] && Boolean(permesso))
+        })();
     };
 
-    await initSettingsUI();
+    initSettingsUI();
 
     // Event Listeners
     musicBtn.addEventListener("click", async (e) => {
