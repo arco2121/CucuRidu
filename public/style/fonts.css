@@ -6,7 +6,7 @@
     src: url('/assets/fonts/NunitoVariableFont_wght.ttf') format('truetype-variations');
     font-weight: 200 1000;
     font-style: normal;
-    font-display: swap;
+    font-display: block;
 }
 
 @font-face {
@@ -14,7 +14,7 @@
     src: url('/assets/fonts/Nunito-Italic-VariableFont_wght.ttf') format('truetype-variations');
     font-weight: 200 1000;
     font-style: italic;
-    font-display: swap;
+    font-display: block;
 }
 
 @font-face {
@@ -22,7 +22,7 @@
     src: url('/assets/fonts/SourGummy-VariableFont_wdth,wght.ttf') format('truetype-variations');
     font-weight: 100 900;
     font-style: normal;
-    font-display: swap;
+    font-display: block;
 }
 
 @font-face {
@@ -30,7 +30,7 @@
     src: url('/assets/fonts/SourGummy-Italic-VariableFont_wdth,wght.ttf') format('truetype-variations');
     font-weight: 100 900;
     font-style: italic;
-    font-display: swap;
+    font-display: block;
 }
 
 .nunito_regular {
@@ -84,7 +84,6 @@
     font-optical-sizing: auto;
     font-weight: 700;
     font-style: italic;
-    font-display: block;
     font-variation-settings: "wdth" 100;
 }
 
