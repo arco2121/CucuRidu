@@ -3,6 +3,7 @@ const babel = require('@babel/core');
 const fs = require('fs');
 const path = require('path');
 const postcss = require('postcss');
+const postcssConfig = require(path.join(__dirname, "postcss.config"));
 
 const paths = {
     scriptsIn: path.join(__dirname, 'public', 'script'),
@@ -11,6 +12,7 @@ const paths = {
     cssDist: path.join(__dirname, 'public', 'dist', 'style'),
     babelConfig: JSON.parse(fs.readFileSync(path.join(__dirname, '.babelrc'), 'utf8') || "{}")
 };
+const filesToIgnore = ['ejs.js'];
 
 const babelPlugin = {
     name: 'babel',
@@ -56,7 +58,7 @@ const buildCSS = async () => {
 
         const css = fs.readFileSync(file, 'utf8');
 
-        const result = await postcss().process(css, { from: file, to });
+        const result = await postcss(postcssConfig.plugins).process(css, { from: file, to });
         fs.writeFileSync(to, result.css);
         if (result.map) fs.writeFileSync(to + '.map', result.map.toString());
     }
@@ -78,15 +80,14 @@ const getFilesRecursively = (dir, extension) => {
 };
 
 const buildScripts = async () => {
-    await esbuild.build({
-        entryPoints: [path.join(paths.scriptsIn, 'config/importLegacy.js')],
-        bundle: true,
-        minify: true,
-        target: ['chrome50'],
-        outfile: path.join(paths.scriptsOut, 'config/importLegacy.js'),
+    const allFiles = getFilesRecursively(paths.scriptsIn, '.js');
+    const entryPoints = allFiles.filter(f => {
+        const fileName = path.basename(f);
+        return !filesToIgnore.includes(fileName);
     });
+
     await esbuild.build({
-        entryPoints: getFilesRecursively(paths.scriptsIn, '.js').filter(f => !f.includes('importLegacy.js')),
+        entryPoints: entryPoints,
         bundle: false,
         minify: false,
         target: ['chrome50'],

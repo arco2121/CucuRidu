@@ -1,4 +1,8 @@
 <% if(legacy) { %>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/3.36.1/minified.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/regenerator-runtime@0.14.1/runtime.js"></script>
+
     <script>
         window.onerror = function(message, source, lineno, colno, error) {
             var fileName = source ? source.split('/').pop() : "Script sconosciuto";
@@ -11,5 +15,4 @@
             return true;
         };
     </script>
-    <script src="<%= scripts %>/config/importLegacy.js"></script>
 <% } %>

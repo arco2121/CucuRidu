@@ -12,17 +12,20 @@
     <link rel="stylesheet" href="<%= styles %>/<%= page %>.css">
     <link rel="icon" href="/assets/icon.png">
     <title>Cucu Ridu</title>
-    <%- include("components/importLegacy") %>
+
+    <script src="/script/ejs.js"></script>
+    <%- include("components/legacyManager") %>
+    <script src="<%= scripts %>/config/colorConfig.js"></script>
 </head>
 <body>
-    <script src="<%= scripts %>/config/colorConfig.js"></script>
     <%- include("components/loadScreen") %>
+
     <script src="<%= scripts %>/config/registerWorker.js"></script>
-    <script src="<%= scripts %>/ejs.js"></script>
     <script src="<%= scripts %>/config/globalConfig.js"></script>
     <script src="<%= scripts %>/config/eventsConfig.js"></script>
     <script src="<%= scripts %>/config/midleChecks.js"></script>
     <script src="<%= scripts %>/config/manageBack.js"></script>
+
     <%- include(page, params) %>
     <%- include("components/audioManager", { bgm: params.bgm || "GameMusic-Candy_Bazaar" }) %>
 
