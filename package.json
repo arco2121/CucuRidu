@@ -20,7 +20,7 @@
   "type": "commonjs",
   "main": "app.js",
   "scripts": {
-    "build": "npm uninstall && npm install",
+    "build": "npm install",
     "jumpstart": "node app.js",
     "start": "node build.js && node app.js"
   },
