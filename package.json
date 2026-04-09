@@ -21,13 +21,13 @@
   "main": "app.js",
   "scripts": {
     "build": "npm install",
+    "jumpstart": "node app.js",
     "start": "node build.js && node app.js"
   },
   "dependencies": {
     "@socket.io/postgres-adapter": "^0.5.0",
     "@supabase/supabase-js": "^2.99.3",
     "connect-pg-simple": "^10.0.0",
-    "core-js": "3.36",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "ejs": "^4.0.1",
@@ -37,13 +37,11 @@
     "jsonwebtoken": "^9.0.3",
     "memorystore": "^1.6.7",
     "pg": "^8.20.0",
-    "regenerator-runtime": "^0.14.1",
     "sitemap": "^9.0.1",
     "socket.io": "^4.8.3",
     "web-push": "^3.6.7"
   },
   "devDependencies": {
-    "@babel/cli": "^7.28.6",
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.29.2",
     "autoprefixer": "^10.4.27",
