@@ -29,6 +29,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         const legacy = filter.test(target);
         const scripts = legacy ? "/dist/script" : "/script";
         const styles = legacy ? "/dist/style" : "/style";
+        console.log(legacy)
 
         res.render("header", {
             params: {
