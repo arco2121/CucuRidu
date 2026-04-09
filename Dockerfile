@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Installa le dipendenze
-RUN npm install
+RUN npm run build
 
 # Copia tutto il resto del codice
 COPY . .
@@ -17,5 +17,4 @@ COPY . .
 EXPOSE 7860
 
 # Comando per avviare il sito
-CMD [ "npm", "run", "build" ]
 CMD [ "npm", "start" ]
