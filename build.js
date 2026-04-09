@@ -12,7 +12,7 @@ const paths = {
     cssDist: path.join(__dirname, 'public', 'dist', 'style'),
     babelConfig: JSON.parse(fs.readFileSync(path.join(__dirname, '.babelrc'), 'utf8') || "{}")
 };
-const filesToIgnore = ['ejs.js'];
+const toIgnore = ['external'];
 
 const babelPlugin = {
     name: 'babel',
@@ -82,8 +82,9 @@ const getFilesRecursively = (dir, extension) => {
 const buildScripts = async () => {
     const allFiles = getFilesRecursively(paths.scriptsIn, '.js');
     const entryPoints = allFiles.filter(f => {
-        const fileName = path.basename(f);
-        return !filesToIgnore.includes(fileName);
+        const pathParts = f.split(path.sep);
+        const isIgnored = pathParts.some(part => toIgnore.includes(part));
+        return !isIgnored;
     });
 
     await esbuild.build({

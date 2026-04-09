@@ -5,6 +5,7 @@ const ASSETS_TO_CACHE = [
     OFFLINE_URL,
     '/assets/colors.json',
     '/style/global.css',
+    '/style/fonts.css',
     '/script/config/colorConfig.js',
     '/script/config/ejs.js',
     '/script/config/eventsConfig.js',
