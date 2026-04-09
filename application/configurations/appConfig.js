@@ -20,7 +20,8 @@ const { createGzip } = require('zlib');
  * @param pagesOptions
  */
 const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout = 3600000, pagesOptions = {
-    notifications: false
+    notifications: false,
+    version: '1.0.0'
 }) => {
 
     const renderPage = (req, res, page, params = {}) => {

@@ -1,7 +1,7 @@
 importScripts("/socket.io/socket.io.js");
 let socket = null;
 
-const lobbyController = (event = {}) => {
+const socketController = (event = {}) => {
     switch (event.type) {
         case "init": {
             console.log("Initializing...");
@@ -39,4 +39,4 @@ const lobbyController = (event = {}) => {
     }
 };
 
-onmessage = (event) => lobbyController(event.data);
+onmessage = (event) => socketController(event.data);

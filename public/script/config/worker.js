@@ -1,24 +1,46 @@
 const CACHE_NAME = 'cucuridu_cache';
 const OFFLINE_URL = '/offline';
-
-const ASSETS_TO_CACHE = [
-    OFFLINE_URL,
+const files = [
     '/assets/colors.json',
-    '/style/global.css',
-    '/style/fonts.css',
-    '/script/config/colorConfig.js',
-    '/script/config/ejs.js',
-    '/script/config/eventsConfig.js',
-    '/script/config/manageBack.js',
-    '/script/config/clearDom.js',
+    '<st?/global.css',
+    '<st?/fonts.css',
+    '<sc?/config/colorConfig.js',
+    '/script/external/ejs.js',
+    '<sc?/config/eventsConfig.js',
+    '<sc?/views/components/manageBack.js',
+    '<sc?/views/components/clearDom.js',
     '/assets/icon.png',
     '/assets/offline_icon.png',
+    '/assets/icon_notification.png',
+    '/assets/pencil.png',
     '/assets/loading.webp',
+    '/assets/loading.gif',
     '/assets/fonts/Nunito-Italic-VariableFont_wght.ttf',
     '/assets/fonts/Nunito-VariableFont_wght.ttf',
     '/assets/fonts/SourGummy-Italic-VariableFont_wdth,wght.ttf',
     '/assets/fonts/SourGummy-VariableFont_wdth,wght.ttf'
 ];
+
+const FILES = [];
+files.map(file => {
+    if(file.startsWith("<st?")) {
+        FILES.push(file.replace("<st?", "/style"));
+        FILES.push(file.replace("<st?", "/dist/style"));
+        return;
+    }
+    if(file.startsWith("<sc?")) {
+        FILES.push(file.replace("<sc?", "/script"));
+        FILES.push(file.replace("<sc?", "/dist/script"));
+        return;
+    }
+    FILES.push(file);
+});
+
+const ASSETS_TO_CACHE = [
+    OFFLINE_URL,
+    ...FILES
+];
+console.log("File in cache => ", FILES);
 
 self.addEventListener('install', (event) => {
     event.waitUntil(

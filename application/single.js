@@ -32,7 +32,7 @@ const singleApp = async (local, port, allowedOrigins, env = {}, timeout = 360000
     });
 
     //App Config
-    appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout);
+    appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout, { version: env.npm_package_version });
 
     //ServerIO Config
     serverConfig(server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout);

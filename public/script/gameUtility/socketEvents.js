@@ -1,4 +1,4 @@
-const controller = new Worker(fromBackEnd["scripts"] + '/pages/lobbyController.js');
+const controller = new Worker(fromBackEnd["scripts"] + '/gameUtility/socketController.js');
 const base = document.getElementById("landpoint");
 
 const receivers = {};
