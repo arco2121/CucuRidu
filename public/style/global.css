@@ -771,6 +771,9 @@ input:active {
     font-size: 3rem;
     width: 90%;
     margin-top: 5px;
+    padding-bottom: 10px;
+    color: var(--background-variant-outline);
+    border-bottom: dotted 4px var(--background-variant-outline);
 }
 
 .active_Btn:active {
@@ -784,7 +787,7 @@ input:active {
 }
 
 .options_content {
-    width: 80%;
+    width: 90%;
 }
 
 .options_row {
