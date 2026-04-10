@@ -42,8 +42,7 @@ class Stanza {
         };
         this.giocatori.set(this.master.id, this.master);
         this.chat = {
-            messaggi: [],
-            persone: Array.from(this.giocatori.keys())
+            messaggi: []
         };
         this.numeroRound = [0, this.giocatori.size];
         return this;
@@ -59,10 +58,6 @@ class Stanza {
         });
         this.numeroRound = [this.numeroRound[0], Math.floor(maxOccorrenze / (this.giocatori.size + 1))];
         this.giocatori.set(giocatore.id, giocatore);
-        this.chat = {
-            messaggi: this.chat.messaggi,
-            persone: Array.from(this.giocatori.keys())
-        };
         return giocatore;
     }
 
@@ -75,10 +70,9 @@ class Stanza {
         this.giocatori.delete(giocatoreId);
         this.chat = {
             messaggi: this.chat.messaggi.map(messaggio => {
-                if(messaggio["chi"] === giocatoreId) messaggio.eliminato = true;
+                if(messaggio["giocatoreId"] === giocatoreId) messaggio.eliminato = true;
                 return messaggio;
             }),
-            persone: Array.from(this.giocatori.keys())
         };
 
         if(giocatore === this.master) {
@@ -270,6 +264,19 @@ class Stanza {
         }
     }
 
+    scriviInChat(messaggio, giocatoreId) {
+        const giocatore = this.trovaGiocatore(giocatoreId);
+        if(!giocatore) return false;
+        this.chat.messaggi.push({
+            pfp: giocatore?.pfp,
+            username: giocatore?.username,
+            messaggio: messaggio,
+            giocatoreId: giocatoreId,
+            eliminato: false
+        });
+        return this.chat.messaggi.toReversed();
+    }
+
     static trovaDaGiocatore(idGiocatore, Stanze) {
         for (const stanza of Stanze) {
             if (stanza.giocatori?.has(idGiocatore)) {
@@ -314,7 +321,8 @@ class Stanza {
             round: {
                 ...this.round,
                 risposte: this.round.risposte ? Array.from(this.round.risposte.entries()) : null
-            }
+            },
+            chat: this.chat
         };
     }
 
@@ -339,6 +347,7 @@ class Stanza {
             chiStaInterrogando: data.round.chiStaInterrogando,
             risposte: data.round.risposte ? new Map(data.round.risposte) : new Map()
         };
+        s.chat = data.chat;
 
         return s;
     }

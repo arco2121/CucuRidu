@@ -311,8 +311,16 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             })
         });
 
+        user.on("aggiornaChat", async (data) => {
+            const Stanza = await Stanze.get(data["stanzaId"] || user.data?.referenceStanza);
+
+            server.to(data["stanzaId"] || user.data?.referenceStanza).emit("aggiornamentoChat", {
+                chat: Stanza?.chat.messaggi.toReversed()
+            });
+        });
+
         user.on("aggiungiMazzo", async (data) => {
-            const stanza = await Stanze.get(data['id']);
+            const stanza = await Stanze.get(data["id"] || user.data?.referenceStanza);
             const result = stanza?.modificaMazzo(data["packs"]);
             if(result)
                 user.emit("mazzoAggiunto");
@@ -334,6 +342,16 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 signal: data.signal,
                 responderSocketId: user.id
             });
+        });
+
+        user.on("messaggioChat", async (data) => {
+            const stanza = await Stanze.get(data["id"] || user.data?.referenceStanza);
+            const result = stanza.scriviInChat(data["message"], user.data?.referenceGiocatore?.id)
+            if(result)
+                server.to(data["id"] || user.data?.referenceStanza).emit("aggiornamentoChat", {
+                    chat: result
+                });
+            await Stanze.set(stanza.id, stanza);
         });
 
         user.on("lasciaStanza", async (data) => {
