@@ -754,11 +754,22 @@ input:active {
     justify-content: space-between;
     align-items: center;
     font-size: 3rem;
+    padding-bottom: 10px;
     width: 90%;
+    margin-top: 5px;
+}
+
+.options_line {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+}
+
+.options_outline {
     color: var(--background-variant-outline);
     border-bottom: dotted 4px var(--background-variant-outline);
-    padding-bottom: 10px;
-    margin-top: 5px;
 }
 
 .active_Btn:active {
