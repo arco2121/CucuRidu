@@ -8,7 +8,8 @@
           "ie": "11",
           "safari": "10"
         },
-        "useBuiltIns": false,
+        "useBuiltIns": "usage",
+        "corejs": 3,
         "modules": false
       }
     ]
