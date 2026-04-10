@@ -91,7 +91,7 @@ const buildScripts = async () => {
         entryPoints: entryPoints,
         bundle: false,
         minify: false,
-        target: ['chrome50'],
+        target: ['es5'],
         plugins: [babelPlugin],
         outdir: paths.scriptsOut,
         outbase: paths.scriptsIn,

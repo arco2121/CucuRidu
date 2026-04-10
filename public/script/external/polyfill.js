@@ -1,9 +1,11 @@
-// Element.remove() polyfill
-if (!Element.prototype.remove) {
-    Element.prototype.remove = function() {
-        if (this.parentNode) this.parentNode.removeChild(this);
-    };
-}
+(function(){
+    var arr=[window.Element,window.CharacterData,window.DocumentType];
+    arr.forEach(function(item){
+        if(item&&item.prototype&&!item.prototype.hasOwnProperty('remove')){
+            Object.defineProperty(item.prototype,'remove',{configurable:true,enumerable:true,writable:true,value:function(){if(this.parentNode!==null)this.parentNode.removeChild(this);}});
+        }
+    });
+})();
 
 // Event constructor polyfill
 (function() {
@@ -19,11 +21,17 @@ if (!Element.prototype.remove) {
     window.Event = CustomEvent;
 })();
 
-// NodeList.forEach polyfill
-if (typeof NodeList !== "undefined" && NodeList.prototype && !NodeList.prototype.forEach) {
-    NodeList.prototype.forEach = Array.prototype.forEach;
-}
+if(typeof NodeList!=='undefined'&&!NodeList.prototype.forEach)
+    NodeList.prototype.forEach=Array.prototype.forEach;
 
+// Polyfill Array.from
+if(!Array.from) Array.from=(function(){return function from(a){return Array.prototype.slice.call(a);};})();
+
+// Symbol minimal polyfill per evitare crash
+if(typeof Symbol === 'undefined'){
+    window.Symbol = function(desc){ return '__symbol__' + desc + '__' + Math.random(); };
+    window.Symbol.iterator = '__symbol__iterator__';
+}
 //AudioContext
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -40,6 +48,14 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext;
     window.CustomEvent = CustomEvent;
     window.Event = CustomEvent;
 })();
+
+(function(){
+    if(typeof window.Event === 'function') return;
+    function Event(e,t){t=t||{};var v=document.createEvent('Event');v.initEvent(e,!!t.bubbles,!!t.cancelable);return v;}
+    Event.prototype=window.Event.prototype;
+    window.Event=window.CustomEvent=Event;
+})();
+
 
 //ClassList
 var testElement = document.createElement("_");

@@ -1,6 +1,5 @@
 const unloadScreen = new Event("loadScreenEnd");
 const loadScreen = new Event("loadScreenStart");
-const loadingScreen = document.querySelector(".loadingscreen");
 const stateConnected = new Event("doConnected");
 const stateDisconnected = new Event("doDisconnected");
 

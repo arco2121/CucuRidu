@@ -4,12 +4,9 @@
       "@babel/preset-env",
       {
         "targets": {
-          "chrome": "50",
-          "ie": "11",
-          "safari": "10"
+          "ie": "11"
         },
-        "useBuiltIns": "usage",
-        "corejs": 3,
+        "useBuiltIns": false,
         "modules": false
       }
     ]

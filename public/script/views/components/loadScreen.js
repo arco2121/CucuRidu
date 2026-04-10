@@ -1,3 +1,4 @@
+const loadingScreen = document.querySelector(".loadingscreen");
 const timing = 250;
 const isLoadScreen = () => document.body.contains(loadingScreen);
 (() => {
@@ -6,13 +7,12 @@ const isLoadScreen = () => document.body.contains(loadingScreen);
             loadingScreen.style.animation = "none";
             loadingScreen.style.opacity = "1";
             document.body.appendChild(loadingScreen);
+            intervalId = setInterval(update, timing);
         }
     });
     window.addEventListener("pageshow", (event) => {
         if (event.persisted) {
-            loadingScreen.style.animation = "";
             document.dispatchEvent(unloadScreen);
-            intervalId = setInterval(update, timing);
         }
     });
     const update = () => {
