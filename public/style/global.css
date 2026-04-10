@@ -748,28 +748,29 @@ input:active {
     overflow-y: scroll;
 }
 
-.options_exit_btn {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 3rem;
-    padding-bottom: 10px;
-    width: 90%;
-    margin-top: 5px;
-}
-
 .options_line {
     display: flex;
-    flex-direction: row;
     justify-content: center;
     align-items: center;
     width: 90%;
 }
 
 .options_outline {
+    width: 100%;
+    flex-direction: row;
+    padding-bottom: 20px;
     color: var(--background-variant-outline);
     border-bottom: dotted 4px var(--background-variant-outline);
+}
+
+.options_exit_btn {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 3rem;
+    width: 90%;
+    margin-top: 5px;
 }
 
 .active_Btn:active {
