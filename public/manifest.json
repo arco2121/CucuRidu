@@ -1,63 +1,110 @@
 {
-  "name": "Cucu Ridu",
-  "short_name": "Cucu Ridu",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ee9aab",
-  "theme_color": "#ee9aab",
-  "orientation": "natural",
-  "categories": ["game", "braindead", "cards"],
-  "description": "Un gioco di carte irriverente, storto e assolutamente necessario",
-  "icons": [
-    {
-      "src": "/assets/icon.png",
-      "sizes": "1280x1280",
-      "type": "image/png"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/assets/icon.png",
-      "sizes": "1280x1280",
-      "type": "image/png",
-      "label": "Home - Cucu Ridu"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Crea Stanza",
-      "short_name": "Crea Stanza",
-      "description": "Crea una stanza per giocare",
-      "url": "/creaStanza",
-      "icons": [
+    "name": "Cucu Ridu",
+    "short_name": "Cucu Ridu",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ee9aab",
+    "theme_color": "#ee9aab",
+    "orientation": "natural",
+    "categories": ["game", "braindead", "cards"],
+    "description": "Un gioco di carte irriverente, storto e assolutamente necessario",
+    "icons": [
+        {
+          "src": "/assets/icon.png",
+          "sizes": "1280x1280",
+          "type": "image/png"
+        },
         {
           "src": "/assets/icon_notification.png",
-          "sizes": "200x200"
+          "sizes": "1280x1280",
+          "type": "image/png"
         }
-      ]
-    },
-    {
-      "name": "Unisciti",
-      "short_name": "Unisciti",
-      "description": "Unisciti ad una stanza per giocare",
-      "url": "/partecipaStanza",
-      "icons": [
+    ],
+    "screenshots": [
         {
-          "src": "/assets/icon_notification.png",
-          "sizes": "200x200"
-        }
-      ]
-    },
-    {
-      "name": "Opzioni",
-      "short_name": "Opzioni",
-      "url": "/?openSettings=true",
-      "icons": [
+          "src": "/assets/screenshots/mobile/homepage_mobile.png",
+          "type": "image/png",
+          "label": "Home",
+          "form_factor": "narrow"
+        },
         {
-          "src": "/assets/pencil.png",
-          "sizes": "200x200"
+          "src": "/assets/screenshots/desktop/homepage_desktop.png",
+          "type": "image/png",
+          "label": "Home",
+          "form_factor": "wide"
+        },
+        {
+          "src": "/assets/screenshots/mobile/options_mobile.png",
+          "type": "image/png",
+          "label": "Options",
+          "form_factor": "narrow"
+        },
+        {
+          "src": "/assets/screenshots/desktop/options_desktop.png",
+          "type": "image/png",
+          "label": "Options",
+          "form_factor": "wide"
+        },
+        {
+          "src": "/assets/screenshots/mobile/profile_mobile.png",
+          "type": "image/png",
+          "label": "Profile",
+          "form_factor": "narrow"
+        },
+        {
+          "src": "/assets/screenshots/desktop/profile_desktop.png",
+          "type": "image/png",
+          "label": "Profile",
+          "form_factor": "wide"
+        },
+        {
+          "src": "/assets/screenshots/mobile/lobby_mobile.png",
+          "type": "image/png",
+          "label": "Lobby",
+          "form_factor": "narrow"
+        },
+        {
+          "src": "/assets/screenshots/desktop/lobby_desktop.png",
+          "type": "image/png",
+          "label": "Lobby",
+          "form_factor": "wide"
         }
-      ]
-    }
-  ]
+    ],
+    "shortcuts": [
+      {
+        "name": "Crea Stanza",
+        "short_name": "Crea Stanza",
+        "description": "Crea una stanza per giocare",
+        "url": "/creaStanza",
+        "icons": [
+          {
+            "src": "/assets/icon_notification.png",
+            "sizes": "200x200"
+          }
+        ]
+      },
+      {
+        "name": "Unisciti",
+        "short_name": "Unisciti",
+        "description": "Unisciti ad una stanza per giocare",
+        "url": "/partecipaStanza",
+        "icons": [
+          {
+            "src": "/assets/icon_notification.png",
+            "sizes": "200x200"
+          }
+        ]
+      },
+      {
+        "name": "Opzioni",
+        "short_name": "Opzioni",
+        "url": "/?openSettings=true",
+        "icons": [
+          {
+            "src": "/assets/pencil.png",
+            "sizes": "200x200"
+          }
+        ]
+      }
+    ]
 }
