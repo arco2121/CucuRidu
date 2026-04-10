@@ -25,48 +25,56 @@
           "src": "/assets/screenshots/mobile/homepage_mobile.png",
           "type": "image/png",
           "label": "Home",
+          "sizes": "371x823",
           "form_factor": "narrow"
         },
         {
           "src": "/assets/screenshots/desktop/homepage_desktop.png",
           "type": "image/png",
           "label": "Home",
+          "sizes": "1912x914",
           "form_factor": "wide"
         },
         {
           "src": "/assets/screenshots/mobile/options_mobile.png",
           "type": "image/png",
           "label": "Options",
+          "sizes": "371x823",
           "form_factor": "narrow"
         },
         {
           "src": "/assets/screenshots/desktop/options_desktop.png",
           "type": "image/png",
           "label": "Options",
+          "sizes": "1912x914",
           "form_factor": "wide"
         },
         {
           "src": "/assets/screenshots/mobile/profile_mobile.png",
           "type": "image/png",
           "label": "Profile",
+          "sizes": "371x823",
           "form_factor": "narrow"
         },
         {
           "src": "/assets/screenshots/desktop/profile_desktop.png",
           "type": "image/png",
           "label": "Profile",
+          "sizes": "1912x914",
           "form_factor": "wide"
         },
         {
           "src": "/assets/screenshots/mobile/lobby_mobile.png",
           "type": "image/png",
           "label": "Lobby",
+          "sizes": "371x823",
           "form_factor": "narrow"
         },
         {
           "src": "/assets/screenshots/desktop/lobby_desktop.png",
           "type": "image/png",
           "label": "Lobby",
+          "sizes": "1912x914",
           "form_factor": "wide"
         }
     ],
