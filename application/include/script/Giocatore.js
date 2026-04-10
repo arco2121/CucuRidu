@@ -1,6 +1,6 @@
 const path = require("path");
 const { generateId } = require(path.join(__dirname, '/generazione'));
-const { Mazzo, TipoMazzo } = require((path.join(__dirname, '/Mazzo')));
+const { Mazzo } = require((path.join(__dirname, '/Mazzo')));
 
 class Giocatore {
 
@@ -9,6 +9,7 @@ class Giocatore {
         this.punti = 0;
         this.pfp = pfp;
         this.online = true;
+        this.socketId = "";
         this.masterRole = role;
         this.interrogationRole = interrogating;
         this.mazzo = new Mazzo();
@@ -35,6 +36,10 @@ class Giocatore {
         return this.online;
     }
 
+    assegnaSocket(id) {
+        this.socketId = id ?? "";
+    }
+
     toJSON() {
         return {
             id: this.id,
@@ -44,7 +49,8 @@ class Giocatore {
             online: this.online,
             masterRole: this.masterRole,
             interrogationRole: this.interrogationRole,
-            mazzo: this.mazzo
+            mazzo: this.mazzo,
+            socketId: this.socketId
         };
     }
 

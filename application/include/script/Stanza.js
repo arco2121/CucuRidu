@@ -22,14 +22,14 @@ class Stanza {
                 tipoMazzo: TipoMazzo.COMPLETAMENTI
             }),
             scarto: new Mazzo()
-        }
+        };
         this.mazzoFrasi = {
             mazzo: new Mazzo({
                 pack: "standard",
                 tipoMazzo: TipoMazzo.FRASI
             }),
             scarto: new Mazzo()
-        }
+        };
     }
 
     async init(username, pfp, memory) {
@@ -39,8 +39,12 @@ class Stanza {
             domanda: null,
             risposte: null,
             chiStaInterrogando: this.master.id
-        }
+        };
         this.giocatori.set(this.master.id, this.master);
+        this.chat = {
+            messaggi: [],
+            persone: Array.from(this.giocatori.keys())
+        };
         this.numeroRound = [0, this.giocatori.size];
         return this;
     }
@@ -55,6 +59,10 @@ class Stanza {
         });
         this.numeroRound = [this.numeroRound[0], Math.floor(maxOccorrenze / (this.giocatori.size + 1))];
         this.giocatori.set(giocatore.id, giocatore);
+        this.chat = {
+            messaggi: this.chat.messaggi,
+            persone: Array.from(this.giocatori.keys())
+        };
         return giocatore;
     }
 
@@ -65,6 +73,13 @@ class Stanza {
         this.mazzoCompletamenti.mazzo.aggiungiCarte(...giocatore.prendiTuttaLaMano())
         this.giocatoriPassati.add(giocatore.id);
         this.giocatori.delete(giocatoreId);
+        this.chat = {
+            messaggi: this.chat.messaggi.map(messaggio => {
+                if(messaggio["chi"] === giocatoreId) messaggio.eliminato = true;
+                return messaggio;
+            }),
+            persone: Array.from(this.giocatori.keys())
+        };
 
         if(giocatore === this.master) {
             this.master = this.giocatori.values().next().value;

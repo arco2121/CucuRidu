@@ -56,6 +56,11 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     break;
                 }
             }
+
+            server.to(Stanza.id).emit("segnaleAudio", {
+                socketId: socket.id,
+                playerId: socket.data.referenceGiocatore?.id
+            });
         }));
     };
 
@@ -86,6 +91,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         if (!exist) return next(new Error("SESSION_EXPIRED"));
         if (exist.online === true) return next(new Error("ALREADY_CONNECTED"));
         exist.online = true;
+        exist.assegnaSocket(socket.id);
         socket.join(stanzaId);
         await Stanze.set(stanzaId, stanza);
         socket.data.referenceGiocatore = exist;
@@ -117,6 +123,10 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 });
                 server.to(stanza.id).emit("listaGiocatoriAggiornamento", {
                     giocatori: stanza.classifica().map(giocatore => giocatore.toJSON())
+                });
+                server.to(stanza.id).emit("segnaleAudio", {
+                    socketId: user.id,
+                    playerId: user.data.referenceGiocatore.id
                 });
                 console.log("Stanza creata => " + stanza.id);
             } catch(e) {
@@ -151,6 +161,10 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 });
                 server.to(stanzaId).emit("listaGiocatoriAggiornamento", {
                     giocatori: Stanza.classifica().map(giocatore => giocatore.toJSON())
+                });
+                server.to(stanzaId).emit("segnaleAudio", {
+                    socketId: user.id,
+                    playerId: user.data.referenceGiocatore.id
                 });
                 await Stanze.set(stanzaId, Stanza);
                 console.log("Giocatore aggiunto a Stanza => " + stanzaId);
@@ -306,6 +320,20 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 user.emit("mazzoErrore", {
                     message: "Mannaggia, mi sa che al server non sono piaciuti :("
                 });
+        });
+
+        user.on("webrtcOfferta", (data) => {
+            server.to(data['targetSocketId']).emit("webrtcRiceviOfferta", {
+                signal: data.signal,
+                callerId: user.id
+            });
+        });
+
+        user.on("webrtcRisposta", (data) => {
+            server.to(data['callerSocketId']).emit("webrtcRiceviRisposta", {
+                signal: data.signal,
+                responderSocketId: user.id
+            });
         });
 
         user.on("lasciaStanza", async (data) => {
