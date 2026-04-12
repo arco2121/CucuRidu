@@ -245,7 +245,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 if(result) {
                     const sockets = await server.in(stanzaId).fetchSockets();
                     for (const socket of sockets) {
-                        socket.data.referenceGiocatore = Stanza.trovaGiocatore(socket.data.referenceGiocatore.id);
+                        socket.data.referenceGiocatore = Stanza.trovaGiocatore(socket.data.referenceGiocatore?.id);
                         socket.emit("fineTurno", {
                             vincitore: result[0],
                             domanda: result[1],
