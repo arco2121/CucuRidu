@@ -7,7 +7,6 @@ const socketController = (event = {}) => {
             console.log("Initializing...");
             socket = io({
                 auth: event.params,
-                transports: ["websocket", "polling"],
                 reconnection: true,
                 reconnectionDelay: 500,
                 autoConnect: false
