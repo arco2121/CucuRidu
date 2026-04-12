@@ -57,7 +57,8 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
     appConfig(app, serverSession, env.JWTKEY || TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout, {
         notifications: true,
         notificationsKey: env.NOTIFICATION_PUBLIC,
-        version: env.npm_package_version
+        version: env.npm_package_version,
+        cluster: env.USE_CLUSTER
     });
     notificationsConfig(app, database, generationMemory, env, timeout);
 
