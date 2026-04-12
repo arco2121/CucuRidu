@@ -9,7 +9,6 @@ const receivers = {};
 const initializeIO = () => {
     const socket = io({
         auth: params,
-        transports: ["websocket", "polling"],
         reconnection: true,
         reconnectionDelay: 500,
     });
