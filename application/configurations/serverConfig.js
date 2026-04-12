@@ -192,6 +192,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     const sockets = await server.in(stanzaId).fetchSockets();
                     const round = Stanza.round;
                     for (const socket of sockets) {
+                        if(!socket.data.referenceGiocatore?.id) continue;
                         socket.data.referenceGiocatore = Stanza.trovaGiocatore(socket.data.referenceGiocatore?.id);
                         socket.emit("roundIniziato", {
                             chiStaInterrogando: Stanza.trovaGiocatore(round.chiStaInterrogando).toJSON(),
@@ -241,11 +242,12 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 const stanzaId = data["id"];
                 const vincitore = data["vincitore"];
                 const Stanza = await Stanze.get(stanzaId);
-                const result = Stanza.scegliVincitore(user.data.referenceGiocatore.id, vincitore);
+                const result = Stanza.scegliVincitore(user.data.referenceGiocatore?.id, vincitore);
                 if(result) {
                     const sockets = await server.in(stanzaId).fetchSockets();
                     for (const socket of sockets) {
-                        socket.data.referenceGiocatore = Stanza.trovaGiocatore(socket.data.referenceGiocatore?.id);
+                        if(!socket.data.referenceGiocatore?.id) continue;
+                        socket.data.referenceGiocatore = Stanza.trovaGiocatore(socket.data.referenceGiocatore.id);
                         socket.emit("fineTurno", {
                             vincitore: result[0],
                             domanda: result[1],

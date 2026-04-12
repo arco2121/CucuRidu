@@ -29,7 +29,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         const target = req.headers['user-agent'] || "";
         const legacy = filter.test(target);
         const scripts = legacy ? "/dist/script" : "/script";
-        const styles = legacy ? "/dist/style" : "/style";
+        const styles = "/dist/style";
 
         res.render("header", {
             params: {

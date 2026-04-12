@@ -1,22 +1,71 @@
-const controller = new Worker(fromBackEnd["scripts"] + '/gameUtility/socketController.js');
+const params = {
+    validation: fromBackEnd["token"],
+    stanzaId: fromBackEnd["stanzaId"],
+    userId: fromBackEnd["userId"],
+    token: JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}")["savingToken"] || null
+};
+const receivers = {};
+
+const initializeIO = () => {
+    const socket = io({
+        auth: params,
+        transports: ["websocket", "polling"],
+        reconnection: true,
+        reconnectionDelay: 500,
+    });
+    Object.keys(receivers).forEach(event => {
+        if (event === "any") {
+            socket.onAny((name, data) => receivers["any"].forEach(cb => cb(data)));
+        } else {
+            receivers[event].forEach(cb => socket.on(event, cb));
+        }
+    });
+    return socket;
+};
+
+let controller = (() => {
+    if('Worker' in window)
+        return new Worker(fromBackEnd["scripts"] + '/gameUtility/socketController.js');
+    else return initializeIO()
+})();
+if (controller instanceof Worker)
+    controller.onerror = () => {
+        controller.terminate();
+        controller = initializeIO();
+    };
+
 const base = document.getElementById("landpoint");
 
 //Controller
-const receivers = {};
 const on = (event = "default", callback = (data) => {}) => {
-    if(!receivers[event]) receivers[event] = [];
-    receivers[event].push(callback);
-};
-const emit = (event = "deafult", params = {}) => controller.postMessage({
-    type: event,
-    params: params
-});
-const off = (event) => receivers[event] = null;
-controller.onmessage = (event) => {
-    const { event: eventName, params } = event.data;
-    if (receivers[eventName])
-        for(const call of receivers[eventName]) call(params);
-};
+    if(controller instanceof Worker) {
+        if(!receivers[event]) receivers[event] = [];
+        receivers[event].push(callback);
+    }
+    else if(event === "any")
+        controller.onAny((event, ...args) => callback(args[0]));
+    else controller.on(event, callback);
+}
+const emit = (event = "deafult", params = {}) => {
+    if(controller instanceof Worker)
+        controller.postMessage({
+            type: event,
+            params: params
+        });
+    else controller.emit(event, params);
+}
+const off = (event) => {
+    if(controller instanceof Worker)
+        receivers[event] = null;
+    else controller.off(event);
+}
+if(controller instanceof Worker)
+    controller.onmessage = (event) => {
+        const { event: eventName, params } = event.data;
+        if (receivers[eventName])
+            for(const call of receivers[eventName])
+                call(params);
+    };
 
 //Utility
 let referenceGiocatore;
@@ -226,12 +275,8 @@ on("partitaTerminata", async (data) => {
     });
 });
 
-controller.postMessage({
-    type: "init",
-    params: {
-        validation: fromBackEnd["token"],
-        stanzaId: fromBackEnd["stanzaId"],
-        userId: fromBackEnd["userId"],
-        token: JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}")["savingToken"] || null
-    }
-});
+if(controller instanceof Worker)
+    controller.postMessage({
+        type: "init",
+        params: params
+    });

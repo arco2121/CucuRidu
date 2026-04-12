@@ -193,7 +193,7 @@ class Stanza {
 
     scegliVincitore(chiStaChiedendo, idGiocatore) {
         if(this.stato !== StatoStanza.CHOOSING_WINNER ||
-            this.round.risposte.size !== (this.giocatori.size - 1) ||
+            this.round.risposte.size !== (this.giocatori.size - 1) || !chiStaChiedendo ||
             chiStaChiedendo !== this.round.chiStaInterrogando || !this.round.risposte.has(idGiocatore)) return false;
 
         const risposte = this.round.risposte.get(idGiocatore);
