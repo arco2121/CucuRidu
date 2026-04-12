@@ -58,7 +58,7 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
         notifications: true,
         notificationsKey: env.NOTIFICATION_PUBLIC,
         version: env.npm_package_version,
-        cluster: env.USE_CLUSTER
+        cluster: true
     });
     notificationsConfig(app, database, generationMemory, env, timeout);
 

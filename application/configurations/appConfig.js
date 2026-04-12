@@ -43,7 +43,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
             },
             page: page,
             ...details,
-            ...pagesOptions,
+            cluster: pagesOptions.cluster,
             headerIcon: getIcon(true)
         });
     }

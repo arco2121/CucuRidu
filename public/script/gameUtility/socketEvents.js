@@ -1,4 +1,4 @@
-const params = {
+const parametri = {
     validation: fromBackEnd["token"],
     stanzaId: fromBackEnd["stanzaId"],
     userId: fromBackEnd["userId"],
@@ -8,7 +8,7 @@ const receivers = {};
 
 const initializeIO = () => {
     const socket = io({
-        auth: params,
+        auth: parametri,
         reconnection: true,
         reconnectionDelay: 500,
     });
@@ -58,6 +58,7 @@ const off = (event) => {
         receivers[event] = null;
     else controller.off(event);
 }
+
 if(controller instanceof Worker)
     controller.onmessage = (event) => {
         const { event: eventName, params } = event.data;
@@ -277,5 +278,5 @@ on("partitaTerminata", async (data) => {
 if(controller instanceof Worker)
     controller.postMessage({
         type: "init",
-        params: params
+        params: parametri
     });

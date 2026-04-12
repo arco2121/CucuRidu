@@ -21,6 +21,7 @@
   "main": "app.js",
   "scripts": {
     "build": "npm install",
+    "app": "node app.js",
     "start": "node build.js && node app.js"
   },
   "dependencies": {
