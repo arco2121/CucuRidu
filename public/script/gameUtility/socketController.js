@@ -3,13 +3,17 @@ let socket = null;
 
 const socketController = (event = {}) => {
     switch (event.type) {
+
+        case "socketId": {
+            postMessage({ event: "socketId", params: socket.id });
+        }
         case "init": {
             console.log("Initializing...");
             socket = io({
                 auth: event.params,
+                transports: ["websocket", "polling"],
                 reconnection: true,
-                reconnectionDelay: 500,
-                autoConnect: false
+                reconnectionDelay: 50,
             });
 
             socket.on("connect", () => postMessage({ event: "connect", params: null }));
@@ -29,8 +33,6 @@ const socketController = (event = {}) => {
                 postMessage({ event: "any", params: null });
                 postMessage({ event: tag, params: data });
             });
-
-            socket.connect();
             break;
         }
 

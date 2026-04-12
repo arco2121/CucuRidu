@@ -9,8 +9,9 @@ const receivers = {};
 const initializeIO = () => {
     const socket = io({
         auth: parametri,
+        transports: ["websocket", "polling"],
         reconnection: true,
-        reconnectionDelay: 500,
+        reconnectionDelay: 50,
     });
     Object.keys(receivers).forEach(event => {
         if (event === "any") {
