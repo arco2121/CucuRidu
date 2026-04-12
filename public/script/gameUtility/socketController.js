@@ -6,6 +6,7 @@ const socketController = (event = {}) => {
 
         case "socketId": {
             postMessage({ event: "socketId", params: socket.id });
+            break;
         }
         case "init": {
             console.log("Initializing...");
@@ -14,6 +15,7 @@ const socketController = (event = {}) => {
                 transports: ["websocket", "polling"],
                 reconnection: true,
                 reconnectionDelay: 50,
+                autoConnect: false
             });
 
             socket.on("connect", () => postMessage({ event: "connect", params: null }));
@@ -33,6 +35,8 @@ const socketController = (event = {}) => {
                 postMessage({ event: "any", params: null });
                 postMessage({ event: tag, params: data });
             });
+
+            socket.connect();
             break;
         }
 

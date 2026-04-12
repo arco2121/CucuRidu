@@ -362,8 +362,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 const giocatoreId = data["giocatore"] ?? user.data.referenceGiocatore?.id;
                 const stanza = await Stanze.get(stanzaId);
                 const result = stanza?.eliminaGiocatore(giocatoreId);
+                user.emit("stanzaLasciata");
                 if(result) {
-                    user.emit("stanzaLasciata");
                     console.log("Giocatore ha abbandonato la Stanza => " + stanzaId);
                     user.leave(stanzaId);
                     const sockets = await server.in(stanzaId).fetchSockets();
