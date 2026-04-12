@@ -20,9 +20,8 @@
   "type": "commonjs",
   "main": "app.js",
   "scripts": {
-    "build": "npm install",
-    "jumpstart": "node app.js",
-    "start": "node build.js && node app.js"
+    "build": "npm install && node build.js",
+    "start": "node app.js"
   },
   "dependencies": {
     "@socket.io/postgres-adapter": "^0.5.0",
