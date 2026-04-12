@@ -192,7 +192,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     const sockets = await server.in(stanzaId).fetchSockets();
                     const round = Stanza.round;
                     for (const socket of sockets) {
-                        socket.data.referenceGiocatore = Stanza.trovaGiocatore(socket.data.referenceGiocatore.id);
+                        socket.data.referenceGiocatore = Stanza.trovaGiocatore(socket.data.referenceGiocatore?.id);
                         socket.emit("roundIniziato", {
                             chiStaInterrogando: Stanza.trovaGiocatore(round.chiStaInterrogando).toJSON(),
                             domanda: round.domanda,
