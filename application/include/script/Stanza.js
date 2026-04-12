@@ -11,7 +11,7 @@ const { generateId } = require(path.join(__dirname, '/generazione'));
 
 class Stanza {
 
-    constructor(minimoGiocatori = 3) {
+    constructor(minimoGiocatori = 2) {
         this.giocatori = new Map();
         this.giocatoriPassati = new Set();
         this.stato = StatoStanza.WAIT;
