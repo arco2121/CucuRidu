@@ -14,13 +14,14 @@ const renderChat = async (chat = []) => {
         return;
     }
 
+    chatView.innerHTML = "";
     chatView.classList.add("chat");
-    const historySet = new Set(chatHistory.map(m => m.messaggio));
-    const newMessages = chat.filter(m => !historySet.has(m.messaggio));
+    const historySet = new Set(chatHistory.map(m => m.timestamp));
+    const newMessages = chat.filter(m => !historySet.has(m.timestamp));
     chatHistory.push(...newMessages);
 
-    chatView.innerHTML += await renderFragment(chatView, "components/chatMessages", {
-        messages: newMessages,
+    chatView.innerHTML = await renderFragment(chatView, "components/chatMessages", {
+        messages: chatHistory,
         you: referenceGiocatore.id,
         notInject: true
     });

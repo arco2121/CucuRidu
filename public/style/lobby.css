@@ -118,7 +118,7 @@
 .chat_list_con_bg {
     display: flex;
     width: 95%;
-    border: solid 5px var(--background-outline);
+    border: solid 3px var(--background-outline);
     background: var(--background);
     background-image: linear-gradient(to bottom, var(--background), var(--background-middle));
     border-radius: 25px;
@@ -131,7 +131,7 @@
     justify-content: center;
     overflow-y: scroll;
     overflow-x: hidden;
-    height: 95%;
+    height: 45vh;
 }
 
 .wait_players_list {
@@ -542,13 +542,15 @@
 
 .message {
     display: flex;
-    width: 45%;
+    min-width: 45%;
+    width: auto;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     padding: 5px;
     text-align: start;
     border-width: 3px;
+    max-width: 85%;
     border-radius: 15px;
 }
 

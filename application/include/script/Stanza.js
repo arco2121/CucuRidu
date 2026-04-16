@@ -272,6 +272,7 @@ class Stanza {
             username: giocatore?.username,
             messaggio: messaggio,
             giocatoreId: giocatoreId,
+            timestamp: Date.now(),
             eliminato: false
         });
         return this.chat.messaggi;
