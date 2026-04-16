@@ -604,11 +604,12 @@
     resize: none;
     transition: all 0.1s ease-out;
     font-family: "Sour Gummy", sans-serif;
-    margin: 0 15px;
+    margin: 0 10px;
+    transform-origin: bottom;
 }
 
 .chatInput:focus {
-    padding: 15px 10px 48px 10px;
+    padding: 0 0 48px 0;
 }
 
 #sendBtn {
