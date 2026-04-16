@@ -409,6 +409,7 @@ a {
     width: 40px;
     height: 40px;
     border-radius: 13px;
+    aspect-ratio: 1/1;
 }
 
 .btn_style_1 {
@@ -472,10 +473,7 @@ a {
     padding: 8px 7px;
     text-align: center;
     font-size: 1rem;
-}
-
-.input:focus {
-    scale: 1.1;
+    transition: all 0.15s ease-in-out;
 }
 
 input:active {
@@ -500,6 +498,17 @@ input:active {
 
 .doubleBorder_small {
     box-shadow: 0 0 0 2px white;
+}
+
+@media (hover: hover) {
+    .input:hover {
+        scale: 1.02;
+    }
+}
+
+#sendBtn {
+    border-width: 3px;
+    padding: 5px 10px;
 }
 
 /* ---------------------------------------------------
@@ -817,6 +826,11 @@ input:active {
 .options_footer {
     padding-bottom: 10px;
     width: 90%;
+}
+
+.chat_footer {
+    padding-bottom: 10px;
+    width: 100%;
 }
 
 @media (max-width: 400px) {

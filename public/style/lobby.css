@@ -73,7 +73,7 @@
 }
 
 .pause_content {
-    width: 98%;
+    width: 95%;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -113,6 +113,25 @@
     overflow-y: scroll;
     overflow-x: auto;
     align-items: flex-start;
+}
+
+.chat_list_con_bg {
+    display: flex;
+    width: 95%;
+    border: solid 5px var(--background-outline);
+    background: var(--background);
+    background-image: linear-gradient(to bottom, var(--background), var(--background-middle));
+    border-radius: 25px;
+    flex-direction: column;
+    padding: 10px;
+    font-family: inherit;
+    color: var(--background-outline);
+    margin: 5px 0;
+    align-items: center;
+    justify-content: center;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 95%;
 }
 
 .wait_players_list {
@@ -512,6 +531,84 @@
     }
 }
 
+/* ---------------------------------------------------
+ >>> SCELTA VINCITORE
+--------------------------------------------------- */
 
+.chat {
+    justify-content: flex-start;
+    align-items: flex-start;
+}
 
+.message {
+    display: flex;
+    width: 45%;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 5px;
+    text-align: start;
+    border-width: 3px;
+    border-radius: 15px;
+}
 
+.message_row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    height: auto;
+    margin: 5px 0;
+    animation: popup 0.2s ease-in forwards;
+}
+
+.fromYou {
+    justify-content: flex-end;
+}
+
+.fromSelf {
+    justify-content: flex-start;
+}
+
+.message_info h6 {
+    font-size: 0.65rem;
+}
+
+.message_info {
+    margin: 0;
+}
+
+.message_info img {
+    width: 20px;
+    padding: 0;
+    margin-right: 5px;
+    border-width: 1px;
+    height: 20px;
+}
+
+.message_text {
+    text-align: start;
+    margin: 10px 2px;
+    width: 100%;
+    height: auto;
+}
+
+.chatInput {
+    width: 100%;
+    border: solid 3px var(--accent-color-3-outline);
+    border-radius: 15px;
+    text-align: left;
+    font-size: 0.9rem;
+    resize: none;
+    transition: all 0.1s ease-out;
+    font-family: "Sour Gummy", sans-serif;
+    margin: 0 15px;
+}
+
+.chatInput:focus {
+    padding: 15px 10px 48px 10px;
+}
+
+#sendBtn {
+    margin-right: 15px;
+}

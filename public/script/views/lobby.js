@@ -24,9 +24,12 @@ const stayAlive = () => {
 document.addEventListener("DOMContentLoaded", () => {
     const game_section = document.getElementById("game_section");
     const pauseMenu = document.getElementById("pauseMenu");
+    const chatMenu = document.getElementById("chatMenu");
     const leaveBtn = document.getElementById("leaveBtn");
     const exitPauseBtn = document.getElementById("exitPauseBtn");
+    const exitChatBtn = document.getElementById("exitChatBtn");
     const menuBtn = document.getElementById("menuBtn");
+    const chatBtn = document.getElementById('chatBtn');
     const codiceStanzaPause = document.getElementById("codiceStanzaPause");
 
     leaveBtn.addEventListener("click", () => emit("lasciaStanza", {
@@ -39,6 +42,16 @@ document.addEventListener("DOMContentLoaded", () => {
         game_section.dispatchEvent(showPanel);
     });
 
+    exitPauseBtn.addEventListener("click", () => {
+        pauseMenu.dispatchEvent(hidePanel);
+        game_section.dispatchEvent(showPanel);
+    });
+
+    exitChatBtn.addEventListener("click", () => {
+        chatMenu.dispatchEvent(hidePanel);
+        game_section.dispatchEvent(showPanel);
+    });
+
     menuBtn.addEventListener("click", () => {
         if(deactivateMenu) return;
         emit("listaGiocatori", {
@@ -48,6 +61,15 @@ document.addEventListener("DOMContentLoaded", () => {
         codiceStanzaPause.textContent = referenceStanza;
         pauseMenu.dispatchEvent(showPanel);
     });
+
+    chatBtn.addEventListener("click", () => {
+        if(deactivateMenu) return;
+        emit("aggiornaChat", {
+            stanzaId: referenceStanza
+        });
+        game_section.dispatchEvent(hidePanel);
+        chatMenu.dispatchEvent(showPanel);
+    })
 });
 
 document.addEventListener("click", stayAlive, { once: true });
