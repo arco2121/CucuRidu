@@ -64,9 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     chatBtn.addEventListener("click", () => {
         if(deactivateMenu) return;
-        emit("aggiornaChat", {
-            stanzaId: referenceStanza
-        });
+        renderChat();
         game_section.dispatchEvent(hidePanel);
         chatMenu.dispatchEvent(showPanel);
     })
