@@ -132,6 +132,7 @@
     overflow-y: scroll;
     overflow-x: hidden;
     height: 45vh;
+    max-height: 90%;
 }
 
 .wait_players_list {
@@ -604,12 +605,12 @@
     resize: none;
     transition: all 0.1s ease-out;
     font-family: "Sour Gummy", sans-serif;
-    margin: 0 10px;
+    margin: 0 15px;
     transform-origin: bottom;
 }
 
 .chatInput:focus {
-    padding: 0 0 48px 0;
+    padding: 10px 0 48px 10px;
 }
 
 #sendBtn {
