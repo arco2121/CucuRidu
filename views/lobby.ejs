@@ -4,6 +4,21 @@
 <%- include("components/optionsPanel") %>
 <div class="game_section visible showByConnectionManager" id="game_section">
     <div id="navbar_con" class="wait_navbar">
+        <div class="navbar_pause_btn btn_square button btn_style_3" id="chatBtn">
+            <svg fill-rule="evenodd" clip-rule="evenodd" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                 width="80" height="80" viewBox="-25 -25 300 300"
+                 xml:space="preserve">
+                <g>
+                    <path d="M23.384,30.344c-33.205,22.27-28.035,55.087-3.307,80.888c5.724,5.974,12.032,10.995,18.701,15.515
+                        c11.129,7.547,31.201,17.451,43.912,23.635c2.168,1.05,4.328,2.132,6.441,3.249c12.498,6.604,12.32,5.744,11.191-8.347
+                        c-2.672-33.196,36.268-59.115,37.318-74.839c-0.047-14.875-2.589-26.581-7.045-35.688C112.593-2.032,63.408,3.499,23.384,30.344z"
+                    />
+                    <path d="M151.204,100.091c39.886-14.885,114.67,36.044,102.191,81.215c-6.757,24.447-29.922,37.67-51.754,46.772
+                        c-13.549,5.648-33.401,8.855-49.907,15.039c-13.232,4.962-12.141,4.835-9.474-9.045c4.924-25.621-20.313-49.506-23.098-77.659
+                        c-1.279-12.903,1.737-26.252,8.585-37.016C133.2,110.81,141.104,103.859,151.204,100.091z"/>
+                </g>
+            </svg>
+        </div>
         <div class="navbar_pause_btn btn_square button btn_style_3" id="menuBtn">
             <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M36 24.0468V20.0468C36 17.8376 34.2091 16.0468 32 16.0468L24 16.0468C21.7909 16.0468 20 17.8376 20 20.0468V24.0468L20 56.2339V60.2339C20 62.443 21.7909 64.2339 24 64.2339H32C34.2091 64.2339 36 62.443 36 60.2339L36 56.2339L36 24.0468ZM60 24.0468V20.0468C60 17.8376 58.2091 16.0468 56 16.0468L48 16.0468C45.7909 16.0468 44 17.8376 44 20.0468V24.0468L44 56.2339V60.2339C44 62.443 45.7909 64.2339 48 64.2339H56C58.2091 64.2339 60 62.443 60 60.2339V56.2339L60 24.0468Z" fill="#C2CCDE" />
@@ -15,9 +30,10 @@
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="<%= scripts %>/gameUtility/GiocatoreInterface.js"></script>
-<script src="<%= scripts %>/gameUtility/socketEvents.js"></script>
+<script src="<%= scripts %>/game/GiocatoreInterface.js"></script>
+<script src="<%= scripts %>/game/socketEvents.js"></script>
 <script src="<%= scripts %>/views/lobby.js"></script>
 
 <%- include("components/pauseMenu") %>
+<%- include("components/chatMenu") %>
 <%- include("components/packsPanel") %>

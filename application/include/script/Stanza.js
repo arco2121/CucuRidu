@@ -274,7 +274,7 @@ class Stanza {
             giocatoreId: giocatoreId,
             eliminato: false
         });
-        return this.chat.messaggi.toReversed();
+        return this.chat.messaggi;
     }
 
     static trovaDaGiocatore(idGiocatore, Stanze) {

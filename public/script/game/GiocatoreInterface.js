@@ -1,6 +1,7 @@
 class GiocatoreInterface {
 
     constructor(dataFromServer) {
+        if(dataFromServer === null) return;
         this.id = dataFromServer["id"];
         this.username = dataFromServer["username"];
         this.mazzo = dataFromServer["mazzo"]["carte"];

@@ -317,7 +317,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             const Stanza = await Stanze.get(data["stanzaId"] || user.data?.referenceStanza);
 
             server.to(data["stanzaId"] || user.data?.referenceStanza).emit("aggiornamentoChat", {
-                chat: Stanza?.chat.messaggi.toReversed()
+                chat: Stanza?.chat.messaggi
             });
         });
 

@@ -56,6 +56,7 @@ const fragmentsCache = {};
 const renderFragment = async (root, page, params = {}) => {
     params = {
         animation: true,
+        notInject: false,
         ...params
     };
     try {
@@ -64,7 +65,7 @@ const renderFragment = async (root, page, params = {}) => {
             if(!input.ok) throw new Error("fragment not found");
             fragmentsCache[page] = await input.text();
         }
-        if(!root) return fragmentsCache[page];
+        if(root === null) return fragmentsCache[page];
         if(params.animation) {
             root.dispatchEvent(hideOpacity);
             await wait(170);
@@ -73,6 +74,12 @@ const renderFragment = async (root, page, params = {}) => {
             scripts: fromBackEnd["scripts"],
             styles: fromBackEnd["styles"]
         };
+        if(params.notInject) {
+            return ejs.render(fragmentsCache[page], {
+                ...params,
+                ...paths
+            });
+        }
         const header = await renderFragment(null, "header");
         const processed = ejs.render(header, {
             params: {
@@ -96,6 +103,7 @@ const renderFragment = async (root, page, params = {}) => {
     document.dispatchEvent(fragmentRendered);
 };
 
+//Intervals
 const fragmentIntervalsMemory = new Map();
 const fragmentInterval = (call, interval, fragmentId) => {
     let internal = null;

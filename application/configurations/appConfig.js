@@ -31,7 +31,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         const legacy = filter.test(target);
         const details = {
             scripts: legacy ? "/dist/script" : "/script",
-            styles: "/dist/style",
+            styles: pagesOptions.cluster ? "/dist/style/" : "/style",
             legacy: legacy
         };
 

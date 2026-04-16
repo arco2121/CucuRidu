@@ -14,18 +14,15 @@ const initializeIO = () => {
         reconnectionDelay: 50,
     });
     Object.keys(receivers).forEach(event => {
-        if (event === "any") {
-            socket.onAny((name, data) => receivers["any"].forEach(cb => cb(data)));
-        } else {
-            receivers[event].forEach(cb => socket.on(event, cb));
-        }
+        if (event === "any") socket.onAny((name, data) => receivers["any"].forEach(cb => cb(data)));
+        else receivers[event].forEach(cb => socket.on(event, cb));
     });
     return socket;
 };
 
 let controller = (() => {
     if('Worker' in window)
-        return new Worker(fromBackEnd["scripts"] + '/gameUtility/socketController.js');
+        return new Worker(fromBackEnd["scripts"] + '/game/socketController.js');
     else return initializeIO()
 })();
 if (controller instanceof Worker)
@@ -69,7 +66,7 @@ if(controller instanceof Worker)
     };
 
 //Utility
-let referenceGiocatore;
+let referenceGiocatore = new GiocatoreInterface(null);
 let referenceStanza = "";
 const notificationMessage = [
     "Allora... pensi di continuare a giocare o cosa?",
