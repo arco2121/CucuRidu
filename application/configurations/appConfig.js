@@ -22,7 +22,8 @@ const { createGzip } = require('zlib');
 const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout = 3600000, pagesOptions = {
     notifications: false,
     version: '1.0.0',
-    cluster: false
+    cluster: false,
+    readyState: true
 }) => {
 
     const renderPage = (req, res, page, params = {}) => {
@@ -48,7 +49,11 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         });
     }
 
-    const resumeGame = async (req, res, next) => {
+    const preCheck = async (req, res, next) => {
+        if (!pagesOptions.readyState)
+            return res.status(503).json({
+                error: "L'istanza è in fase di build/avvio. Riprova tra pochi secondi."
+            });
         const { userId, stanzaId } = await serverSession.get(req, req.query?.token);
         const redirecting = req.query?.token ? "?token=" + req.query.token : "";
         if(userId && (await Stanze.get(stanzaId))?.trovaGiocatore(userId)) return res.redirect("/game" + redirecting);
@@ -79,7 +84,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         }
     }));
 
-    app.get("/", resumeGame, (req, res) => {
+    app.get("/", preCheck, (req, res) => {
         const { openSettings } = req.query;
         renderPage(req, res, "index", {
             icon: getIcon(),
@@ -90,7 +95,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     });
     app.get(['/home', '/index'], (req, res) => res.redirect('/'));
 
-    app.get("/partecipaStanza/:codiceStanza", resumeGame, (req, res) => {
+    app.get("/partecipaStanza/:codiceStanza", preCheck, (req, res) => {
         const stanza = req.params["codiceStanza"];
         if (stanza) renderPage(req, res, "profile", {
             stanza: stanza,
@@ -101,7 +106,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         else res.redirect("/");
     });
 
-    app.get("/partecipaStanza", resumeGame, (req, res) => {
+    app.get("/partecipaStanza", preCheck, (req, res) => {
         const {nome, pfp, stanza} = req.query;
         if (nome && pfp && stanza) {
             const token = serverSession.set(req, {
@@ -123,7 +128,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         });
     });
 
-    app.get("/creaStanza", resumeGame, (req, res) => {
+    app.get("/creaStanza", preCheck, (req, res) => {
         const {nome, pfp} = req.query;
         if (nome && pfp) {
             const token = serverSession.set(req, {
@@ -169,6 +174,11 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     app.get("/creaMazzo", (req, res) => renderPage(req, res, "createPacks", {
         loadToken: false,
     }));
+
+    app.get("/healthz", (req, res) => {
+        if(pagesOptions.readyState) res.status(200).send('OK');
+        else res.status(503).send('NOPE');
+    });
 
     app.get("/offline", (req, res) => renderPage(req, res, "offline", {
         loadToken: false,
@@ -228,7 +238,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     });
 
     app.head("/ping", (req, res) => {
-        res.status(200).end();
+        res.status(pagesOptions.readyState ? 200 : 503).send();
     });
 
     app.post("/doRoomExists", async (req, res) => {
