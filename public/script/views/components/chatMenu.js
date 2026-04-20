@@ -8,8 +8,9 @@ let notify = true;
 const delayChat = 2000;
 
 const renderChat = async (chat = [], renderAll = true) => {
+    const place = "<h1>Bha... a me sembra tutto morto qui</h1>";
     if(chat.length + chatHistory.length === 0) {
-        chatView.innerHTML = "<h1>Bha... a me sembra tutto morto qui</h1>";
+        chatView.innerHTML = place;
         chatView.classList.remove("chat");
         return;
     }
@@ -27,8 +28,10 @@ const renderChat = async (chat = [], renderAll = true) => {
 
     if(renderAll)
         chatView.innerHTML = rendered;
-    else
+    else {
+        if(chatView.innerHTML === place) chatView.innerHTML = "";
         chatView.innerHTML += rendered;
+    }
 
     chatView.lastElementChild.scrollIntoView({
         behavior: "smooth"
