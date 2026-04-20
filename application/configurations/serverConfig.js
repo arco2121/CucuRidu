@@ -320,7 +320,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             for(const socket of sockets)
                 socket.emit("aggiornamentoChat", {
                     chat: Stanza?.chat.messaggi,
-                    renderAll: socket.id === user.id,
+                    renderAll: socket.data?.referenceGiocatore.id === user.data?.referenceGiocatore.id,
                 });
         });
 
@@ -336,7 +336,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     message: "Mannaggia, mi sa che al server non sono piaciuti :("
                 });
 
-            await Stanze.set(stanza.id, Stanza);
+            await Stanze.set(stanza.id, stanza);
         });
 
         user.on("webrtcOfferta", (data) => {

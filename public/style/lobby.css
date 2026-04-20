@@ -131,8 +131,7 @@
     justify-content: center;
     overflow-y: scroll;
     overflow-x: hidden;
-    height: 45vh;
-    max-height: 90%;
+    height: 90%;
 }
 
 .wait_players_list {
@@ -593,6 +592,7 @@
     text-align: start;
     margin: 10px 2px;
     width: 100%;
+    font-size: 0.75rem;
     height: auto;
 }
 
