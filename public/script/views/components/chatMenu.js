@@ -9,6 +9,7 @@ const delayChat = 2000;
 
 const renderChat = async (chat = [], renderAll = true) => {
     const place = "<h1>Bha... a me sembra tutto morto qui</h1>";
+    console.log(renderAll)
     if(chat.length + chatHistory.length === 0) {
         chatView.innerHTML = place;
         chatView.classList.remove("chat");
@@ -30,7 +31,8 @@ const renderChat = async (chat = [], renderAll = true) => {
         chatView.innerHTML = rendered;
     else {
         if(chatView.innerHTML === place) chatView.innerHTML = "";
-        chatView.innerHTML += rendered;
+        const frag = document.createRange().createContextualFragment(rendered);
+        chatView.appendChild(frag);
     }
 
     chatView.lastElementChild.scrollIntoView({

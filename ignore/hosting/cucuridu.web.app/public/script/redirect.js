@@ -9,7 +9,7 @@
 
     function checkHost(host) {
         var xhr = new XMLHttpRequest();
-        xhr.open('HEAD', host + "/ping", true);
+        xhr.open('GET', host + "/ping", true);
 
         var timeout = setTimeout(function() {
             xhr.abort();

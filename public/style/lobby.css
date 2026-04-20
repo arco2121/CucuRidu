@@ -538,6 +538,7 @@
 .chat {
     justify-content: flex-start;
     align-items: flex-start;
+    max-height: 68vh;
 }
 
 .message {
@@ -592,7 +593,7 @@
     text-align: start;
     margin: 10px 2px;
     width: 100%;
-    font-size: 1.15rem;
+    font-size: 0.85rem;
     height: auto;
 }
 

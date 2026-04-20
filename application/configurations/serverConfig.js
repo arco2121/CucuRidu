@@ -320,7 +320,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             for(const socket of sockets)
                 socket.emit("aggiornamentoChat", {
                     chat: Stanza?.chat.messaggi,
-                    renderAll: socket.data?.referenceGiocatore.id === user.data?.referenceGiocatore.id,
+                    renderAll: socket.data?.referenceGiocatore.id === user.data?.referenceGiocatore.id
                 });
         });
 
