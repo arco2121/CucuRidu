@@ -22,8 +22,7 @@ const { createGzip } = require('zlib');
 const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout = 3600000, pagesOptions = {
     notifications: false,
     version: '1.0.0',
-    cluster: false,
-    readyState: true
+    cluster: false
 }) => {
 
     const renderPage = (req, res, page, params = {}) => {
@@ -50,10 +49,6 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     }
 
     const preCheck = async (req, res, next) => {
-        if (!pagesOptions.readyState)
-            return res.status(503).json({
-                error: "L'istanza è in fase di build/avvio. Riprova tra pochi secondi."
-            });
         const { userId, stanzaId } = await serverSession.get(req, req.query?.token);
         const redirecting = req.query?.token ? "?token=" + req.query.token : "";
         if(userId && (await Stanze.get(stanzaId))?.trovaGiocatore(userId)) return res.redirect("/game" + redirecting);
@@ -175,11 +170,6 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         loadToken: false,
     }));
 
-    app.get("/healthz", (req, res) => {
-        if(pagesOptions.readyState) res.status(200).send('OK');
-        else res.status(503).send('NOPE');
-    });
-
     app.get("/offline", (req, res) => renderPage(req, res, "offline", {
         loadToken: false,
     }));
@@ -237,8 +227,8 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         res.status(200).json({nome: generateName(), pfp: generatePfp()});
     });
 
-    app.get("/ping", (req, res) => {
-        res.status(pagesOptions.readyState ? 200 : 503).send();
+    app.head("/ping", (req, res) => {
+        res.status(200).end();
     });
 
     app.post("/doRoomExists", async (req, res) => {
