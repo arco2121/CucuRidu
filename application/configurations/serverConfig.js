@@ -110,6 +110,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 await Stanze.set(stanza.id, stanza);
                 user.join(stanza.id);
                 user.data.referenceGiocatore = stanza.master;
+                user.data.referenceStanza = stanza.id;
                 user.emit("confermaStanza", {
                     stanzaId: stanza.id,
                     reference: user.data.referenceGiocatore.toJSON(),
@@ -148,6 +149,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     });
                     return;
                 }
+                user.data.referenceStanza = stanzaId;
                 user.join(stanzaId);
                 user.emit("confermaStanza", {
                     reference: user.data.referenceGiocatore.toJSON(),
