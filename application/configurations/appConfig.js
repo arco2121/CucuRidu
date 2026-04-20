@@ -237,7 +237,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         res.status(200).json({nome: generateName(), pfp: generatePfp()});
     });
 
-    app.head("/ping", (req, res) => {
+    app.get("/ping", (req, res) => {
         res.status(pagesOptions.readyState ? 200 : 503).send();
     });
 
