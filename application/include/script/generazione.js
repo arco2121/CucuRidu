@@ -76,14 +76,14 @@ const translateToPack = (packs) => {
 
 // Generazione Foto Profilo
 const generatePfp = () => {
-    const pfpNumber = 121;
+    const pfpNumber = 123;
     const pfpPath = '/assets/pfps/';
     let rdmNumber = Math.floor(Math.random() * (pfpNumber - 1) + 1);
     return pfpPath + rdmNumber + ".jpg";
 }
 
 const getAllPfp = () => {
-    const pfpNumber = 121;
+    const pfpNumber = 123;
     const pfpPath = '/assets/pfps/';
     return Array.from({ length: pfpNumber }, (v, i) => `${pfpPath}${i + 1}.jpg`);
 }
