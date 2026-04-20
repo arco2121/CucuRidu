@@ -16,7 +16,6 @@ const renderChat = async (chat = [], renderAll = true) => {
         return;
     }
 
-    chatView.classList.add("chat");
     const historySet = new Set(chatHistory.map(m => m.timestamp));
     const newMessages = chat.filter(m => !historySet.has(m.timestamp));
     chatHistory.push(...newMessages);
@@ -27,6 +26,7 @@ const renderChat = async (chat = [], renderAll = true) => {
         notInject: true
     });
 
+    chatView.classList.add("chat");
     if(renderAll)
         chatView.innerHTML = rendered;
     else {
