@@ -316,20 +316,27 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         user.on("aggiornaChat", async (data) => {
             const Stanza = await Stanze.get(data["stanzaId"] || user.data?.referenceStanza);
 
-            server.to(data["stanzaId"] || user.data?.referenceStanza).emit("aggiornamentoChat", {
-                chat: Stanza?.chat.messaggi
-            });
+            const sockets = await server.in(data["stanzaId"] || user.data?.referenceStanza).fetchSockets();
+            for(const socket of sockets)
+                socket.emit("aggiornamentoChat", {
+                    chat: Stanza?.chat.messaggi,
+                    renderAll: socket.id === user.id,
+                });
         });
 
         user.on("aggiungiMazzo", async (data) => {
             const stanza = await Stanze.get(data["id"] || user.data?.referenceStanza);
             const result = stanza?.modificaMazzo(data["packs"]);
-            if(result)
+            if(result) {
                 user.emit("mazzoAggiunto");
+                console.log("Mazzo cambiato nella stanza => " + stanza.id);
+            }
             else
                 user.emit("mazzoErrore", {
                     message: "Mannaggia, mi sa che al server non sono piaciuti :("
                 });
+
+            await Stanze.set(stanza.id, Stanza);
         });
 
         user.on("webrtcOfferta", (data) => {
@@ -351,7 +358,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             const result = stanza.scriviInChat(data["message"], user.data?.referenceGiocatore?.id)
             if(result)
                 server.to(data["id"] || user.data?.referenceStanza).emit("aggiornamentoChat", {
-                    chat: result
+                    chat: result,
+                    renderAll: false
                 });
             await Stanze.set(stanza.id, stanza);
         });
