@@ -617,3 +617,21 @@
 #sendBtn {
     margin-right: 15px;
 }
+
+#qrcodeSharing {
+    aspect-ratio: 1/1;
+    height: auto;
+    width: 50vw;
+    padding: 15px;
+}
+
+#qrCode * {
+    margin: 15px;
+}
+
+@media (orientation: landscape) {
+    #qrcodeSharing {
+        width: auto;
+        height: 50vh;
+    }
+}

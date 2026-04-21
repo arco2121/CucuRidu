@@ -3,12 +3,17 @@ off("aggiornamentoAttesa");
 const numeroGiocatoriCount = document.getElementById("numeroGiocatori");
 const attesaView = document.getElementById("attesa");
 const shareButton = document.getElementById("shareButton");
+const showQrcode = document.getElementById("showQrcode");
 const showGiocatori = document.getElementById("showGiocatori");
 const startButton = document.getElementById("startButton");
 const chiudiButton = document.getElementById("chiudiButton");
 const packsButton = document.getElementById("packsButton");
 const game_section = document.getElementById("game_section");
+const qrcodeSharing = document.getElementById("qrCode");
 const idStanza = fromFragments["stanzaId"];
+const waitMenu = document.getElementById("waitMenu");
+const url = "/partecipaStanza/" + idStanza;
+qrcodeSharing.querySelector("img").src = "https://qrtag.net/api/qr_transparent_6.png?url=" + encodeURIComponent(window.location.origin + url);
 
 on("aggiornamentoAttesa", (data) => {
     const {numeroGiocatori, minimoGiocatori, giocatori} = data || {};
@@ -36,10 +41,20 @@ shareButton.addEventListener("click", async () => {
     const shareData = {
         title: "Cucu Ridu",
         text: shareText,
-        url: "/partecipaStanza/" + idStanza
+        url: url,
     };
     if (navigator.canShare(shareData)) await navigator.share(shareData).catch(_ => null);
     else await navigator.clipboard.writeText(idStanza).then(() => alert(copytext)).catch(_ => alert(failText));
+});
+
+showQrcode.addEventListener("click", () => {
+    waitMenu.dispatchEvent(hidePanel);
+    qrcodeSharing.dispatchEvent(showPanel);
+});
+
+qrcodeSharing.addEventListener("click", () => {
+    qrcodeSharing.dispatchEvent(hidePanel);
+    waitMenu.dispatchEvent(showPanel);
 });
 
 startButton?.addEventListener("click", () => emit("iniziaTurno", {
