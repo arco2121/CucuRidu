@@ -42,7 +42,7 @@ const renderChat = async (chat = [], renderAll = true) => {
     if(newMessages.length !== 0 && notify) {
         notify = false;
         const lastMessage = newMessages.pop();
-        await sendNotifica(lastMessage.username + " - Cucu Ridu", lastMessage.messaggio);
+        await sendNotifica(lastMessage.username + " - Cucu Ridu", lastMessage.messaggio, lastMessage.pfp);
         setTimeout(() => notify = true, delayChat);
     }
 };

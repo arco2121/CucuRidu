@@ -77,11 +77,12 @@ const concediPermesso = async () => {
     return permesso === "granted" ? true : (permesso === "default" ? 0 : false);
 };
 
-const sendNotifica = async (title, message, url = "") => {
+const sendNotifica = async (title, message, icon = null, url = "") => {
     if (!(await concediPermesso())) return;
     const notifica = new Notification(title, {
         body: message,
-        icon: "/assets/icon_notification.png",
+        icon: icon ? icon : "/assets/icon_notification.png",
+        badge: "/assets/icon_notification_mono.png",
         renotify: true,
         tag: 'cucuridu'
     });
