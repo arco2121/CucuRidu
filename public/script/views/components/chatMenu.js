@@ -9,7 +9,6 @@ const delayChat = 2000;
 
 const renderChat = async (chat = [], renderAll = true) => {
     const place = "<h1>Bha... a me sembra tutto morto qui</h1>";
-    console.log(renderAll)
     if(chat.length + chatHistory.length === 0) {
         chatView.innerHTML = place;
         chatView.classList.remove("chat");
