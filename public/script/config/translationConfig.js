@@ -1,44 +1,34 @@
 const lang = (navigator.language || navigator.userLanguage).split('-')[0];
+const defaultLang = document.documentElement.lang + "";
 const originalTexts = new Map();
+const trConfig = {
+    sourceLanguage: defaultLang,
+    targetLanguage: lang,
+};
 
-const restoreOriginal = () => {
+const restoreDom = () => {
     if (originalTexts.size === 0) return;
     document.documentElement.lang = "it";
     originalTexts.forEach((value, node) => {
         node.nodeValue = value;
     });
 };
-
 const translateDom = async (nodo = null, tolanguage = lang, ignore = false) => {
     try {
-        const defaultLang = "it";
-
-        if (typeof nodo === "string") {
-            const translator = await Translator.create({
-                sourceLanguage: defaultLang,
-                targetLanguage: tolanguage,
-            });
-            return await translator.translate(nodo);
-        }
-
         if (tolanguage === document.documentElement.lang && !ignore) return;
-
         if (tolanguage === defaultLang && originalTexts.size > 0) {
-            restoreOriginal();
+            restoreDom();
             return;
         }
-
         const translator = await Translator.create({
-            sourceLanguage: document.documentElement.lang || defaultLang,
+            ...trConfig,
             targetLanguage: tolanguage,
         });
 
         const nd = nodo || document.body;
         const walker = document.createTreeWalker(nd, NodeFilter.SHOW_TEXT, null);
-
         let node;
         const translationPromises = [];
-
         while ((node = walker.nextNode())) {
             const originalText = node.nodeValue.trim();
 
@@ -60,7 +50,30 @@ const translateDom = async (nodo = null, tolanguage = lang, ignore = false) => {
 
         document.documentElement.lang = tolanguage;
         await Promise.all(translationPromises);
+        translator.destroy();
     } catch(e) {
         console.error(e.message);
+        return nodo;
     }
+};
+const translate = async (text = "", tolanguage = lang) => {
+    if (tolanguage === document.documentElement.lang) return;
+    const translator = await Translator.create({
+        ...trConfig,
+        targetLanguage: tolanguage,
+    });
+    const res = await translator.translate(text + "");
+    translator.destroy();
+    return res;
+};
+const canTranslate = async (tolanguage = lang) => {
+  try {
+      const state = await Translator.availability({
+          ...trConfig,
+          targetLanguage: tolanguage,
+      });
+      return state === "available";
+  } catch {
+      return false;
+  }
 };

@@ -36,7 +36,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         updateButtonUI(musicBtn, !!settings["audio"]);
         updateButtonUI(soundBtn, !!settings["sound"]);
         updateButtonUI(vibrationBtn, !!settings["vibration"]);
-        updateButtonUI(translationBtn, !!settings["translate"]);
         localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
 
         (async () => {
@@ -46,6 +45,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (permesso === false) settingsAfter.notifications = false;
             localStorage.setItem("cucuRiduSettings", JSON.stringify(settingsAfter));
             updateButtonUI(notificationBtn, settingsAfter["notifications"] && Boolean(permesso))
+        })();
+
+        (async () => {
+            const settingsAfter = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
+            const permesso = await canTranslate();
+            if (settings.translate === undefined) settingsAfter.translate = permesso;
+            if (permesso === false) settingsAfter.notifications = false;
+            localStorage.setItem("cucuRiduSettings", JSON.stringify(settingsAfter));
+            updateButtonUI(translationBtn, settingsAfter["translate"] && permesso)
         })();
     };
 
@@ -71,10 +79,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     translationBtn.addEventListener("click", async (e) => {
-        toggleSetting(e, "translate");
+        const permesso = await canTranslate();
+        if(!permesso) alert("Teso la traduzione sembra un po' demente, non usarla");
+        toggleSetting(translationBtn, "translate", permesso);
         const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
         if(settings["translate"]) await translateDom(null, lang);
-        else restoreOriginal();
+        else restoreDom();
     });
 
     exitOptionsBtn.addEventListener("click", () => {
