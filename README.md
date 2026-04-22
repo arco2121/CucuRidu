@@ -59,8 +59,8 @@ Vuoi creare il tuo mazzo? [Qui c'è la guida →](https://github.com/arco2121/Cu
 ```bash
 git clone https://github.com/arco2121/CucuRidu.git
 cd CucuRidu
-npm install
-node app.js
+npm run build
+npm start
 ```
 
 Il server parte su una porta casuale e te la dice in console. Aprila nel browser e il gioco è fatto.
