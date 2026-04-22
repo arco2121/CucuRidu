@@ -169,7 +169,6 @@ window.alert = (message) => {
         const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || '{}');
         let newMessage = message;
         if(settings.translate) newMessage = await translateDom(message);
-        console.log(newMessage)
         defaultAlert(newMessage);
     })();
 };
