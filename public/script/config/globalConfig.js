@@ -161,3 +161,15 @@ const cssVars = (fileName) => {
     });
     return Array.from(variableNames);
 };
+
+//Alert Override
+const defaultAlert = window.alert;
+window.alert = (message) => {
+    (async () => {
+        const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || '{}');
+        let newMessage = message;
+        if(settings.translate) newMessage = await translateDom(message);
+        console.log(newMessage)
+        defaultAlert(newMessage);
+    })();
+};

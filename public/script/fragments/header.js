@@ -59,5 +59,8 @@
 
     container.innerHTML = pars.body.innerHTML;
     execFunctions.forEach(fn => fn());
+
+    const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || '{}');
+    if(settings.translate) await translateDom(container, lang);
     currentScript?.remove();
 })();

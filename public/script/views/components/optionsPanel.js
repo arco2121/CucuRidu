@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const exitOptionsBtn = document.getElementById("exitOptionsBtn");
     const vibrationBtn = document.getElementById("vibrationbtn");
     const notificationBtn = document.getElementById("notificationbtn");
+    const translationBtn = document.getElementById("translationbtn");
     const sectionDefault = document.querySelector(".sectionToHide");
     const updateButtonUI = (btn, isOn) => {
         if(!btn) return;
@@ -30,10 +31,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (settings.audio === undefined) settings.audio = true;
         if (settings.sound === undefined) settings.sound = true;
         if (settings.vibration === undefined) settings.vibration = true;
+        if (settings.translate === undefined) settings.translate = false;
 
         updateButtonUI(musicBtn, !!settings["audio"]);
         updateButtonUI(soundBtn, !!settings["sound"]);
         updateButtonUI(vibrationBtn, !!settings["vibration"]);
+        updateButtonUI(translationBtn, !!settings["translate"]);
         localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
 
         (async () => {
@@ -66,6 +69,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             else await revocaPush();
         }
     });
+
+    translationBtn.addEventListener("click", async (e) => {
+        toggleSetting(e, "translate");
+        const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
+        if(settings["translate"]) await translateDom(null, lang);
+        else restoreOriginal();
+    });
+
     exitOptionsBtn.addEventListener("click", () => {
         optionPanel.dispatchEvent(hidePanel);
         sectionDefault.dispatchEvent(showPanel);
