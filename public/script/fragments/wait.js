@@ -13,7 +13,6 @@ const qrcodeSharing = document.getElementById("qrCode");
 const idStanza = fromFragments["stanzaId"];
 const waitMenu = document.getElementById("waitMenu");
 const url = "/partecipaStanza/" + idStanza;
-qrcodeSharing.querySelector("img").src = "https://qrtag.net/api/qr_transparent_6.png?url=" + encodeURIComponent(window.location.origin + url);
 
 on("aggiornamentoAttesa", (data) => {
     const {numeroGiocatori, minimoGiocatori, giocatori} = data || {};
@@ -48,8 +47,14 @@ shareButton.addEventListener("click", async () => {
 });
 
 showQrcode.addEventListener("click", () => {
-    waitMenu.dispatchEvent(hidePanel);
-    qrcodeSharing.dispatchEvent(showPanel);
+    const qrCode = qrcodeSharing.querySelector("img");
+    qrCode.onload = () => {
+        waitMenu.dispatchEvent(hidePanel);
+        qrcodeSharing.dispatchEvent(showPanel);
+    };
+    qrCode.onerror = () => alert("Evitiamo di piangere sul un QrCode rotto 😭");
+
+    qrCode.src = "/qrCode?padding=2&url=" + encodeURIComponent(window.location.origin + url);
 });
 
 qrcodeSharing.addEventListener("click", () => {

@@ -7,6 +7,7 @@ const express = require("express");
 const cors = require("cors");
 const { SitemapStream } = require('sitemap');
 const { createGzip } = require('zlib');
+const QRCode = require("qrcode-svg");
 
 /**
  * Configura gli endpoint dell' application Express
@@ -220,6 +221,47 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         } catch (e) {
             console.error(e);
             res.status(500).end();
+        }
+    });
+
+    app.get('/qrCode', async (req, res) => {
+        res.setHeader('Content-Type', 'image/svg+xml');
+        res.setHeader('Content-Disposition', 'inline; filename="qrcode.svg"');
+        res.setHeader('Cache-Control', 'public, max-age=36000');
+        try {
+            const url = req.query.url;
+            const size = parseInt(req.query.size) || 400;
+            const radius = parseFloat(req.query.radius) || 0;
+            const padding = parseFloat(req.query.padding) || 0;
+            const background = req.query.background || "none";
+            const filler = req.query.filler || "#000000";
+            const QR_ECL = {
+                L: '7%',
+                M: '15%',
+                Q: '25%',
+                H: '30%'
+            };
+            let quality = req.query.quality;
+            if(!QR_ECL[quality])
+                quality = "H";
+
+            const qr = new QRCode({
+                content: url,
+                padding: padding,
+                width: size,
+                height: size,
+                color: filler,
+                background: background,
+                ecl: quality,
+            });
+            const svg = qr.svg();
+            const rValue = radius * (size / 40);
+            const roundedSvg = svg.replace(/<rect(?! [^>]*id="bg"| [^>]*class="background")/g, `<rect rx="${rValue}" ry="${rValue}"`);
+
+            res.send(roundedSvg);
+        } catch (err) {
+            console.log(err);
+            res.status(500).send('Errore');
         }
     });
 
