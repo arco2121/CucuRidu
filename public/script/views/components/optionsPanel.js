@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     translationBtn.addEventListener("click", async (e) => {
         const permesso = await canTranslate();
-        if(!permesso) alert("Teso la traduzione sembra un po' demente, non usarla");
+        if(!permesso) alert("Teso la traduzione sembra un po' rincoglionita, non si può usare");
         toggleSetting(translationBtn, "translate", permesso);
         const settings = JSON.parse(localStorage.getItem("cucuRiduSettings")) || {};
         if(settings["translate"]) await translateDom(null, lang);
