@@ -11,7 +11,8 @@ const clusterApp = require(path.join(__dirname, "/application/cluster"));
 const allowedOrigins = [
     "https://cucuridu.web.app",
     'https://cucuridu.onrender.com',
-    'https://arco2120-cucuridu.hf.space'
+    'https://arco2120-cucuridu.hf.space',
+    'https://cucuridu-9xvi.onrender.com'
 ];
 const attempt = async (operation, fallback) => {
     try { return await operation();}
