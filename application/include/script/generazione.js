@@ -78,7 +78,6 @@ const translateToPack = (packs) => {
 
 const contaPfp = (cartella) => {
     try {
-        console.log("Rieseguendola")
         const fileJpg = fs.readdirSync(cartella)
             .filter(file => path.extname(file).toLowerCase() === '.jpg')
             .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
