@@ -49,7 +49,7 @@ shareButton.addEventListener("click", async () => {
 showQrcode.addEventListener("click", () => {
     const qrCode = qrcodeSharing.querySelector("img");
     qrcodeSharing.classList.remove("instant");
-        qrcodeSharing.classList.remove("hidden_text");
+     qrcodeSharing.classList.remove("hidden_text");
     qrCode.onload = () => {
         waitMenu.dispatchEvent(hidePanel);
         qrcodeSharing.dispatchEvent(showPanel);
