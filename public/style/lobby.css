@@ -326,12 +326,15 @@
     margin-bottom: 8px;
 }
 
+.card {
+    transition: all 0.25s ease;
+}
+
 .game_card {
     border-radius: 16px;
     padding: 13px 10px;
     min-height: 100px;
     min-width: 90%;
-    transition: all 0.25s ease;
 }
 
 .game_card_domanda {
