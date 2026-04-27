@@ -699,6 +699,10 @@ input:active {
     pointer-events: none;
 }
 
+.instant {
+    animation: none;
+}
+
 .visible, .hidden {
     will-change: transform, opacity;
     contain: layout style;

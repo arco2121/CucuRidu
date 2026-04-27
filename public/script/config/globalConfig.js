@@ -56,6 +56,7 @@ const renderFragment = async (root, page, params = {}) => {
     params = {
         animation: true,
         notInject: false,
+        addOverride: false,
         ...params
     };
     try {
@@ -92,7 +93,8 @@ const renderFragment = async (root, page, params = {}) => {
         const old = root.querySelectorAll(".fragment");
         for (const fragment of old)
             clearAllFragmentInterval(fragment.id);
-        root.innerHTML = "";
+        if(!params.addOverride) root.innerHTML = "";
+
         const fragment = document.createRange().createContextualFragment(processed);
         root.appendChild(fragment);
         if(params.animation) root.dispatchEvent(showOpacity);

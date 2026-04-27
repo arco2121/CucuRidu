@@ -22,7 +22,7 @@
   "scripts": {
     "build": "npm install",
     "app": "node app.js",
-    "start": "node build.js && node app.js",
+    "start": "npm run generateAll && node build.js && node app.js",
     "generateAll": "node ./ignore/scratch/generateAllCards.js && node ./ignore/scratch/generateNames.js"
   },
   "dependencies": {
