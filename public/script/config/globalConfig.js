@@ -31,12 +31,11 @@ const fillBlanks = (templateText, replacements) => {
         if (index >= replacements.length) return match;
 
         let word = replacements[index];
-        console.log(word, index)
         index++;
 
         if (bannedSymbols.split("").some(symbol => word.startsWith(symbol))) {
             const cleanedWord = word.slice(1);
-            return cleanedWord.charAt(0).toUpperCase() + cleanedWord.slice(1).toLowerCase();
+            return cleanedWord.charAt(0).toUpperCase() + cleanedWord.slice(1);
         }
         const textBefore = fullString.slice(0, offset);
 
