@@ -689,6 +689,10 @@ input:active {
     }
 }
 
+.hidden_text {
+    display: none;
+}
+
 .visible {
     display: flex;
     animation: popup 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
@@ -1104,10 +1108,6 @@ input:active {
     word-wrap: break-word;
     pointer-events: none;
     margin: 0;
-}
-
-.hidden_text {
-    display: none;
 }
 
 .auto {
