@@ -99,7 +99,7 @@ const buildScripts = async () => {
 }
 
 buildScripts()
-    .then(() => console.log("build script => true"))
+    .then(() => console.log("\nbuild script => true"))
     .catch(err => {
         console.error(err);
         process.exit(1);

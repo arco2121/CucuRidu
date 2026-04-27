@@ -23,7 +23,7 @@
     "build": "npm install",
     "app": "node app.js",
     "start": "npm run generateAll && node build.js && node app.js",
-    "generateAll": "node ./ignore/scratch/generateAllCards.js && node ./ignore/scratch/generateNames.js"
+    "generateAll": "node ./ignore/scratch/generateAllCards.js && node ./ignore/scratch/generateNames.js && node ./application/include/script/generazione.js"
   },
   "dependencies": {
     "@socket.io/postgres-adapter": "^0.5.0",
