@@ -11,6 +11,7 @@ const generateCards = (group, files) => {
                 .split("\n").map(line => line.trim());
             let array = [];
             for (const line of lines) {
+                if(!line) continue;
                 const string = line[0]?.toUpperCase() + line.slice(1);
                 const completamenti = (line.match(/_/g) || []).length;
                 array.push(completamenti !== 0 ? [

@@ -37,7 +37,7 @@ const generateCombinedJSON = () => {
         const outputPath = path.join(outputFolder, "names.json");
         fs.writeFileSync(outputPath, JSON.stringify(finalData, null, 2));
 
-        console.log(`Tutto pronto tesoro! Il file è stato generato in: ${outputPath} 🩷`);
+        console.log(`Tutto pronto tesoro! Il file è stato generato in: ${outputPath}`);
         return true;
 
     } catch (error) {
