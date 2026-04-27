@@ -1,6 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 const alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm@#!£$%&/";
+const pfpPathServer = './public/assets/pfps/';
+const pfpPath = '/assets/pfps/';
 
 const generateId = async (length, memory = new Set()) => {
     let code = "";
@@ -74,19 +76,47 @@ const translateToPack = (packs) => {
     }
 };
 
-// Generazione Foto Profilo
+const contaPfp = (cartella) => {
+    try {
+        console.log("Rieseguendola")
+        const fileJpg = fs.readdirSync(cartella)
+            .filter(file => path.extname(file).toLowerCase() === '.jpg')
+            .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+        const totale = fileJpg.length;
+        if (totale === 0) return 0;
+
+        fileJpg.forEach((nome, i) => {
+            const vecchioPath = path.join(cartella, nome);
+            const tempPath = path.join(cartella, `TEMP_${i}_${Date.now()}.tmp`);
+            fs.renameSync(vecchioPath, tempPath);
+        });
+
+        const fileTemp = fs.readdirSync(cartella)
+            .filter(file => file.endsWith('.tmp'))
+            .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+        fileTemp.forEach((nome, i) => {
+            const vecchioPath = path.join(cartella, nome);
+            const nuovoPath = path.join(cartella, `${i + 1}.jpg`);
+            fs.renameSync(vecchioPath, nuovoPath);
+        });
+
+        return totale;
+    } catch (error) {
+        console.error(error);
+        return 0;
+    }
+};
+
+const pfpNumber = contaPfp(pfpPathServer);
+
 const generatePfp = () => {
-    const pfpNumber = 139;
-    const pfpPath = '/assets/pfps/';
     let rdmNumber = Math.round(Math.random() * (pfpNumber - 1) + 1);
     return pfpPath + rdmNumber + ".jpg";
 }
 
-const getAllPfp = () => {
-    const pfpNumber = 139;
-    const pfpPath = '/assets/pfps/';
-    return Array.from({ length: pfpNumber }, (v, i) => `${pfpPath}${i + 1}.jpg`);
-}
+const getAllPfp = () => Array.from({ length: pfpNumber }, (v, i) => `${pfpPath}${i + 1}.jpg`);
 
 const getIcon = (defaultIcon) => String("/assets/icon_imgs/" + (defaultIcon ? 1 : Math.floor(Math.random() * (22 - 1) + 1)) + ".png");
 
