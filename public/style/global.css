@@ -126,6 +126,7 @@ table {
     transition: all ease 0.15s;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
 }
 
 *::before, *::after {
