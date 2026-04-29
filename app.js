@@ -12,7 +12,7 @@ const allowedOrigins = [
     "https://cucuridu.web.app",
     'https://cucuridu.onrender.com',
     'https://arco2120-cucuridu.hf.space',
-    'https://cucuridu-9xvi.onrender.com'
+    'https://cucuridu-gmgv.onrender.com'
 ];
 const attempt = async (operation, fallback) => {
     try { return await operation();}
