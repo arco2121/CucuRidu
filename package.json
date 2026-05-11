@@ -1,6 +1,6 @@
 {
   "name": "cucuridu",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Un gioco di carte irriverente, storto e assolutamente necessario",
   "keywords": [
     "js",
@@ -22,8 +22,8 @@
   "scripts": {
     "build": "npm install",
     "app": "node app.js",
-    "start": "node build.js && node app.js",
-    "generateAll": "node ./ignore/scratch/generateAllCards.js && node ./ignore/scratch/generateNames.js"
+    "start": "npm run generateAll && node build.js && node app.js",
+    "generateAll": "node ./ignore/scratch/generateAllCards.js && node ./ignore/scratch/generateNames.js && node ./application/include/script/generazione.js"
   },
   "dependencies": {
     "@socket.io/postgres-adapter": "^0.5.0",

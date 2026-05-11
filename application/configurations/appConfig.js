@@ -33,7 +33,8 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         const details = {
             scripts: legacy ? "/dist/script" : "/script",
             styles: pagesOptions.cluster ? "/dist/style/" : "/style",
-            legacy: legacy
+            legacy,
+            allowedOrigins
         };
 
         res.render("header", {

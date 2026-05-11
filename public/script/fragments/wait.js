@@ -51,6 +51,10 @@ showQrcode.addEventListener("click", () => {
     qrCode.onload = () => {
         waitMenu.dispatchEvent(hidePanel);
         qrcodeSharing.dispatchEvent(showPanel);
+        setTimeout(() => {
+            qrcodeSharing.classList.remove("hidden_text");
+            qrcodeSharing.classList.remove("instant");
+        }, timeOut);
     };
     qrCode.onerror = () => alert("Evitiamo di piangere sul un QrCode rotto 😭");
 

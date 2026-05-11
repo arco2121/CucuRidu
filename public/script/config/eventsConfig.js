@@ -32,9 +32,9 @@ const navigateWithLoading = (url) => {
     }, timing);
 };
 const fragmentRendered = new Event("fragmentRendered");
+const timeOut = 150;
 
 (() => {
-    const timeOut = 150;
     document.addEventListener('hidePanel', (e) => {
         const section = e.target;
         section.classList.replace('visible', 'hidden');

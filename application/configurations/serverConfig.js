@@ -35,7 +35,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 }
                 case StatoStanza.CHOOSING_CARDS : {
                     if(Stanza.round.risposte.has(socket.data?.referenceGiocatore.id))
-                        socket.emit("rispostaRegistrata");
+                        socket.emit("rispostaRegistrata", {
+                            stanzaId: Stanza.id
+                        });
                     else
                         socket.emit("roundIniziato", {
                             chiStaInterrogando: Stanza.trovaGiocatore(Stanza.round.chiStaInterrogando).toJSON(),

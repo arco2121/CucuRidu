@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    translationBtn.addEventListener("click", async (e) => {
+    translationBtn?.addEventListener("click", async (e) => {
         const permesso = await canTranslate();
         if(!permesso) alert("Teso la traduzione sembra un po' rincoglionita, non si può usare");
         toggleSetting(translationBtn, "translate", permesso);

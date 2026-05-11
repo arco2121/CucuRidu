@@ -3,7 +3,7 @@ Petunia
 Matilda
 Gesù
 Patrizia
-Anastasia 
+Anastasia
 Tancredi
 Geltrude
 San bartolomeo
@@ -190,3 +190,17 @@ Loredano
 Giuseppina Bonaparte
 Massimilianotello
 Mariottide
+Orazio
+Santa Maria Senza Peccato Concepta
+Galeazzo
+Rosaana
+Gianantonio
+Broccolo
+Crostatina
+Teresa Fidalgo
+Fiorella
+Ninetta
+Armenegilda
+Lancillotta
+Enza
+Viterbo

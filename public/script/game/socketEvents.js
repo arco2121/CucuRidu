@@ -227,7 +227,9 @@ on("roundIniziato", async (data) => {
     });
 });
 
-on("rispostaRegistrata", async () => {
+on("rispostaRegistrata", async (data) => {
+    const { stanzaId } = data;
+    if(stanzaId) referenceStanza = stanzaId;
     await renderFragment(base, "waitWinner", {
         stanzaId: referenceStanza
     });

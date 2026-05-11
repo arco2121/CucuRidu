@@ -326,6 +326,10 @@
     margin-bottom: 8px;
 }
 
+.card {
+    transition: all 0.25s ease;
+}
+
 .game_card {
     border-radius: 16px;
     padding: 13px 10px;
