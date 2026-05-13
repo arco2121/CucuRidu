@@ -63,7 +63,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     displayPfp.addEventListener("click", () => {
        profile.dispatchEvent(hidePanel);
        pfpPanel.dispatchEvent(showPanel);
-       document.getElenentById("pfp_" + displayPfp.src.split(".")[0]).focus();
+       document.querySelectorAll(".pfp_selected").forEach(pfp => pfp.classList.remove("pfp_selected"));
+       const thePfp = document.getElementById("pfp_" + (() => {
+           const id = displayPfp.src.split("/");
+           return id[id.length - 1].split(".")[0];
+       })());
+       thePfp.classList.add("pfp_selected");
+       thePfp.scrollIntoView({
+           block: "center",
+           inline: "center"
+       });
     });
 
     editUsername.addEventListener("click", () => {

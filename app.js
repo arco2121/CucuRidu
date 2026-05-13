@@ -8,12 +8,6 @@ require('dotenv').config({
 const path = require("path");
 const singleApp = require(path.join(__dirname, "/application/single"));
 const clusterApp = require(path.join(__dirname, "/application/cluster"));
-const allowedOrigins = [
-    "https://cucuridu.web.app",
-    'https://cucuridu.onrender.com',
-    'https://arco2120-cucuridu.hf.space',
-    'https://cucuridu-gmgv.onrender.com'
-];
 const attempt = async (operation, fallback) => {
     try { return await operation();}
     catch (err) {return await fallback(err);}
@@ -22,8 +16,16 @@ const ENV = {
     ...envFiles,
     ...process.env
 };
+
+const allowedOrigins = [
+    "https://cucuridu.web.app",
+    'https://cucuridu.onrender.com',
+    'https://arco2120-cucuridu.hf.space',
+    'https://cucuridu-gmgv.onrender.com',
+    ENV.ON_PLATFORM !== "true" ? "http://localhost:" : null
+];
 const cluster = ENV.USE_CLUSTER === "true";
-const local = ENV.ON_PLATFORM !== "true" ? "http://localhost:" : false;
+const local = allowedOrigins[allowedOrigins.length - 1] ?? false;
 const port = !local ? 7860 : 0
 
 const initApp = async () => {
