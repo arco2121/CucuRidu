@@ -63,6 +63,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     displayPfp.addEventListener("click", () => {
        profile.dispatchEvent(hidePanel);
        pfpPanel.dispatchEvent(showPanel);
+       document.getElenentById("pfp_" + displayPfp.src.split(".")[0]).focus();
     });
 
     editUsername.addEventListener("click", () => {
