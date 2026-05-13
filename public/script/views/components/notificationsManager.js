@@ -1,6 +1,6 @@
 const notificationsKey = fromBackEnd["notificationsKey"];
-const settingsToCeck = JSON.parse(localStorage.getItem("cucuRiduSettings") || '{}');
-let clientId = settings["clientId"];
+const settingsToCheck = JSON.parse(localStorage.getItem("cucuRiduSettings") || '{}');
+let clientId = settingsToCheck["clientId"];
 if(!clientId)
     fetch("/ottieniClientId", {
         method: "POST",
@@ -8,7 +8,7 @@ if(!clientId)
     }).then(res => res.json()).then(json => {
         clientId = json["id"];
         localStorage.setItem("cucuRiduSettings", JSON.stringify({
-            ...settingsToCeck,
+            ...settingsToCheck,
             clientId: clientId
         }));
     }).catch(() => null);
