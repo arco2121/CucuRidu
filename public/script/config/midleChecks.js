@@ -21,7 +21,7 @@ const syncAll = async () => {
         .map(origin => {
             return new Promise((resolve) => {
                 const iframe = document.createElement("iframe");
-                iframe.src = `${origin}/bridge.html`;
+                iframe.src = origin;
                 iframe.style.display = "none";
                 document.body.appendChild(iframe);
 
@@ -34,10 +34,7 @@ const syncAll = async () => {
                 };
 
                 window.addEventListener("message", handleResponse);
-
-                iframe.onload = () => {
-                    iframe.contentWindow.postMessage({ action: "sync", value: data }, origin);
-                };
+                iframe.onload = () => iframe.contentWindow.postMessage({ action: "sync", value: data }, origin);
 
                 setTimeout(() => {
                     window.removeEventListener("message", handleResponse);
