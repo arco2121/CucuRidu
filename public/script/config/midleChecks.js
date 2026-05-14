@@ -21,7 +21,7 @@ const syncAll = async () => {
         .map(origin => {
             return new Promise((resolve) => {
                 const iframe = document.createElement("iframe");
-                iframe.src = origin;
+                iframe.src = origin + '/localStorageSync';
                 iframe.style.display = "none";
                 document.body.appendChild(iframe);
 
