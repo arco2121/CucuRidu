@@ -37,10 +37,9 @@ const syncAll = async () => {
                 iframe.onload = () => iframe.contentWindow.postMessage({ action: "sync", value: data }, origin);
 
                 setTimeout(() => {
-                    window.removeEventListener("message", handleResponse);
                     if (document.body.contains(iframe)) document.body.removeChild(iframe);
                     resolve();
-                }, 3000);
+                }, 7000);
             });
         });
 
@@ -54,6 +53,7 @@ window.addEventListener("message", (e) => {
     const merged = { ...local, ...e.data.value };
 
     localStorage.setItem("cucuRiduSettings", JSON.stringify(merged));
+    alert("Complete")
     e.source.postMessage({ action: "sync_complete" }, e.origin);
 });
 
