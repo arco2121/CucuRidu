@@ -14,7 +14,7 @@ const checkHost = async (hosts) => {
 };
 
 (async () => {
-    await syncAll();
+    //await syncAll();
     
     const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
     if (fromBackEnd["deleteToken"] === true) {
