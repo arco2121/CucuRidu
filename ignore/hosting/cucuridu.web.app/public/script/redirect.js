@@ -9,7 +9,6 @@
     var found = false;
 
     function checkHost(host) {
-        return handleFailure();
         var xhr = new XMLHttpRequest();
         xhr.open('GET', host + "/ping", true);
 
