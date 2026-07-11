@@ -1,9 +1,9 @@
 (function () {
     var path = window.location.pathname;
     var HOSTS = [
-        /*'https://cucuridu.onrender.com',*/
-        'https://cucuridu-gmgv.onrender.com'/*,
-        'https://arco2120-cucuridu.hf.space'*/
+        'https://cucuridu.onrender.com',
+        'https://cucuridu-gmgv.onrender.com',
+        'https://arco2120-cucuridu.hf.space'
     ];
     var completed = 0;
     var found = false;
