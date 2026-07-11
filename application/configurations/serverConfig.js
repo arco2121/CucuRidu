@@ -221,7 +221,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 const stanzaId = data["id"];
                 const carte = data["indexCarte"];
                 const Stanza =  await Stanze.get(stanzaId);
-                const result = Stanza.aggiungiRisposta(user.data.referenceGiocatore.id, ...carte);
+                const result = Stanza.aggiungiRisposta(user.data?.referenceGiocatore?.id, ...carte);
                 if(typeof result === "object") {
                     server.to(stanzaId).emit("sceltaVincitore", {
                         domanda: result[0],
