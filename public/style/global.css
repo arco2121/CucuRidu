@@ -170,15 +170,6 @@ body {
 /* ---------------------------------------------------
  >>> BACKGROUND PARALLAX
 --------------------------------------------------- */
-@keyframes floatingDots {
-    from {
-        background-position: 0 0;
-    }
-    to {
-        background-position: 50px 50px;
-    }
-}
-
 body::before {
     content: "";
     position: fixed;
@@ -592,33 +583,6 @@ input:active {
     }
 }
 
-@keyframes disappear {
-    from {
-        opacity: 1;
-    }
-    to {
-        opacity: 0;
-    }
-}
-
-@keyframes appear {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes bubbleBlur {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
 
 /* ---------------------------------------------------
  >>> COMPONENTS
@@ -634,61 +598,6 @@ input:active {
 /* ---------------------------------------------------
  >>> OPTIONS
 --------------------------------------------------- */
-
-@keyframes popup {
-    0% {
-        opacity: 0;
-        scale: 0.75;
-    }
-    70% {
-        opacity: 1;
-        scale: 1.01;
-    }
-    100% {
-        opacity: 1;
-        scale: 1;
-    }
-}
-
-@keyframes popdown {
-    0% {
-        opacity: 1;
-        scale: 1;
-    }
-    20% {
-        opacity: 0.2;
-        scale: 0.7;
-    }
-    45% {
-        opacity: 0.1;
-    }
-    100% {
-        opacity: 0;
-        scale: 0.5;
-    }
-}
-
-@keyframes appearup {
-    from {
-        opacity: 0;
-        scale: 0.7;
-    }
-    to {
-        opacity: 1;
-        scale: 1;
-    }
-}
-
-@keyframes appeardown {
-    from {
-        opacity: 1;
-        scale: 1;
-    }
-    to {
-        opacity: 0;
-        scale: 0.7;
-    }
-}
 
 .hidden_text {
     display: none;

@@ -25,6 +25,13 @@
     width: 100%;
 }
 
+@media (orientation: landscape) {
+    .create_con {
+        justify-content: center;
+        align-items: center;
+    }
+}
+
 .create_uploads_con {
     align-items: center;
     margin-top: 20px;

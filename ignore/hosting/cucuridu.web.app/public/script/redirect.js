@@ -43,7 +43,7 @@
     function handleFailure() {
         completed++;
         if (completed === HOSTS.length && !found) {
-            document.body.innerHTML = "<h1>Nessun server disponibile. Prova a ricaricare.</h1>";
+            document.body.innerHTML = "<h1 class='sour_gummy_bold'>Nessun server disponibile. Prova a ricaricare.</h1>";
         }
     }
 

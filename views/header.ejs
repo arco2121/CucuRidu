@@ -15,6 +15,7 @@
     <link rel="preload" href="/assets/fonts/Nunito-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="stylesheet" href="<%= styles %>/fonts.css">
 
+    <link rel="stylesheet" href="<%= styles %>/animations.css">
     <link rel="stylesheet" href="<%= styles %>/global.css">
     <link rel="stylesheet" href="<%= styles %>/<%= page %>.css">
 
@@ -25,11 +26,12 @@
 <body>
     <%- include("components/loadScreen") %>
 
+    <script src="<%= scripts %>/config/globalConfig.js"></script>
+    <!--script src="<%= scripts %>/config/syncCheck.js"></script-->
+    <script src="<%= scripts %>/config/midleChecks.js"></script>
     <script src="<%= scripts %>/config/translationConfig.js"></script>
     <script src="<%= scripts %>/config/registerWorker.js"></script>
-    <script src="<%= scripts %>/config/globalConfig.js"></script>
     <script src="<%= scripts %>/config/eventsConfig.js"></script>
-    <script src="<%= scripts %>/config/midleChecks.js"></script>
     <script src="<%= scripts %>/views/components/manageBack.js"></script>
 
     <%- include(page, params) %>

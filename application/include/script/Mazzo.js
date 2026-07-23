@@ -69,19 +69,16 @@ class Mazzo {
             }
             return value;
         });
-        let occorrenze = frasiCompletamentiPair.reduce((acc, m) => {
-            const val = m.frasi ? m.frasi.length : (m[0] ? m[0].length : 0);
-            return acc + val;
-        }, 0);
 
-        const first = frasiCompletamentiPair.some(mazzo => {
-            const c = mazzo.frasi || mazzo[0];
-            const f = mazzo.completamenti || mazzo[1];
-            return (f && f.length > 5) && ((33 + occorrenze * 3) >= c.length);
+        const first = frasiCompletamentiPair.some(m => {
+            const f = m.frasi || m[0] || [];
+            const c = m.completamenti || m[1] || [];
+            return c.length > 10 && c.length >= (f.length * 2);
         });
+
         const second = frasiCompletamentiPair.every(mazzo => {
             const { hash: hashOriginale, ...dati } = mazzo;
-            if (!hashOriginale) return true;
+            if (!hashOriginale) return false;
             const datiString = JSON.stringify(dati, Object.keys(dati).sort());
             const hashRicalcolato = crypto.createHash("sha256")
                 .update(datiString)
@@ -95,10 +92,16 @@ class Mazzo {
 
     static recuperaInCache(data = "") {
         if(!packsCache[data]) {
-            packsCache[data] = {
+            const mazzo = {
                 completamenti : JSON.parse(fs.readFileSync(path.join(__dirname, "../cards/" + data + "/completamenti.json"), "utf-8")),
                 frasi: JSON.parse(fs.readFileSync(path.join(__dirname, "../cards/" + data + "/frasi.json"), "utf-8"))
             };
+            const datiString = JSON.stringify(mazzo, Object.keys(mazzo).sort());
+            const hash = crypto.createHash('sha256')
+                .update(datiString)
+                .digest('hex');
+
+            packsCache[data] = { ...mazzo, hash };
         }
     }
 
