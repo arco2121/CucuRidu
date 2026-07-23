@@ -1,4 +1,4 @@
-const fs = require('node:fs');
+ const fs = require('node:fs');
 const { join } = require("node:path");
 
 const generateCards = () => {
