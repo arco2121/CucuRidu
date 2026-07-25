@@ -1,5 +1,7 @@
 let deactivateMenu = false;
 let aliver = null;
+const reloadBtn = document.getElementById("reloadBtn");
+
 const stayAlive = () => {
     try {
         if (!aliver)
@@ -31,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const menuBtn = document.getElementById("menuBtn");
     const chatBtn = document.getElementById('chatBtn');
     const codiceStanzaPause = document.getElementById("codiceStanzaPause");
-    const reloadBtn = document.getElementById("reloadBtn");
 
     leaveBtn.addEventListener("click", () => emit("lasciaStanza", {
         id: referenceStanza,
@@ -71,9 +72,9 @@ document.addEventListener("DOMContentLoaded", () => {
         game_section.dispatchEvent(hidePanel);
         chatMenu.dispatchEvent(showPanel);
     });
-
-    reloadBtn.addEventListener("click", () => window.location.reload());
 });
+
+reloadBtn.addEventListener("click", function () { window.location.reload() });
 
 document.addEventListener("click", stayAlive, { once: true });
 
