@@ -92,7 +92,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         if (exist === null) return next();
         if (!exist) return next(new Error("SESSION_EXPIRED"));
         //if (exist.online === true) return next(new Error("ALREADY_CONNECTED"));
-        exist.online = true;
+        try { await Stanze.setPresenza(userId, stanzaId, true, socket.id, Date.now()); }
+        catch { exist.online = true; }
         exist.assegnaSocket(socket.id);
         socket.join(stanzaId);
         await Stanze.set(stanzaId, stanza);
@@ -401,8 +402,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 if (stanza) {
                     const giocatore = stanza.trovaGiocatore(giocatoreId);
                     if (giocatore) {
-                        giocatore.online = false;
-                        await Stanze.set(stanzaId, stanza);
+                        try { await Stanze.setPresenza(giocatoreId, stanzaId, false, null, Date.now()); }
+                        catch { giocatore.online = false; await Stanze.set(stanzaId, stanza); }
                     }
                 }
                 setTimeout(async () => {

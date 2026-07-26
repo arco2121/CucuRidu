@@ -13,13 +13,26 @@ class ClusterStanze extends ClusterMap {
 
     async get(key) {
         const { data, error } = await this.supabase
-            .from(this.table)
-            .select(this.valueField)
-            .eq(this.keyField, key)
-            .maybeSingle();
-
+            .from(this.table).select(this.valueField).eq(this.keyField, key).maybeSingle();
         if (error || !data) return null;
-        return await Stanza.fromJSON(data[this.valueField]);
+
+        const stanza = await Stanza.fromJSON(data[this.valueField]);
+
+        const { data: presenze } = await this.supabase
+            .from('presenza').select('giocatore_id, online, socket_id').eq('stanza_id', key);
+        for (const p of presenze || []) {
+            const g = stanza.trovaGiocatore(p.giocatore_id);
+            if (g) { g.online = p.online; g.socketId = p.socket_id || ""; }
+        }
+        return stanza;
+    }
+
+    async setPresenza(giocatoreId, stanzaId, online, socketId, eventTime) {
+        const { error } = await this.supabase.rpc('set_presenza', {
+            p_giocatore_id: giocatoreId, p_stanza_id: stanzaId,
+            p_online: online, p_socket_id: socketId, p_event_time: eventTime
+        });
+        if (error) throw error;
     }
 
     async set(key, value) {
