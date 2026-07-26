@@ -52,6 +52,8 @@ class ClusterStanze extends ClusterMap {
     async checkOld() {
         const { error } = await this.supabase.rpc('delete_old_stanze');
         if (error) throw error;
+        const { error: presError } = await this.supabase.rpc('delete_old_presenza');
+        if (presError) throw presError;
     }
 
 

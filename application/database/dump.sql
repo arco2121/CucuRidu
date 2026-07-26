@@ -47,6 +47,43 @@ CREATE TABLE public.push_subscriptions (
 );
 CREATE INDEX IF NOT EXISTS idx_push_subs_client_id ON public.push_subscriptions(client_Id);
 
+DROP FUNCTION IF EXISTS jsonb_merge_deep(jsonb, jsonb) CASCADE;
+DROP FUNCTION IF EXISTS merge_pair_array(jsonb, jsonb) CASCADE;
+DROP FUNCTION IF EXISTS is_pair_array(jsonb) CASCADE;
+
+CREATE OR REPLACE FUNCTION is_pair_array(x jsonb) RETURNS boolean AS $$
+SELECT COALESCE(
+               (
+                   SELECT bool_and(jsonb_typeof(elem) = 'array' AND jsonb_array_length(elem) = 2)
+                   FROM jsonb_array_elements(x) elem
+               ), false
+       )
+    WHERE jsonb_typeof(x) = 'array' AND jsonb_array_length(x) > 0;
+$$ LANGUAGE sql IMMUTABLE;
+
+-- Stub: serve solo per soddisfare il binding di merge_pair_array in fase di CREATE.
+CREATE OR REPLACE FUNCTION jsonb_merge_deep(a jsonb, b jsonb) RETURNS jsonb AS $$
+SELECT b;
+$$ LANGUAGE sql IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION merge_pair_array(a jsonb, b jsonb) RETURNS jsonb AS $$
+SELECT jsonb_agg(jsonb_build_array(key, value) ORDER BY key)
+FROM (
+         SELECT COALESCE(ka.key, kb.key) AS key,
+               CASE
+                   WHEN ka.val IS NULL THEN kb.val
+                   WHEN kb.val IS NULL THEN ka.val
+                   WHEN jsonb_typeof(ka.val) = 'object' AND jsonb_typeof(kb.val) = 'object'
+                       THEN jsonb_merge_deep(ka.val, kb.val)
+                   ELSE kb.val
+               END AS value
+         FROM (SELECT elem->>0 AS key, elem->1 AS val FROM jsonb_array_elements(a) elem) ka
+             FULL OUTER JOIN (SELECT elem->>0 AS key, elem->1 AS val FROM jsonb_array_elements(b) elem) kb
+         ON ka.key = kb.key
+     ) merged;
+$$ LANGUAGE sql IMMUTABLE;
+
+-- Ora la sostituisco con il corpo vero: merge_pair_array esiste già, quindi il binding riesce.
 CREATE OR REPLACE FUNCTION jsonb_merge_deep(a jsonb, b jsonb)
 RETURNS jsonb AS $$
 SELECT CASE
@@ -58,6 +95,8 @@ SELECT CASE
                                   WHEN b_val IS NULL THEN a_val
                                   WHEN jsonb_typeof(a_val) = 'object' AND jsonb_typeof(b_val) = 'object'
                                       THEN jsonb_merge_deep(a_val, b_val)
+                                  WHEN is_pair_array(a_val) AND is_pair_array(b_val)
+                                      THEN merge_pair_array(a_val, b_val)
                                   ELSE b_val
                                   END
                       )
@@ -69,6 +108,7 @@ SELECT CASE
                             FULL OUTER JOIN jsonb_object_keys(b) kb(key) ON ka.key = kb.key
                     ) sub
            )
+           WHEN is_pair_array(a) AND is_pair_array(b) THEN merge_pair_array(a, b)
            ELSE b
            END;
 $$ LANGUAGE sql IMMUTABLE;
@@ -97,6 +137,16 @@ VALUES (target_id, new_json, id_of_machine, now())
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION delete_old_presenza()
+RETURNS void
+SECURITY DEFINER
+AS $$
+BEGIN
+DELETE FROM public.presenza
+WHERE updated_at < (now() - INTERVAL '2 hours');
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION delete_old_stanze()
 RETURNS void
 SECURITY DEFINER
@@ -122,3 +172,9 @@ VALUES (p_giocatore_id, p_stanza_id, p_online, p_socket_id, p_event_time, now())
         updated_at = now();
 END;
 $$ LANGUAGE plpgsql;
+
+ALTER TABLE public.presenza
+ADD CONSTRAINT presenza_stanza_id_fkey
+FOREIGN KEY (stanza_id)
+REFERENCES public.stanze("stanza_Id")
+ON DELETE CASCADE;
