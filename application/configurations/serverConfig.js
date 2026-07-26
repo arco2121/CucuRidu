@@ -92,9 +92,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         if (exist === null) return next();
         if (!exist) return next(new Error("SESSION_EXPIRED"));
         //if (exist.online === true) return next(new Error("ALREADY_CONNECTED"));
+        exist.assegnaSocket(socket.id);
         try { await Stanze.setPresenza(userId, stanzaId, true, socket.id, Date.now()); }
         catch { exist.online = true;   await Stanze.set(stanzaId, stanza); }
-        exist.assegnaSocket(socket.id);
         socket.join(stanzaId);
         socket.data.referenceGiocatore = exist;
         socket.data.referenceStanza = stanzaId;
