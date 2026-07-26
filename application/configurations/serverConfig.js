@@ -84,7 +84,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             validation,
             stanzaId,
             userId
-        } = serverSession.validate(checks, socket.handshake.auth, socket.handshake.auth?.token)
+        } = await serverSession.validate(checks, socket.handshake.auth, socket.handshake.auth?.token)
         if (validation !== TEMPORARY_TOKEN) return next(new Error("INVALID_KEY"));
         if (!stanzaId) return next();
         const stanza = await Stanze.get(stanzaId);
@@ -422,7 +422,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     } catch (innerError) {
                         console.error("Errore nel timeout disconnessione:", innerError);
                     }
-                }, timeout / 60);
+                }, (timeout / 60) * 3);
             } catch (e) {
                 console.error("Errore generale disconnect:", e);
             }

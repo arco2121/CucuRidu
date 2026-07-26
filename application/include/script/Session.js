@@ -67,13 +67,13 @@ class Session {
             await this.blackList.set(token, Date.now() + this.timeout);
     }
 
-    validate(keys, ...sources) {
+    async validate(keys, ...sources) {
         const result = {};
         const params = Array.isArray(keys) ? keys : Object.keys(keys);
         for (const source of sources) {
             let data = {};
             if (typeof source === "string") {
-                data = this.get(null, source);
+                data = await this.get(null, source);
             } else if (source && typeof source === "object") {
                 data = source.session?.storeData || source;
             }
