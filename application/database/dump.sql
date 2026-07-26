@@ -47,19 +47,15 @@ CREATE TABLE public.push_subscriptions (
 );
 CREATE INDEX IF NOT EXISTS idx_push_subs_client_id ON public.push_subscriptions(client_Id);
 
-DROP FUNCTION IF EXISTS jsonb_merge_deep(jsonb, jsonb) CASCADE;
-DROP FUNCTION IF EXISTS merge_pair_array(jsonb, jsonb) CASCADE;
-DROP FUNCTION IF EXISTS is_pair_array(jsonb) CASCADE;
-
 CREATE OR REPLACE FUNCTION update_stanza(target_id text, new_json jsonb, id_of_machine text)
 RETURNS void AS $$
 BEGIN
 INSERT INTO public.stanze ("stanza_Id", "stanza", "machine_id", "updated_at")
 VALUES (target_id, new_json, id_of_machine, now())
     ON CONFLICT ("stanza_Id")
-DO UPDATE SET
-    "stanza" = jsonb_merge_deep("stanze"."stanza", EXCLUDED."stanza"),
-           "updated_at" = now();
+    DO UPDATE SET
+    "stanza" = "stanze"."stanza" || EXCLUDED."stanza",
+               "updated_at" = now();
 END;
 $$ LANGUAGE plpgsql;
 
