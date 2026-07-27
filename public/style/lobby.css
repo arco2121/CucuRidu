@@ -152,6 +152,7 @@
 
 .wait_players_list_2 {
     height: unset;
+    min-height: 35vh;
 }
 
 .wait_players_list_hr {
