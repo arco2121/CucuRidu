@@ -84,7 +84,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             validation,
             stanzaId,
             userId
-        } = serverSession.validate(checks, socket.handshake.auth, socket.handshake.auth?.token)
+        } = await serverSession.validate(checks, socket.handshake.auth, socket.handshake.auth?.token)
         if (validation !== TEMPORARY_TOKEN) return next(new Error("INVALID_KEY"));
         if (!stanzaId) return next();
         const stanza = await Stanze.get(stanzaId);
@@ -92,10 +92,10 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         if (exist === null) return next();
         if (!exist) return next(new Error("SESSION_EXPIRED"));
         //if (exist.online === true) return next(new Error("ALREADY_CONNECTED"));
-        exist.online = true;
         exist.assegnaSocket(socket.id);
+        try { await Stanze.setPresenza(userId, stanzaId, true, socket.id, Date.now()); }
+        catch { exist.online = true;   await Stanze.set(stanzaId, stanza); }
         socket.join(stanzaId);
-        await Stanze.set(stanzaId, stanza);
         socket.data.referenceGiocatore = exist;
         socket.data.referenceStanza = stanzaId;
         next();
@@ -401,8 +401,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 if (stanza) {
                     const giocatore = stanza.trovaGiocatore(giocatoreId);
                     if (giocatore) {
-                        giocatore.online = false;
-                        await Stanze.set(stanzaId, stanza);
+                        try { await Stanze.setPresenza(giocatoreId, stanzaId, false, null, Date.now()); }
+                        catch { giocatore.online = false; await Stanze.set(stanzaId, stanza); }
                     }
                 }
                 setTimeout(async () => {
@@ -422,7 +422,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     } catch (innerError) {
                         console.error("Errore nel timeout disconnessione:", innerError);
                     }
-                }, timeout / 60);
+                }, (timeout / 60) * 3);
             } catch (e) {
                 console.error("Errore generale disconnect:", e);
             }

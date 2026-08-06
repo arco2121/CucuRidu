@@ -29,6 +29,15 @@ CREATE TABLE public.items (
     CONSTRAINT items_pkey PRIMARY KEY ("item_id")
 );
 
+CREATE TABLE IF NOT EXISTS public.presenza (
+   giocatore_id text PRIMARY KEY,
+   stanza_id text NOT NULL,
+   online boolean NOT NULL DEFAULT true,
+   socket_id text,
+   event_time bigint NOT NULL DEFAULT 0,
+   updated_at timestamptz NOT NULL DEFAULT now()
+);
+
 CREATE TABLE public.push_subscriptions (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
@@ -62,6 +71,16 @@ VALUES (target_id, new_json, id_of_machine, now())
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION delete_old_presenza()
+RETURNS void
+SECURITY DEFINER
+AS $$
+BEGIN
+DELETE FROM public.presenza
+WHERE updated_at < (now() - INTERVAL '2 hours');
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION delete_old_stanze()
 RETURNS void
 SECURITY DEFINER
@@ -71,3 +90,25 @@ DELETE FROM public.stanze
 WHERE updated_at < (now() - INTERVAL '1 hour');
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION set_presenza(
+    p_giocatore_id text, p_stanza_id text,
+    p_online boolean, p_socket_id text, p_event_time bigint
+)
+RETURNS void AS $$
+BEGIN
+INSERT INTO public.presenza (giocatore_id, stanza_id, online, socket_id, event_time, updated_at)
+VALUES (p_giocatore_id, p_stanza_id, p_online, p_socket_id, p_event_time, now())
+    ON CONFLICT (giocatore_id) DO UPDATE SET
+    online    = CASE WHEN p_event_time >= presenza.event_time THEN EXCLUDED.online    ELSE presenza.online END,
+                                      socket_id = CASE WHEN p_event_time >= presenza.event_time THEN EXCLUDED.socket_id ELSE presenza.socket_id END,
+        event_time = GREATEST(presenza.event_time, p_event_time),
+        updated_at = now();
+END;
+$$ LANGUAGE plpgsql;
+
+ALTER TABLE public.presenza
+ADD CONSTRAINT presenza_stanza_id_fkey
+FOREIGN KEY (stanza_id)
+REFERENCES public.stanze("stanza_Id")
+ON DELETE CASCADE;

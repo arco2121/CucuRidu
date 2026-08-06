@@ -147,10 +147,12 @@
     overflow-y: scroll;
     height: 20%;
     min-width: 100%;
+    max-height: 50%;
 }
 
 .wait_players_list_2 {
     height: unset;
+    min-height: 35vh;
 }
 
 .wait_players_list_hr {
@@ -636,5 +638,11 @@
     #qrcodeSharing {
         width: auto;
         height: 50vh;
+    }
+}
+
+@media (max-height: 700px) {
+    .game_main_con {
+        justify-content: flex-start;
     }
 }
