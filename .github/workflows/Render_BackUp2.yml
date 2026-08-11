@@ -1,0 +1,26 @@
+name: Deploy to Render Backup 2
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'ignore/hosting/**'
+      - 'LICENSE'
+      - '.github/**'
+      - '.git/**'
+      - 'README_HF.md'
+      - '.envXample'
+  workflow_dispatch:
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Trigger Render Deploy
+        run: |
+          curl -f "${{ secrets.RENDER_KEY_BACKUP2 }}&clear_cache=do"
