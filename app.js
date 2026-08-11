@@ -22,6 +22,7 @@ const allowedOrigins = [
     'https://cucuridu.onrender.com',
     'https://arco2120-cucuridu.hf.space',
     'https://cucuridu-gmgv.onrender.com',
+    'https://cucuridu-jean.onrender.com',
     ENV.ON_PLATFORM !== "true" ? "http://localhost:" : null
 ];
 const cluster = ENV.USE_CLUSTER === "true";
