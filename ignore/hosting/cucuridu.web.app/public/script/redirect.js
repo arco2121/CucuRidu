@@ -3,7 +3,8 @@
     var HOSTS = [
         'https://cucuridu.onrender.com',
         'https://cucuridu-gmgv.onrender.com',
-        'https://arco2120-cucuridu.hf.space'
+        'https://arco2120-cucuridu.hf.space',
+        'https://cucuridu-jean.onrender.com'
     ];
     var completed = 0;
     var found = false;
