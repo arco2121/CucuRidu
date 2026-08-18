@@ -55,13 +55,67 @@ cards.forEach(card => Array.from(bannedSymbols).forEach(letter =>
         document.getElementById("rispostaText_" + card.id).textContent.replaceAll(letter, "")
 ));
 
+// --- Invio con conferma ------------------------------------------------------
+// Prima l'invio era "spara e spera": se il pacchetto si perdeva durante una
+// riconnessione il giocatore restava fermo qui e per tutti gli altri risultava
+// come "non ha ancora risposto". Ora finche' il server non conferma (e quindi
+// finche' questo fragment non viene sostituito) l'invio viene ripetuto. Il
+// server tratta i reinvii come idempotenti, quindi ripetere non fa danni.
+const testoConferma = sendCardsBtn?.textContent;
+let ripetizioneInvio = null;
+
+const inviaCompletamenti = () => emit("inviaRisposta", {
+    id: referenceStanza,
+    indexCarte: givenAnswerIndices
+});
+
+const fermaRipetizione = () => {
+    if (ripetizioneInvio === null) return;
+    clearFragmentInterval(ripetizioneInvio, fromFragments["pageId"]);
+    ripetizioneInvio = null;
+};
+
 sendCardsBtn?.addEventListener("click", () => {
+    if (ripetizioneInvio !== null) return;
     if (givenAnswerIndices.some(v => v === null)) {
         alert("Finisci di selezionare le risposte, mongolo");
         return;
     }
-    emit("inviaRisposta", {
-        id: referenceStanza,
-        indexCarte: givenAnswerIndices
-    });
+
+    sendCardsBtn.disabled = true;
+    sendCardsBtn.textContent = "Invio...";
+    inviaCompletamenti();
+
+    let tentativi = 0;
+    ripetizioneInvio = fragmentInterval(() => {
+        tentativi++;
+        if (tentativi > 5) {
+            fermaRipetizione();
+            sendCardsBtn.disabled = false;
+            sendCardsBtn.textContent = testoConferma || "Conferma";
+            alert("Il server non risponde, riprova a confermare");
+            return;
+        }
+        inviaCompletamenti();
+    }, 3500, fromFragments["pageId"]);
 });
+
+// --- Vista di chi legge: chi ha gia inviato -----------------------------------
+const numeroCompletati = document.getElementById("numeroCompletati");
+const showCompletati = document.getElementById("showCompletati");
+
+if (numeroCompletati && showCompletati) {
+    off("aggiornamentoAttesaRisposta");
+    on("aggiornamentoAttesaRisposta", (data) => {
+        const { numeroGiocatori, totaleAttesi, giocatori } = data || {};
+        numeroCompletati.textContent = "Completati: " + (numeroGiocatori ?? 0)
+            + (typeof totaleAttesi === "number" ? " / " + totaleAttesi : "");
+        renderFragment(showCompletati, "components/giocatoreRow", {
+            giocatori: giocatori || [],
+            animation: false
+        });
+    });
+    emit("aggiornaAttesaRisposta", { stanzaId: referenceStanza });
+    fragmentInterval(() => emit("aggiornaAttesaRisposta", { stanzaId: referenceStanza }),
+        8000, fromFragments["pageId"]);
+}

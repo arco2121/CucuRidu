@@ -14,19 +14,34 @@ const socketController = (event = {}) => {
                 auth: event.params,
                 transports: ["websocket", "polling"],
                 reconnection: true,
-                reconnectionDelay: 50,
+                // 50 ms voleva dire martellare il server con decine di tentativi
+                // al secondo appena cadeva la linea: ora si riparte comunque
+                // subito ma con un backoff sensato e senza arrendersi mai
+                reconnectionDelay: 300,
+                reconnectionDelayMax: 4000,
+                randomizationFactor: 0.5,
+                reconnectionAttempts: Infinity,
+                timeout: 20000,
                 autoConnect: false
             });
 
             socket.on("connect", () => postMessage({ event: "connect", params: null }));
 
-            socket.on("disconnect", () => postMessage({ event: "disconnect", params: null }));
+            socket.on("disconnect", (motivo) => {
+                postMessage({ event: "disconnect", params: { motivo } });
+                // se e' stato il server a chiudere, socket.io NON riprova da solo:
+                // senza questo il giocatore restava fermo su "disconnesso" per sempre
+                if (motivo === "io server disconnect")
+                    setTimeout(() => { try { socket.connect(); } catch (e) {} }, 1000);
+            });
 
-            socket.on("reconnect", () => postMessage({ event: "reconnect", params: null }));
+            // in socket.io v4 questi eventi stanno sul manager, non sul socket:
+            // registrati sul socket non si attivavano mai
+            socket.io.on("reconnect", () => postMessage({ event: "reconnect", params: null }));
 
-            socket.on("reconnect_attempt", () => postMessage({ event: "reconnect_attempt", params: null }));
+            socket.io.on("reconnect_attempt", () => postMessage({ event: "reconnect_attempt", params: null }));
 
-            socket.on("reconnect_failed", () => postMessage({ event: "reconnect_failed", params: null }));
+            socket.io.on("reconnect_failed", () => postMessage({ event: "reconnect_failed", params: null }));
 
             socket.on("connect_error", (err) => postMessage({ event: "connect_error", params: err }));
 

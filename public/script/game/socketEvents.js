@@ -11,7 +11,15 @@ const initializeIO = () => {
         auth: parametri,
         transports: ["websocket", "polling"],
         reconnection: true,
-        reconnectionDelay: 50,
+        reconnectionDelay: 300,
+        reconnectionDelayMax: 4000,
+        randomizationFactor: 0.5,
+        reconnectionAttempts: Infinity,
+        timeout: 20000
+    });
+    socket.on("disconnect", (motivo) => {
+        if (motivo === "io server disconnect")
+            setTimeout(() => { try { socket.connect(); } catch (e) {} }, 1000);
     });
     Object.keys(receivers).forEach(event => {
         if (event === "any") socket.onAny((name, data) => receivers["any"].forEach(cb => cb(data)));
@@ -126,12 +134,22 @@ on("reconnect", () => document.dispatchEvent(stateConnected));
 on("reconnect_attempt", () => document.dispatchEvent(stateDisconnected));
 
 on("reconnect_failed", () => {
-    alert("Impossibile riconnettersi al server, STACCA STACCA!");
-    lasciaStanza();
+    // con i tentativi infiniti non dovrebbe piu succedere: se succede non
+    // buttiamo fuori nessuno, mostriamo solo lo stato disconnesso
+    document.dispatchEvent(stateDisconnected);
 });
 
+/**
+ * Solo due errori sono davvero definitivi: la sessione scaduta e la chiave
+ * sbagliata. Tutti gli altri sono problemi di rete temporanei e socket.io sta
+ * gia riprovando. Prima il ramo default faceva location.replace("/"), quindi
+ * un qualsiasi errore di trasporto passeggero (timeout, transport error,
+ * server temporaneamente giu) sbatteva il giocatore fuori dalla partita: era
+ * uno dei modi in cui la gente "si disconnetteva dal nulla".
+ */
 on("connect_error", (err) => {
-    switch(err.message) {
+    const messaggio = err?.message || String(err || "");
+    switch(messaggio) {
         case "SESSION_EXPIRED" : {
             alert("La tua sessione è scaduta o la stanza è stata chiusa. Come al solito in ritardo");
             return lasciaStanza();
@@ -144,16 +162,9 @@ on("connect_error", (err) => {
             window.location.replace("/error?alreadyConnected=true");
             break;
         }
-        case "xhr poll error" : {
-            document.dispatchEvent(stateDisconnected);
-            break;
-        }
-        case "websocket error" : {
-            document.dispatchEvent(stateDisconnected);
-            break;
-        }
         default: {
-            window.location.replace("/");
+            console.warn("connect_error =>", messaggio);
+            document.dispatchEvent(stateDisconnected);
         }
     }
 });

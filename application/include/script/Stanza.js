@@ -49,9 +49,19 @@ class Stanza {
     }
 
     async aggiungiGiocatore(username, pfp, memory) {
-        if(this.stato !== StatoStanza.WAIT)
-            return false;
         const giocatore = await new Giocatore(username, pfp).init(memory);
+        return this.aggiungiGiocatorePronto(giocatore);
+    }
+
+    /**
+     * Versione sincrona di aggiungiGiocatore, con il Giocatore gia costruito.
+     * Serve perche' le modifiche alla stanza devono poter essere rieseguite
+     * (vedi ClusterStanze.mutate) e quindi non possono contenere await.
+     */
+    aggiungiGiocatorePronto(giocatore) {
+        if(this.stato !== StatoStanza.WAIT) return false;
+        if(!giocatore?.id) return false;
+        if(this.giocatori.has(giocatore.id)) return this.giocatori.get(giocatore.id);
         let maxOccorrenze = 0;
         this.mazzoFrasi.mazzo.carte.map(carta => carta[1]).forEach(occorrenza => {
             if(!isNaN(parseInt(occorrenza))) maxOccorrenze += parseInt(occorrenza)
@@ -59,6 +69,22 @@ class Stanza {
         this.numeroRound = [this.numeroRound[0], Math.floor(maxOccorrenze / (this.giocatori.size + 1))];
         this.giocatori.set(giocatore.id, giocatore);
         return giocatore;
+    }
+
+    /**
+     * Rete di sicurezza contro le stanze bloccate: se tutti quelli che devono
+     * rispondere hanno risposto ma lo stato e' rimasto indietro (perche' nel
+     * frattempo qualcuno e' uscito o si e' persa una scrittura), avanza.
+     */
+    sincronizzaStato() {
+        if(this.stato !== StatoStanza.CHOOSING_CARDS) return false;
+        if(!(this.round?.risposte instanceof Map)) return false;
+        const attesi = this.giocatori.size - 1;
+        if(attesi > 0 && this.round.risposte.size >= attesi) {
+            this.stato = StatoStanza.CHOOSING_WINNER;
+            return true;
+        }
+        return false;
     }
 
     eliminaGiocatore(giocatoreId) {
@@ -69,23 +95,23 @@ class Stanza {
         this.giocatoriPassati.add(giocatore.id);
         this.giocatori.delete(giocatoreId);
         this.chat = {
-            messaggi: this.chat.messaggi.map(messaggio => {
+            messaggi: (this.chat?.messaggi ?? []).map(messaggio => {
                 if(messaggio["giocatoreId"] === giocatoreId) messaggio.eliminato = true;
                 return messaggio;
             }),
         };
 
-        if(giocatore === this.master) {
+        if(giocatore.id === this.master?.id) {
             this.master = this.giocatori.values().next().value;
             if (this.master) this.master.masterRole = true;
         }
-        if(giocatore.id === this.round.chiStaInterrogando) {
+        if(giocatore.id === this.round?.chiStaInterrogando) {
             this.round.chiStaInterrogando = this.giocatori.values().next()?.value?.id;
             const nuovoInterrogante = this.trovaGiocatore(this.round.chiStaInterrogando);
             if (nuovoInterrogante) nuovoInterrogante.interrogationRole = true;
         }
 
-        if (this.round.risposte?.has(giocatoreId)) {
+        if (this.round?.risposte?.has(giocatoreId)) {
             const carteGiocate = this.round.risposte.get(giocatoreId);
             this.mazzoCompletamenti.mazzo.aggiungiCarte(...carteGiocate);
             this.round.risposte.delete(giocatoreId);
@@ -94,13 +120,15 @@ class Stanza {
         if(this.giocatori.size < this.minimoGiocatori) {
             this.stato = StatoStanza.WAIT;
             this.numeroRound[0] = Math.max(0, this.numeroRound[0] - 1);
-            Array.from(this.round.risposte?.entries() || []).forEach(([key, value]) => {
+            Array.from(this.round?.risposte?.entries() || []).forEach(([key, value]) => {
                 this.trovaGiocatore(key)?.aggiungiMano(...value);
             });
-            this.round.risposte?.clear();
+            this.round?.risposte?.clear();
         }
         else if (this.stato === StatoStanza.CHOOSING_CARDS) {
-            if (this.round.risposte.size === (this.giocatori.size - 1)) {
+            // >= e non ===: se lo stato e' rimasto indietro non deve restare bloccato
+            if ((this.round?.risposte?.size ?? 0) >= (this.giocatori.size - 1)
+                && this.giocatori.size > 1) {
                 this.stato = StatoStanza.CHOOSING_WINNER;
             }
         }
@@ -126,8 +154,9 @@ class Stanza {
         return null;
     }
 
-    terminaPartita(idGiocatore) {
-        if(this.stato !== StatoStanza.END && this.trovaGiocatore(idGiocatore) === this.master) {
+    terminaPartita(idGiocatore, forzato = false) {
+        if(this.stato !== StatoStanza.END
+            && (forzato || (!!this.master && this.trovaGiocatore(idGiocatore)?.id === this.master.id))) {
             this.stato = StatoStanza.END;
             const classifica = this.classifica();
             this.giocatori.clear();
@@ -160,8 +189,11 @@ class Stanza {
                 chiStaInterrogando: this.master.id
             }
         }
+        // fine partita per numero di round esaurito: va forzata, qui non e' il
+        // master a chiedere ma il sistema (prima tornava sempre false e la
+        // partita restava appesa)
         if(this.numeroRound[0] === this.numeroRound[1])
-            return this.terminaPartita();
+            return this.terminaPartita(null, true);
         this.controllaMazzi(this.round.domanda[1]);
         for (const giocatore of this.giocatori.values())
             if(giocatore.mazzo.carte.length === 0) giocatore.aggiungiMano(...this.mazzoCompletamenti.mazzo.prendiCarte(11));
@@ -173,12 +205,15 @@ class Stanza {
     }
 
     aggiungiRisposta(giocatoreId, ...indexCarte) {
+        if(!(this.round?.risposte instanceof Map)) return false;
+        if(giocatoreId === this.round.chiStaInterrogando) return false;
         if(this.stato === StatoStanza.CHOOSING_CARDS && this.giocatori.has(giocatoreId)
             && !this.round.risposte.has(giocatoreId)) {
             const giocatore = this.trovaGiocatore(giocatoreId);
             const carte = giocatore.prendiMano(...indexCarte);
+            if(!carte || carte.length === 0) return false;
             this.round.risposte.set(giocatoreId, carte);
-            if(this.round.risposte.size === (this.giocatori.size - 1)) {
+            if(this.round.risposte.size >= (this.giocatori.size - 1)) {
                 this.stato = StatoStanza.CHOOSING_WINNER;
                 return [
                     this.round.domanda,
@@ -192,8 +227,9 @@ class Stanza {
     }
 
     scegliVincitore(chiStaChiedendo, idGiocatore) {
+        if(!(this.round?.risposte instanceof Map)) return false;
         if(this.stato !== StatoStanza.CHOOSING_WINNER ||
-            this.round.risposte.size !== (this.giocatori.size - 1) || !chiStaChiedendo ||
+            this.round.risposte.size < (this.giocatori.size - 1) || !chiStaChiedendo ||
             chiStaChiedendo !== this.round.chiStaInterrogando || !this.round.risposte.has(idGiocatore)) return false;
 
         const risposte = this.round.risposte.get(idGiocatore);
@@ -267,6 +303,7 @@ class Stanza {
     scriviInChat(messaggio, giocatoreId) {
         const giocatore = this.trovaGiocatore(giocatoreId);
         if(!giocatore) return false;
+        if(!this.chat?.messaggi) this.chat = { messaggi: [] };
         this.chat.messaggi.push({
             pfp: giocatore?.pfp,
             username: giocatore?.username,
@@ -348,7 +385,7 @@ class Stanza {
             chiStaInterrogando: data.round.chiStaInterrogando,
             risposte: data.round.risposte ? new Map(data.round.risposte) : new Map()
         };
-        s.chat = data.chat;
+        s.chat = data.chat?.messaggi ? data.chat : { messaggi: [] };
 
         return s;
     }

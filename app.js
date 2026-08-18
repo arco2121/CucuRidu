@@ -29,6 +29,15 @@ const cluster = ENV.USE_CLUSTER === "true";
 const local = allowedOrigins[allowedOrigins.length - 1] ?? false;
 const port = !local ? 7860 : 0
 
+// Rete di sicurezza: un errore non gestito dentro un handler asincrono non
+// deve piu poter chiudere il processo e buttare fuori tutta la partita.
+process.on('unhandledRejection', (motivo) => {
+    console.error("Promise non gestita =>", motivo?.message || motivo);
+});
+process.on('uncaughtException', (err) => {
+    console.error("Eccezione non gestita =>", err?.message || err);
+});
+
 const initApp = async () => {
     if (!cluster) return await singleApp(local, port, allowedOrigins, ENV);
     await attempt(

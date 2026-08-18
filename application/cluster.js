@@ -41,7 +41,11 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
     const serverSession = new Session(timeout, env.JWTKEY || await generateId(64, generationMemory), sessionsMap, pool);
 
     const Stanze = new ClusterStanze(database, machineId);
-    const TEMPORARY_TOKEN = await generateId(64, generationMemory);
+    // Senza JWTKEY ogni istanza ha un token diverso: un giocatore spostato da
+    // un host all'altro (o rimasto in piedi durante un riavvio) si ritrova con
+    // INVALID_KEY e viene cacciato. Con piu deploy attivi e' obbligatoria.
+    const TEMPORARY_TOKEN = env.JWTKEY || await generateId(64, generationMemory);
+    if (!env.JWTKEY) console.warn("ATTENZIONE: JWTKEY non impostata. Con piu istanze o dopo un riavvio i giocatori verranno disconnessi.");
 
     const server = new Server(httpServer, {
         cors: {
@@ -49,16 +53,15 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
             origin: allowedOrigins,
             credentials: true,
         },
-        pingInterval: 15000,
-        pingTimeout: 10000,
-        /*connectionStateRecovery: {
-            maxDisconnectionDuration: timeout/120,
-            skipMiddlewares: true,
-        }*/
+        // valori piu tolleranti: con pingTimeout a 10s bastava un buco di rete
+        // di pochi secondi su 4G per far dichiarare morto un client vivissimo
+        pingInterval: 20000,
+        pingTimeout: 30000,
+        maxHttpBufferSize: 5e6
     });
     server.adapter(createAdapter(adapter));
 
-    appConfig(app, serverSession, env.JWTKEY || TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout, {
+    appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout, {
         notifications: true,
         notificationsKey: env.NOTIFICATION_PUBLIC,
         version: env.npm_package_version,
@@ -66,7 +69,7 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
     });
     notificationsConfig(app, database, generationMemory, env, timeout);
 
-    serverConfig(server, serverSession, env.JWTKEY || TEMPORARY_TOKEN, Stanze, generationMemory, timeout);
+    serverConfig(server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout);
     cleanUpStanze(Stanze, timeout);
 
     const listening = httpServer.listen(port, (error) => {

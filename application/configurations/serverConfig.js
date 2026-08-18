@@ -1,5 +1,7 @@
 const path = require("path");
 const { Stanza, StatoStanza } = require(path.join(__dirname, "../include/script/Stanza"));
+const { Giocatore } = require(path.join(__dirname, "../include/script/Giocatore"));
+const { NESSUNA_MODIFICA } = require(path.join(__dirname, "../include/script/concorrenza"));
 
 /**
  * Configura gli endpoint del ServerIO
@@ -12,58 +14,142 @@ const { Stanza, StatoStanza } = require(path.join(__dirname, "../include/script/
  */
 const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout = 3600000) => {
 
+    // quanto aspettiamo prima di togliere davvero dalla stanza chi si e' disconnesso
+    const GRAZIA_DISCONNESSIONE = Math.min(Math.max((timeout / 60) * 3, 60000), 300000);
+
+    /**
+     * Nessun handler socket deve poter far cadere il processo: prima di questa
+     * modifica una singola eccezione dentro un handler async diventava una
+     * unhandledRejection e Node chiudeva tutto, buttando fuori l'intera partita.
+     */
+    const sicuro = (nome, handler) => async (...args) => {
+        try { await handler(...args); }
+        catch (e) { console.error(`[socket:${nome}]`, e?.message || e); }
+    };
+
+    const giocatoreDi = (socket, stanza) => {
+        const id = socket.data?.giocatoreId || socket.data?.referenceGiocatore?.id;
+        if (!id) return null;
+        return stanza?.trovaGiocatore(id) || null;
+    };
+
+    /** Riallinea la copia del giocatore appesa al socket con lo stato vero della stanza. */
+    const aggiornaReference = (stanza, sockets) => {
+        for (const socket of sockets) {
+            const giocatore = giocatoreDi(socket, stanza);
+            if (giocatore) socket.data.referenceGiocatore = giocatore;
+        }
+    };
+
+    /**
+     * Il giocatore ha ancora un socket vivo nella stanza (magari su un'altra
+     * istanza del cluster)? Se si', il disconnect che stiamo gestendo riguarda
+     * una connessione vecchia e va ignorato.
+     */
+    const haAncoraUnSocket = async (stanzaId, giocatoreId, escluso) => {
+        try {
+            const sockets = await server.in(stanzaId).fetchSockets();
+            return sockets.some(s => s.id !== escluso && s.data?.giocatoreId === giocatoreId);
+        } catch { return false; }
+    };
+
+    const inviaListe = (stanza) => {
+        if (!stanza?.id) return;
+        const classifica = stanza.classifica().map(giocatore => giocatore.toJSON());
+        server.to(stanza.id).emit("aggiornamentoAttesa", {
+            numeroGiocatori: stanza.giocatori.size,
+            minimoGiocatori: stanza.minimoGiocatori,
+            giocatori: classifica
+        });
+        server.to(stanza.id).emit("listaGiocatoriAggiornamento", { giocatori: classifica });
+    };
+
+    /** Chi ha gia inviato i completamenti: lo vede tutta la stanza, lettore compreso. */
+    const inviaAttesaRisposte = (stanza) => {
+        if (!stanza?.id || !stanza.round) return;
+        const risposte = stanza.round.risposte instanceof Map ? stanza.round.risposte : new Map();
+        server.to(stanza.id).emit("aggiornamentoAttesaRisposta", {
+            numeroGiocatori: risposte.size,
+            totaleAttesi: Math.max(0, stanza.giocatori.size - 1),
+            giocatori: Array.from(risposte.keys())
+                .map(id => stanza.trovaGiocatore(id)?.toJSON())
+                .filter(Boolean)
+        });
+    };
+
     const emitStatoStanza = async (stanzaId, ...sockets) => {
-        const Stanza = typeof stanzaId === "string" ? await Stanze.get(stanzaId) : stanzaId;
-        if (!Stanza) return;
-
-        await Promise.all(sockets.map(socket => {
-            switch (Stanza.stato) {
-                case StatoStanza.WAIT : {
-                    socket.emit("confermaStanza", {
-                        reference: socket.data?.referenceGiocatore?.toJSON(),
-                        stanzaId: Stanza.id,
-                        primoRound: Stanza.numeroRound[0] === 0,
-                        interroghi: Stanza.round.chiStaInterrogando === socket.data.referenceGiocatore.id
-                    });
-                    break;
-                }
-                case StatoStanza.END : {
-                    socket.emit("stanzaChiusa");
-                    socket.data.referenceGiocatore = null;
-                    socket.leave(stanzaId);
-                    break;
-                }
-                case StatoStanza.CHOOSING_CARDS : {
-                    if(Stanza.round.risposte.has(socket.data?.referenceGiocatore.id))
-                        socket.emit("rispostaRegistrata", {
-                            stanzaId: Stanza.id
-                        });
-                    else
-                        socket.emit("roundIniziato", {
-                            chiStaInterrogando: Stanza.trovaGiocatore(Stanza.round.chiStaInterrogando).toJSON(),
-                            domanda: Stanza.round.domanda,
-                            reference: socket.data?.referenceGiocatore?.toJSON(),
-                            stanza: Stanza.id
-                        });
-                    break;
-                }
-                case StatoStanza.CHOOSING_WINNER : {
-                    socket.emit("sceltaVincitore", {
-                        risposte: Array.from(Stanza.round.risposte.entries()),
-                        domanda: Stanza.round.domanda,
-                        chiInterroga: Stanza.trovaGiocatore(Stanza.round.chiStaInterrogando).toJSON(),
-                        reference: socket.data?.referenceGiocatore?.toJSON(),
-                        stanza: Stanza.id
-                    });
-                    break;
-                }
+        const stanza = typeof stanzaId === "string" ? await Stanze.get(stanzaId) : stanzaId;
+        if (!stanza) {
+            for (const socket of sockets) {
+                try { socket.emit("stanzaChiusa"); } catch { /* ignora */ }
             }
+            return;
+        }
 
-            server.to(Stanza.id).emit("segnaleAudio", {
-                socketId: socket.id,
-                playerId: socket.data.referenceGiocatore?.id
-            });
-        }));
+        for (const socket of sockets) {
+            try {
+                const giocatore = giocatoreDi(socket, stanza);
+                if (giocatore) socket.data.referenceGiocatore = giocatore;
+
+                switch (stanza.stato) {
+                    case StatoStanza.WAIT: {
+                        socket.emit("confermaStanza", {
+                            reference: giocatore?.toJSON() ?? null,
+                            stanzaId: stanza.id,
+                            primoRound: stanza.numeroRound[0] === 0,
+                            interroghi: !!giocatore && stanza.round?.chiStaInterrogando === giocatore.id
+                        });
+                        break;
+                    }
+                    case StatoStanza.END: {
+                        socket.emit("stanzaChiusa");
+                        socket.data.referenceGiocatore = null;
+                        socket.leave(stanza.id);
+                        break;
+                    }
+                    case StatoStanza.CHOOSING_CARDS: {
+                        if (!giocatore) { socket.emit("stanzaChiusa"); break; }
+                        if (stanza.round?.risposte?.has(giocatore.id))
+                            socket.emit("rispostaRegistrata", { stanzaId: stanza.id });
+                        else
+                            socket.emit("roundIniziato", {
+                                chiStaInterrogando: stanza.trovaGiocatore(stanza.round.chiStaInterrogando)?.toJSON() ?? null,
+                                domanda: stanza.round.domanda,
+                                reference: giocatore.toJSON(),
+                                stanza: stanza.id
+                            });
+                        break;
+                    }
+                    case StatoStanza.CHOOSING_WINNER: {
+                        socket.emit("sceltaVincitore", {
+                            risposte: Array.from(stanza.round?.risposte?.entries() ?? []),
+                            domanda: stanza.round?.domanda ?? null,
+                            chiInterroga: stanza.trovaGiocatore(stanza.round?.chiStaInterrogando)?.toJSON() ?? null,
+                            reference: giocatore?.toJSON() ?? null,
+                            stanza: stanza.id
+                        });
+                        break;
+                    }
+                }
+
+                server.to(stanza.id).emit("segnaleAudio", {
+                    socketId: socket.id,
+                    playerId: giocatore?.id ?? null
+                });
+            } catch (e) {
+                console.error("[emitStatoStanza]", e?.message || e);
+            }
+        }
+    };
+
+    const chiudiStanza = async (stanza) => {
+        if (!stanza) return;
+        for (const id of stanza.giocatoriPassati.values()) {
+            try { await generationMemory.delete(id); } catch { /* ignora */ }
+        }
+        try { await Stanze.delete(stanza.id); } catch { /* ignora */ }
+        try { await generationMemory.delete(stanza.id); } catch { /* ignora */ }
+        server.socketsLeave(stanza.id);
     };
 
     const cleanUp = async () => {
@@ -73,277 +159,354 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 server.socketsLeave(id);
                 console.log("Stanza eliminata => " + id);
             }, generationMemory, Stanze);
-        } catch (err) { console.error(err); } finally {
-            setTimeout(cleanUp, timeout/30/60);
+        } catch (err) { console.error(err?.message || err); } finally {
+            // era timeout/30/60, cioe' ogni 2 secondi: su Supabase voleva dire
+            // scansionare tutta la tabella stanze 30 volte al minuto da ogni
+            // istanza, rallentando tutte le altre query del gioco
+            const t = setTimeout(cleanUp, Math.max(timeout / 30, 60000));
+            if (t.unref) t.unref();
         }
     };
 
     server.use(async (socket, next) => {
-        const checks = ["validation", "stanzaId", "userId"];
-        const {
-            validation,
-            stanzaId,
-            userId
-        } = await serverSession.validate(checks, socket.handshake.auth, socket.handshake.auth?.token)
-        if (validation !== TEMPORARY_TOKEN) return next(new Error("INVALID_KEY"));
-        if (!stanzaId) return next();
-        const stanza = await Stanze.get(stanzaId);
-        const exist = stanza?.trovaGiocatoreAnchePassato(userId);
-        if (exist === null) return next();
-        if (!exist) return next(new Error("SESSION_EXPIRED"));
-        //if (exist.online === true) return next(new Error("ALREADY_CONNECTED"));
-        exist.assegnaSocket(socket.id);
-        try { await Stanze.setPresenza(userId, stanzaId, true, socket.id, Date.now()); }
-        catch { exist.online = true;   await Stanze.set(stanzaId, stanza); }
-        socket.join(stanzaId);
-        socket.data.referenceGiocatore = exist;
-        socket.data.referenceStanza = stanzaId;
-        next();
+        try {
+            const checks = ["validation", "stanzaId", "userId"];
+            const { validation, stanzaId, userId } = await serverSession.validate(
+                checks, socket.handshake.auth, socket.handshake.auth?.token
+            );
+            if (validation !== TEMPORARY_TOKEN) return next(new Error("INVALID_KEY"));
+            if (!stanzaId) return next();
+
+            const stanza = await Stanze.get(stanzaId);
+            const exist = stanza?.trovaGiocatoreAnchePassato(userId);
+            if (exist === null) return next();          // stanza c'e', il giocatore deve ancora entrare
+            if (!exist) return next(new Error("SESSION_EXPIRED"));
+
+            exist.assegnaSocket(socket.id);
+            try { await Stanze.setPresenza(userId, stanzaId, true, socket.id, Date.now(), null); }
+            catch { exist.online = true; try { await Stanze.set(stanzaId, stanza); } catch { /* ignora */ } }
+            socket.join(stanzaId);
+            socket.data.giocatoreId = exist.id;
+            socket.data.referenceGiocatore = exist;
+            socket.data.referenceStanza = stanzaId;
+            next();
+        } catch (e) {
+            console.error("[middleware]", e?.message || e);
+            next(new Error("SESSION_EXPIRED"));
+        }
     });
 
     server.on("connection", (user) => {
-        if(user.data?.referenceStanza) user.join(user.data?.referenceStanza);
-        (async () => await emitStatoStanza(user.data.referenceStanza, user))();
-
-        user.on("creaStanza", async (data) => {
+        if (user.data?.referenceStanza) user.join(user.data.referenceStanza);
+        (async () => {
             try {
-                const { username, pfp } = data;
+                if (!user.data?.referenceStanza) return;
+                const stanza = await Stanze.get(user.data.referenceStanza);
+                if (!stanza) return user.emit("stanzaChiusa");
+                await emitStatoStanza(stanza, user);
+                inviaListe(stanza);
+                inviaAttesaRisposte(stanza);
+            } catch (e) { console.error("[connection]", e?.message || e); }
+        })();
+
+        user.on("creaStanza", sicuro("creaStanza", async (data) => {
+            try {
+                const { username, pfp } = data || {};
                 const stanza = await new Stanza().init(username, pfp, generationMemory);
                 await Stanze.set(stanza.id, stanza);
                 user.join(stanza.id);
                 user.data.referenceGiocatore = stanza.master;
+                user.data.giocatoreId = stanza.master.id;
                 user.data.referenceStanza = stanza.id;
+                try { await Stanze.setPresenza(stanza.master.id, stanza.id, true, user.id, Date.now(), null); }
+                catch { /* in RAM basta l'oggetto */ }
                 user.emit("confermaStanza", {
                     stanzaId: stanza.id,
-                    reference: user.data.referenceGiocatore.toJSON(),
+                    reference: stanza.master.toJSON(),
                     primoRound: stanza.numeroRound[0] === 0,
-                    interroghi: stanza.round.chiStaInterrogando === user.data.referenceGiocatore.id
+                    interroghi: stanza.round.chiStaInterrogando === stanza.master.id
                 });
-                server.to(stanza.id).emit("aggiornamentoAttesa", {
-                    numeroGiocatori: stanza.giocatori.size,
-                    minimoGiocatori: stanza.minimoGiocatori,
-                    giocatori: stanza.classifica().map(giocatore => giocatore.toJSON())
-                });
-                server.to(stanza.id).emit("listaGiocatoriAggiornamento", {
-                    giocatori: stanza.classifica().map(giocatore => giocatore.toJSON())
-                });
+                inviaListe(stanza);
                 server.to(stanza.id).emit("segnaleAudio", {
                     socketId: user.id,
-                    playerId: user.data.referenceGiocatore.id
+                    playerId: stanza.master.id
                 });
                 console.log("Stanza creata => " + stanza.id);
-            } catch(e) {
-                console.log(e)
+            } catch (e) {
+                console.log(e);
                 user.emit("errore", {
                     message: "Impossibile creare la stanza, non va niente porcaccio al catamarano ubriaco"
                 });
             }
-        });
+        }));
 
-        user.on("partecipaStanza", async (data) => {
-            try {
-                const stanzaId = data["id"];
-                const Stanza = await Stanze.get(stanzaId);
-                user.data.referenceGiocatore = await Stanza.aggiungiGiocatore(data["username"], data["pfp"], generationMemory);
-                if(user.data.referenceGiocatore === false) {
-                    user.emit("impossibileAggiungersi", {
-                        message: "Impossibile aggiungersi alla stanza, le regole giustamente non ammettono schifi umani"
-                    });
-                    return;
+        user.on("partecipaStanza", sicuro("partecipaStanza", async (data) => {
+            const stanzaId = data?.["id"];
+            if (!stanzaId) return;
+
+            // l'id del giocatore va generato PRIMA della mutate: il mutatore
+            // deve restare sincrono per poter essere rieseguito in caso di conflitto
+            const nuovo = await new Giocatore(data["username"], data["pfp"]).init(generationMemory);
+
+            let rifiutato = false;
+            const esito = await Stanze.mutate(stanzaId, (stanza) => {
+                rifiutato = false;
+                if (!stanza.aggiungiGiocatorePronto(nuovo)) {
+                    rifiutato = true;
+                    return NESSUNA_MODIFICA;
                 }
-                user.data.referenceStanza = stanzaId;
-                user.join(stanzaId);
-                user.emit("confermaStanza", {
-                    reference: user.data.referenceGiocatore.toJSON(),
-                    interroghi: Stanza.round.chiStaInterrogando === user.data.referenceGiocatore.id,
-                    primoRound: Stanza.numeroRound[0] === 0
-                });
-                server.to(stanzaId).emit("aggiornamentoAttesa", {
-                    numeroGiocatori: Stanza.giocatori.size,
-                    minimoGiocatori: Stanza.minimoGiocatori,
-                    giocatori: Stanza.classifica().map(giocatore => giocatore.toJSON())
-                });
-                server.to(stanzaId).emit("listaGiocatoriAggiornamento", {
-                    giocatori: Stanza.classifica().map(giocatore => giocatore.toJSON())
-                });
-                server.to(stanzaId).emit("segnaleAudio", {
-                    socketId: user.id,
-                    playerId: user.data.referenceGiocatore.id
-                });
-                await Stanze.set(stanzaId, Stanza);
-                console.log("Giocatore aggiunto a Stanza => " + stanzaId);
-            } catch (e) {
-                console.log(e)
-            }
-        });
-
-        user.on("iniziaTurno", async (data) => {
-            try {
-                const stanzaId = data["id"];
-                const Stanza = await Stanze.get(stanzaId);
-                const result = Stanza.iniziaTurno(user.data.referenceGiocatore?.id);
-                if(typeof result === "object") {
-                    server.to(stanzaId).emit("partitaTerminata", {
-                        classifica: result.map(giocatore => giocatore.toJSON())
-                    });
-                    for(const id of Stanza.giocatoriPassati.values()) await generationMemory.delete(id);
-                    await Stanze.delete(stanzaId);
-                    await generationMemory.delete(stanzaId);
-                    server.socketsLeave(stanzaId);
-                    console.log("Stanza " + stanzaId + " chiusa");
-                }
-                else if(result) {
-                    const sockets = await server.in(stanzaId).fetchSockets();
-                    const round = Stanza.round;
-                    for (const socket of sockets) {
-                        if(!socket.data.referenceGiocatore?.id) continue;
-                        socket.data.referenceGiocatore = Stanza.trovaGiocatore(socket.data.referenceGiocatore?.id);
-                        socket.emit("roundIniziato", {
-                            chiStaInterrogando: Stanza.trovaGiocatore(round.chiStaInterrogando).toJSON(),
-                            domanda: round.domanda,
-                            reference: socket.data.referenceGiocatore.toJSON()
-                        });
-                    }
-                }
-                else
-                    user.emit("aspettaAltri", {
-                        message: "Girl non ci sono chatbot ai che fingano di esserti amico. Go touch some grass e non fare come Calipso"
-                    });
-
-                await Stanze.set(stanzaId, Stanza);
-            } catch (e) {
-                console.log(e)
-            }
-        });
-
-        user.on("inviaRisposta", async (data) => {
-            try {
-                const stanzaId = data["id"];
-                const carte = data["indexCarte"];
-                const Stanza =  await Stanze.get(stanzaId);
-                const result = Stanza.aggiungiRisposta(user.data?.referenceGiocatore?.id, ...carte);
-                if(typeof result === "object") {
-                    server.to(stanzaId).emit("sceltaVincitore", {
-                        domanda: result[0],
-                        risposte: result[1],
-                        chiInterroga: Stanza.trovaGiocatore(result[2]).toJSON(),
-                    });
-                } else if(result)
-                    user.emit("rispostaRegistrata");
-                else {
-                    user.emit("giaRegistrata", {
-                        message: "Non puoi rispondere 2 volte giuseppino coltivatore di carote in un campo di reclusione ucraino"
-                    });
-                }
-                await Stanze.set(stanzaId, Stanza);
-            } catch (e) {
-                console.log(e)
-            }
-        });
-
-        user.on("scegliVincitore", async (data) => {
-            try {
-                const stanzaId = data["id"];
-                const vincitore = data["vincitore"];
-                const Stanza = await Stanze.get(stanzaId);
-                const result = Stanza.scegliVincitore(user.data.referenceGiocatore?.id, vincitore);
-                if(result) {
-                    const sockets = await server.in(stanzaId).fetchSockets();
-                    for (const socket of sockets) {
-                        if(!socket.data.referenceGiocatore?.id) continue;
-                        socket.data.referenceGiocatore = Stanza.trovaGiocatore(socket.data.referenceGiocatore.id);
-                        socket.emit("fineTurno", {
-                            vincitore: result[0],
-                            domanda: result[1],
-                            risposte: result[2],
-                            reference: socket.data.referenceGiocatore.toJSON()
-                        });
-                    }
-                } else {
-                    user.emit("errore", {
-                        message: "Aspetta e spera che tutti quanti rispondano, selezionane un'altro (tanto ti ghostano perchè gli stai sul cabbo)"
-                    });
-                }
-                await Stanze.set(stanzaId, Stanza);
-            } catch (e) {
-                console.log(e)
-            }
-        });
-
-        user.on("terminaPartita", async (data) => {
-            try {
-                const stanzaId = data["id"];
-                const Stanza = await Stanze.get(stanzaId);
-                const result = Stanza.terminaPartita(user.data.referenceGiocatore.id);
-                if(result) {
-                    server.to(stanzaId).emit("partitaTerminata", {
-                        classifica: result.map(giocatore => giocatore.toJSON())
-                    });
-                    for(const id of Stanza.giocatoriPassati.values()) await generationMemory.delete(id);
-                    await Stanze.delete(stanzaId);
-                    await generationMemory.delete(stanzaId);
-                    server.socketsLeave(stanzaId);
-                    console.log("Stanza eliminata => " + stanzaId);
-                }
-            } catch (e) {
-                console.log(e)
-            }
-        });
-
-        user.on("aggiornaAttesa", async (data) => {
-            const Stanza = await Stanze.get(data["stanzaId"] || user.data?.referenceStanza);
-
-            server.to(data["stanzaId"] || user.data?.referenceStanza).emit("aggiornamentoAttesa", {
-                numeroGiocatori: Stanza?.giocatori.size,
-                minimoGiocatori: Stanza?.minimoGiocatori,
-                giocatori: Stanza?.classifica().map(giocatore => giocatore.toJSON())
-            })
-        });
-
-        user.on("listaGiocatori", async (data) => {
-            const Stanza = await Stanze.get(data["stanzaId"] || user.data?.referenceStanza);
-
-            server.to(data["stanzaId"] || user.data?.referenceStanza).emit("listaGiocatoriAggiornamento", {
-                giocatori: Stanza?.classifica().map(giocatore => giocatore.toJSON())
+                return true;
             });
-        });
 
-        user.on("aggiornaAttesaRisposta", async (data) => {
-            const Stanza = await Stanze.get(data["stanzaId"] || user.data?.referenceStanza);
-
-            server.to(data["stanzaId"] || user.data?.referenceStanza).emit("aggiornamentoAttesaRisposta", {
-                numeroGiocatori: Stanza?.round.risposte.size,
-                giocatori: Array.from(Stanza?.round.risposte.keys()).map(giocatore => Stanza.trovaGiocatore(giocatore).toJSON())
-            })
-        });
-
-        user.on("aggiornaChat", async (data) => {
-            const Stanza = await Stanze.get(data["stanzaId"] || user.data?.referenceStanza);
-
-            const sockets = await server.in(data["stanzaId"] || user.data?.referenceStanza).fetchSockets();
-            for(const socket of sockets)
-                socket.emit("aggiornamentoChat", {
-                    chat: Stanza?.chat.messaggi,
-                    renderAll: socket.data?.referenceGiocatore?.id === user.data?.referenceGiocatore?.id
+            if (!esito || rifiutato) {
+                user.emit("impossibileAggiungersi", {
+                    message: "Impossibile aggiungersi alla stanza, le regole giustamente non ammettono schifi umani"
                 });
-        });
-
-        user.on("aggiungiMazzo", async (data) => {
-            const stanza = await Stanze.get(data["id"] || user.data?.referenceStanza);
-            const result = stanza?.modificaMazzo(data["packs"]);
-            if(result) {
-                user.emit("mazzoAggiunto");
-                console.log("Mazzo cambiato nella stanza => " + stanza.id);
+                return;
             }
-            else
+
+            const stanza = esito.stanza;
+            const giocatore = stanza.trovaGiocatore(nuovo.id) || nuovo;
+            user.data.referenceGiocatore = giocatore;
+            user.data.giocatoreId = giocatore.id;
+            user.data.referenceStanza = stanzaId;
+            user.join(stanzaId);
+            try { await Stanze.setPresenza(giocatore.id, stanzaId, true, user.id, Date.now(), null); }
+            catch { /* in RAM basta l'oggetto */ }
+
+            user.emit("confermaStanza", {
+                stanzaId: stanzaId,
+                reference: giocatore.toJSON(),
+                interroghi: stanza.round?.chiStaInterrogando === giocatore.id,
+                primoRound: stanza.numeroRound[0] === 0
+            });
+            inviaListe(stanza);
+            server.to(stanzaId).emit("segnaleAudio", {
+                socketId: user.id,
+                playerId: giocatore.id
+            });
+            console.log("Giocatore aggiunto a Stanza => " + stanzaId);
+        }));
+
+        user.on("iniziaTurno", sicuro("iniziaTurno", async (data) => {
+            const stanzaId = data?.["id"] ?? user.data?.referenceStanza;
+            const giocatoreId = user.data?.giocatoreId;
+            if (!stanzaId) return;
+
+            const esito = await Stanze.mutate(stanzaId, (stanza) => stanza.iniziaTurno(giocatoreId));
+            if (!esito) return user.emit("stanzaChiusa");
+            const { stanza, risultato } = esito;
+
+            if (typeof risultato === "object" && risultato) {
+                server.to(stanzaId).emit("partitaTerminata", {
+                    classifica: risultato.map(giocatore => giocatore.toJSON())
+                });
+                await chiudiStanza(stanza);
+                console.log("Stanza " + stanzaId + " chiusa");
+                return;
+            }
+
+            if (risultato) {
+                const sockets = await server.in(stanzaId).fetchSockets();
+                const round = stanza.round;
+                for (const socket of sockets) {
+                    const giocatore = giocatoreDi(socket, stanza);
+                    if (!giocatore) continue;
+                    socket.data.referenceGiocatore = giocatore;
+                    socket.emit("roundIniziato", {
+                        chiStaInterrogando: stanza.trovaGiocatore(round.chiStaInterrogando)?.toJSON() ?? null,
+                        domanda: round.domanda,
+                        reference: giocatore.toJSON(),
+                        stanza: stanza.id
+                    });
+                }
+                inviaAttesaRisposte(stanza);
+                return;
+            }
+
+            user.emit("aspettaAltri", {
+                message: "Girl non ci sono chatbot ai che fingano di esserti amico. Go touch some grass e non fare come Calipso"
+            });
+        }));
+
+        user.on("inviaRisposta", sicuro("inviaRisposta", async (data) => {
+            const stanzaId = data?.["id"] ?? user.data?.referenceStanza;
+            const giocatoreId = user.data?.giocatoreId;
+            const carte = data?.["indexCarte"] ?? [];
+            if (!stanzaId || !giocatoreId) return;
+
+            let motivo = null;
+            const esito = await Stanze.mutate(stanzaId, (stanza) => {
+                motivo = null;
+                // reinvio dopo una riconnessione: non e' un errore, e' idempotente
+                if (stanza.round?.risposte?.has(giocatoreId)) {
+                    motivo = "gia";
+                    return NESSUNA_MODIFICA;
+                }
+                const risultato = stanza.aggiungiRisposta(giocatoreId, ...carte);
+                if (risultato === false) {
+                    motivo = "rifiutata";
+                    return NESSUNA_MODIFICA;
+                }
+                return risultato;
+            });
+
+            if (!esito) return user.emit("stanzaChiusa");
+            const { stanza, risultato } = esito;
+
+            if (motivo === "gia") {
+                if (stanza.stato === StatoStanza.CHOOSING_WINNER) await emitStatoStanza(stanza, user);
+                else user.emit("rispostaRegistrata", { stanzaId: stanza.id });
+                inviaAttesaRisposte(stanza);
+                return;
+            }
+
+            if (motivo === "rifiutata") {
+                // lo stato reale e' diverso da quello che crede il client: riallineiamolo
+                await emitStatoStanza(stanza, user);
+                inviaAttesaRisposte(stanza);
+                return;
+            }
+
+            if (typeof risultato === "object" && risultato) {
+                server.to(stanzaId).emit("sceltaVincitore", {
+                    domanda: risultato[0],
+                    risposte: risultato[1],
+                    chiInterroga: stanza.trovaGiocatore(risultato[2])?.toJSON() ?? null,
+                    stanza: stanza.id
+                });
+            } else {
+                user.emit("rispostaRegistrata", { stanzaId: stanza.id });
+            }
+            inviaAttesaRisposte(stanza);
+        }));
+
+        user.on("scegliVincitore", sicuro("scegliVincitore", async (data) => {
+            const stanzaId = data?.["id"] ?? user.data?.referenceStanza;
+            const vincitore = data?.["vincitore"];
+            const giocatoreId = user.data?.giocatoreId;
+            if (!stanzaId) return;
+
+            const esito = await Stanze.mutate(stanzaId, (stanza) => {
+                const risultato = stanza.scegliVincitore(giocatoreId, vincitore);
+                return risultato === false ? NESSUNA_MODIFICA : risultato;
+            });
+
+            if (!esito) return user.emit("stanzaChiusa");
+            const { stanza, risultato } = esito;
+
+            if (!risultato) {
+                user.emit("errore", {
+                    message: "Aspetta e spera che tutti quanti rispondano, selezionane un'altro (tanto ti ghostano perche' gli stai sul cabbo)"
+                });
+                return;
+            }
+
+            const sockets = await server.in(stanzaId).fetchSockets();
+            for (const socket of sockets) {
+                const giocatore = giocatoreDi(socket, stanza);
+                if (!giocatore) continue;
+                socket.data.referenceGiocatore = giocatore;
+                socket.emit("fineTurno", {
+                    vincitore: risultato[0],
+                    domanda: risultato[1],
+                    risposte: risultato[2],
+                    reference: giocatore.toJSON()
+                });
+            }
+            inviaListe(stanza);
+        }));
+
+        user.on("terminaPartita", sicuro("terminaPartita", async (data) => {
+            const stanzaId = data?.["id"] ?? user.data?.referenceStanza;
+            const giocatoreId = user.data?.giocatoreId;
+            if (!stanzaId) return;
+
+            const esito = await Stanze.mutate(stanzaId, (stanza) => {
+                const risultato = stanza.terminaPartita(giocatoreId);
+                return risultato === false ? NESSUNA_MODIFICA : risultato;
+            });
+            if (!esito || !esito.risultato) return;
+
+            server.to(stanzaId).emit("partitaTerminata", {
+                classifica: esito.risultato.map(giocatore => giocatore.toJSON())
+            });
+            await chiudiStanza(esito.stanza);
+            console.log("Stanza eliminata => " + stanzaId);
+        }));
+
+        user.on("aggiornaAttesa", sicuro("aggiornaAttesa", async (data) => {
+            const stanzaId = data?.["stanzaId"] || user.data?.referenceStanza;
+            const stanza = await Stanze.get(stanzaId);
+            if (!stanza) return;
+            inviaListe(stanza);
+        }));
+
+        user.on("listaGiocatori", sicuro("listaGiocatori", async (data) => {
+            const stanzaId = data?.["stanzaId"] || user.data?.referenceStanza;
+            const stanza = await Stanze.get(stanzaId);
+            if (!stanza) return;
+            server.to(stanzaId).emit("listaGiocatoriAggiornamento", {
+                giocatori: stanza.classifica().map(giocatore => giocatore.toJSON())
+            });
+        }));
+
+        user.on("aggiornaAttesaRisposta", sicuro("aggiornaAttesaRisposta", async (data) => {
+            const stanzaId = data?.["stanzaId"] || user.data?.referenceStanza;
+            const stanza = await Stanze.get(stanzaId);
+            if (!stanza) return;
+            inviaAttesaRisposte(stanza);
+        }));
+
+        user.on("aggiornaChat", sicuro("aggiornaChat", async (data) => {
+            const stanzaId = data?.["stanzaId"] || user.data?.referenceStanza;
+            const stanza = await Stanze.get(stanzaId);
+            if (!stanza) return;
+            const sockets = await server.in(stanzaId).fetchSockets();
+            for (const socket of sockets)
+                socket.emit("aggiornamentoChat", {
+                    chat: stanza.chat?.messaggi ?? [],
+                    renderAll: !!user.data?.giocatoreId && socket.data?.giocatoreId === user.data.giocatoreId
+                });
+        }));
+
+        user.on("messaggioChat", sicuro("messaggioChat", async (data) => {
+            const stanzaId = data?.["id"] || user.data?.referenceStanza;
+            const giocatoreId = user.data?.giocatoreId;
+            if (!stanzaId) return;
+
+            const esito = await Stanze.mutate(stanzaId, (stanza) => {
+                const risultato = stanza.scriviInChat(data?.["message"], giocatoreId);
+                return risultato === false ? NESSUNA_MODIFICA : risultato;
+            });
+            if (!esito || !esito.risultato) return;
+
+            server.to(stanzaId).emit("aggiornamentoChat", {
+                chat: esito.risultato,
+                renderAll: false
+            });
+        }));
+
+        user.on("aggiungiMazzo", sicuro("aggiungiMazzo", async (data) => {
+            const stanzaId = data?.["id"] || user.data?.referenceStanza;
+            if (!stanzaId) return;
+
+            const esito = await Stanze.mutate(stanzaId, (stanza) => {
+                const risultato = stanza.modificaMazzo(data?.["packs"]);
+                return risultato === false ? NESSUNA_MODIFICA : risultato;
+            });
+
+            if (esito && esito.risultato) {
+                user.emit("mazzoAggiunto");
+                console.log("Mazzo cambiato nella stanza => " + stanzaId);
+            } else
                 user.emit("mazzoErrore", {
                     message: "Mannaggia, mi sa che al server non sono piaciuti :("
                 });
-
-            await Stanze.set(stanza.id, stanza);
-        });
+        }));
 
         user.on("webrtcOfferta", (data) => {
+            if (!data?.targetSocketId) return;
             server.to(data['targetSocketId']).emit("webrtcRiceviOfferta", {
                 signal: data.signal,
                 callerId: user.id
@@ -351,82 +514,98 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         });
 
         user.on("webrtcRisposta", (data) => {
+            if (!data?.callerSocketId) return;
             server.to(data['callerSocketId']).emit("webrtcRiceviRisposta", {
                 signal: data.signal,
                 responderSocketId: user.id
             });
         });
 
-        user.on("messaggioChat", async (data) => {
-            const stanza = await Stanze.get(data["id"] || user.data?.referenceStanza);
-            const result = stanza.scriviInChat(data["message"], user.data?.referenceGiocatore?.id)
-            if(result)
-                server.to(data["id"] || user.data?.referenceStanza).emit("aggiornamentoChat", {
-                    chat: result,
-                    renderAll: false
-                });
-            await Stanze.set(stanza.id, stanza);
-        });
+        user.on("lasciaStanza", sicuro("lasciaStanza", async (data) => {
+            const stanzaId = data?.["id"] ?? user.data?.referenceStanza;
+            const giocatoreId = data?.["giocatore"] ?? user.data?.giocatoreId;
+            user.emit("stanzaLasciata");
+            if (!stanzaId || !giocatoreId) return;
 
-        user.on("lasciaStanza", async (data) => {
-            try {
-                const stanzaId = data["id"] ?? user.data.referenceStanza;
-                const giocatoreId = data["giocatore"] ?? user.data.referenceGiocatore?.id;
-                const stanza = await Stanze.get(stanzaId);
-                const result = stanza?.eliminaGiocatore(giocatoreId);
-                user.emit("stanzaLasciata");
-                if(result) {
-                    console.log("Giocatore ha abbandonato la Stanza => " + stanzaId);
-                    user.leave(stanzaId);
-                    const sockets = await server.in(stanzaId).fetchSockets();
-                    for(const socket of sockets) socket.data.referenceGiocatore = stanza.giocatori.get(socket.data.referenceGiocatore.id);
-                    const stanzaNuova = await Stanze.set(stanzaId, stanza);
-                    const stanzona = stanzaNuova instanceof Stanza ? stanzaNuova : (stanzaNuova[stanzaId] ?? null);
-                    await emitStatoStanza(stanzona ?? stanzaId, ...sockets);
-                    console.log("Giocatore eliminato da Stanza => " + stanzaId);
-                }
-            } catch (e) {
-                console.log(e)
-            }
-        });
+            const esito = await Stanze.mutate(stanzaId, (stanza) => {
+                const risultato = stanza.eliminaGiocatore(giocatoreId);
+                if (risultato === false) return NESSUNA_MODIFICA;
+                stanza.sincronizzaStato();
+                return risultato;
+            });
+            if (!esito || !esito.risultato) return;
 
-        user.on("disconnect", async () => {
-            const giocatoreId = user.data.referenceGiocatore?.id;
+            user.leave(stanzaId);
+            console.log("Giocatore ha abbandonato la Stanza => " + stanzaId);
+            const sockets = await server.in(stanzaId).fetchSockets();
+            aggiornaReference(esito.stanza, sockets);
+            await emitStatoStanza(esito.stanza, ...sockets);
+            inviaListe(esito.stanza);
+            inviaAttesaRisposte(esito.stanza);
+        }));
+
+        user.on("disconnect", sicuro("disconnect", async () => {
+            const giocatoreId = user.data?.giocatoreId || user.data?.referenceGiocatore?.id;
+            const socketMorto = user.id;
             let stanzaId = user.data?.referenceStanza;
             if (!giocatoreId) return;
-            if(!stanzaId) stanzaId = Stanza.trovaDaGiocatore(giocatoreId, await Stanze.values());
-            try {
-                user.leave(stanzaId);
-                const stanza = await Stanze.get(stanzaId);
-                if (stanza) {
-                    const giocatore = stanza.trovaGiocatore(giocatoreId);
-                    if (giocatore) {
-                        try { await Stanze.setPresenza(giocatoreId, stanzaId, false, null, Date.now()); }
-                        catch { giocatore.online = false; await Stanze.set(stanzaId, stanza); }
-                    }
-                }
-                setTimeout(async () => {
-                    try {
-                        const stanzaDopo = await Stanze.get(stanzaId);
-                        const giocatoreDopo = stanzaDopo?.trovaGiocatore(giocatoreId);
-                        if (stanzaDopo && giocatoreDopo && !giocatoreDopo.isOnline(giocatoreId)) {
-                            stanzaDopo.eliminaGiocatore(giocatoreId);
-                            const sockets = await server.in(stanzaId).fetchSockets();
-                            for (const s of sockets) {
-                                s.data.referenceGiocatore = stanzaDopo.giocatori.get(s.data.referenceGiocatore.id);
-                            }
-                            const nuova = await Stanze.set(stanzaId, stanzaDopo);
-                            const stanzona = nuova instanceof Stanza ? nuova : (nuova[stanzaId] ?? null);
-                            await emitStatoStanza(stanzona ?? stanzaId, ...sockets);
-                        }
-                    } catch (innerError) {
-                        console.error("Errore nel timeout disconnessione:", innerError);
-                    }
-                }, (timeout / 60) * 3);
-            } catch (e) {
-                console.error("Errore generale disconnect:", e);
+            if (!stanzaId) stanzaId = Stanza.trovaDaGiocatore(giocatoreId, await Stanze.values());
+            if (!stanzaId) return;
+
+            user.leave(stanzaId);
+
+            const stanza = await Stanze.get(stanzaId);
+            const giocatore = stanza?.trovaGiocatore(giocatoreId);
+            if (!giocatore) return;
+
+            // Il disconnect di un socket morto arriva SEMPRE dopo che il client si e'
+            // gia riconnesso: il server se ne accorge solo dopo pingInterval + pingTimeout.
+            // Se nel frattempo il giocatore ha un socket nuovo, questo evento non lo
+            // riguarda piu. Senza questo controllo veniva marcato offline e, tre minuti
+            // dopo, buttato fuori dalla stanza mentre stava giocando.
+            if (giocatore.socketId && giocatore.socketId !== socketMorto) return;
+            if (await haAncoraUnSocket(stanzaId, giocatoreId, socketMorto)) return;
+
+            try { await Stanze.setPresenza(giocatoreId, stanzaId, false, null, Date.now(), socketMorto); }
+            catch {
+                giocatore.online = false;
+                try { await Stanze.set(stanzaId, stanza); } catch { /* ignora */ }
             }
-        });
+
+            inviaListe(stanza);
+
+            const attesa = setTimeout(async () => {
+                try {
+                    const stanzaDopo = await Stanze.get(stanzaId);
+                    const giocatoreDopo = stanzaDopo?.trovaGiocatore(giocatoreId);
+                    if (!stanzaDopo || !giocatoreDopo) return;
+                    // rientrato nel frattempo (anche con un socket diverso): non si tocca
+                    if (giocatoreDopo.isOnline()) return;
+                    if (giocatoreDopo.socketId && giocatoreDopo.socketId !== socketMorto) return;
+                    if (await haAncoraUnSocket(stanzaId, giocatoreId, socketMorto)) return;
+
+                    const esito = await Stanze.mutate(stanzaId, (s) => {
+                        const g = s.trovaGiocatore(giocatoreId);
+                        if (!g || g.isOnline()) return NESSUNA_MODIFICA;
+                        const risultato = s.eliminaGiocatore(giocatoreId);
+                        if (risultato === false) return NESSUNA_MODIFICA;
+                        s.sincronizzaStato();
+                        return risultato;
+                    });
+                    if (!esito || !esito.risultato) return;
+
+                    console.log("Giocatore rimosso per inattivita => " + stanzaId);
+                    const sockets = await server.in(stanzaId).fetchSockets();
+                    aggiornaReference(esito.stanza, sockets);
+                    await emitStatoStanza(esito.stanza, ...sockets);
+                    inviaListe(esito.stanza);
+                    inviaAttesaRisposte(esito.stanza);
+                } catch (innerError) {
+                    console.error("Errore nel timeout disconnessione:", innerError?.message || innerError);
+                }
+            }, GRAZIA_DISCONNESSIONE);
+            if (attesa.unref) attesa.unref();
+        }));
     });
 
     (async () => cleanUp())();

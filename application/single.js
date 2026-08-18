@@ -7,6 +7,7 @@ const { Session } = require(path.join(__dirname, "/include/script/Session"));
 const { generateId } = require(path.join(__dirname, "/include/script/generazione"));
 const appConfig = require(path.join(__dirname, "/configurations/appConfig"));
 const serverConfig = require(path.join(__dirname, "/configurations/serverConfig"));
+const { LocalStanze } = require(path.join(__dirname, "/include/script/LocalStanze"));
 
 const singleApp = async (local, port, allowedOrigins, env = {}, timeout = 3600000) => {
     const generationMemory = new Set();
@@ -14,8 +15,13 @@ const singleApp = async (local, port, allowedOrigins, env = {}, timeout = 360000
     const httpServer = createServer(app);
     const serverSession = new Session(timeout, env.JWTKEY || await generateId(64, generationMemory));
 
-    const Stanze = new Map();
-    const TEMPORARY_TOKEN = await generateId(64, generationMemory);
+    const Stanze = new LocalStanze();
+    // Con un token casuale a ogni avvio, il primo riavvio del server (Render free
+    // si riaddormenta di continuo) rendeva invalido l'handshake di tutti i client
+    // gia in partita: INVALID_KEY e fuori tutti. Con JWTKEY il token resta stabile
+    // fra riavvii e fra istanze diverse.
+    const TEMPORARY_TOKEN = env.JWTKEY || await generateId(64, generationMemory);
+    if (!env.JWTKEY) console.warn("ATTENZIONE: JWTKEY non impostata. Dopo un riavvio del server i giocatori in partita verranno disconnessi.");
 
     const server = new Server(httpServer, {
         cors: {
@@ -23,12 +29,11 @@ const singleApp = async (local, port, allowedOrigins, env = {}, timeout = 360000
             origin: allowedOrigins,
             credentials: true,
         },
-        pingInterval: 15000,
-        pingTimeout: 10000,
-        /*connectionStateRecovery: {
-            maxDisconnectionDuration: timeout/120,
-            skipMiddlewares: true,
-        }*/
+        // valori piu tolleranti: con pingTimeout a 10s bastava un buco di rete
+        // di pochi secondi su 4G per far dichiarare morto un client vivissimo
+        pingInterval: 20000,
+        pingTimeout: 30000,
+        maxHttpBufferSize: 5e6
     });
 
     //App Config

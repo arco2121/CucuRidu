@@ -1,60 +1,26 @@
---DUMP da eseguire solo su supbase (Almeno pensato per quello)
---ATTENZIONE: questo file CANCELLA le tabelle. Su un database gia in uso
---esegui invece migrazione_disconnessioni.sql, che aggiorna senza distruggere.
+-- ============================================================================
+--  MIGRAZIONE "disconnessioni" per Cucu Ridu 2.5
+--  Da eseguire sul database Supabase esistente. NON cancella dati.
+--  Sistema due cose:
+--   1) le scritture concorrenti sulla stessa stanza che si sovrascrivevano a
+--      vicenda (la risposta di un giocatore spariva)
+--   2) il disconnect di un socket vecchio che marcava offline un giocatore
+--      gia rientrato con un socket nuovo
+-- ============================================================================
 
-DROP TABLE IF EXISTS public.memory CASCADE;
-DROP TABLE IF EXISTS public.stanze CASCADE;
-DROP TABLE IF EXISTS public.items CASCADE;
-DROP TABLE IF EXISTS public.push_subscriptions CASCADE;
-DROP TABLE IF EXISTS sessions CASCADE;
+-- ----------------------------------------------------------------------------
+-- 1. VERSIONING OTTIMISTICO SULLE STANZE
+-- ----------------------------------------------------------------------------
 
-CREATE TABLE public.memory (
-    set_name text NOT NULL,
-    item_id text NOT NULL,
-    created_at timestamp with time zone DEFAULT now(),
-    CONSTRAINT memory_pkey PRIMARY KEY (set_name, item_id)
-);
+ALTER TABLE public.stanze
+    ADD COLUMN IF NOT EXISTS version bigint NOT NULL DEFAULT 0;
 
-CREATE TABLE public.stanze (
-    "stanza_Id" text NOT NULL,
-    stanza jsonb DEFAULT '{}'::jsonb,
-    machine_id text NOT NULL,
-    updated_at timestamp with time zone DEFAULT now(),
-    version bigint NOT NULL DEFAULT 0,
-    CONSTRAINT stanze_pkey PRIMARY KEY ("stanza_Id")
-);
-
-CREATE TABLE public.items (
-    "item_id" text NOT NULL,
-    value jsonb DEFAULT '{}'::jsonb,
-    machine_id text NOT NULL,
-    updated_at timestamp with time zone DEFAULT now(),
-    CONSTRAINT items_pkey PRIMARY KEY ("item_id")
-);
-
-CREATE TABLE IF NOT EXISTS public.presenza (
-   giocatore_id text PRIMARY KEY,
-   stanza_id text NOT NULL,
-   online boolean NOT NULL DEFAULT true,
-   socket_id text,
-   event_time bigint NOT NULL DEFAULT 0,
-   updated_at timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE TABLE public.push_subscriptions (
-    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    client_Id text NOT NULL,
-    subscription jsonb DEFAULT '{}'::jsonb,
-    endpoint text NOT NULL UNIQUE
-);
-CREATE INDEX IF NOT EXISTS idx_push_subs_client_id ON public.push_subscriptions(client_Id);
-
--- Scrittura della stanza con compare-and-swap sulla colonna version.
---   > 0 => ok, e' la nuova version
---    -1 => conflitto, qualcun altro ha scritto: rileggi e riprova
---    -2 => la stanza non esiste piu
--- expected_version NULL => scrittura incondizionata (creazione stanza)
+-- update_stanza_cas: scrive la stanza SOLO se nessun altro l'ha modificata
+-- nel frattempo (compare-and-swap sulla colonna version).
+--   ritorna  > 0  => scrittura riuscita, e' la nuova version
+--   ritorna   -1  => conflitto: qualcun altro ha scritto, rileggi e riprova
+--   ritorna   -2  => la stanza non esiste piu
+-- Se expected_version e' NULL la scrittura e' incondizionata (creazione stanza).
 CREATE OR REPLACE FUNCTION update_stanza_cas(
     target_id        text,
     new_json         jsonb,
@@ -98,6 +64,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- La vecchia update_stanza faceva un merge JSONB shallow (stanza || nuovo):
+-- la chiave "round" veniva sostituita in blocco, quindi l'ultimo che scriveva
+-- cancellava la risposta appena registrata da un altro. La lasciamo definita
+-- solo come fallback, ma ora sovrascrive in modo esplicito invece di fondere.
 CREATE OR REPLACE FUNCTION update_stanza(target_id text, new_json jsonb, id_of_machine text)
 RETURNS void AS $$
 BEGIN
@@ -105,41 +75,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION update_item(target_id text, new_json jsonb, id_of_machine text)
-RETURNS void AS $$
-BEGIN
-INSERT INTO public.items ("item_id", "value", "machine_id", "updated_at")
-VALUES (target_id, new_json, id_of_machine, now())
-    ON CONFLICT ("item_id")
-    DO UPDATE SET
-    "value" = EXCLUDED."value",
-               "updated_at" = now();
-END;
-$$ LANGUAGE plpgsql;
+-- ----------------------------------------------------------------------------
+-- 2. PRESENZA LEGATA AL SOCKET, NON SOLO AL TEMPO
+-- ----------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION delete_old_presenza()
-RETURNS void
-SECURITY DEFINER
-AS $$
-BEGIN
-DELETE FROM public.presenza
-WHERE updated_at < (now() - INTERVAL '2 hours');
-END;
-$$ LANGUAGE plpgsql;
+-- La vecchia set_presenza accettava un "offline" solo in base a event_time.
+-- Ma il disconnect di un socket morto arriva SEMPRE dopo la riconnessione
+-- (il server se ne accorge dopo pingInterval + pingTimeout), quindi passava
+-- la guardia e marcava offline un giocatore che stava gia giocando.
+-- Ora un "offline" viene applicato solo se il socket che si e' disconnesso e'
+-- ancora quello registrato per quel giocatore.
+DROP FUNCTION IF EXISTS set_presenza(text, text, boolean, text, bigint);
 
-CREATE OR REPLACE FUNCTION delete_old_stanze()
-RETURNS void
-SECURITY DEFINER
-AS $$
-BEGIN
-DELETE FROM public.stanze
-WHERE updated_at < (now() - INTERVAL '1 hour');
-END;
-$$ LANGUAGE plpgsql;
-
--- Un "offline" viene accettato solo se il socket che si e' disconnesso e'
--- ancora quello registrato per il giocatore: altrimenti il disconnect tardivo
--- di un socket morto buttava fuori chi si era gia riconnesso.
 CREATE OR REPLACE FUNCTION set_presenza(
     p_giocatore_id       text,
     p_stanza_id          text,
@@ -178,11 +125,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-ALTER TABLE public.presenza
-ADD CONSTRAINT presenza_stanza_id_fkey
-FOREIGN KEY (stanza_id)
-REFERENCES public.stanze("stanza_Id")
-ON DELETE CASCADE;
+-- ----------------------------------------------------------------------------
+-- 3. INDICI UTILI
+-- ----------------------------------------------------------------------------
 
 CREATE INDEX IF NOT EXISTS idx_presenza_stanza ON public.presenza(stanza_id);
 CREATE INDEX IF NOT EXISTS idx_stanze_updated  ON public.stanze(updated_at);

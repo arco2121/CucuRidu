@@ -278,9 +278,16 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     });
 
     app.post("/doRoomExists", async (req, res) => {
-        const {roomId} = req.body;
-        const stato = Boolean(await Stanze.has(roomId) && await Stanze.get(roomId).stato !== StatoStanza.END);
-        res.status(200).json({result: stato});
+        try {
+            const {roomId} = req.body || {};
+            // mancavano le parentesi: si leggeva .stato su una Promise, quindi
+            // il controllo sullo stato non ha mai funzionato
+            const stanza = roomId ? await Stanze.get(roomId) : null;
+            res.status(200).json({result: Boolean(stanza && stanza.stato !== StatoStanza.END)});
+        } catch (e) {
+            console.error("[doRoomExists]", e?.message || e);
+            res.status(200).json({result: false});
+        }
     })
 
     app.post("/saveGameReference", async (req, res) => {
