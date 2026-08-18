@@ -23,7 +23,7 @@ const QRCode = require("qrcode-svg");
 const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout = 3600000, pagesOptions = {
     version: '1.0.0',
     cluster: false
-}) => {
+}, archivioSegnalazioni = null, chiaveSegnalazioni = null) => {
 
     const renderPage = (req, res, page, params = {
         simple: false,
@@ -274,6 +274,65 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
 
     app.get("/ping", (req, res) => {
         res.status(200).end();
+    });
+
+    /*
+     * Elenco delle frasi e dei completamenti segnalati come sbagliati.
+     * Protetto dalla chiave in SEGNALAZIONI_KEY: se non e' impostata la pagina
+     * non esiste proprio, cosi non resta aperta per sbaglio.
+     */
+    app.get("/segnalazioni", async (req, res) => {
+        if (!archivioSegnalazioni || !chiaveSegnalazioni) return res.redirect("/error");
+        if (req.query?.chiave !== chiaveSegnalazioni) return res.redirect("/error");
+
+        const scappa = (testo) => String(testo ?? "")
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+        try {
+            const righe = await archivioSegnalazioni.leggi(300);
+            const quandoIt = (valore) => {
+                if (!valore) return "";
+                const d = new Date(valore);
+                return isNaN(d) ? String(valore) : d.toLocaleString("it-IT");
+            };
+
+            const corpo = righe.length
+                ? righe.map(r => `<tr class="${r.tipo === "frase" ? "frase" : "compl"}">
+                        <td class="quando">${scappa(quandoIt(r.creato_at))}</td>
+                        <td class="tipo">${scappa(r.tipo)}</td>
+                        <td class="testo">${scappa(r.testo)}</td>
+                        <td class="nota">${scappa(r.nota || "")}</td>
+                        <td class="chi">${scappa(r.giocatore || "")}<br><small>${scappa(r.stanza_id || "")}</small></td>
+                    </tr>`).join("")
+                : `<tr><td colspan="5" class="vuoto">Nessuna segnalazione, per ora tutto a posto</td></tr>`;
+
+            res.status(200).send(`<!doctype html><html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Segnalazioni - Cucu Ridu</title><style>
+body{font-family:system-ui,Arial,sans-serif;margin:0;padding:24px;background:#faf7f2;color:#2b2b2b}
+h1{font-size:1.4rem;margin:0 0 4px}
+p.sotto{margin:0 0 18px;color:#777;font-size:0.85rem}
+table{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12);border-radius:8px;overflow:hidden}
+th,td{padding:9px 12px;text-align:left;vertical-align:top;font-size:0.88rem;border-bottom:1px solid #eee}
+th{background:#f0ece5;font-size:0.75rem;text-transform:uppercase;letter-spacing:.04em;color:#666}
+tr.frase .tipo{color:#a3560f;font-weight:600}
+tr.compl .tipo{color:#3a6ea5;font-weight:600}
+td.quando,td.chi{white-space:nowrap;color:#777;font-size:0.8rem}
+td.testo{font-weight:600;max-width:520px}
+td.nota{color:#555;max-width:320px}
+td.vuoto{text-align:center;color:#888;padding:30px}
+</style></head><body>
+<h1>Segnalazioni</h1>
+<p class="sotto">${righe.length} segnalazioni, dalla piu recente. Frasi e completamenti che qualcuno ha marcato come sbagliati durante una partita.</p>
+<table><thead><tr><th>Quando</th><th>Tipo</th><th>Testo</th><th>Nota</th><th>Chi</th></tr></thead>
+<tbody>${corpo}</tbody></table>
+</body></html>`);
+        } catch (e) {
+            console.error("[segnalazioni]", e?.message || e);
+            res.status(500).send("Errore nel leggere le segnalazioni");
+        }
     });
 
     app.post("/doRoomExists", async (req, res) => {

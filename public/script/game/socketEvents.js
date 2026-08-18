@@ -76,6 +76,12 @@ if(controller instanceof Worker)
 //Utility
 let referenceGiocatore = new GiocatoreInterface(null);
 let referenceStanza = "";
+// la frase del round in corso, serve al pannello delle segnalazioni
+let fraseCorrente = null;
+const ricordaFrase = (domanda) => {
+    const testo = Array.isArray(domanda) ? domanda[0] : domanda;
+    if (typeof testo === "string" && testo.trim()) fraseCorrente = testo;
+};
 const lasciaStanza = () => {
     const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
     const token = settings["savingToken"];
@@ -218,6 +224,7 @@ on("roundIniziato", async (data) => {
     const { chiStaInterrogando, stanza, reference, domanda } = data;
     if(reference) referenceGiocatore = new GiocatoreInterface(reference);
     if(stanza) referenceStanza = stanza
+    ricordaFrase(domanda);
     await renderFragment(base, "choosingCards", {
         domanda: domanda,
         risposte: !referenceGiocatore.interrogationRole ? referenceGiocatore.mazzo : null,
@@ -242,6 +249,7 @@ on("sceltaVincitore", async (data) => {
     const { reference, stanza, domanda, chiInterroga, risposte } = data;
     if(reference) referenceGiocatore = new GiocatoreInterface(reference);
     if(stanza) referenceStanza = stanza
+    ricordaFrase(domanda);
     await renderFragment(base, "chooseWinner", {
         domanda: domanda,
         risposte: risposte,
@@ -254,6 +262,7 @@ on("sceltaVincitore", async (data) => {
 on("fineTurno", async (data) => {
     const { reference, vincitore, domanda, risposte } = data;
     if(reference) referenceGiocatore = new GiocatoreInterface(reference);
+    ricordaFrase(domanda);
     await renderFragment(base, "showWinner", {
         domanda: domanda,
         risposte: risposte,

@@ -664,6 +664,74 @@
     {
       "nome": "Il Gabibbo",
       "genere": "m"
+    },
+    {
+      "nome": "Un Pompiere",
+      "genere": "m"
+    },
+    {
+      "nome": "Ventilatroie",
+      "genere": "m"
+    },
+    {
+      "nome": "Nonnina",
+      "genere": "f"
+    },
+    {
+      "nome": "Bruschetta",
+      "genere": "f"
+    },
+    {
+      "nome": "Beba",
+      "genere": "f"
+    },
+    {
+      "nome": "Berna",
+      "genere": "f"
+    },
+    {
+      "nome": "Chiquita",
+      "genere": "f"
+    },
+    {
+      "nome": "Cristinella",
+      "genere": "f"
+    },
+    {
+      "nome": "Marmotta",
+      "genere": "f"
+    },
+    {
+      "nome": "Nerina",
+      "genere": "f"
+    },
+    {
+      "nome": "Pippa",
+      "genere": "f"
+    },
+    {
+      "nome": "Tequila",
+      "genere": "f"
+    },
+    {
+      "nome": "Zagara",
+      "genere": "f"
+    },
+    {
+      "nome": "Fiona",
+      "genere": "f"
+    },
+    {
+      "nome": "Ornella",
+      "genere": "f"
+    },
+    {
+      "nome": "Banana",
+      "genere": "f"
+    },
+    {
+      "nome": "I Fantastici 4",
+      "genere": "p"
     }
   ],
   "adjectives": [
@@ -1354,8 +1422,8 @@
     {
       "n": "Bueo",
       "m": "Bueo",
-      "f": "Bueo",
-      "p": "Bueo"
+      "f": "Buea",
+      "p": "Buei"
     },
     {
       "n": "Con il parrucchino",
@@ -1404,6 +1472,18 @@
       "m": "E la sua bussy",
       "f": "E la sua bussy",
       "p": "E la loro bussy"
+    },
+    {
+      "n": "Mastodontic*",
+      "m": "Mastodontico",
+      "f": "Mastodontica",
+      "p": "Mastodontici"
+    },
+    {
+      "n": "In plastica riciclabile",
+      "m": "In plastica riciclabile",
+      "f": "In plastica riciclabile",
+      "p": "In plastica riciclabile"
     }
   ]
 }

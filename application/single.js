@@ -8,6 +8,7 @@ const { generateId } = require(path.join(__dirname, "/include/script/generazione
 const appConfig = require(path.join(__dirname, "/configurations/appConfig"));
 const serverConfig = require(path.join(__dirname, "/configurations/serverConfig"));
 const { LocalStanze } = require(path.join(__dirname, "/include/script/LocalStanze"));
+const { SegnalazioniLocali } = require(path.join(__dirname, "/include/script/Segnalazioni"));
 
 const singleApp = async (local, port, allowedOrigins, env = {}, timeout = 3600000) => {
     const generationMemory = new Set();
@@ -36,11 +37,15 @@ const singleApp = async (local, port, allowedOrigins, env = {}, timeout = 360000
         maxHttpBufferSize: 5e6
     });
 
+    // in RAM: le segnalazioni si perdono al riavvio, in cluster finiscono su Supabase
+    const segnalazioni = new SegnalazioniLocali();
+
     //App Config
-    appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout, { version: env.npm_package_version });
+    appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout,
+        { version: env.npm_package_version }, segnalazioni, env.SEGNALAZIONI_KEY || null);
 
     //ServerIO Config
-    serverConfig(server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout);
+    serverConfig(server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout, segnalazioni);
 
     //Listening
     const listening = httpServer.listen(port, (error) => {

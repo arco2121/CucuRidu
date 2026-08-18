@@ -3,8 +3,20 @@ DATABASE_PASSWORD=
 DATABASE_POOL=
 DATABASE_URL=
 JWTKEY=
+SEGNALAZIONI_KEY=
 USE_CLUSTER=false
 ON_PLATFORM=false
 
 #ON_PLATFORM INDICA SE DEVE RUNNARE CON CONFIGURAZIONE PER localhost
 #USE_CLUSTER INDICA SE DEVE RUNNARE CENTRALIZZATO CON UN DATABASE CONDIVISO
+
+#JWTKEY OBBLIGATORIA E UGUALE SU TUTTI I DEPLOY: firma le sessioni e il token
+#di handshake dei socket. Se manca, ogni istanza ne genera uno casuale e al
+#primo riavvio i giocatori in partita vengono buttati fuori con INVALID_KEY
+
+#SEGNALAZIONI_KEY chiave per aprire /segnalazioni?chiave=... , la pagina con le
+#frasi e i completamenti segnalati come sbagliati durante le partite.
+#Se e' vuota la pagina non esiste proprio
+
+#NOTIFICATION_PUBLIC e NOTIFICATION_PRIVATE non servono piu: le notifiche push
+#sono state rimosse

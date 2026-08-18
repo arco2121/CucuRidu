@@ -2,6 +2,7 @@ const path = require("path");
 const { Stanza, StatoStanza } = require(path.join(__dirname, "../include/script/Stanza"));
 const { Giocatore } = require(path.join(__dirname, "../include/script/Giocatore"));
 const { NESSUNA_MODIFICA } = require(path.join(__dirname, "../include/script/concorrenza"));
+const { normalizzaRighe } = require(path.join(__dirname, "../include/script/Segnalazioni"));
 
 /**
  * Configura gli endpoint del ServerIO
@@ -11,11 +12,14 @@ const { NESSUNA_MODIFICA } = require(path.join(__dirname, "../include/script/con
  * @param Stanze
  * @param generationMemory
  * @param timeout
+ * @param archivioSegnalazioni
  */
-const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout = 3600000) => {
+const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout = 3600000, archivioSegnalazioni = null) => {
 
     // quanto aspettiamo prima di togliere davvero dalla stanza chi si e' disconnesso
     const GRAZIA_DISCONNESSIONE = Math.min(Math.max((timeout / 60) * 3, 60000), 300000);
+    // per non farsi riempire l'archivio da chi spamma il bottone
+    const PAUSA_SEGNALAZIONI = 4000;
 
     /**
      * Nessun handler socket deve poter far cadere il processo: prima di questa
@@ -503,6 +507,29 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 user.emit("mazzoErrore", {
                     message: "Mannaggia, mi sa che al server non sono piaciuti :("
                 });
+        }));
+
+        user.on("segnala", sicuro("segnala", async (data) => {
+            if (!archivioSegnalazioni) return user.emit("segnalazioneEsito", { ok: false });
+
+            const adesso = Date.now();
+            if (adesso - (user.data.ultimaSegnalazione || 0) < PAUSA_SEGNALAZIONI)
+                return user.emit("segnalazioneEsito", { ok: false, messaggio: "Aspetta un attimo prima di segnalare ancora" });
+            user.data.ultimaSegnalazione = adesso;
+
+            const stanzaId = data?.["id"] ?? user.data?.referenceStanza;
+            const righe = normalizzaRighe(data?.["elementi"], {
+                stanzaId: stanzaId,
+                giocatore: user.data?.referenceGiocatore?.username,
+                nota: data?.["nota"]
+            });
+
+            if (!righe.length)
+                return user.emit("segnalazioneEsito", { ok: false, messaggio: "Non hai selezionato niente da segnalare" });
+
+            await archivioSegnalazioni.aggiungi(righe);
+            console.log("Segnalazioni ricevute => " + righe.length + " da " + stanzaId);
+            user.emit("segnalazioneEsito", { ok: true, quante: righe.length });
         }));
 
         user.on("webrtcOfferta", (data) => {

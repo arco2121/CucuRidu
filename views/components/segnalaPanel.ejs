@@ -1,0 +1,29 @@
+<div class="section hidden sectionToHide showByConnectionManager" id="segnalaMenu">
+    <div class="floatSection packs_section btn_doubleBorder pauseSection">
+        <div class="options_exit_btn upper sour_gummy_extra" >
+            <h1 class="panel_title sour_gummy_bold">Segnala</h1>
+            <h1 class="active_Btn" id="exitSegnalaBtn">X</h1>
+        </div>
+        <div class="pause_content sour_gummy_medium">
+            <h4 class="segnala_spiega sour_gummy_regular_italic">
+                Tocca quello che è sbagliato, poi invia. Ce lo ritroviamo scritto e lo sistemiamo.
+            </h4>
+            <div class="segnala_lista_con" id="segnalaLista">
+                <h4 class="segnala_vuoto sour_gummy_regular_italic">Niente da segnalare al momento</h4>
+            </div>
+        </div>
+        <div class="pause_footer_con column">
+            <div class="wait_players_list_hr"></div>
+            <div class="column segnala_footer pause_footer_margin flex_gap_10">
+                <textarea class="input segnala_nota sour_gummy_medium"
+                          id="segnalaNota"
+                          rows="1"
+                          maxlength="500"
+                          placeholder="Cosa non va? (facoltativo)"></textarea>
+                <button id="inviaSegnalazioneBtn" class="button btn_mediumText btn_style_2 sour_gummy_bold btn_doubleBorder">Invia</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="<%= scripts %>/views/components/segnalaPanel.js"></script>

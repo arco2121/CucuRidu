@@ -126,7 +126,28 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ----------------------------------------------------------------------------
--- 3. INDICI UTILI
+-- 3. update_item SCRIVEVA IN UNA COLONNA CHE NON ESISTE
+-- ----------------------------------------------------------------------------
+
+-- La vecchia update_item inseriva in "id_item", ma la colonna della tabella
+-- items si chiama "item_id": ogni chiamata falliva in silenzio. La usa
+-- ClusterMap per la blacklist dei token di sessione, che quindi non ha mai
+-- funzionato in cluster.
+CREATE OR REPLACE FUNCTION update_item(target_id text, new_json jsonb, id_of_machine text)
+RETURNS void AS $$
+BEGIN
+    INSERT INTO public.items ("item_id", "value", "machine_id", "updated_at")
+    VALUES (target_id, new_json, id_of_machine, now())
+    ON CONFLICT ("item_id")
+    DO UPDATE SET
+        "value"      = EXCLUDED."value",
+        "machine_id" = EXCLUDED."machine_id",
+        "updated_at" = now();
+END;
+$$ LANGUAGE plpgsql;
+
+-- ----------------------------------------------------------------------------
+-- 4. INDICI UTILI
 -- ----------------------------------------------------------------------------
 
 CREATE INDEX IF NOT EXISTS idx_presenza_stanza ON public.presenza(stanza_id);

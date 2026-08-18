@@ -276,12 +276,8 @@
 }
 
 @media (max-width: 840px) {
-    /* Prima era 90% dentro un contenitore con 24px di padding: fra questo e i
-       95% annidati piu sotto, sul telefono restava un margine enorme ai lati.
-       Ora il margine lo decide solo questo padding. */
     .game_main_con {
-        width: 100%;
-        padding: 0 10px;
+        width: 90%;
         justify-content: center;
         flex-direction: column;
         align-items: center;
@@ -293,10 +289,6 @@
 }
 
 @media (max-width: 450px) {
-    .game_main_con {
-        padding: 0 6px;
-    }
-
     .wait_players_list {
         width: auto;
         padding: 25px 10px;
@@ -397,29 +389,6 @@
     height: 20px;
 }
 
-/* Numero dello spazio che la carta selezionata va a riempire.
-   Compare solo quando la frase ha piu di uno spazio vuoto. */
-.card_slot_num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 20px;
-    height: 20px;
-    margin-right: 6px;
-    padding: 0 5px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    line-height: 1;
-    color: var(--accent-color-confirm-outline);
-    background: var(--accent-color-confirm-middle);
-    border: solid 2px var(--accent-color-confirm-outline);
-    transition: opacity 0.15s ease-out;
-}
-
-.card_slot_num:empty {
-    display: none;
-}
-
 .game_card_decoration_style_1 svg path {
     fill: var(--accent-color-1-outline) !important;
 }
@@ -477,10 +446,8 @@
 }
 
 @media (max-width: 840px) {
-    /* Su telefono si usa tutta la larghezza disponibile: il respiro dai bordi
-       lo da' gia il padding di .game_main_con */
     .game_main_con_selectCards {
-        width: 100%;
+        width: 95%;
         justify-content: space-evenly;
         flex-direction: column;
         align-items: center;
@@ -488,28 +455,30 @@
     }
 
     .game_main_con_selectCards:has(.game_card_domanda) {
-        width: 100%;
+        width: 95%;
         justify-content: center;
         flex-direction: column;
         align-items: center;
     }
 
     .game_side_r {
-        width: 100%;
+        width: 95%;
         flex-shrink: 0;
         margin: 0;
+    }
+
+    .game_side_r {
         gap: unset;
     }
 
     .game_side_l {
-        width: 100%;
+        width: 95%;
         height: 75%;
-        margin: 0;
     }
 
     .game_cards_list {
         width: 100%;
-        padding: 6px;
+        padding: 5px;
     }
 }
 
@@ -602,134 +571,6 @@
 /* ---------------------------------------------------
  >>> SCELTA VINCITORE
 --------------------------------------------------- */
-
-/* ---------------------------------------------------
- >>> SEGNALAZIONI
---------------------------------------------------- */
-.segnala_spiega {
-    text-align: center;
-    margin: 4px 0 10px;
-    font-size: 0.9rem;
-    color: var(--background-variant-outline);
-}
-
-.segnala_lista_con {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-    padding: 4px 2px;
-    overflow-y: auto;
-    max-height: 60vh;
-}
-
-.segnala_vuoto {
-    text-align: center;
-    padding: 24px 0;
-    opacity: 0.7;
-}
-
-.segnala_riga {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 16px;
-    cursor: pointer;
-    text-align: start;
-    border: solid 3px var(--accent-color-1-outline);
-    background: var(--accent-color-1);
-    background-image: linear-gradient(to bottom, var(--accent-color-1), var(--accent-color-1-middle));
-    color: var(--accent-color-1-outline);
-    transition: all 0.12s ease-out;
-}
-
-.segnala_riga_frase {
-    border-color: var(--accent-color-2-outline);
-    background: var(--accent-color-2);
-    background-image: linear-gradient(to bottom, var(--accent-color-2), var(--accent-color-2-middle));
-    color: var(--accent-color-2-outline);
-}
-
-.segnala_scelto {
-    border-color: var(--accent-color-critical-outline);
-    background: var(--accent-color-critical);
-    background-image: linear-gradient(to bottom, var(--accent-color-critical), var(--accent-color-critical-middle));
-    color: var(--accent-color-critical-outline);
-    box-shadow: 0 0 0 2px white;
-}
-
-.segnala_etichetta {
-    flex-shrink: 0;
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    opacity: 0.85;
-}
-
-.segnala_testo {
-    flex: 1 1 auto;
-    font-size: 0.9rem;
-    line-height: 1.25;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-}
-
-/* Il pallino a destra dice a colpo d'occhio cosa hai scelto, senza dover
-   distinguere due sfumature di un colore che ogni partita cambia. */
-.segnala_riga::after {
-    content: "";
-    flex-shrink: 0;
-    width: 22px;
-    height: 22px;
-    border-radius: 100%;
-    border: solid 3px currentColor;
-    opacity: 0.45;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8rem;
-    line-height: 1;
-}
-
-.segnala_scelto::after {
-    content: "✕";
-    opacity: 1;
-    color: var(--accent-color-critical-outline);
-    background: white;
-}
-
-.segnala_footer {
-    width: 100%;
-    padding: 8px 12px 12px;
-}
-
-.segnala_nota {
-    width: 100%;
-    border: solid 3px var(--accent-color-3-outline);
-    background: var(--accent-color-3);
-    background-image: linear-gradient(to bottom, var(--accent-color-3), var(--accent-color-3-middle));
-    color: var(--accent-color-3-outline);
-    box-shadow: 0 0 0 2px white;
-    border-radius: 18px;
-    text-align: left;
-    font-size: 0.9rem;
-    padding: 10px 14px;
-    resize: none;
-    min-height: 44px;
-    font-family: "Sour Gummy", sans-serif;
-}
-
-.segnala_nota::placeholder {
-    color: var(--accent-color-3-text);
-}
-
-.segnala_nota:focus {
-    outline: none;
-    border-color: var(--accent-color-2-outline);
-}
 
 /* ---------------------------------------------------
  >>> CHAT

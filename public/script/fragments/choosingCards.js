@@ -38,7 +38,8 @@ const toggleCards = (target) => {
 
     cards.forEach(card => {
         const thisCardIdx = parseInt(card.getAttribute("data-card-index"));
-        const isThisCardSelected = givenAnswerIndices.includes(thisCardIdx);
+        const slot = givenAnswerIndices.indexOf(thisCardIdx);
+        const isThisCardSelected = slot !== -1;
 
         if (isThisCardSelected) {
             card.classList.add("selected");
@@ -49,6 +50,10 @@ const toggleCards = (target) => {
         } else {
             card.classList.remove("selected", "unselected");
         }
+
+        // con piu spazi da riempire serve sapere QUALE spazio occupa la carta
+        const badge = document.getElementById("slot_" + card.id);
+        if (badge) badge.textContent = (isThisCardSelected && maxSlots > 1) ? String(slot + 1) : "";
     });
 };
 
