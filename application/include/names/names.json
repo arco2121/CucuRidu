@@ -671,22 +671,19 @@
       "n": "Cane",
       "m": "Cane",
       "f": "Cagna",
-      "p": "Cani",
-      "rivedere": "'Cagna' e' un femminile vero ma cambia parecchio il tono"
+      "p": "Cani"
     },
     {
       "n": "Troia",
       "m": "Troia",
       "f": "Troia",
-      "p": "Troie",
-      "rivedere": "non esiste il maschile, resta 'Troia' per tutti"
+      "p": "Troie"
     },
     {
       "n": "Puttan*",
       "m": "Puttano",
       "f": "Puttana",
-      "p": "Puttani",
-      "rivedere": "'Puttano' non e' italiano vero, valuta 'Puttaniere'"
+      "p": "Puttani"
     },
     {
       "n": "Ebete",
@@ -698,15 +695,13 @@
       "n": "Rincoglionit*",
       "m": "Rincoglionito",
       "f": "Rincoglionita",
-      "p": "Rincoglioniti",
-      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+      "p": "Rincoglioniti"
     },
     {
       "n": "Maltrattat*",
       "m": "Maltrattato",
       "f": "Maltrattata",
-      "p": "Maltrattati",
-      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+      "p": "Maltrattati"
     },
     {
       "n": "Demente",
@@ -760,8 +755,7 @@
       "n": "Accoltellat*",
       "m": "Accoltellato",
       "f": "Accoltellata",
-      "p": "Accoltellati",
-      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+      "p": "Accoltellati"
     },
     {
       "n": "Serbatoio idraulico",
@@ -803,8 +797,7 @@
       "n": "Slinguazzat* da suo padre",
       "m": "Slinguazzato da suo padre",
       "f": "Slinguazzata da suo padre",
-      "p": "Slinguazzati dal padre",
-      "rivedere": "al plurale 'suo padre' andrebbe cambiato"
+      "p": "Slinguazzati dal padre"
     },
     {
       "n": "Megazord",
@@ -834,8 +827,7 @@
       "n": "Disadattat*",
       "m": "Disadattato",
       "f": "Disadattata",
-      "p": "Disadattati",
-      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+      "p": "Disadattati"
     },
     {
       "n": "Imbecille",
@@ -865,8 +857,7 @@
       "n": "Cretin*",
       "m": "Cretino",
       "f": "Cretina",
-      "p": "Cretini",
-      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+      "p": "Cretini"
     },
     {
       "n": "Anfibio",
@@ -878,15 +869,13 @@
       "n": "Stronz*",
       "m": "Stronzo",
       "f": "Stronza",
-      "p": "Stronzi",
-      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+      "p": "Stronzi"
     },
     {
       "n": "Zoccol*",
       "m": "Zoccolo",
       "f": "Zoccola",
-      "p": "Zoccoli",
-      "rivedere": "'Zoccolo' al maschile perde il senso dell'insulto"
+      "p": "Zoccoli"
     },
     {
       "n": "Puttanier*",
@@ -910,8 +899,7 @@
       "n": "Negr*",
       "m": "Negro",
       "f": "Negra",
-      "p": "Negri",
-      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+      "p": "Negri"
     },
     {
       "n": "Con una grave malattia terminale",
@@ -1349,8 +1337,7 @@
       "n": "Filibustier*",
       "m": "Filibustiere",
       "f": "Filibustiera",
-      "p": "Filibustieri",
-      "rivedere": "'Filibustiera' suona strano"
+      "p": "Filibustieri"
     },
     {
       "n": "Alito fetente",
@@ -1386,8 +1373,7 @@
       "n": "Geneticamente modificat*",
       "m": "Geneticamente modificato",
       "f": "Geneticamente modificata",
-      "p": "Geneticamente modificati",
-      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+      "p": "Geneticamente modificati"
     },
     {
       "n": "Che brilla al buio",
@@ -1405,8 +1391,7 @@
       "n": "Costosett*",
       "m": "Costosetto",
       "f": "Costosetta",
-      "p": "Costosetti",
-      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+      "p": "Costosetti"
     },
     {
       "n": "Un po' cesso",
