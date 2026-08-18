@@ -22,27 +22,42 @@ const generateId = (memory) => {
     memory.add(code);
     return code;
 };
+/*
+ * Marcatori di formattazione:
+ *   §  davanti a un COMPLETAMENTO  -> il completamento tiene sempre l'iniziale
+ *                                     maiuscola (nome proprio). Es. "§Gabibbo"
+ *   §  davanti a uno SPAZIO VUOTO  -> tutto il completamento va in maiuscolo.
+ *                                     Es. "NON PUOI METTERTI A §_"
+ * I marcatori non devono mai finire sotto gli occhi di chi gioca: pulisciFrase
+ * li toglie dal testo mostrato, fillBlanks li consuma mentre riempie.
+ */
+const marcatoriFrase = /[§$]+(?=_)/g;
+
+const pulisciFrase = (testo = "") => String(testo).replace(marcatoriFrase, "");
+
 const fillBlanks = (templateText, replacements) => {
     let index = 0;
-    replacements = replacements.filter(rep => rep !== null);
-    console.log(replacements);
+    replacements = (replacements || []).filter(rep => rep !== null && rep !== undefined);
 
-    return templateText.replace(/_/g, (match, offset, fullString) => {
-        if (index >= replacements.length) return match;
+    return String(templateText).replace(/([§$]?)_/g, (match, marcatore, offset, fullString) => {
+        // spazio non ancora riempito: mostriamo il trattino nudo, senza marcatore
+        if (index >= replacements.length) return "_";
 
-        let word = replacements[index];
+        let word = String(replacements[index]);
         index++;
 
-        if (bannedSymbols.split("").some(symbol => word.startsWith(symbol))) {
-            const cleanedWord = word.slice(1);
-            return cleanedWord.charAt(0).toUpperCase() + cleanedWord.slice(1);
-        }
-        const textBefore = fullString.slice(0, offset);
+        const tuttoMaiuscolo = marcatore === "§";
+        const nomeProprio = bannedSymbols.split("").some(symbol => word.startsWith(symbol));
+        if (nomeProprio) word = word.slice(1);
 
+        if (tuttoMaiuscolo) return word.toUpperCase();
+        if (nomeProprio) return word.charAt(0).toUpperCase() + word.slice(1);
+
+        const textBefore = pulisciFrase(fullString.slice(0, offset));
         const isStartOfSentence = textBefore.trim().length === 0 || /[.!?]\s*$/.test(textBefore);
 
         if (isStartOfSentence) {
-            return word;
+            return word.charAt(0).toUpperCase() + word.slice(1);
         } else {
             return word.charAt(0).toLowerCase() + word.slice(1);
         }
@@ -165,11 +180,4 @@ const cssVars = (fileName) => {
 
 //Alert Override
 const defaultAlert = window.alert;
-window.alert = (message) => {
-    (async () => {
-        const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || '{}');
-        let newMessage = message;
-        if(settings.translate) newMessage = await translateDom(message);
-        defaultAlert(newMessage);
-    })();
-};
+window.alert = (message) => defaultAlert(message);

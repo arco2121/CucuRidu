@@ -11,7 +11,6 @@ const files = [
     '<sc?/views/components/clearDom.js',
     '/assets/icon.png',
     '/assets/offline_icon.png',
-    '/assets/icon_notification.png',
     '/assets/pencil.png',
     '/assets/loading.webp',
     '/assets/loading.gif',
@@ -99,55 +98,5 @@ self.addEventListener('fetch', (event) => {
                 return cachedResponse || fetchPromise;
             });
         })
-    );
-});
-
-self.addEventListener('push', (event) => {
-    let data = { title: 'Default', body: 'Default', url: '/' };
-    try {
-        if (event.data)
-            data = event.data.json();
-    } catch (e) {
-        console.error("Errore:", e);
-    }
-
-    const options = {
-        body: data.body,
-        icon: '/assets/icon.png',
-        badge: '/assets/error_icon.png',
-        vibrate: [200, 100, 200],
-        tag: data.tag || 'cucuridu',
-        renotify: true,
-        data: {
-            url: data.url || '/'
-        },
-        actions: data.actions || null
-    };
-
-    event.waitUntil(
-        self.registration.showNotification(data.title, options)
-    );
-});
-
-self.addEventListener('notificationclick', (event) => {
-    const notification = event.notification;
-    const action = event.action;
-    const targetUrl = new URL(notification.data.url, self.location.origin).href;
-    notification.close();
-
-    if (action === 'close') return;
-
-    event.waitUntil(
-        clients.matchAll({ type: 'window', includeUncontrolled: true })
-            .then((windowClients) => {
-                for (let client of windowClients) {
-                    if (client.url === targetUrl && 'focus' in client) {
-                        return client.focus();
-                    }
-                }
-                if (clients.openWindow) {
-                    return clients.openWindow(targetUrl);
-                }
-            })
     );
 });

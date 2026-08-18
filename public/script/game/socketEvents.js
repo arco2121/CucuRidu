@@ -76,13 +76,6 @@ if(controller instanceof Worker)
 //Utility
 let referenceGiocatore = new GiocatoreInterface(null);
 let referenceStanza = "";
-const notificationMessage = [
-    "Allora... pensi di continuare a giocare o cosa?",
-    "Muovi quel culo che stanno andando avanti senza di te",
-    "A sto punto fatti due domande, datti due risposte e tirati due sberle",
-    "Vuoi davvero competere con gli Ipad Kid? CONCENTRATI SUL GIOCO!",
-    "Se non vuoi giocare davvero basta uscire sai"
-];
 const lasciaStanza = () => {
     const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
     const token = settings["savingToken"];
@@ -167,11 +160,6 @@ on("connect_error", (err) => {
             document.dispatchEvent(stateDisconnected);
         }
     }
-});
-
-on("any", async () => {
-    if(document.hidden)
-        await sendNotifica(referenceStanza + " - Cucu Ridu", notificationMessage[Math.floor(Math.random()*notificationMessage.length)]);
 });
 
 on("confermaStanza", async (data) => {

@@ -58,8 +58,6 @@ if (!params.has("token") && token && fromBackEnd["loadToken"] !== false) {
     window.location.replace(newUrl.href);
 }
 
-if(settings.translate) document.addEventListener("DOMContentLoaded", () => translateDom(null, lang));
-
 setInterval(() => checkHost(fromBackEnd["allowedOrigins"]), 30000);
 document.addEventListener("visibilitychange", () => {
     if (!document.hidden) fallimentiConsecutivi = 0;

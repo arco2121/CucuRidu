@@ -28,24 +28,53 @@ const getknownPacks = () => {
     return dirs.filter(dir => dir.isDirectory()).map(dir => dir.name);
 };
 
-// Generazione Nome Casuale
-const generateName = () => {
-    const fs = require('node:fs');
-    const path = require('node:path');
+/*
+ * Generazione Nome Casuale
+ *
+ * names.json versione 2:
+ *   names:      { nome, genere }  con genere m | f | n | p
+ *   adjectives: { m, f, n, p }    n = forma neutra, quella con l'asterisco
+ * L'aggettivo viene scelto nella forma che concorda col genere del nome, cosi
+ * non serve piu l'asterisco per cavarsela: "Petunia Stronza" invece di
+ * "Petunia Stronz*". Il vecchio formato a liste di stringhe continua a
+ * funzionare, viene trattato come tutto neutro.
+ */
+let datiNomi = null;
 
+const caricaNomi = () => {
+    if (datiNomi) return datiNomi;
     try {
         const filePath = path.join(__dirname, '../names/names.json');
-        const rawData = fs.readFileSync(filePath, 'utf-8');
-        const data = JSON.parse(rawData);
-
-        // Scelta random
-        let name = data.names[Math.floor(Math.random() * (data.names.length))];
-        let adjective = data.adjectives[Math.floor(Math.random() * data.adjectives.length)];
-
-        return name + " " + adjective;
+        const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        datiNomi = {
+            names: (data.names || [])
+                .map(n => typeof n === "string" ? { nome: n, genere: "n" } : n)
+                .filter(n => n && n.nome),
+            adjectives: (data.adjectives || [])
+                .map(a => typeof a === "string" ? { n: a, m: a, f: a, p: a } : a)
+                .filter(Boolean)
+        };
     } catch (error) {
-        console.error('Errore durante la lettura del file JSON:', error);
+        console.error('Errore durante la lettura del file JSON:', error.message);
+        datiNomi = { names: [], adjectives: [] };
     }
+    return datiNomi;
+};
+
+const scegliACaso = (lista) => lista[Math.floor(Math.random() * lista.length)];
+
+const generateName = () => {
+    const dati = caricaNomi();
+    if (!dati.names.length) return "Giocatore Anonimo";
+
+    const nome = scegliACaso(dati.names);
+    if (!dati.adjectives.length) return nome.nome;
+
+    const aggettivo = scegliACaso(dati.adjectives);
+    const genere = ["m", "f", "n", "p"].includes(nome.genere) ? nome.genere : "n";
+    const forma = aggettivo[genere] || aggettivo.n || aggettivo.m || aggettivo.f || "";
+
+    return (nome.nome + " " + forma).trim();
 }
 
 const translateToPack = (packs) => {

@@ -1,342 +1,1424 @@
 {
+  "version": 2,
   "names": [
-    "Gianfranco",
-    "Petunia",
-    "Matilda",
-    "Gesù",
-    "Patrizia",
-    "Anastasia",
-    "Tancredi",
-    "Geltrude",
-    "San bartolomeo",
-    "Stefania",
-    "Sandrina",
-    "Gervasio",
-    "Tibetino",
-    "Filiberto",
-    "Demetra",
-    "Carlina",
-    "Peppone",
-    "Brumilda",
-    "Ermenegilda",
-    "Loretta",
-    "Juan",
-    "Gonzago",
-    "Carmeletto",
-    "Clarissa",
-    "Asdrubale",
-    "Osvaldo",
-    "Moreno",
-    "Gilberto",
-    "Lucresia",
-    "Esposito",
-    "Proserpina",
-    "Annunziata",
-    "Pasqualino",
-    "Simonetta",
-    "Giovanni",
-    "Natalia",
-    "Anastasia",
-    "Girolamo",
-    "Ernesto",
-    "Ambrogio",
-    "Ettorina",
-    "Onorino",
-    "Giandomenica",
-    "Natalino",
-    "Romualda",
-    "Melania",
-    "Reginaldo",
-    "Percivaldo",
-    "Flaviana",
-    "Manuela",
-    "Madonna",
-    "Gabibbo",
-    "Calimero",
-    "Mussolini",
-    "Marilina",
-    "Michael Jackson",
-    "Orietta Berti",
-    "Gerry Scotti",
-    "Maria de Filippi",
-    "Ormina",
-    "Rosita",
-    "Hello Kitty",
-    "Cesare",
-    "Chiara Facchetti",
-    "Onorio",
-    "Adolfo",
-    "Teodolinda",
-    "Iolanda",
-    "Domiziano",
-    "Diocleziano",
-    "Mafalda",
-    "Apollonia",
-    "Eufrasio",
-    "Mirandolina",
-    "Torquato",
-    "Beppe",
-    "Giampiertolda",
-    "Mariano",
-    "Lancillotto",
-    "Vernelia",
-    "Marcantonio",
-    "Perpetua",
-    "Cassiopea",
-    "Papa Francesco",
-    "Ampelietto",
-    "Don Abbondio",
-    "Maria Luisa Pia",
-    "Ludmilla",
-    "Madonna",
-    "Cristo",
-    "Gesù",
-    "Dio",
-    "Signore",
-    "San Giovanni",
-    "Madre Teresa",
-    "San Sebastiano",
-    "Arcangelo Gabriele",
-    "Maria",
-    "Sant'Anna",
-    "Sant'Antonio",
-    "Santa Chiara Da Copenaghen",
-    "Beata Crocifissa Ostrogota",
-    "San Eristefale",
-    "Santa Emerenziana",
-    "Eustachio",
-    "Cunegonda",
-    "Pancrazio",
-    "Genoveffa",
-    "Addolorata",
-    "Teopompo",
-    "Clodoveo",
-    "Ermenegildo",
-    "Bixio",
-    "Gelsomina",
-    "Trifone",
-    "Annibale",
-    "Barbara D'Urso",
-    "Malgioglio",
-    "Il Divino Otelma",
-    "Pingu",
-    "Peppa Pig",
-    "Magalli",
-    "Amadeus",
-    "Lady Gaga",
-    "Shrek",
-    "Spongebob",
-    "Mocio Vileda",
-    "Telecomanda",
-    "Tiramisù",
-    "Varechina",
-    "San Bitter",
-    "Santa Pazienza",
-    "Beata Solitudine",
-    "Arcangelo Smirneo",
-    "Tutankhamon",
-    "Vercingetorige",
-    "Napoleone",
-    "Giulio Cesare",
-    "Beata Ignoranza",
-    "Sant'Iddio",
-    "San Giovanni Decapitato",
-    "Pierpiero",
-    "Gianmariafilippo",
-    "Maria Antonietta",
-    "Loredano",
-    "Giuseppina Bonaparte",
-    "Massimilianotello",
-    "Mariottide",
-    "Eustachio",
-    "Cunegonda",
-    "Pancrazio",
-    "Genoveffa",
-    "Addolorata",
-    "Teopompo",
-    "Clodoveo",
-    "Ermenegildo",
-    "Bixio",
-    "Gelsomina",
-    "Trifone",
-    "Annibale",
-    "Barbara D'Urso",
-    "Malgioglio",
-    "Il Divino Otelma",
-    "Pingu",
-    "Peppa Pig",
-    "Magalli",
-    "Amadeus",
-    "Lady Gaga",
-    "Shrek",
-    "Spongebob",
-    "Mocio Vileda",
-    "Telecomanda",
-    "Tiramisù",
-    "Varechina",
-    "San Bitter",
-    "Santa Pazienza",
-    "Beata Solitudine",
-    "Arcangelo Smirneo",
-    "Tutankhamon",
-    "Vercingetorige",
-    "Napoleone",
-    "Giulio Cesare",
-    "Beata Ignoranza",
-    "Sant'Iddio",
-    "San Giovanni",
-    "Pierpiero",
-    "Gianmariafilippo",
-    "Maria Antonietta",
-    "Loredano",
-    "Giuseppina Bonaparte",
-    "Massimilianotello",
-    "Mariottide",
-    "Orazio",
-    "Santa Maria Senza Peccato Concepta",
-    "Galeazzo",
-    "Rosaana",
-    "Gianantonio",
-    "Broccolo",
-    "Crostatina",
-    "Teresa Fidalgo",
-    "Fiorella",
-    "Ninetta",
-    "Armenegilda",
-    "Lancillotta",
-    "Enza",
-    "Viterbo",
-    "Jessika La Troia",
-    "Romina",
-    "Concetta",
-    "Reginella",
-    "Umberto",
-    "Lyon WGF",
-    "Il Gabibbo"
+    {
+      "nome": "Gianfranco",
+      "genere": "m"
+    },
+    {
+      "nome": "Petunia",
+      "genere": "f"
+    },
+    {
+      "nome": "Matilda",
+      "genere": "f"
+    },
+    {
+      "nome": "Gesù",
+      "genere": "m"
+    },
+    {
+      "nome": "Patrizia",
+      "genere": "f"
+    },
+    {
+      "nome": "Anastasia",
+      "genere": "f"
+    },
+    {
+      "nome": "Tancredi",
+      "genere": "m"
+    },
+    {
+      "nome": "Geltrude",
+      "genere": "f"
+    },
+    {
+      "nome": "San bartolomeo",
+      "genere": "m"
+    },
+    {
+      "nome": "Stefania",
+      "genere": "f"
+    },
+    {
+      "nome": "Sandrina",
+      "genere": "f"
+    },
+    {
+      "nome": "Gervasio",
+      "genere": "m"
+    },
+    {
+      "nome": "Tibetino",
+      "genere": "m"
+    },
+    {
+      "nome": "Filiberto",
+      "genere": "m"
+    },
+    {
+      "nome": "Demetra",
+      "genere": "f"
+    },
+    {
+      "nome": "Carlina",
+      "genere": "f"
+    },
+    {
+      "nome": "Peppone",
+      "genere": "m"
+    },
+    {
+      "nome": "Brumilda",
+      "genere": "f"
+    },
+    {
+      "nome": "Ermenegilda",
+      "genere": "f"
+    },
+    {
+      "nome": "Loretta",
+      "genere": "f"
+    },
+    {
+      "nome": "Juan",
+      "genere": "m"
+    },
+    {
+      "nome": "Gonzago",
+      "genere": "m"
+    },
+    {
+      "nome": "Carmeletto",
+      "genere": "m"
+    },
+    {
+      "nome": "Clarissa",
+      "genere": "f"
+    },
+    {
+      "nome": "Asdrubale",
+      "genere": "m"
+    },
+    {
+      "nome": "Osvaldo",
+      "genere": "m"
+    },
+    {
+      "nome": "Moreno",
+      "genere": "m"
+    },
+    {
+      "nome": "Gilberto",
+      "genere": "m"
+    },
+    {
+      "nome": "Lucresia",
+      "genere": "f"
+    },
+    {
+      "nome": "Esposito",
+      "genere": "m"
+    },
+    {
+      "nome": "Proserpina",
+      "genere": "f"
+    },
+    {
+      "nome": "Annunziata",
+      "genere": "f"
+    },
+    {
+      "nome": "Pasqualino",
+      "genere": "m"
+    },
+    {
+      "nome": "Simonetta",
+      "genere": "f"
+    },
+    {
+      "nome": "Giovanni",
+      "genere": "m"
+    },
+    {
+      "nome": "Natalia",
+      "genere": "f"
+    },
+    {
+      "nome": "Girolamo",
+      "genere": "m"
+    },
+    {
+      "nome": "Ernesto",
+      "genere": "m"
+    },
+    {
+      "nome": "Ambrogio",
+      "genere": "m"
+    },
+    {
+      "nome": "Ettorina",
+      "genere": "f"
+    },
+    {
+      "nome": "Onorino",
+      "genere": "m"
+    },
+    {
+      "nome": "Giandomenica",
+      "genere": "f"
+    },
+    {
+      "nome": "Natalino",
+      "genere": "m"
+    },
+    {
+      "nome": "Romualda",
+      "genere": "f"
+    },
+    {
+      "nome": "Melania",
+      "genere": "f"
+    },
+    {
+      "nome": "Reginaldo",
+      "genere": "m"
+    },
+    {
+      "nome": "Percivaldo",
+      "genere": "m"
+    },
+    {
+      "nome": "Flaviana",
+      "genere": "f"
+    },
+    {
+      "nome": "Manuela",
+      "genere": "f"
+    },
+    {
+      "nome": "Madonna",
+      "genere": "f"
+    },
+    {
+      "nome": "Gabibbo",
+      "genere": "m"
+    },
+    {
+      "nome": "Calimero",
+      "genere": "m"
+    },
+    {
+      "nome": "Mussolini",
+      "genere": "m"
+    },
+    {
+      "nome": "Marilina",
+      "genere": "f"
+    },
+    {
+      "nome": "Michael Jackson",
+      "genere": "m"
+    },
+    {
+      "nome": "Orietta Berti",
+      "genere": "f"
+    },
+    {
+      "nome": "Gerry Scotti",
+      "genere": "m"
+    },
+    {
+      "nome": "Maria de Filippi",
+      "genere": "f"
+    },
+    {
+      "nome": "Ormina",
+      "genere": "f"
+    },
+    {
+      "nome": "Rosita",
+      "genere": "f"
+    },
+    {
+      "nome": "Hello Kitty",
+      "genere": "f"
+    },
+    {
+      "nome": "Cesare",
+      "genere": "m"
+    },
+    {
+      "nome": "Chiara Facchetti",
+      "genere": "f"
+    },
+    {
+      "nome": "Onorio",
+      "genere": "m"
+    },
+    {
+      "nome": "Adolfo",
+      "genere": "m"
+    },
+    {
+      "nome": "Teodolinda",
+      "genere": "f"
+    },
+    {
+      "nome": "Iolanda",
+      "genere": "f"
+    },
+    {
+      "nome": "Domiziano",
+      "genere": "m"
+    },
+    {
+      "nome": "Diocleziano",
+      "genere": "m"
+    },
+    {
+      "nome": "Mafalda",
+      "genere": "f"
+    },
+    {
+      "nome": "Apollonia",
+      "genere": "f"
+    },
+    {
+      "nome": "Eufrasio",
+      "genere": "m"
+    },
+    {
+      "nome": "Mirandolina",
+      "genere": "f"
+    },
+    {
+      "nome": "Torquato",
+      "genere": "m"
+    },
+    {
+      "nome": "Beppe",
+      "genere": "m"
+    },
+    {
+      "nome": "Giampiertolda",
+      "genere": "f"
+    },
+    {
+      "nome": "Mariano",
+      "genere": "m"
+    },
+    {
+      "nome": "Lancillotto",
+      "genere": "m"
+    },
+    {
+      "nome": "Vernelia",
+      "genere": "f"
+    },
+    {
+      "nome": "Marcantonio",
+      "genere": "m"
+    },
+    {
+      "nome": "Perpetua",
+      "genere": "f"
+    },
+    {
+      "nome": "Cassiopea",
+      "genere": "f"
+    },
+    {
+      "nome": "Papa Francesco",
+      "genere": "m"
+    },
+    {
+      "nome": "Ampelietto",
+      "genere": "m"
+    },
+    {
+      "nome": "Don Abbondio",
+      "genere": "m"
+    },
+    {
+      "nome": "Maria Luisa Pia",
+      "genere": "f"
+    },
+    {
+      "nome": "Ludmilla",
+      "genere": "f"
+    },
+    {
+      "nome": "Cristo",
+      "genere": "m"
+    },
+    {
+      "nome": "Dio",
+      "genere": "m"
+    },
+    {
+      "nome": "Signore",
+      "genere": "m"
+    },
+    {
+      "nome": "San Giovanni",
+      "genere": "m"
+    },
+    {
+      "nome": "Madre Teresa",
+      "genere": "f"
+    },
+    {
+      "nome": "San Sebastiano",
+      "genere": "m"
+    },
+    {
+      "nome": "Arcangelo Gabriele",
+      "genere": "m"
+    },
+    {
+      "nome": "Maria",
+      "genere": "f"
+    },
+    {
+      "nome": "Sant'Anna",
+      "genere": "f"
+    },
+    {
+      "nome": "Sant'Antonio",
+      "genere": "m"
+    },
+    {
+      "nome": "Santa Chiara Da Copenaghen",
+      "genere": "f"
+    },
+    {
+      "nome": "Beata Crocifissa Ostrogota",
+      "genere": "f"
+    },
+    {
+      "nome": "San Eristefale",
+      "genere": "m"
+    },
+    {
+      "nome": "Santa Emerenziana",
+      "genere": "f"
+    },
+    {
+      "nome": "Eustachio",
+      "genere": "m"
+    },
+    {
+      "nome": "Cunegonda",
+      "genere": "f"
+    },
+    {
+      "nome": "Pancrazio",
+      "genere": "m"
+    },
+    {
+      "nome": "Genoveffa",
+      "genere": "f"
+    },
+    {
+      "nome": "Addolorata",
+      "genere": "f"
+    },
+    {
+      "nome": "Teopompo",
+      "genere": "m"
+    },
+    {
+      "nome": "Clodoveo",
+      "genere": "m"
+    },
+    {
+      "nome": "Ermenegildo",
+      "genere": "m"
+    },
+    {
+      "nome": "Bixio",
+      "genere": "m"
+    },
+    {
+      "nome": "Gelsomina",
+      "genere": "f"
+    },
+    {
+      "nome": "Trifone",
+      "genere": "m"
+    },
+    {
+      "nome": "Annibale",
+      "genere": "m"
+    },
+    {
+      "nome": "Barbara D'Urso",
+      "genere": "f"
+    },
+    {
+      "nome": "Malgioglio",
+      "genere": "m"
+    },
+    {
+      "nome": "Il Divino Otelma",
+      "genere": "m"
+    },
+    {
+      "nome": "Pingu",
+      "genere": "m"
+    },
+    {
+      "nome": "Peppa Pig",
+      "genere": "f"
+    },
+    {
+      "nome": "Magalli",
+      "genere": "m"
+    },
+    {
+      "nome": "Amadeus",
+      "genere": "m"
+    },
+    {
+      "nome": "Lady Gaga",
+      "genere": "f"
+    },
+    {
+      "nome": "Shrek",
+      "genere": "m"
+    },
+    {
+      "nome": "Spongebob",
+      "genere": "m"
+    },
+    {
+      "nome": "Mocio Vileda",
+      "genere": "m"
+    },
+    {
+      "nome": "Telecomanda",
+      "genere": "f"
+    },
+    {
+      "nome": "Tiramisù",
+      "genere": "m"
+    },
+    {
+      "nome": "Varechina",
+      "genere": "f"
+    },
+    {
+      "nome": "San Bitter",
+      "genere": "m"
+    },
+    {
+      "nome": "Santa Pazienza",
+      "genere": "f"
+    },
+    {
+      "nome": "Beata Solitudine",
+      "genere": "f"
+    },
+    {
+      "nome": "Arcangelo Smirneo",
+      "genere": "m"
+    },
+    {
+      "nome": "Tutankhamon",
+      "genere": "m"
+    },
+    {
+      "nome": "Vercingetorige",
+      "genere": "m"
+    },
+    {
+      "nome": "Napoleone",
+      "genere": "m"
+    },
+    {
+      "nome": "Giulio Cesare",
+      "genere": "m"
+    },
+    {
+      "nome": "Beata Ignoranza",
+      "genere": "f"
+    },
+    {
+      "nome": "Sant'Iddio",
+      "genere": "m"
+    },
+    {
+      "nome": "San Giovanni Decapitato",
+      "genere": "m"
+    },
+    {
+      "nome": "Pierpiero",
+      "genere": "m"
+    },
+    {
+      "nome": "Gianmariafilippo",
+      "genere": "m"
+    },
+    {
+      "nome": "Maria Antonietta",
+      "genere": "f"
+    },
+    {
+      "nome": "Loredano",
+      "genere": "m"
+    },
+    {
+      "nome": "Giuseppina Bonaparte",
+      "genere": "f"
+    },
+    {
+      "nome": "Massimilianotello",
+      "genere": "m"
+    },
+    {
+      "nome": "Mariottide",
+      "genere": "f"
+    },
+    {
+      "nome": "Orazio",
+      "genere": "m"
+    },
+    {
+      "nome": "Santa Maria Senza Peccato Concepta",
+      "genere": "f"
+    },
+    {
+      "nome": "Galeazzo",
+      "genere": "m"
+    },
+    {
+      "nome": "Rosaana",
+      "genere": "f"
+    },
+    {
+      "nome": "Gianantonio",
+      "genere": "m"
+    },
+    {
+      "nome": "Broccolo",
+      "genere": "m"
+    },
+    {
+      "nome": "Crostatina",
+      "genere": "f"
+    },
+    {
+      "nome": "Teresa Fidalgo",
+      "genere": "f"
+    },
+    {
+      "nome": "Fiorella",
+      "genere": "f"
+    },
+    {
+      "nome": "Ninetta",
+      "genere": "f"
+    },
+    {
+      "nome": "Armenegilda",
+      "genere": "f"
+    },
+    {
+      "nome": "Lancillotta",
+      "genere": "f"
+    },
+    {
+      "nome": "Enza",
+      "genere": "f"
+    },
+    {
+      "nome": "Viterbo",
+      "genere": "m"
+    },
+    {
+      "nome": "Jessika La Troia",
+      "genere": "f"
+    },
+    {
+      "nome": "Romina",
+      "genere": "f"
+    },
+    {
+      "nome": "Concetta",
+      "genere": "f"
+    },
+    {
+      "nome": "Reginella",
+      "genere": "f"
+    },
+    {
+      "nome": "Umberto",
+      "genere": "m"
+    },
+    {
+      "nome": "Lyon WGF",
+      "genere": "m"
+    },
+    {
+      "nome": "Il Gabibbo",
+      "genere": "m"
+    }
   ],
   "adjectives": [
-    "Cane",
-    "Troia",
-    "Puttan*",
-    "Ebete",
-    "Rincoglionit*",
-    "Maltrattat*",
-    "Demente",
-    "Porc*",
-    "Termosifone",
-    "Stradale",
-    "Dismorf*",
-    "Campione di sperma",
-    "Triceratopo",
-    "Terron*",
-    "Accoltellat*",
-    "Serbatoio idraulico",
-    "Condominio",
-    "Inalante di cocaina",
-    "Leprecauno",
-    "Trifosfato",
-    "Lerci*",
-    "Slinguazzat* da suo padre",
-    "Megazord",
-    "Ebre*",
-    "Scalz* nella valle dei chiodi arrugginiti",
-    "Sciocchin*",
-    "Disadattat*",
-    "Imbecille",
-    "Mongoloide",
-    "Gatto",
-    "Coniglio",
-    "Cretin*",
-    "Anfibio",
-    "Stronz*",
-    "Zoccol*",
-    "Puttanier*",
-    "Mozzarella bio",
-    "Cancro",
-    "Negr*",
-    "Con una grave malattia terminale",
-    "Gravemente omosessuale",
-    "Mattacchion*",
-    "Proveniente dalla bollente provincia napoletana",
-    "Soprammobile",
-    "Flagello del mondo",
-    "Buco di culo",
-    "Con un forte accento bergamasco",
-    "Asdrubalante",
-    "Vibrante",
-    "Caliente",
-    "Eccitante",
-    "Segante",
-    "Scopante",
-    "Cagarellante",
-    "Macchiante",
-    "Incontinente",
-    "Gemente",
-    "Performante",
-    "Sniffante",
-    "Folgorante",
-    "Gocciolante",
-    "Rizzante",
-    "Scompisciante",
-    "Sburrante",
-    "Ninfomane",
-    "Abominevole",
-    "Gigante",
-    "Piacevole",
-    "Sensuale",
-    "Omosessuale",
-    "Petulante",
-    "Pizzicolante",
-    "Orgasmante",
-    "Vegetante",
-    "Indulgente",
-    "Bocca larga",
-    "Culo stretto",
-    "Mani rapide",
-    "Imprecante",
-    "Salivante",
-    "Ortofruttante",
-    "Strimpellante",
-    "Seno esplosivo",
-    "Passione fisting",
-    "Saccente",
-    "Orifizio dilatato",
-    "Comunista",
-    "Fascista",
-    "Eccessivamente omosessuale",
-    "Che salta sui tetti",
-    "Che corre nei campi",
-    "Provocante",
-    "Effervescente",
-    "Con la felpa di Salvini",
-    "Fessa dentata",
-    "Culo peloso",
-    "Down",
-    "Su una sedia a rotelle",
-    "Intollerante al lattosio",
-    "Bocchinante",
-    "Naso imponente",
-    "Dissacrante",
-    "Elefante",
-    "Feticista",
-    "Sconvolgente",
-    "Saltasburellante",
-    "Necromante",
-    "Che picchia i bambini",
-    "Che deruba le vecchie",
-    "Pluriomicida",
-    "Sodomita",
-    "Filibustier*",
-    "Alito fetente",
-    "Senpai",
-    "Bueo",
-    "Con il parrucchino",
-    "A forma di scarpiera",
-    "Geneticamente modificat*",
-    "Che brilla al buio",
-    "Fetente",
-    "Costosett*",
-    "Un po' cesso",
-    "E la sua bussy"
+    {
+      "n": "Cane",
+      "m": "Cane",
+      "f": "Cagna",
+      "p": "Cani",
+      "rivedere": "'Cagna' e' un femminile vero ma cambia parecchio il tono"
+    },
+    {
+      "n": "Troia",
+      "m": "Troia",
+      "f": "Troia",
+      "p": "Troie",
+      "rivedere": "non esiste il maschile, resta 'Troia' per tutti"
+    },
+    {
+      "n": "Puttan*",
+      "m": "Puttano",
+      "f": "Puttana",
+      "p": "Puttani",
+      "rivedere": "'Puttano' non e' italiano vero, valuta 'Puttaniere'"
+    },
+    {
+      "n": "Ebete",
+      "m": "Ebete",
+      "f": "Ebete",
+      "p": "Ebeti"
+    },
+    {
+      "n": "Rincoglionit*",
+      "m": "Rincoglionito",
+      "f": "Rincoglionita",
+      "p": "Rincoglioniti",
+      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+    },
+    {
+      "n": "Maltrattat*",
+      "m": "Maltrattato",
+      "f": "Maltrattata",
+      "p": "Maltrattati",
+      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+    },
+    {
+      "n": "Demente",
+      "m": "Demente",
+      "f": "Demente",
+      "p": "Dementi"
+    },
+    {
+      "n": "Porc*",
+      "m": "Porco",
+      "f": "Porca",
+      "p": "Porci"
+    },
+    {
+      "n": "Termosifone",
+      "m": "Termosifone",
+      "f": "Termosifone",
+      "p": "Termosifoni"
+    },
+    {
+      "n": "Stradale",
+      "m": "Stradale",
+      "f": "Stradale",
+      "p": "Stradali"
+    },
+    {
+      "n": "Dismorf*",
+      "m": "Dismorfo",
+      "f": "Dismorfa",
+      "p": "Dismorfi"
+    },
+    {
+      "n": "Campione di sperma",
+      "m": "Campione di sperma",
+      "f": "Campionessa di sperma",
+      "p": "Campioni di sperma"
+    },
+    {
+      "n": "Triceratopo",
+      "m": "Triceratopo",
+      "f": "Triceratopo",
+      "p": "Triceratopi"
+    },
+    {
+      "n": "Terron*",
+      "m": "Terrone",
+      "f": "Terrona",
+      "p": "Terroni"
+    },
+    {
+      "n": "Accoltellat*",
+      "m": "Accoltellato",
+      "f": "Accoltellata",
+      "p": "Accoltellati",
+      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+    },
+    {
+      "n": "Serbatoio idraulico",
+      "m": "Serbatoio idraulico",
+      "f": "Serbatoio idraulico",
+      "p": "Serbatoi idraulici"
+    },
+    {
+      "n": "Condominio",
+      "m": "Condominio",
+      "f": "Condominio",
+      "p": "Condomini"
+    },
+    {
+      "n": "Inalante di cocaina",
+      "m": "Inalante di cocaina",
+      "f": "Inalante di cocaina",
+      "p": "Inalanti di cocaina"
+    },
+    {
+      "n": "Leprecauno",
+      "m": "Leprecauno",
+      "f": "Leprecauna",
+      "p": "Leprecauni"
+    },
+    {
+      "n": "Trifosfato",
+      "m": "Trifosfato",
+      "f": "Trifosfato",
+      "p": "Trifosfati"
+    },
+    {
+      "n": "Lerci*",
+      "m": "Lercio",
+      "f": "Lercia",
+      "p": "Lerci"
+    },
+    {
+      "n": "Slinguazzat* da suo padre",
+      "m": "Slinguazzato da suo padre",
+      "f": "Slinguazzata da suo padre",
+      "p": "Slinguazzati dal padre",
+      "rivedere": "al plurale 'suo padre' andrebbe cambiato"
+    },
+    {
+      "n": "Megazord",
+      "m": "Megazord",
+      "f": "Megazord",
+      "p": "Megazord"
+    },
+    {
+      "n": "Ebre*",
+      "m": "Ebreo",
+      "f": "Ebrea",
+      "p": "Ebrei"
+    },
+    {
+      "n": "Scalz* nella valle dei chiodi arrugginiti",
+      "m": "Scalzo nella valle dei chiodi arrugginiti",
+      "f": "Scalza nella valle dei chiodi arrugginiti",
+      "p": "Scalzi nella valle dei chiodi arrugginiti"
+    },
+    {
+      "n": "Sciocchin*",
+      "m": "Sciocchino",
+      "f": "Sciocchina",
+      "p": "Sciocchini"
+    },
+    {
+      "n": "Disadattat*",
+      "m": "Disadattato",
+      "f": "Disadattata",
+      "p": "Disadattati",
+      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+    },
+    {
+      "n": "Imbecille",
+      "m": "Imbecille",
+      "f": "Imbecille",
+      "p": "Imbecilli"
+    },
+    {
+      "n": "Mongoloide",
+      "m": "Mongoloide",
+      "f": "Mongoloide",
+      "p": "Mongoloidi"
+    },
+    {
+      "n": "Gatto",
+      "m": "Gatto",
+      "f": "Gatta",
+      "p": "Gatti"
+    },
+    {
+      "n": "Coniglio",
+      "m": "Coniglio",
+      "f": "Coniglia",
+      "p": "Conigli"
+    },
+    {
+      "n": "Cretin*",
+      "m": "Cretino",
+      "f": "Cretina",
+      "p": "Cretini",
+      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+    },
+    {
+      "n": "Anfibio",
+      "m": "Anfibio",
+      "f": "Anfibia",
+      "p": "Anfibi"
+    },
+    {
+      "n": "Stronz*",
+      "m": "Stronzo",
+      "f": "Stronza",
+      "p": "Stronzi",
+      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+    },
+    {
+      "n": "Zoccol*",
+      "m": "Zoccolo",
+      "f": "Zoccola",
+      "p": "Zoccoli",
+      "rivedere": "'Zoccolo' al maschile perde il senso dell'insulto"
+    },
+    {
+      "n": "Puttanier*",
+      "m": "Puttaniere",
+      "f": "Puttaniera",
+      "p": "Puttanieri"
+    },
+    {
+      "n": "Mozzarella bio",
+      "m": "Mozzarella bio",
+      "f": "Mozzarella bio",
+      "p": "Mozzarelle bio"
+    },
+    {
+      "n": "Cancro",
+      "m": "Cancro",
+      "f": "Cancro",
+      "p": "Cancri"
+    },
+    {
+      "n": "Negr*",
+      "m": "Negro",
+      "f": "Negra",
+      "p": "Negri",
+      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+    },
+    {
+      "n": "Con una grave malattia terminale",
+      "m": "Con una grave malattia terminale",
+      "f": "Con una grave malattia terminale",
+      "p": "Con una grave malattia terminale"
+    },
+    {
+      "n": "Gravemente omosessuale",
+      "m": "Gravemente omosessuale",
+      "f": "Gravemente omosessuale",
+      "p": "Gravemente omosessuali"
+    },
+    {
+      "n": "Mattacchion*",
+      "m": "Mattacchione",
+      "f": "Mattacchiona",
+      "p": "Mattacchioni"
+    },
+    {
+      "n": "Proveniente dalla bollente provincia napoletana",
+      "m": "Proveniente dalla bollente provincia napoletana",
+      "f": "Proveniente dalla bollente provincia napoletana",
+      "p": "Provenienti dalla bollente provincia napoletana"
+    },
+    {
+      "n": "Soprammobile",
+      "m": "Soprammobile",
+      "f": "Soprammobile",
+      "p": "Soprammobili"
+    },
+    {
+      "n": "Flagello del mondo",
+      "m": "Flagello del mondo",
+      "f": "Flagello del mondo",
+      "p": "Flagelli del mondo"
+    },
+    {
+      "n": "Buco di culo",
+      "m": "Buco di culo",
+      "f": "Buco di culo",
+      "p": "Buchi di culo"
+    },
+    {
+      "n": "Con un forte accento bergamasco",
+      "m": "Con un forte accento bergamasco",
+      "f": "Con un forte accento bergamasco",
+      "p": "Con un forte accento bergamasco"
+    },
+    {
+      "n": "Asdrubalante",
+      "m": "Asdrubalante",
+      "f": "Asdrubalante",
+      "p": "Asdrubalanti"
+    },
+    {
+      "n": "Vibrante",
+      "m": "Vibrante",
+      "f": "Vibrante",
+      "p": "Vibranti"
+    },
+    {
+      "n": "Caliente",
+      "m": "Caliente",
+      "f": "Caliente",
+      "p": "Calienti"
+    },
+    {
+      "n": "Eccitante",
+      "m": "Eccitante",
+      "f": "Eccitante",
+      "p": "Eccitanti"
+    },
+    {
+      "n": "Segante",
+      "m": "Segante",
+      "f": "Segante",
+      "p": "Seganti"
+    },
+    {
+      "n": "Scopante",
+      "m": "Scopante",
+      "f": "Scopante",
+      "p": "Scopanti"
+    },
+    {
+      "n": "Cagarellante",
+      "m": "Cagarellante",
+      "f": "Cagarellante",
+      "p": "Cagarellanti"
+    },
+    {
+      "n": "Macchiante",
+      "m": "Macchiante",
+      "f": "Macchiante",
+      "p": "Macchianti"
+    },
+    {
+      "n": "Incontinente",
+      "m": "Incontinente",
+      "f": "Incontinente",
+      "p": "Incontinenti"
+    },
+    {
+      "n": "Gemente",
+      "m": "Gemente",
+      "f": "Gemente",
+      "p": "Gementi"
+    },
+    {
+      "n": "Performante",
+      "m": "Performante",
+      "f": "Performante",
+      "p": "Performanti"
+    },
+    {
+      "n": "Sniffante",
+      "m": "Sniffante",
+      "f": "Sniffante",
+      "p": "Sniffanti"
+    },
+    {
+      "n": "Folgorante",
+      "m": "Folgorante",
+      "f": "Folgorante",
+      "p": "Folgoranti"
+    },
+    {
+      "n": "Gocciolante",
+      "m": "Gocciolante",
+      "f": "Gocciolante",
+      "p": "Gocciolanti"
+    },
+    {
+      "n": "Rizzante",
+      "m": "Rizzante",
+      "f": "Rizzante",
+      "p": "Rizzanti"
+    },
+    {
+      "n": "Scompisciante",
+      "m": "Scompisciante",
+      "f": "Scompisciante",
+      "p": "Scompiscianti"
+    },
+    {
+      "n": "Sburrante",
+      "m": "Sburrante",
+      "f": "Sburrante",
+      "p": "Sburranti"
+    },
+    {
+      "n": "Ninfomane",
+      "m": "Ninfomane",
+      "f": "Ninfomane",
+      "p": "Ninfomani"
+    },
+    {
+      "n": "Abominevole",
+      "m": "Abominevole",
+      "f": "Abominevole",
+      "p": "Abominevoli"
+    },
+    {
+      "n": "Gigante",
+      "m": "Gigante",
+      "f": "Gigantessa",
+      "p": "Giganti"
+    },
+    {
+      "n": "Piacevole",
+      "m": "Piacevole",
+      "f": "Piacevole",
+      "p": "Piacevoli"
+    },
+    {
+      "n": "Sensuale",
+      "m": "Sensuale",
+      "f": "Sensuale",
+      "p": "Sensuali"
+    },
+    {
+      "n": "Omosessuale",
+      "m": "Omosessuale",
+      "f": "Omosessuale",
+      "p": "Omosessuali"
+    },
+    {
+      "n": "Petulante",
+      "m": "Petulante",
+      "f": "Petulante",
+      "p": "Petulanti"
+    },
+    {
+      "n": "Pizzicolante",
+      "m": "Pizzicolante",
+      "f": "Pizzicolante",
+      "p": "Pizzicolanti"
+    },
+    {
+      "n": "Orgasmante",
+      "m": "Orgasmante",
+      "f": "Orgasmante",
+      "p": "Orgasmanti"
+    },
+    {
+      "n": "Vegetante",
+      "m": "Vegetante",
+      "f": "Vegetante",
+      "p": "Vegetanti"
+    },
+    {
+      "n": "Indulgente",
+      "m": "Indulgente",
+      "f": "Indulgente",
+      "p": "Indulgenti"
+    },
+    {
+      "n": "Bocca larga",
+      "m": "Bocca larga",
+      "f": "Bocca larga",
+      "p": "Bocche larghe"
+    },
+    {
+      "n": "Culo stretto",
+      "m": "Culo stretto",
+      "f": "Culo stretto",
+      "p": "Culi stretti"
+    },
+    {
+      "n": "Mani rapide",
+      "m": "Mani rapide",
+      "f": "Mani rapide",
+      "p": "Mani rapide"
+    },
+    {
+      "n": "Imprecante",
+      "m": "Imprecante",
+      "f": "Imprecante",
+      "p": "Imprecanti"
+    },
+    {
+      "n": "Salivante",
+      "m": "Salivante",
+      "f": "Salivante",
+      "p": "Salivanti"
+    },
+    {
+      "n": "Ortofruttante",
+      "m": "Ortofruttante",
+      "f": "Ortofruttante",
+      "p": "Ortofruttanti"
+    },
+    {
+      "n": "Strimpellante",
+      "m": "Strimpellante",
+      "f": "Strimpellante",
+      "p": "Strimpellanti"
+    },
+    {
+      "n": "Seno esplosivo",
+      "m": "Seno esplosivo",
+      "f": "Seno esplosivo",
+      "p": "Seni esplosivi"
+    },
+    {
+      "n": "Passione fisting",
+      "m": "Passione fisting",
+      "f": "Passione fisting",
+      "p": "Passione fisting"
+    },
+    {
+      "n": "Saccente",
+      "m": "Saccente",
+      "f": "Saccente",
+      "p": "Saccenti"
+    },
+    {
+      "n": "Orifizio dilatato",
+      "m": "Orifizio dilatato",
+      "f": "Orifizio dilatato",
+      "p": "Orifizi dilatati"
+    },
+    {
+      "n": "Comunista",
+      "m": "Comunista",
+      "f": "Comunista",
+      "p": "Comunisti"
+    },
+    {
+      "n": "Fascista",
+      "m": "Fascista",
+      "f": "Fascista",
+      "p": "Fascisti"
+    },
+    {
+      "n": "Eccessivamente omosessuale",
+      "m": "Eccessivamente omosessuale",
+      "f": "Eccessivamente omosessuale",
+      "p": "Eccessivamente omosessuali"
+    },
+    {
+      "n": "Che salta sui tetti",
+      "m": "Che salta sui tetti",
+      "f": "Che salta sui tetti",
+      "p": "Che saltano sui tetti"
+    },
+    {
+      "n": "Che corre nei campi",
+      "m": "Che corre nei campi",
+      "f": "Che corre nei campi",
+      "p": "Che corrono nei campi"
+    },
+    {
+      "n": "Provocante",
+      "m": "Provocante",
+      "f": "Provocante",
+      "p": "Provocanti"
+    },
+    {
+      "n": "Effervescente",
+      "m": "Effervescente",
+      "f": "Effervescente",
+      "p": "Effervescenti"
+    },
+    {
+      "n": "Con la felpa di Salvini",
+      "m": "Con la felpa di Salvini",
+      "f": "Con la felpa di Salvini",
+      "p": "Con le felpe di Salvini"
+    },
+    {
+      "n": "Fessa dentata",
+      "m": "Fessa dentata",
+      "f": "Fessa dentata",
+      "p": "Fesse dentate"
+    },
+    {
+      "n": "Culo peloso",
+      "m": "Culo peloso",
+      "f": "Culo peloso",
+      "p": "Culi pelosi"
+    },
+    {
+      "n": "Down",
+      "m": "Down",
+      "f": "Down",
+      "p": "Down"
+    },
+    {
+      "n": "Su una sedia a rotelle",
+      "m": "Su una sedia a rotelle",
+      "f": "Su una sedia a rotelle",
+      "p": "Su una sedia a rotelle"
+    },
+    {
+      "n": "Intollerante al lattosio",
+      "m": "Intollerante al lattosio",
+      "f": "Intollerante al lattosio",
+      "p": "Intolleranti al lattosio"
+    },
+    {
+      "n": "Bocchinante",
+      "m": "Bocchinante",
+      "f": "Bocchinante",
+      "p": "Bocchinanti"
+    },
+    {
+      "n": "Naso imponente",
+      "m": "Naso imponente",
+      "f": "Naso imponente",
+      "p": "Nasi imponenti"
+    },
+    {
+      "n": "Dissacrante",
+      "m": "Dissacrante",
+      "f": "Dissacrante",
+      "p": "Dissacranti"
+    },
+    {
+      "n": "Elefante",
+      "m": "Elefante",
+      "f": "Elefantessa",
+      "p": "Elefanti"
+    },
+    {
+      "n": "Feticista",
+      "m": "Feticista",
+      "f": "Feticista",
+      "p": "Feticisti"
+    },
+    {
+      "n": "Sconvolgente",
+      "m": "Sconvolgente",
+      "f": "Sconvolgente",
+      "p": "Sconvolgenti"
+    },
+    {
+      "n": "Saltasburellante",
+      "m": "Saltasburellante",
+      "f": "Saltasburellante",
+      "p": "Saltasburellanti"
+    },
+    {
+      "n": "Necromante",
+      "m": "Necromante",
+      "f": "Necromante",
+      "p": "Necromanti"
+    },
+    {
+      "n": "Che picchia i bambini",
+      "m": "Che picchia i bambini",
+      "f": "Che picchia i bambini",
+      "p": "Che picchiano i bambini"
+    },
+    {
+      "n": "Che deruba le vecchie",
+      "m": "Che deruba le vecchie",
+      "f": "Che deruba le vecchie",
+      "p": "Che derubano le vecchie"
+    },
+    {
+      "n": "Pluriomicida",
+      "m": "Pluriomicida",
+      "f": "Pluriomicida",
+      "p": "Pluriomicidi"
+    },
+    {
+      "n": "Sodomita",
+      "m": "Sodomita",
+      "f": "Sodomita",
+      "p": "Sodomiti"
+    },
+    {
+      "n": "Filibustier*",
+      "m": "Filibustiere",
+      "f": "Filibustiera",
+      "p": "Filibustieri",
+      "rivedere": "'Filibustiera' suona strano"
+    },
+    {
+      "n": "Alito fetente",
+      "m": "Alito fetente",
+      "f": "Alito fetente",
+      "p": "Aliti fetenti"
+    },
+    {
+      "n": "Senpai",
+      "m": "Senpai",
+      "f": "Senpai",
+      "p": "Senpai"
+    },
+    {
+      "n": "Bueo",
+      "m": "Bueo",
+      "f": "Bueo",
+      "p": "Bueo"
+    },
+    {
+      "n": "Con il parrucchino",
+      "m": "Con il parrucchino",
+      "f": "Con il parrucchino",
+      "p": "Con il parrucchino"
+    },
+    {
+      "n": "A forma di scarpiera",
+      "m": "A forma di scarpiera",
+      "f": "A forma di scarpiera",
+      "p": "A forma di scarpiera"
+    },
+    {
+      "n": "Geneticamente modificat*",
+      "m": "Geneticamente modificato",
+      "f": "Geneticamente modificata",
+      "p": "Geneticamente modificati",
+      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+    },
+    {
+      "n": "Che brilla al buio",
+      "m": "Che brilla al buio",
+      "f": "Che brilla al buio",
+      "p": "Che brillano al buio"
+    },
+    {
+      "n": "Fetente",
+      "m": "Fetente",
+      "f": "Fetente",
+      "p": "Fetenti"
+    },
+    {
+      "n": "Costosett*",
+      "m": "Costosetto",
+      "f": "Costosetta",
+      "p": "Costosetti",
+      "rivedere": "generato automaticamente dall'asterisco, controlla che suoni bene"
+    },
+    {
+      "n": "Un po' cesso",
+      "m": "Un po' cesso",
+      "f": "Un po' cesso",
+      "p": "Un po' cessi"
+    },
+    {
+      "n": "E la sua bussy",
+      "m": "E la sua bussy",
+      "f": "E la sua bussy",
+      "p": "E la loro bussy"
+    }
   ]
 }

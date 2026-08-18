@@ -21,7 +21,6 @@ const QRCode = require("qrcode-svg");
  * @param pagesOptions
  */
 const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout = 3600000, pagesOptions = {
-    notifications: false,
     version: '1.0.0',
     cluster: false
 }) => {

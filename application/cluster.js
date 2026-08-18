@@ -12,7 +12,7 @@ const { createClient } = require("@supabase/supabase-js");
 const { ClusterStanze } = require(path.join(__dirname, "/include/script/ClusterStanze"));
 const { ClusterSet } = require(path.join(__dirname, "/include/script/ClusterSet"));
 const { Stanza } = require(path.join(__dirname, "/include/script/Stanza"));
-const { cleanUpStanze, notificationsConfig } = require(path.join(__dirname, "/configurations/clusterExtensions"));
+const { cleanUpStanze } = require(path.join(__dirname, "/configurations/clusterExtensions"));
 const { ClusterMap } = require(path.join(__dirname, "/include/script/ClusterMap"));
 
 const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 3600000) => {
@@ -62,12 +62,9 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
     server.adapter(createAdapter(adapter));
 
     appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout, {
-        notifications: true,
-        notificationsKey: env.NOTIFICATION_PUBLIC,
         version: env.npm_package_version,
         cluster: true
     });
-    notificationsConfig(app, database, generationMemory, env, timeout);
 
     serverConfig(server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout);
     cleanUpStanze(Stanze, timeout);

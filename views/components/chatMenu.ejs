@@ -1,21 +1,25 @@
 <div class="section hidden sectionToHide showByConnectionManager" id="chatMenu">
-    <div class="floatSection packs_section btn_doubleBorder pauseSection">
+    <div class="floatSection packs_section btn_doubleBorder pauseSection chat_section">
         <div class="options_exit_btn upper sour_gummy_extra" >
-            <h1 class="panel_title sour_gummy_bold">Chat</h1>
+            <h1 class="panel_title sour_gummy_bold">Chat ✿</h1>
             <h1 class="active_Btn" id="exitChatBtn">X</h1>
         </div>
         <div class="pause_content sour_gummy_medium">
             <div class="chat_list_con_bg" id="chat">
             </div>
-
         </div>
         <div class="pause_footer_con column">
-            <div class="wait_players_list_hr"></div>
-            <div class="options_row chat_footer pause_footer_margin">
-                <textarea class="input input_style_1 chatInput sour_gummy_bold"
-                        id="inputMessage"
-                        placeholder="Scrivi qualche cazzata..."></textarea>
-                <button id="sendBtn" class="button btn_toggle btn_style_2 sour_gummy_extra">Invia</button>
+            <div class="chat_footer_con">
+                <textarea class="input chatInput sour_gummy_medium"
+                          id="inputMessage"
+                          rows="1"
+                          maxlength="300"
+                          placeholder="Scrivi qualche cazzata..."></textarea>
+                <button id="sendBtn" class="button btn_style_2 btn_doubleBorder chat_send_btn" aria-label="Invia">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3.4 20.4 21 12 3.4 3.6 3.4 10.2 15.6 12 3.4 13.8z" fill="currentColor"/>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>

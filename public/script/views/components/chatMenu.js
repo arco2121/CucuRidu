@@ -4,13 +4,26 @@ const chatView = document.getElementById("chat");
 const sendBtn = document.getElementById("sendBtn");
 const inputMessage = document.getElementById("inputMessage");
 let chatHistory = [];
-let notify = true;
-const delayChat = 2000;
+
+const chatVuota = `
+    <div class="chat_vuota">
+        <span class="chat_vuota_faccia">(  ˶ ˘ ³˘)ﾉ</span>
+        <span class="chat_vuota_testo sour_gummy_regular_italic">Qui non ha ancora scritto nessuno,<br>rompi tu il ghiaccio</span>
+    </div>`;
+
+const scorriInFondo = (istantaneo = false) => {
+    if (!chatView) return;
+    chatView.scrollTo({
+        top: chatView.scrollHeight,
+        behavior: istantaneo ? "auto" : "smooth"
+    });
+};
 
 const renderChat = async (chat = [], renderAll = true) => {
-    const place = "<h1>Bha... a me sembra tutto morto qui</h1>";
-    if(chat.length + chatHistory.length === 0) {
-        chatView.innerHTML = place;
+    if (!chatView) return;
+
+    if (chat.length + chatHistory.length === 0) {
+        chatView.innerHTML = chatVuota;
         chatView.classList.remove("chat");
         return;
     }
@@ -25,39 +38,54 @@ const renderChat = async (chat = [], renderAll = true) => {
         notInject: true
     });
 
+    const eraInFondo = chatView.scrollHeight - chatView.scrollTop - chatView.clientHeight < 80;
+
     chatView.classList.add("chat");
-    if(renderAll)
+    if (renderAll)
         chatView.innerHTML = rendered;
     else {
-        if(chatView.innerHTML === place) chatView.innerHTML = "";
-        const frag = document.createRange().createContextualFragment(rendered);
-        chatView.appendChild(frag);
+        if (chatView.querySelector(".chat_vuota")) chatView.innerHTML = "";
+        chatView.appendChild(document.createRange().createContextualFragment(rendered));
     }
 
-    chatView.lastElementChild.scrollIntoView({
-        behavior: "smooth"
-    });
-
-    if(newMessages.length !== 0 && notify) {
-        notify = false;
-        const lastMessage = newMessages.pop();
-        await sendNotifica(lastMessage.username + " - Cucu Ridu", lastMessage.messaggio, lastMessage.pfp);
-        setTimeout(() => notify = true, delayChat);
-    }
+    // si scende in automatico solo se stavi gia guardando il fondo, cosi
+    // non ti strappa via mentre leggi i messaggi vecchi
+    if (renderAll || eraInFondo || newMessages.some(m => m.giocatoreId === referenceGiocatore.id))
+        scorriInFondo(renderAll);
 };
 
 on("aggiornamentoChat", async (data) => renderChat(data["chat"], data["renderAll"]));
 
-sendBtn.addEventListener("click", () => {
-    if(inputMessage.value === "") {
+const adattaAltezza = () => {
+    if (!inputMessage) return;
+    inputMessage.style.height = "auto";
+    inputMessage.style.height = Math.min(inputMessage.scrollHeight, 110) + "px";
+};
+
+const inviaMessaggio = () => {
+    const testo = (inputMessage?.value || "").trim();
+    if (testo === "") {
         alert("Pensi di scrivere qualcosa o di spammare il tasto come una scimmia ?!");
         return;
     }
 
     emit("messaggioChat", {
-        message: inputMessage.value,
+        message: testo,
         id: referenceStanza
     });
 
     inputMessage.value = "";
+    adattaAltezza();
+    inputMessage.focus();
+};
+
+sendBtn?.addEventListener("click", inviaMessaggio);
+inputMessage?.addEventListener("input", adattaAltezza);
+
+// Invio con Enter, a capo con Shift+Enter. Sul telefono si usa il bottone.
+inputMessage?.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" || e.shiftKey) return;
+    if (window.matchMedia("(hover: none)").matches) return;
+    e.preventDefault();
+    inviaMessaggio();
 });

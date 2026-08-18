@@ -1,8 +1,11 @@
 const cards = document.querySelectorAll(".risposta");
 const currentQuestion = document.querySelector(".domanda");
 const sendCardsBtn = document.getElementById("sendCards");
+// defaultText tiene i marcatori (§ prima di uno spazio vuoto = completamento
+// tutto maiuscolo), il testo mostrato invece va sempre ripulito
 const defaultText = currentQuestion.textContent.trim();
 const maxSlots = parseInt(currentQuestion.id);
+currentQuestion.textContent = pulisciFrase(defaultText);
 
 const givenAnswerIndices = Array.from({length: maxSlots}, () => null);
 const givenAnswerTexts = Array.from({length: maxSlots}, () => null);
@@ -28,7 +31,7 @@ const toggleCards = (target) => {
     if (currentAnswersCount > 0) {
         currentQuestion.textContent = fillBlanks(defaultText, givenAnswerTexts);
     } else {
-        currentQuestion.textContent = defaultText;
+        currentQuestion.textContent = pulisciFrase(defaultText);
     }
 
     const isFull = givenAnswerIndices.every(v => v !== null);

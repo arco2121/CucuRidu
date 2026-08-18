@@ -1,13 +1,14 @@
 <% messages.forEach(message => { %>
-    <div class="message_row <%= message.giocatoreId === you ? "fromYou" : "fromElse"%>">
-        <div class="message input_style_1">
-            <div class="message_info wait_players_list_row">
-                <img src="<%= message.pfp %>" alt="pfp" class="wait_players_list_pfp">
-                <h6 class="wait_players_list_name"><%= message.username %></h6>
-            </div>
-            <h5 class="message_text"><%= message.messaggio %></h5>
-
+    <div class="chat_riga <%= message.giocatoreId === you ? "chat_mia" : "chat_altrui" %>">
+        <% if (message.giocatoreId !== you) { %>
+            <img src="<%= message.pfp %>" alt="" class="chat_pfp">
+        <% } %>
+        <div class="chat_bolla<%= message.eliminato ? " chat_bolla_fantasma" : "" %>">
+            <% if (message.giocatoreId !== you) { %>
+                <span class="chat_nome sour_gummy_bold"><%= message.username %><%= message.eliminato ? " 👻" : "" %></span>
+            <% } %>
+            <span class="chat_testo sour_gummy_medium"><%= message.messaggio %></span>
+            <span class="chat_ora sour_gummy_regular_italic"><%= new Date(message.timestamp || Date.now()).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" }) %></span>
         </div>
-
     </div>
 <% }) %>

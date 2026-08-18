@@ -1,6 +1,8 @@
 const currentQuestion = document.querySelector(".domanda");
 const confirmBtn = document.getElementById("sendConferma");
+// il testo grezzo tiene i marcatori di formattazione, quello mostrato no
 const defaultText = currentQuestion.textContent;
+currentQuestion.textContent = pulisciFrase(defaultText);
 const allAnswers = fromFragments["risposte"];
 const prevBtn = document.getElementById("prima");
 const nextBtn = document.getElementById("dopo");
