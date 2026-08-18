@@ -59,8 +59,12 @@ document.addEventListener("DOMContentLoaded", () => {
             // i marcatori di formattazione non c'entrano niente con chi legge
             testo.textContent = pulisciFrase(elemento.testo).replace(/[§$]/g, "");
 
+            const indicatore = document.createElement("span");
+            indicatore.className = "segnala_indicatore";
+
             riga.appendChild(etichetta);
             riga.appendChild(testo);
+            riga.appendChild(indicatore);
 
             riga.addEventListener("click", () => {
                 if (scelti.has(indice)) {
