@@ -752,6 +752,258 @@
     {
       "nome": "Una troia bastarda",
       "genere": "f"
+    },
+    {
+      "nome": "Andrea",
+      "genere": "m"
+    },
+    {
+      "nome": "Raul",
+      "genere": "m"
+    },
+    {
+      "nome": "Alice",
+      "genere": "f"
+    },
+    {
+      "nome": "Gianluca",
+      "genere": "m"
+    },
+    {
+      "nome": "Marco",
+      "genere": "m"
+    },
+    {
+      "nome": "Irene",
+      "genere": "f"
+    },
+    {
+      "nome": "Lorenzo",
+      "genere": "m"
+    },
+    {
+      "nome": "Chiara",
+      "genere": "f"
+    },
+    {
+      "nome": "Camilla",
+      "genere": "f"
+    },
+    {
+      "nome": "Alesandro",
+      "genere": "m"
+    },
+    {
+      "nome": "Alessia",
+      "genere": "f"
+    },
+    {
+      "nome": "Noemi",
+      "genere": "f"
+    },
+    {
+      "nome": "Daria",
+      "genere": "f"
+    },
+    {
+      "nome": "Mathia",
+      "genere": "m"
+    },
+    {
+      "nome": "Maja",
+      "genere": "f"
+    },
+    {
+      "nome": "Anja",
+      "genere": "f"
+    },
+    {
+      "nome": "Pietro",
+      "genere": "m"
+    },
+    {
+      "nome": "Shariqa",
+      "genere": "f"
+    },
+    {
+      "nome": "Milo",
+      "genere": "m"
+    },
+    {
+      "nome": "Ginevra",
+      "genere": "f"
+    },
+    {
+      "nome": "Giada",
+      "genere": "f"
+    },
+    {
+      "nome": "Rachele",
+      "genere": "f"
+    },
+    {
+      "nome": "Gabriele",
+      "genere": "m"
+    },
+    {
+      "nome": "Asia-Gaia",
+      "genere": "f"
+    },
+    {
+      "nome": "Barbie",
+      "genere": "f"
+    },
+    {
+      "nome": "Ken",
+      "genere": "m"
+    },
+    {
+      "nome": "Dracula",
+      "genere": "m"
+    },
+    {
+      "nome": "Leopardi",
+      "genere": "m"
+    },
+    {
+      "nome": "Chat GPT",
+      "genere": "n"
+    },
+    {
+      "nome": "Claudiano",
+      "genere": "m"
+    },
+    {
+      "nome": "Fasfaceto",
+      "genere": "m"
+    },
+    {
+      "nome": "Vecchi dementi",
+      "genere": "p"
+    },
+    {
+      "nome": "Letizia",
+      "genere": "f"
+    },
+    {
+      "nome": "Benjamin",
+      "genere": "m"
+    },
+    {
+      "nome": "Stefano Universo",
+      "genere": "m"
+    },
+    {
+      "nome": "PDiddy",
+      "genere": "m"
+    },
+    {
+      "nome": "Elsa di Frozen",
+      "genere": "f"
+    },
+    {
+      "nome": "Rita Levi Montalcini",
+      "genere": "f"
+    },
+    {
+      "nome": "Checco Glione",
+      "genere": "m"
+    },
+    {
+      "nome": "Thomas Ticato",
+      "genere": "m"
+    },
+    {
+      "nome": "Checca Pocchia",
+      "genere": "m"
+    },
+    {
+      "nome": "Erminio Ottone",
+      "genere": "m"
+    },
+    {
+      "nome": "Dario Lampa",
+      "genere": "m"
+    },
+    {
+      "nome": "Paul Codio",
+      "genere": "m"
+    },
+    {
+      "nome": "Bella Pompa",
+      "genere": "f"
+    },
+    {
+      "nome": "Eddy Ocane",
+      "genere": "n"
+    },
+    {
+      "nome": "Nadia Arrea",
+      "genere": "f"
+    },
+    {
+      "nome": "Perla Madonna",
+      "genere": "f"
+    },
+    {
+      "nome": "Rick Yone",
+      "genere": "m"
+    },
+    {
+      "nome": "Lollo Causto",
+      "genere": "m"
+    },
+    {
+      "nome": "Giudy Morale",
+      "genere": "f"
+    },
+    {
+      "nome": "Sara Cinesca",
+      "genere": "f"
+    },
+    {
+      "nome": "Gaylord",
+      "genere": "m"
+    },
+    {
+      "nome": "Drusilla",
+      "genere": "f"
+    },
+    {
+      "nome": "Lamberto",
+      "genere": "m"
+    },
+    {
+      "nome": "Euridice",
+      "genere": "f"
+    },
+    {
+      "nome": "Troia (la città)",
+      "genere": "f"
+    },
+    {
+      "nome": "La Signora in Giallo",
+      "genere": "f"
+    },
+    {
+      "nome": "Trilli",
+      "genere": "f"
+    },
+    {
+      "nome": "Minnie",
+      "genere": "f"
+    },
+    {
+      "nome": "Topolino",
+      "genere": "m"
+    },
+    {
+      "nome": "Pedro Pascal",
+      "genere": "m"
+    },
+    {
+      "nome": "Anne Hathaway",
+      "genere": "f"
     }
   ],
   "adjectives": [
@@ -1516,6 +1768,48 @@
       "m": "Impestato",
       "f": "Impestata",
       "p": "Impestati"
+    },
+    {
+      "n": "Malat* di AIDS",
+      "m": "Malato di AIDS",
+      "f": "Malata di AIDS",
+      "p": "Malati di AIDS"
+    },
+    {
+      "n": "Fulminat* sulla via di damasco",
+      "m": "Fulminato sulla via di damasco",
+      "f": "Fulminata sulla via di damasco",
+      "p": "Fulminati sulla via di damasco"
+    },
+    {
+      "n": "e le sue personalità multiple",
+      "m": "e le sue personalità multiple",
+      "f": "e le sue personalità multiple",
+      "p": "e le sue personalità multiple"
+    },
+    {
+      "n": "e la sua ciola",
+      "m": "e la sua ciola",
+      "f": "e la sua ciola",
+      "p": "e la sua ciola"
+    },
+    {
+      "n": "Faccendier* di mafia",
+      "m": "Faccendiere di mafia",
+      "f": "Faccendiera di mafia",
+      "p": "Faccendieri di mafia"
+    },
+    {
+      "n": "da troie accompagnat*",
+      "m": "da troie accompagnato",
+      "f": "da troie accompagnata",
+      "p": "da troie accompagnati"
+    },
+    {
+      "n": "che favoreggia la prostituzione",
+      "m": "che favoreggia la prostituzione",
+      "f": "che favoreggia la prostituzione",
+      "p": "che favoreggia la prostituzione"
     }
   ]
 }
