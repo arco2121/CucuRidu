@@ -732,6 +732,26 @@
     {
       "nome": "I Fantastici 4",
       "genere": "p"
+    },
+    {
+      "nome": "Il Masseo",
+      "genere": "m"
+    },
+    {
+      "nome": "Babbo Natale",
+      "genere": "m"
+    },
+    {
+      "nome": "Befana",
+      "genere": "f"
+    },
+    {
+      "nome": "Aldo, Giovanni e Giacomo",
+      "genere": "p"
+    },
+    {
+      "nome": "Una troia bastarda",
+      "genere": "f"
     }
   ],
   "adjectives": [
@@ -1484,6 +1504,18 @@
       "m": "In plastica riciclabile",
       "f": "In plastica riciclabile",
       "p": "In plastica riciclabile"
+    },
+    {
+      "n": "7 ore prima dell'arresto",
+      "m": "7 ore prima dell'arresto",
+      "f": "7 ore prima dell'arresto",
+      "p": "7 ore prima dell'arresto"
+    },
+    {
+      "n": "Impestat*",
+      "m": "Impestato",
+      "f": "Impestata",
+      "p": "Impestati"
     }
   ]
 }
