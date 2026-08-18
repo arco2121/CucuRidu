@@ -17,6 +17,3 @@ ON_PLATFORM=false
 #SEGNALAZIONI_KEY chiave per aprire /segnalazioni?chiave=... , la pagina con le
 #frasi e i completamenti segnalati come sbagliati durante le partite.
 #Se e' vuota la pagina non esiste proprio
-
-#NOTIFICATION_PUBLIC e NOTIFICATION_PRIVATE non servono piu: le notifiche push
-#sono state rimosse
