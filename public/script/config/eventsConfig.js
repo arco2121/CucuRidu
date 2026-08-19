@@ -41,7 +41,15 @@ const timeOut = 150;
     });
     document.addEventListener("showPanel", (e) => {
         const panel = e.target;
-        setTimeout(() => panel.classList.replace('hidden', 'visible'), timeOut);
+        setTimeout(() => {
+            // "instant" va tolta nello STESSO istante in cui "hidden" diventa
+            // "visible": se la togliessimo prima, per il tempo che passa fino
+            // a qui il pannello avrebbe solo "hidden" (senza instant) e
+            // l'animazione popdown ripartirebbe da capo, lampeggiando visibile
+            // proprio mentre si sta cercando di aprirlo davvero.
+            panel.classList.remove('instant');
+            panel.classList.replace('hidden', 'visible');
+        }, timeOut);
     });
     document.addEventListener('hidePanelCond', (e) => {
         const section = e.target;

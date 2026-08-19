@@ -622,6 +622,18 @@ input:active {
     animation: none;
 }
 
+/* Un pannello "hidden" che non e' MAI stato aperto non ha bisogno di
+   animare: l'animazione di .hidden (popdown) parte sempre dal suo frame 0%
+   (opacita piena), quindi appena montato nel DOM lampeggia visibile per un
+   istante prima di sparire, anche se nessuno l'ha mai aperto. .instant qui
+   sostituisce quel comportamento con lo stato di riposo gia' pronto (vedi
+   eventsConfig.js: viene tolta insieme allo scambio hidden->visible, cosi'
+   le aperture vere restano animate). */
+.hidden.instant {
+    animation: none;
+    opacity: 0;
+}
+
 .visible, .hidden {
     will-change: transform, opacity;
     contain: layout style;
