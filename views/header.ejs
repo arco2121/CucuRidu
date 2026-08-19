@@ -31,6 +31,7 @@
     <script src="<%= scripts %>/config/registerWorker.js"></script>
     <script src="<%= scripts %>/config/eventsConfig.js"></script>
     <script src="<%= scripts %>/views/components/manageBack.js"></script>
+    <%- include("components/pfpLightbox") %>
 
     <%- include(page, params) %>
     <%- include("components/audioManager", { bgm: params.bgm || "GameMusic-Candy_Bazaar" }) %>

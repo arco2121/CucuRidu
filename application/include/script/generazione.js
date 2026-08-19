@@ -3,6 +3,8 @@ const path = require("path");
 const alphabet = "QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm@#!£$%&/";
 const pfpPathServer = './public/assets/pfps/';
 const pfpPath = '/assets/pfps/';
+const iconPathServer = './public/assets/icon_imgs/';
+const iconPath = '/assets/icon_imgs/';
 
 const generateId = async (length, memory = new Set()) => {
     let code = "";
@@ -105,16 +107,23 @@ const translateToPack = (packs) => {
     }
 };
 
-const contaPfp = (cartella) => {
+/*
+ * Conta quanti file con una certa estensione ci sono in una cartella e li
+ * rinumera da 1 in poi (1.jpg, 2.jpg, ...): cosi' basta buttare dentro nuovi
+ * file, senza toccare il codice, e al riavvio del server vengono contati e
+ * rinominati da soli. Usata sia per le pfp (jpg) che per i loghi (png).
+ */
+const contaFile = (cartella, estensione) => {
     try {
-        const fileJpg = fs.readdirSync(cartella)
-            .filter(file => path.extname(file).toLowerCase() === '.jpg')
+        const suffisso = "." + estensione.toLowerCase();
+        const file = fs.readdirSync(cartella)
+            .filter(file => path.extname(file).toLowerCase() === suffisso)
             .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
-        const totale = fileJpg.length;
+        const totale = file.length;
         if (totale === 0) return 0;
 
-        fileJpg.forEach((nome, i) => {
+        file.forEach((nome, i) => {
             const vecchioPath = path.join(cartella, nome);
             const tempPath = path.join(cartella, `TEMP_${i}_${Date.now()}.tmp`);
             fs.renameSync(vecchioPath, tempPath);
@@ -126,7 +135,7 @@ const contaPfp = (cartella) => {
 
         fileTemp.forEach((nome, i) => {
             const vecchioPath = path.join(cartella, nome);
-            const nuovoPath = path.join(cartella, `${i + 1}.jpg`);
+            const nuovoPath = path.join(cartella, `${i + 1}${suffisso}`);
             fs.renameSync(vecchioPath, nuovoPath);
         });
 
@@ -137,7 +146,8 @@ const contaPfp = (cartella) => {
     }
 };
 
-const pfpNumber = contaPfp(pfpPathServer);
+const pfpNumber = contaFile(pfpPathServer, 'jpg');
+const iconNumber = contaFile(iconPathServer, 'png');
 
 const generatePfp = () => {
     let rdmNumber = Math.round(Math.random() * (pfpNumber - 1) + 1);
@@ -146,6 +156,6 @@ const generatePfp = () => {
 
 const getAllPfp = () => Array.from({ length: pfpNumber }, (v, i) => `${pfpPath}${i + 1}.jpg`);
 
-const getIcon = (defaultIcon) => String("/assets/icon_imgs/" + (defaultIcon ? 1 : Math.floor(Math.random() * (24 - 1) + 1)) + ".png");
+const getIcon = (defaultIcon) => String(iconPath + (defaultIcon ? 1 : Math.round(Math.random() * (iconNumber - 1) + 1)) + ".png");
 
 module.exports = { generateId, generatePfp, generateName, getIcon, getAllPfp, getknownPacks, translateToPack };

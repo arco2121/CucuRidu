@@ -260,12 +260,14 @@ on("sceltaVincitore", async (data) => {
 });
 
 on("fineTurno", async (data) => {
-    const { reference, vincitore, domanda, risposte } = data;
+    const { reference, vincitore, domanda, risposte, tutteLeRisposte, giocatori } = data;
     if(reference) referenceGiocatore = new GiocatoreInterface(reference);
     ricordaFrase(domanda);
     await renderFragment(base, "showWinner", {
         domanda: domanda,
         risposte: risposte,
+        tutteLeRisposte: tutteLeRisposte || [],
+        giocatori: giocatori || [],
         animation: !isLoadScreen(),
         interroghi: vincitore.id === referenceGiocatore.id,
         vincitore: vincitore

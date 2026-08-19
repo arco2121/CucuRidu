@@ -297,15 +297,18 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
                 return isNaN(d) ? String(valore) : d.toLocaleString("it-IT");
             };
 
+            const daFare = righe.filter(r => !r.risolta).length;
+
             const corpo = righe.length
-                ? righe.map(r => `<tr class="${r.tipo === "frase" ? "frase" : "compl"}">
+                ? righe.map(r => `<tr class="${r.tipo === "frase" ? "frase" : "compl"}${r.risolta ? " risolta" : ""}" data-id="${scappa(r.id)}">
+                        <td class="fatto"><input type="checkbox" class="segnaFatto" ${r.risolta ? "checked" : ""} aria-label="Segna come fatta"></td>
                         <td class="quando">${scappa(quandoIt(r.creato_at))}</td>
                         <td class="tipo">${scappa(r.tipo)}</td>
                         <td class="testo">${scappa(r.testo)}</td>
                         <td class="nota">${scappa(r.nota || "")}</td>
                         <td class="chi">${scappa(r.giocatore || "")}<br><small>${scappa(r.stanza_id || "")}</small></td>
                     </tr>`).join("")
-                : `<tr><td colspan="5" class="vuoto">Nessuna segnalazione, per ora tutto a posto</td></tr>`;
+                : `<tr><td colspan="6" class="vuoto">Nessuna segnalazione, per ora tutto a posto</td></tr>`;
 
             res.status(200).send(`<!doctype html><html lang="it"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -313,25 +316,82 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
 <title>Segnalazioni - Cucu Ridu</title><style>
 body{font-family:system-ui,Arial,sans-serif;margin:0;padding:24px;background:#faf7f2;color:#2b2b2b}
 h1{font-size:1.4rem;margin:0 0 4px}
-p.sotto{margin:0 0 18px;color:#777;font-size:0.85rem}
+p.sotto{margin:0 0 10px;color:#777;font-size:0.85rem}
+label.filtro{display:inline-flex;align-items:center;gap:6px;margin:0 0 14px;font-size:0.85rem;color:#555;cursor:pointer}
 table{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12);border-radius:8px;overflow:hidden}
 th,td{padding:9px 12px;text-align:left;vertical-align:top;font-size:0.88rem;border-bottom:1px solid #eee}
 th{background:#f0ece5;font-size:0.75rem;text-transform:uppercase;letter-spacing:.04em;color:#666}
+td.fatto{text-align:center;width:20px}
+td.fatto input{width:18px;height:18px;cursor:pointer}
 tr.frase .tipo{color:#a3560f;font-weight:600}
 tr.compl .tipo{color:#3a6ea5;font-weight:600}
+tr.risolta{opacity:0.45}
+tr.risolta td.testo,tr.risolta td.nota{text-decoration:line-through}
+body.nascondiRisolte tr.risolta{display:none}
 td.quando,td.chi{white-space:nowrap;color:#777;font-size:0.8rem}
 td.testo{font-weight:600;max-width:520px}
 td.nota{color:#555;max-width:320px}
 td.vuoto{text-align:center;color:#888;padding:30px}
 </style></head><body>
 <h1>Segnalazioni</h1>
-<p class="sotto">${righe.length} segnalazioni, dalla piu recente. Frasi e completamenti che qualcuno ha marcato come sbagliati durante una partita.</p>
-<table><thead><tr><th>Quando</th><th>Tipo</th><th>Testo</th><th>Nota</th><th>Chi</th></tr></thead>
+<p class="sotto">${righe.length} segnalazioni, dalla piu recente (${daFare} da sistemare). Frasi e completamenti che qualcuno ha marcato come sbagliati durante una partita.</p>
+<label class="filtro"><input type="checkbox" id="nascondiRisolte">Nascondi quelle gia' fatte</label>
+<table><thead><tr><th>Fatto</th><th>Quando</th><th>Tipo</th><th>Testo</th><th>Nota</th><th>Chi</th></tr></thead>
 <tbody>${corpo}</tbody></table>
+<script>
+(function () {
+    var chiave = ${JSON.stringify(String(chiaveSegnalazioni))};
+    document.querySelectorAll(".segnaFatto").forEach(function (box) {
+        box.addEventListener("change", function () {
+            var riga = box.closest("tr");
+            var id = riga.getAttribute("data-id");
+            var risolta = box.checked;
+            box.disabled = true;
+            fetch("/segnalazioni/segna", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ chiave: chiave, id: id, risolta: risolta })
+            }).then(function (r) { return r.json(); }).then(function (data) {
+                if (!data || !data.ok) throw new Error("esito negativo");
+                riga.classList.toggle("risolta", risolta);
+            }).catch(function (e) {
+                console.error(e);
+                box.checked = !risolta;
+                alert("Non sono riuscito a salvare, riprova");
+            }).finally(function () {
+                box.disabled = false;
+            });
+        });
+    });
+    var nascondi = document.getElementById("nascondiRisolte");
+    nascondi.addEventListener("change", function () {
+        document.body.classList.toggle("nascondiRisolte", nascondi.checked);
+    });
+})();
+</script>
 </body></html>`);
         } catch (e) {
             console.error("[segnalazioni]", e?.message || e);
             res.status(500).send("Errore nel leggere le segnalazioni");
+        }
+    });
+
+    /*
+     * Marca (o smarca) una segnalazione come risolta. Stessa chiave della
+     * pagina /segnalazioni, passata nel corpo perche' qui non c'e' un form.
+     */
+    app.post("/segnalazioni/segna", async (req, res) => {
+        if (!archivioSegnalazioni || !chiaveSegnalazioni) return res.status(404).end();
+        const { chiave, id, risolta } = req.body || {};
+        if (chiave !== chiaveSegnalazioni) return res.status(403).json({ ok: false });
+        if (!id) return res.status(400).json({ ok: false });
+
+        try {
+            const ok = await archivioSegnalazioni.segna(String(id), !!risolta);
+            res.status(200).json({ ok: !!ok });
+        } catch (e) {
+            console.error("[segnalazioni:segna]", e?.message || e);
+            res.status(500).json({ ok: false });
         }
     });
 

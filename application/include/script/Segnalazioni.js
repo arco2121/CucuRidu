@@ -6,8 +6,10 @@
  *   SegnalazioniLocali   -> in RAM, per la modalita' single (si perdono al riavvio)
  *
  * Ogni riga e' un singolo elemento segnalato:
- *   { stanza_id, giocatore, tipo: "frase" | "completamento", testo, nota }
+ *   { id, stanza_id, giocatore, tipo: "frase" | "completamento", testo, nota, risolta }
  */
+
+const crypto = require("crypto");
 
 const MASSIMO_PER_INVIO = 15;
 const LUNGHEZZA_TESTO = 400;
@@ -39,7 +41,7 @@ class SegnalazioniLocali {
 
     async aggiungi(righe) {
         if (!righe.length) return 0;
-        const conData = righe.map(r => ({ ...r, creato_at: new Date().toISOString() }));
+        const conData = righe.map(r => ({ ...r, id: crypto.randomUUID(), risolta: false, creato_at: new Date().toISOString() }));
         this.righe.unshift(...conData);
         if (this.righe.length > this.massimo) this.righe.length = this.massimo;
         return conData.length;
@@ -47,6 +49,14 @@ class SegnalazioniLocali {
 
     async leggi(limite = 200) {
         return this.righe.slice(0, limite);
+    }
+
+    /** Segna (o smarca) una segnalazione come risolta. */
+    async segna(id, risolta) {
+        const riga = this.righe.find(r => r.id === id);
+        if (!riga) return false;
+        riga.risolta = !!risolta;
+        return true;
     }
 }
 
@@ -72,6 +82,16 @@ class SegnalazioniCluster {
             .limit(limite);
         if (error) throw error;
         return data || [];
+    }
+
+    /** Segna (o smarca) una segnalazione come risolta. */
+    async segna(id, risolta) {
+        const { error } = await this.supabase
+            .from(this.tabella)
+            .update({ risolta: !!risolta })
+            .eq("id", id);
+        if (error) throw error;
+        return true;
     }
 }
 

@@ -1,9 +1,16 @@
 off("aggiornamentoChat");
 
+const chatMenu = document.getElementById("chatMenu");
 const chatView = document.getElementById("chat");
 const sendBtn = document.getElementById("sendBtn");
 const inputMessage = document.getElementById("inputMessage");
+const chatBadge = document.getElementById("chatBadge");
 let chatHistory = [];
+
+// Pallino sul pulsante chat: si accende se arriva un messaggio da qualcun
+// altro mentre la chat e' chiusa, si spegne appena la si apre.
+const chatEAperta = () => !!chatMenu && chatMenu.classList.contains("visible");
+chatMenu?.addEventListener("showPanel", () => chatBadge?.classList.remove("chat_badge_visible"));
 
 const chatVuota = `
     <div class="chat_vuota">
@@ -54,7 +61,19 @@ const renderChat = async (chat = [], renderAll = true) => {
         scorriInFondo(renderAll);
 };
 
-on("aggiornamentoChat", async (data) => renderChat(data["chat"], data["renderAll"]));
+on("aggiornamentoChat", async (data) => {
+    const chat = data["chat"] || [];
+    const renderAll = !!data["renderAll"];
+    if (!renderAll) {
+        // stesso calcolo del delta che fa renderChat, ma prima che sposti
+        // i messaggi in chatHistory: serve solo per sapere se accendere il pallino
+        const historySet = new Set(chatHistory.map(m => m.timestamp));
+        const nuovi = chat.filter(m => !historySet.has(m.timestamp));
+        const daAltri = nuovi.some(m => m.giocatoreId !== referenceGiocatore.id);
+        if (daAltri && !chatEAperta()) chatBadge?.classList.add("chat_badge_visible");
+    }
+    await renderChat(chat, renderAll);
+});
 
 const adattaAltezza = () => {
     if (!inputMessage) return;

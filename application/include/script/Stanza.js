@@ -233,6 +233,10 @@ class Stanza {
             chiStaChiedendo !== this.round.chiStaInterrogando || !this.round.risposte.has(idGiocatore)) return false;
 
         const risposte = this.round.risposte.get(idGiocatore);
+        // tutte le risposte del round, non solo quella del vincitore: servono
+        // per l'immagine riepilogativa che si scarica dalla schermata vincitore,
+        // dopo questo punto this.round viene azzerato e andrebbero perse
+        const tutteLeRisposte = Array.from(this.round.risposte.entries());
         const vincitoreRound = this.trovaGiocatore(idGiocatore);
         const domandaScartata = this.round.domanda;
 
@@ -262,7 +266,7 @@ class Stanza {
         }
         this.numeroRound[0] += 1;
 
-        return [vincitoreRound.toJSON(), domandaScartata, risposte];
+        return [vincitoreRound.toJSON(), domandaScartata, risposte, tutteLeRisposte];
     }
 
     controllaMazzi(spaziNecessari) {

@@ -1,4 +1,4 @@
-<div class="game_main_con game_main_con_selectCards">
+<div class="game_main_con game_main_con_selectCards<%= risposte ? "" : " game_main_con_selectCards_waiting" %>">
     <div class="column sour_gummy_regular flex_gap_25 wait_code_con game_side_r">
         <div class="game_card game_card_decrated flex_gap_10  game_card_style_2 game_choice_asnwer_card_domanda shrinks_on_active_for_no_reason btn_doubleBorder">
             <% if(risposte) { %>

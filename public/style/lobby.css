@@ -45,6 +45,32 @@
     margin: 10px;
 }
 
+#chatBtn {
+    position: relative;
+}
+
+/* Pallino dei messaggi non letti: appare sopra al pulsante chat quando
+   arriva un messaggio nuovo e la chat non e' aperta. */
+.chat_badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 13px;
+    height: 13px;
+    border-radius: 100%;
+    background: var(--accent-color-critical);
+    border: solid 2px white;
+    opacity: 0;
+    scale: 0;
+    pointer-events: none;
+    transform-origin: center;
+}
+
+.chat_badge_visible {
+    opacity: 1;
+    scale: 1;
+}
+
 
 /* ---------------------------------------------------
  >>> WAIT PAGE
@@ -320,7 +346,8 @@
        Ora il margine lo decide solo questo padding. */
     .game_main_con {
         width: 100%;
-        padding: 0 10px;
+        /* prima 10px: gli elementi arrivavano quasi a toccare il bordo */
+        padding: 0 16px;
         justify-content: center;
         flex-direction: column;
         align-items: center;
@@ -333,7 +360,8 @@
 
 @media (max-width: 450px) {
     .game_main_con {
-        padding: 0 6px;
+        /* prima 6px, stesso discorso di sopra ma sui telefoni piccoli */
+        padding: 0 12px;
     }
 
     .wait_players_list {
@@ -351,6 +379,16 @@
     overflow-y: hidden;
     height: 100%;
     flex-grow: unset;
+}
+
+/* La variante "aspetta che tutti rispondano" (il riquadro Completati al
+   posto della lista di carte da completare) e' piu corta delle altre:
+   ancorata in alto lasciava un vuoto enorme sotto, specie sul telefono
+   dove le due colonne vanno una sopra l'altra. Qui la si centra
+   verticalmente come le altre schermate di attesa. */
+#landpoint:has(.game_main_con_selectCards_waiting) {
+    justify-content: center;
+    overflow-y: auto;
 }
 
 .game_main_con_selectCards {

@@ -406,6 +406,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 return;
             }
 
+            // roster completo, serve al client per abbinare pfp/nome a chi ha
+            // risposto quando genera l'immagine riepilogativa del round
+            const rosterCompleto = stanza.classifica().map(giocatore => giocatore.toJSON());
             const sockets = await server.in(stanzaId).fetchSockets();
             for (const socket of sockets) {
                 const giocatore = giocatoreDi(socket, stanza);
@@ -415,6 +418,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     vincitore: risultato[0],
                     domanda: risultato[1],
                     risposte: risultato[2],
+                    tutteLeRisposte: risultato[3],
+                    giocatori: rosterCompleto,
                     reference: giocatore.toJSON()
                 });
             }

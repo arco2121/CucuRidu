@@ -804,6 +804,14 @@ input:active {
 /* ---------------------------------------------------
  >>> NO INTERNET
 --------------------------------------------------- */
+/* Il pannello offline deve sempre stare sopra a tutti gli altri .section:
+   prima, essendo il primo nel DOM senza z-index, ogni tanto finiva sotto
+   un altro pannello (chat, pausa, ecc.) invece di nasconderlo e restare
+   l'unico visibile. */
+#connectionPanel {
+    z-index: var(--max-index);
+}
+
 .noInternetSection {
     display: flex;
     flex-direction: column;
@@ -1056,4 +1064,40 @@ input:active {
     .packs_footer_link {
         margin-top: 10px;
     }
+}
+
+
+/* ---------------------------------------------------
+ >>> PFP LIGHTBOX
+--------------------------------------------------- */
+/* Le foto profilo mostrate in giro (chat, liste giocatori, vincitore) sono
+   gia' "premibili" a vista (active_Img) ma non facevano niente: con la
+   classe pfp_viewable si aprono a schermo intero, come le pfp dei social. */
+.pfp_viewable {
+    cursor: pointer;
+}
+
+#pfpLightbox {
+    z-index: var(--max-index);
+}
+
+.pfpLightbox_backdrop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 30px;
+    background: rgba(8, 8, 8, 0.82);
+}
+
+.pfpLightbox_img {
+    max-width: min(85vw, 520px);
+    max-height: 75vh;
+    border-radius: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    padding: 6px;
+    border: solid var(--background-variant-outline) 10px;
+    background: var(--background-variant-dark);
 }
