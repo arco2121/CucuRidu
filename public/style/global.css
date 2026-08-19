@@ -518,7 +518,12 @@ input:active {
     left: 50%;
     transform: translate(-50%, -50%);
     transform-origin: top left;
-    z-index: 1000;
+    /* Deve stare sopra a TUTTO, connectionPanel e pfpLightbox compresi (che
+       ora hanno z-index: var(--max-index)): altrimenti il loro flash iniziale
+       di apparizione (l'animazione "hidden" parte sempre da opacita 1, anche
+       per un pannello che non e' mai stato aperto) si vede sopra la schermata
+       di caricamento invece di restarci nascosto sotto. */
+    z-index: calc(var(--max-index) + 1);
     background: #FFAEAE;
     background: var(--loadingScreen-background);
     line-height: 1;
