@@ -3,6 +3,7 @@
 --esegui invece migrazione_disconnessioni.sql, che aggiorna senza distruggere.
 
 DROP TABLE IF EXISTS public.memory CASCADE;
+DROP TABLE IF EXISTS public.presenza CASCADE;
 DROP TABLE IF EXISTS public.stanze CASCADE;
 DROP TABLE IF EXISTS public.items CASCADE;
 DROP TABLE IF EXISTS public.push_subscriptions CASCADE;
@@ -32,7 +33,7 @@ CREATE TABLE public.items (
     CONSTRAINT items_pkey PRIMARY KEY ("item_id")
 );
 
-CREATE TABLE IF NOT EXISTS public.presenza (
+CREATE TABLE public.presenza (
    giocatore_id text PRIMARY KEY,
    stanza_id text NOT NULL,
    online boolean NOT NULL DEFAULT true,
@@ -178,6 +179,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Le righe di presenza che puntano a una stanza che non esiste piu vanno tolte
+-- prima di rimettere il vincolo, altrimenti l'ALTER fallisce con un 23503.
+DELETE FROM public.presenza p
+ WHERE NOT EXISTS (SELECT 1 FROM public.stanze s WHERE s."stanza_Id" = p.stanza_id);
+
+ALTER TABLE public.presenza DROP CONSTRAINT IF EXISTS presenza_stanza_id_fkey;
 ALTER TABLE public.presenza
 ADD CONSTRAINT presenza_stanza_id_fkey
 FOREIGN KEY (stanza_id)

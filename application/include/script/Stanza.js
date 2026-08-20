@@ -21,14 +21,16 @@ class Stanza {
                 pack: "standard",
                 tipoMazzo: TipoMazzo.COMPLETAMENTI
             }),
-            scarto: new Mazzo()
+            // lo scarto deve sapere che tipo di carte accoglie, altrimenti una
+            // frase che ci passa dentro viene appiattita a stringa
+            scarto: new Mazzo({ tipoMazzo: TipoMazzo.COMPLETAMENTI })
         };
         this.mazzoFrasi = {
             mazzo: new Mazzo({
                 pack: "standard",
                 tipoMazzo: TipoMazzo.FRASI
             }),
-            scarto: new Mazzo()
+            scarto: new Mazzo({ tipoMazzo: TipoMazzo.FRASI })
         };
     }
 
@@ -195,8 +197,7 @@ class Stanza {
         if(this.numeroRound[0] === this.numeroRound[1])
             return this.terminaPartita(null, true);
         this.controllaMazzi(this.round.domanda[1]);
-        for (const giocatore of this.giocatori.values())
-            if(giocatore.mazzo.carte.length === 0) giocatore.aggiungiMano(...this.mazzoCompletamenti.mazzo.prendiCarte(11));
+        this.ripristinaMani();
         if(chiStaChidedendo === this.round.chiStaInterrogando) {
             this.stato = StatoStanza.CHOOSING_CARDS;
             return true;
@@ -210,8 +211,18 @@ class Stanza {
         if(this.stato === StatoStanza.CHOOSING_CARDS && this.giocatori.has(giocatoreId)
             && !this.round.risposte.has(giocatoreId)) {
             const giocatore = this.trovaGiocatore(giocatoreId);
+
+            // Gli indici arrivano dal client e vanno controllati: devono essere
+            // tanti quanti gli spazi vuoti della frase, interi, distinti e
+            // dentro la mano. Senza questo controllo un client disallineato
+            // (per esempio dopo una riconnessione) faceva sparire carte dalla
+            // mano e infilava dei null nello scarto.
+            const spaziAttesi = parseInt(this.round.domanda?.[1]) || 1;
+            if(indexCarte.length !== spaziAttesi) return false;
+
             const carte = giocatore.prendiMano(...indexCarte);
-            if(!carte || carte.length === 0) return false;
+            if(!carte || carte.length !== spaziAttesi) return false;
+            if(carte.some(c => typeof c !== "string" || !c)) return false;
             this.round.risposte.set(giocatoreId, carte);
             if(this.round.risposte.size >= (this.giocatori.size - 1)) {
                 this.stato = StatoStanza.CHOOSING_WINNER;
@@ -248,11 +259,7 @@ class Stanza {
         }
 
         this.controllaMazzi(domandaScartata[1]);
-
-        for (const giocatore of this.giocatori.values()) {
-            if(giocatore.id !== chiStaChiedendo)
-                giocatore.aggiungiMano(...this.mazzoCompletamenti.mazzo.prendiCarte(domandaScartata[1]));
-        }
+        this.ripristinaMani();
 
         this.mazzoCompletamenti.scarto.aggiungiCarte(...Array.from(this.round.risposte.values()).flat());
         this.mazzoFrasi.scarto.aggiungiCarte(domandaScartata);
@@ -267,6 +274,22 @@ class Stanza {
         this.numeroRound[0] += 1;
 
         return [vincitoreRound.toJSON(), domandaScartata, risposte, tutteLeRisposte];
+    }
+
+    /**
+     * Riporta ogni mano a CARTE_IN_MANO. Prima le carte venivano date solo a
+     * chi aveva la mano completamente vuota, quindi col passare dei round le
+     * mani si sbilanciavano e gli indici del client non corrispondevano piu a
+     * quello che aveva il server.
+     */
+    ripristinaMani(quante = Stanza.CARTE_IN_MANO) {
+        for (const giocatore of this.giocatori.values()) {
+            const mancanti = quante - giocatore.mazzo.carte.length;
+            if (mancanti <= 0) continue;
+            if (this.mazzoCompletamenti.mazzo.carte.length < mancanti)
+                this.controllaMazzi(mancanti);
+            giocatore.aggiungiMano(...this.mazzoCompletamenti.mazzo.prendiCarte(mancanti));
+        }
     }
 
     controllaMazzi(spaziNecessari) {
@@ -295,9 +318,9 @@ class Stanza {
                 tipoMazzo: TipoMazzo.COMPLETAMENTI
             }));
             this.mazzoFrasi.mazzo = Mazzo.unisciMazzi(...mazziFrasi);
-            this.mazzoFrasi.scarto = new Mazzo();
+            this.mazzoFrasi.scarto = new Mazzo({ tipoMazzo: TipoMazzo.FRASI });
             this.mazzoCompletamenti.mazzo = Mazzo.unisciMazzi(...mazziCompletamenti);
-            this.mazzoCompletamenti.scarto = new Mazzo();
+            this.mazzoCompletamenti.scarto = new Mazzo({ tipoMazzo: TipoMazzo.COMPLETAMENTI });
             return true;
         } catch {
             return false;
@@ -377,12 +400,12 @@ class Stanza {
         s.giocatoriPassati = new Set(data.giocatoriPassati);
         s.master = s.giocatori.get(data.masterId);
 
-        const ripristinaMazzo = (obj) => ({
-            mazzo: Mazzo.fromJSON(obj.mazzo),
-            scarto: Mazzo.fromJSON(obj.scarto)
+        const ripristinaMazzo = (obj, tipo) => ({
+            mazzo: Mazzo.fromJSON(obj?.mazzo, tipo),
+            scarto: Mazzo.fromJSON(obj?.scarto, tipo)
         });
-        s.mazzoCompletamenti = ripristinaMazzo(data.mazzoCompletamenti);
-        s.mazzoFrasi = ripristinaMazzo(data.mazzoFrasi);
+        s.mazzoCompletamenti = ripristinaMazzo(data.mazzoCompletamenti, TipoMazzo.COMPLETAMENTI);
+        s.mazzoFrasi = ripristinaMazzo(data.mazzoFrasi, TipoMazzo.FRASI);
 
         s.round = {
             domanda: data.round.domanda,
@@ -395,4 +418,6 @@ class Stanza {
     }
 }
 
-module.exports = { Stanza, StatoStanza };
+Stanza.CARTE_IN_MANO = 11;
+
+module.exports = { Stanza, StatoStanza };

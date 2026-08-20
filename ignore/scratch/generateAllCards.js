@@ -1,5 +1,25 @@
- const fs = require('node:fs');
+const fs = require('node:fs');
 const { join } = require("node:path");
+
+/*
+ * Come si trasforma una riga di testo in carta:
+ *
+ *   frasi         -> [testo, numeroDiSpaziVuoti]   (il _ conta gli spazi)
+ *   completamenti -> testo e basta
+ *
+ * Prima la regola dell'underscore veniva applicata a TUTTI i file: un
+ * completamento che conteneva un _ diventava una coppia [testo, 1] e in
+ * partita compariva come "testo,1", cioe' la carta con la virgola in mezzo.
+ */
+const eUnFileDiFrasi = (nomeFile) => /frasi/i.test(nomeFile);
+
+const rigaInCarta = (riga, perFrasi) => {
+    const testo = riga[0]?.toUpperCase() + riga.slice(1);
+    if (!perFrasi) return testo;
+    const spazi = (riga.match(/_/g) || []).length;
+    return spazi !== 0 ? [testo, spazi] : testo;
+};
+
 
 const generateCards = () => {
     try {
@@ -17,16 +37,11 @@ const generateCards = () => {
                 const lines = fs.readFileSync(join(groupDir, file), "utf-8")
                     .split("\n").map(line => line.trim());
 
+                const perFrasi = eUnFileDiFrasi(file);
                 let array = [];
                 for (const line of lines) {
                     if (!line) continue;
-
-                    const string = line[0]?.toUpperCase() + line.slice(1);
-                    const completamenti = (line.match(/_/g) || []).length;
-                    array.push(completamenti !== 0 ? [
-                        string,
-                        completamenti,
-                    ] : string);
+                    array.push(rigaInCarta(line, perFrasi));
                 }
 
                 const outputDir = join(__dirname, "..", "../application/include/cards/" + group + "/");
@@ -45,4 +60,4 @@ const generateCards = () => {
 };
 
 const result = generateCards();
-console.log(`Result => ${result}`);
+console.log(`Result => ${result}`);

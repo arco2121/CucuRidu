@@ -79,23 +79,38 @@ const generateName = () => {
     return (nome.nome + " " + forma).trim();
 }
 
+/*
+ * Trasforma i testi incollati in un mazzo personalizzato.
+ * L'ordine dei blocchi e' quello che manda createPacks: frasi, completamenti,
+ * nome. Solo il primo blocco e' fatto di frasi, quindi solo li' l'underscore
+ * va contato come spazio da riempire.
+ *
+ * Prima la regola valeva per tutti: un completamento che conteneva un _
+ * diventava la coppia [testo, 1] e in partita si vedeva come "testo,1".
+ */
+const INDICE_DELLE_FRASI = 0;
+
 const translateToPack = (packs) => {
     try {
         const results = [];
+        let indice = -1;
         for (const stringa of packs) {
+            indice++;
             if(typeof stringa !== "string") {
                 results.push(stringa);
                 continue;
             }
+            const perFrasi = indice === INDICE_DELLE_FRASI;
             const lines = stringa.split(/\r?\n/).filter(line => line.trim() !== "");
             let array = [];
             for (let line of lines) {
                 line = line.trim();
                 const string = line[0]?.toUpperCase() + line.slice(1);
-                const completamenti = (line.match(/_/g) || []).length;
-                array.push(completamenti !== 0 ? [
+                if(!perFrasi) { array.push(string); continue; }
+                const spazi = (line.match(/_/g) || []).length;
+                array.push(spazi !== 0 ? [
                     string,
-                    completamenti,
+                    spazi,
                 ] : string)
             }
             results.push(array);

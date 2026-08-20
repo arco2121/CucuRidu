@@ -26,11 +26,21 @@ vaiAvanti.addEventListener("click", () => renderFragment(base, "wait", {
 const scaricaFrasiBtn = document.getElementById("scaricaFrasiBtn");
 
 const templateGrezzo = fromFragments["domanda"][0];
+// il testo pulito serve SOLO dove la frase si mostra ancora coi buchi, cioe'
+// il titolo dell'immagine: li' i marcatori § non devono vedersi
 const templatePulito = pulisciFrase(templateGrezzo);
 
+/*
+ * Qui invece si riempie, e a riempire deve essere sempre il testo GREZZO:
+ * e' fillBlanks che legge il § davanti allo spazio vuoto per mettere in
+ * maiuscolo il completamento, e poi si mangia il marcatore da solo.
+ * Passandogli il testo gia' pulito i marcatori erano gia' spariti e la
+ * formattazione non veniva applicata: sullo schermo funzionava (li' si parte
+ * dal testo grezzo), nell'immagine scaricata no.
+ */
 const testoDiRisposta = (carte) => {
     const parole = [].concat(carte).map(c => Array.isArray(c) ? c[0] : String(c));
-    return fillBlanks(templatePulito, parole);
+    return fillBlanks(templateGrezzo, parole);
 };
 
 const rosterMap = new Map((fromFragments["giocatori"] || []).map(g => [g.id, g]));

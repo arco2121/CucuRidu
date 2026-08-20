@@ -99,6 +99,15 @@ RETURNS boolean AS $$
 DECLARE
     applicato boolean;
 BEGIN
+    -- La stanza puo' essere gia sparita (partita finita, oppure ripulita da
+    -- delete_old_stanze) mentre arriva un disconnect in ritardo. Senza questo
+    -- controllo la INSERT sbatteva contro la chiave esterna e tirava su un
+    -- errore 23503 per qualcosa che non interessa piu a nessuno.
+    IF NOT EXISTS (SELECT 1 FROM public.stanze WHERE "stanza_Id" = p_stanza_id) THEN
+        DELETE FROM public.presenza WHERE giocatore_id = p_giocatore_id;
+        RETURN false;
+    END IF;
+
     INSERT INTO public.presenza (giocatore_id, stanza_id, online, socket_id, event_time, updated_at)
     VALUES (p_giocatore_id, p_stanza_id, p_online, p_socket_id, p_event_time, now())
     ON CONFLICT (giocatore_id) DO UPDATE SET
@@ -147,7 +156,26 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ----------------------------------------------------------------------------
--- 4. INDICI UTILI
+-- 4. RIGHE DI PRESENZA ORFANE E CHIAVE ESTERNA
+-- ----------------------------------------------------------------------------
+
+-- Se in presenza restano righe che puntano a stanze non piu esistenti, ogni
+-- tentativo di (ri)creare il vincolo fallisce con:
+--   ERROR: 23503 ... Key (stanza_id)=(XXXXXX) is not present in table "stanze"
+-- Succede tipicamente dopo aver rilanciato dump.sql, che ricreava stanze da
+-- zero lasciando presenza con dentro i dati vecchi.
+DELETE FROM public.presenza p
+ WHERE NOT EXISTS (SELECT 1 FROM public.stanze s WHERE s."stanza_Id" = p.stanza_id);
+
+ALTER TABLE public.presenza DROP CONSTRAINT IF EXISTS presenza_stanza_id_fkey;
+ALTER TABLE public.presenza
+  ADD CONSTRAINT presenza_stanza_id_fkey
+  FOREIGN KEY (stanza_id)
+  REFERENCES public.stanze("stanza_Id")
+  ON DELETE CASCADE;
+
+-- ----------------------------------------------------------------------------
+-- 5. INDICI UTILI
 -- ----------------------------------------------------------------------------
 
 CREATE INDEX IF NOT EXISTS idx_presenza_stanza ON public.presenza(stanza_id);
