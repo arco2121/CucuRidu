@@ -64,6 +64,23 @@ const off = (event) => {
         receivers[event] = null;
     else controller.off(event);
 }
+/**
+ * Chiede al socket "sei davvero connesso?" invece di fidarsi ciecamente
+ * degli eventi online/offline del browser (che sono solo lo stato di rete,
+ * non lo stato vero di Socket.IO). Se e' gia connesso rifa scattare
+ * doConnected subito; se non lo e' lo spinge a riconnettersi ORA invece di
+ * aspettare il ping/pong naturale (fino a ~50s, vedi pingInterval/
+ * pingTimeout lato server) — a spegnere davvero il pannello offline ci
+ * pensa comunque il vero evento connect/reconnect qui sotto.
+ */
+const checkConnection = () => {
+    if(controller instanceof Worker)
+        controller.postMessage({ type: "__checkConnection__" });
+    else if(controller) {
+        if(controller.connected) document.dispatchEvent(stateConnected);
+        else try { controller.connect(); } catch (e) {}
+    }
+}
 
 if(controller instanceof Worker)
     controller.onmessage = (event) => {
@@ -129,6 +146,12 @@ on("connect", () => {
 on("disconnect", () => document.dispatchEvent(stateDisconnected));
 
 on("reconnect", () => document.dispatchEvent(stateConnected));
+
+// risposta di checkConnection() quando il worker conferma che il socket
+// era gia connesso (non serve riconnettersi, basta aggiornare la UI)
+on("__connectionCheck__", (data) => {
+    if(data?.connected) document.dispatchEvent(stateConnected);
+});
 
 on("reconnect_attempt", () => document.dispatchEvent(stateDisconnected));
 

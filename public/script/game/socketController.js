@@ -55,6 +55,19 @@ const socketController = (event = {}) => {
             break;
         }
 
+        // Controllo su richiesta: usato quando il browser torna "online" o la
+        // scheda torna visibile, per non aspettare fino a pingInterval+pingTimeout
+        // prima di accorgersi che il socket era rimasto morto in background.
+        case "__checkConnection__": {
+            if (socket) {
+                if (socket.connected)
+                    postMessage({ event: "__connectionCheck__", params: { connected: true } });
+                else
+                    try { socket.connect(); } catch (e) {}
+            }
+            break;
+        }
+
         default: socket.emit(event.type, event.params);
     }
 };
