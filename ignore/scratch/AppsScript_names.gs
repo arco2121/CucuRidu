@@ -1,5 +1,5 @@
 /**
- * Cucu Ridu - generatore di names.json da Google Sheets
+ * Cucu Ridu - pubblica nomi e aggettivi direttamente su GitHub
  * ============================================================================
  *
  * COME SI INSTALLA
@@ -7,26 +7,72 @@
  *   2. Estensioni > Apps Script
  *   3. Cancella quello che c'e' dentro Codice.gs e incolla tutto questo file
  *   4. Salva, poi ricarica il foglio: in alto compare il menu "Cucu Ridu"
+ *   5. Cucu Ridu > Imposta token GitHub: incolla il token (vedi sotto come
+ *      crearlo). Se hai gia' un token creato per il foglio delle carte, va
+ *      benissimo lo stesso: basta che abbia accesso al repo CucuRidu.
+ *   6. Cucu Ridu > Controlla i dati: verifica che trovi le schede giuste e
+ *      quante righe ha letto, senza pubblicare niente
+ *   7. Cucu Ridu > Pubblica su GitHub: primo test manuale
+ *
+ * COSA PUBBLICA
+ *   Non piu' solo un popup da copiare a mano: lo script scrive DIRETTAMENTE
+ *   su GitHub, in un unico commit atomico, tutti e tre i file che prima si
+ *   rischiava di lasciare fuori sincrono tra loro:
+ *     - ignore/scratch/raw/names/nomi.csv
+ *     - ignore/scratch/raw/names/aggettivi.csv
+ *     - application/include/names/names.json  (quello che il gioco legge
+ *       davvero)
+ *   Il motivo per cui serve scrivere anche i due CSV, e non solo il JSON: il
+ *   server rigenera names.json DAI CSV a ogni avvio/deploy (npm start esegue
+ *   generateNames.js). Se si pubblica solo il JSON e i CSV restano vecchi, il
+ *   primo riavvio del server cancella la modifica senza preavviso: e' esattamente
+ *   il bug scoperto il 22/08/2026 (nomi nuovi spariti, "Rosaana" mai
+ *   corretto in "Rossana" perche' il fix era stato incollato solo nel JSON,
+ *   mai nel CSV).
+ *
+ * COME CREARE IL TOKEN GITHUB (una volta sola, va bene anche per il foglio carte)
+ *   1. github.com > icona profilo > Settings > Developer settings >
+ *      Personal access tokens > Fine-grained tokens > Generate new token
+ *   2. Repository access: "Only select repositories" > arco2121/CucuRidu
+ *   3. Permissions > Repository permissions > "Contents" > Read and write
+ *   4. Genera e copia il token (inizia con "github_pat_"), non si rivede piu'
+ *
+ * COME AUTOMATIZZARE (cosi' basta editare da telefono, senza aprire il menu)
+ *   Estensioni > Apps Script > icona orologio "Trigger" a sinistra >
+ *   Aggiungi trigger > funzione "pubblicaAutomatica" > Sorgente evento:
+ *   "basata sul tempo" > timer minuti > ogni 10 minuti. Da qui in poi, se
+ *   modifichi una riga dal telefono (anche solo con l'app Sheets), entro
+ *   ~10 minuti la modifica arriva da sola su GitHub e parte il deploy. Se
+ *   qualcosa va storto arriva una mail di errore in automatico, e in ogni
+ *   caso trovi lo storico nella scheda "Log" che lo script si crea da solo
+ *   in questo foglio.
  *
  * COME DEVE ESSERE FATTO IL FOGLIO
  *   Un foglio chiamato "Nomi" con le colonne:        nome | genere
  *   Un foglio chiamato "Aggettivi" con le colonne:   neutro | maschile | femminile | plurale
  *
  *   Le intestazioni vanno sulla prima riga. L'ordine delle colonne non conta,
- *   vengono cercate per nome. Le colonne in piu (note, appunti, quello che vuoi)
- *   vengono ignorate.
+ *   vengono cercate per nome. Le colonne in piu (note, appunti) vengono ignorate.
  *
  *   Nella colonna genere puoi scrivere m / f / n / p oppure per esteso
  *   (maschile, femminile, neutro, plurale). Se la lasci vuota vale neutro.
- *
- * COSA FA
- *   Menu "Cucu Ridu" > "Genera names.json": apre una finestra con il JSON gia
- *   pronto e un bottone per copiarlo. I nomi doppi vengono tolti da soli
- *   (senza guardare maiuscole e spazi doppi) e ti dice quali ha tolto.
- *   Per gli aggettivi, le forme lasciate vuote ricadono sul neutro.
+ *   Per gli aggettivi che non cambiano forma ripeti la stessa parola nelle
+ *   prime tre colonne. Se lasci vuote maschile, femminile o plurale, il
+ *   gioco usa il neutro al loro posto: comodo per buttare dentro un
+ *   aggettivo al volo e sistemarlo dopo (i CSV pubblicati mantengono le
+ *   caselle vuote cosi' come sono nel foglio, solo names.json ha le forme
+ *   gia' riempite).
  */
 
 // ---------------------------------------------------------------- CONFIG ---
+
+var GITHUB_OWNER = "arco2121";
+var GITHUB_REPO = "CucuRidu";
+var GITHUB_BRANCH = "main";
+
+var PERCORSO_CSV_NOMI = "ignore/scratch/raw/names/nomi.csv";
+var PERCORSO_CSV_AGGETTIVI = "ignore/scratch/raw/names/aggettivi.csv";
+var PERCORSO_JSON = "application/include/names/names.json";
 
 // Nomi dei fogli. Il primo che esiste vince, il confronto ignora le maiuscole.
 var FOGLI_NOMI = ["Nomi", "nomi", "nomi.csv", "Names"];
@@ -46,9 +92,31 @@ var ALIAS_GENERE = {
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu("Cucu Ridu")
-    .addItem("Genera names.json", "mostraJson")
+    .addItem("Pubblica su GitHub", "pubblicaManuale")
+    .addItem("Anteprima JSON (senza pubblicare)", "mostraJson")
     .addItem("Controlla i dati", "mostraControlli")
+    .addSeparator()
+    .addItem("Imposta token GitHub", "impostaToken")
     .addToUi();
+}
+
+function impostaToken() {
+  var ui = SpreadsheetApp.getUi();
+  var risposta = ui.prompt(
+    "Token GitHub",
+    "Incolla il fine-grained personal access token (Contents: read/write su " +
+      GITHUB_OWNER + "/" + GITHUB_REPO + "). Resta salvato solo in questo foglio.",
+    ui.ButtonSet.OK_CANCEL
+  );
+  if (risposta.getSelectedButton() !== ui.Button.OK) return;
+
+  var token = risposta.getResponseText().trim();
+  if (!token) {
+    ui.alert("Token vuoto, non ho salvato niente.");
+    return;
+  }
+  PropertiesService.getScriptProperties().setProperty("GITHUB_TOKEN", token);
+  ui.alert("Fatto", "Token salvato.", ui.ButtonSet.OK);
 }
 
 // ------------------------------------------------------------- LETTURA -----
@@ -99,7 +167,11 @@ function normalizzaGenere_(valore) {
 
 /**
  * Costruisce i dati finali.
- * Ritorna { json, nomi, aggettivi, doppioni, avvisi }
+ * Ritorna { json, nomi, aggettivi, csvNomi, csvAggettivi, doppioni, avvisi }
+ *   - nomi/aggettivi: forme gia' risolte, quelle che finiscono in names.json
+ *   - csvNomi/csvAggettivi: righe grezze cosi' come stanno nel foglio (le
+ *     caselle vuote degli aggettivi restano vuote), quelle che finiscono
+ *     nei due CSV
  */
 function costruisciDati_() {
   var foglioNomi = trovaFoglio_(FOGLI_NOMI);
@@ -123,6 +195,7 @@ function costruisciDati_() {
   var visti = {};
   var doppioni = [];
   var nomi = [];
+  var csvNomi = [];
 
   for (var i = 0; i < righeNomi.length; i++) {
     var riga = righeNomi[i];
@@ -140,14 +213,16 @@ function costruisciDati_() {
     if (grezzo.trim() !== "" && !(grezzo.trim().toLowerCase() in ALIAS_GENERE))
       avvisi.push("Riga " + riga._riga + " dei nomi: genere \"" + grezzo + "\" non riconosciuto, uso neutro (" + nome + ")");
 
-    nomi.push({
-      nome: nome.charAt(0).toUpperCase() + nome.slice(1),
-      genere: normalizzaGenere_(grezzo)
-    });
+    var nomeFinale = nome.charAt(0).toUpperCase() + nome.slice(1);
+    var genereFinale = normalizzaGenere_(grezzo);
+
+    nomi.push({ nome: nomeFinale, genere: genereFinale });
+    csvNomi.push([nomeFinale, genereFinale]);
   }
 
-  // --- AGGETTIVI, le forme vuote ricadono sul neutro ------------------------
+  // --- AGGETTIVI, le forme vuote ricadono sul neutro (solo nel JSON) -------
   var aggettivi = [];
+  var csvAggettivi = [];
 
   for (var k = 0; k < righeAgg.length; k++) {
     var r = righeAgg[k];
@@ -172,6 +247,7 @@ function costruisciDati_() {
       f: femminile || neutro || base,
       p: plurale || maschile || neutro || base
     });
+    csvAggettivi.push([neutro, maschile, femminile, plurale]);
   }
 
   if (!nomi.length) throw new Error("Il foglio dei nomi e' vuoto.");
@@ -180,9 +256,11 @@ function costruisciDati_() {
   var finale = { version: 2, names: nomi, adjectives: aggettivi };
 
   return {
-    json: JSON.stringify(finale, null, 2),
+    json: JSON.stringify(finale, null, 2) + "\n",
     nomi: nomi,
     aggettivi: aggettivi,
+    csvNomi: csvNomi,
+    csvAggettivi: csvAggettivi,
     doppioni: doppioni,
     avvisi: avvisi
   };
@@ -194,33 +272,162 @@ function contaGeneri_(nomi) {
   return conteggi;
 }
 
-// -------------------------------------------------------------- FINESTRE ---
+// -------------------------------------------------------------------- CSV --
 
-function mostraJson() {
-  var ui = SpreadsheetApp.getUi();
-  var dati;
-  try {
-    dati = costruisciDati_();
-  } catch (e) {
-    ui.alert("Ops", e.message, ui.ButtonSet.OK);
-    return;
+function csvCella_(valore) {
+  var testo = String(valore == null ? "" : valore);
+  if (/[",\n\r]/.test(testo)) return '"' + testo.replace(/"/g, '""') + '"';
+  return testo;
+}
+
+function csvRiga_(celle) {
+  return celle.map(csvCella_).join(",");
+}
+
+function costruisciCsvNomi_(csvNomi) {
+  var righe = ["nome,genere"];
+  for (var i = 0; i < csvNomi.length; i++) righe.push(csvRiga_(csvNomi[i]));
+  return righe.join("\n") + "\n";
+}
+
+function costruisciCsvAggettivi_(csvAggettivi) {
+  var righe = ["neutro,maschile,femminile,plurale"];
+  for (var i = 0; i < csvAggettivi.length; i++) righe.push(csvRiga_(csvAggettivi[i]));
+  return righe.join("\n") + "\n";
+}
+
+// -------------------------------------------------------------- GITHUB -----
+
+function githubToken_() {
+  var token = PropertiesService.getScriptProperties().getProperty("GITHUB_TOKEN");
+  if (!token) throw new Error("Manca il token GitHub: Cucu Ridu > Imposta token GitHub.");
+  return token;
+}
+
+function githubHeaders_() {
+  return {
+    "Authorization": "Bearer " + githubToken_(),
+    "Accept": "application/vnd.github+json"
+  };
+}
+
+function githubChiamata_(percorso, opzioni) {
+  opzioni = opzioni || {};
+  opzioni.headers = githubHeaders_();
+  opzioni.muteHttpExceptions = true;
+  if (opzioni.corpo) {
+    opzioni.contentType = "application/json";
+    opzioni.payload = JSON.stringify(opzioni.corpo);
+    delete opzioni.corpo;
+  }
+  var risposta = UrlFetchApp.fetch("https://api.github.com" + percorso, opzioni);
+  return { codice: risposta.getResponseCode(), testo: risposta.getContentText() };
+}
+
+function githubOk_(risposta, contesto) {
+  if (risposta.codice < 200 || risposta.codice >= 300)
+    throw new Error("GitHub (" + contesto + "): HTTP " + risposta.codice + " " + risposta.testo);
+  return JSON.parse(risposta.testo);
+}
+
+/** Legge il contenuto testuale di un file dal repo. Ritorna la stringa, oppure null se non esiste. */
+function githubLeggiContenuto_(percorso) {
+  var risposta = githubChiamata_("/repos/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/contents/" + percorso + "?ref=" + GITHUB_BRANCH, { method: "get" });
+  if (risposta.codice === 404) return null;
+  var dati = githubOk_(risposta, "lettura " + percorso);
+  var puliti = dati.content.replace(/\n/g, "");
+  var bytes = Utilities.base64Decode(puliti);
+  return Utilities.newBlob(bytes).getDataAsString("UTF-8");
+}
+
+/**
+ * Crea un unico commit su GITHUB_BRANCH con tutti i file passati (path + contenuto
+ * testuale), cosi' il push (e quindi il deploy) scatta una volta sola invece che
+ * una volta per file.
+ */
+function githubCommitAtomico_(file, messaggio) {
+  var rifRisposta = githubChiamata_("/repos/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/git/ref/heads/" + GITHUB_BRANCH, { method: "get" });
+  var rif = githubOk_(rifRisposta, "lettura ref " + GITHUB_BRANCH);
+  var commitAttualeSha = rif.object.sha;
+
+  var commitRisposta = githubChiamata_("/repos/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/git/commits/" + commitAttualeSha, { method: "get" });
+  var commitAttuale = githubOk_(commitRisposta, "lettura commit " + commitAttualeSha);
+  var treeAttualeSha = commitAttuale.tree.sha;
+
+  var entries = file.map(function (f) {
+    return { path: f.percorso, mode: "100644", type: "blob", content: f.contenuto };
+  });
+
+  var treeRisposta = githubChiamata_("/repos/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/git/trees", {
+    method: "post",
+    corpo: { base_tree: treeAttualeSha, tree: entries }
+  });
+  var nuovoTree = githubOk_(treeRisposta, "creazione tree");
+
+  var nuovoCommitRisposta = githubChiamata_("/repos/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/git/commits", {
+    method: "post",
+    corpo: { message: messaggio, tree: nuovoTree.sha, parents: [commitAttualeSha] }
+  });
+  var nuovoCommit = githubOk_(nuovoCommitRisposta, "creazione commit");
+
+  var aggiornaRisposta = githubChiamata_("/repos/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/git/refs/heads/" + GITHUB_BRANCH, {
+    method: "patch",
+    corpo: { sha: nuovoCommit.sha }
+  });
+  githubOk_(aggiornaRisposta, "aggiornamento ref " + GITHUB_BRANCH);
+}
+
+/** Nucleo: legge il foglio, confronta con GitHub e pubblica solo cio' che e' cambiato. */
+function pubblicaNomi_() {
+  var dati = costruisciDati_();
+
+  var candidati = [
+    { percorso: PERCORSO_CSV_NOMI, contenuto: costruisciCsvNomi_(dati.csvNomi) },
+    { percorso: PERCORSO_CSV_AGGETTIVI, contenuto: costruisciCsvAggettivi_(dati.csvAggettivi) },
+    { percorso: PERCORSO_JSON, contenuto: dati.json }
+  ];
+
+  var daScrivere = [];
+  for (var i = 0; i < candidati.length; i++) {
+    var attuale = githubLeggiContenuto_(candidati[i].percorso);
+    if (attuale !== candidati[i].contenuto) daScrivere.push(candidati[i]);
   }
 
   var g = contaGeneri_(dati.nomi);
-  var riepilogo = dati.nomi.length + " nomi (m " + g.m + ", f " + g.f + ", n " + g.n + ", p " + g.p + ")"
-    + " e " + dati.aggettivi.length + " aggettivi";
+  var righeRiepilogo = [
+    "Nomi: " + dati.nomi.length + " (m " + g.m + ", f " + g.f + ", n " + g.n + ", p " + g.p + ")",
+    "Aggettivi: " + dati.aggettivi.length
+  ];
+  if (dati.doppioni.length) righeRiepilogo.push("Nomi doppi tolti: " + dati.doppioni.join(", "));
+  if (dati.avvisi.length) righeRiepilogo.push("Avvisi: " + dati.avvisi.join(" / "));
 
-  var note = [];
-  if (dati.doppioni.length)
-    note.push("<b>Nomi doppi tolti (" + dati.doppioni.length + "):</b> " + escapeHtml_(dati.doppioni.join(", ")));
-  if (dati.avvisi.length)
-    note.push("<b>Da controllare (" + dati.avvisi.length + "):</b><br>" + escapeHtml_(dati.avvisi.join("\n")).replace(/\n/g, "<br>"));
+  if (!daScrivere.length) {
+    righeRiepilogo.push("Nessuna modifica rispetto a GitHub.");
+    return { testo: righeRiepilogo.join("\n"), pubblicato: false };
+  }
 
-  var html = paginaJson_(dati.json, riepilogo, note.join("<hr>"));
-  ui.showModalDialog(
-    HtmlService.createHtmlOutput(html).setWidth(760).setHeight(620),
-    "names.json pronto"
-  );
+  githubCommitAtomico_(daScrivere, "Aggiorna nomi e aggettivi (da Google Sheets)");
+
+  righeRiepilogo.push("Pubblicati " + daScrivere.length + " file:");
+  for (var j = 0; j < daScrivere.length; j++) righeRiepilogo.push("  " + daScrivere[j].percorso);
+
+  return { testo: righeRiepilogo.join("\n"), pubblicato: true };
+}
+
+// -------------------------------------------------------------- MANUALE ----
+
+function pubblicaManuale() {
+  var ui = SpreadsheetApp.getUi();
+  try {
+    var risultato = pubblicaNomi_();
+    ui.alert(
+      risultato.pubblicato ? "Pubblicato" : "Nessuna modifica",
+      risultato.testo,
+      ui.ButtonSet.OK
+    );
+  } catch (e) {
+    ui.alert("Ops", e.message, ui.ButtonSet.OK);
+  }
 }
 
 function mostraControlli() {
@@ -265,6 +472,34 @@ function escapeHtml_(testo) {
     .replace(/"/g, "&quot;");
 }
 
+function mostraJson() {
+  var ui = SpreadsheetApp.getUi();
+  var dati;
+  try {
+    dati = costruisciDati_();
+  } catch (e) {
+    ui.alert("Ops", e.message, ui.ButtonSet.OK);
+    return;
+  }
+
+  var g = contaGeneri_(dati.nomi);
+  var riepilogo = dati.nomi.length + " nomi (m " + g.m + ", f " + g.f + ", n " + g.n + ", p " + g.p + ")"
+    + " e " + dati.aggettivi.length + " aggettivi";
+
+  var note = [];
+  if (dati.doppioni.length)
+    note.push("<b>Nomi doppi tolti (" + dati.doppioni.length + "):</b> " + escapeHtml_(dati.doppioni.join(", ")));
+  if (dati.avvisi.length)
+    note.push("<b>Da controllare (" + dati.avvisi.length + "):</b><br>" + escapeHtml_(dati.avvisi.join("\n")).replace(/\n/g, "<br>"));
+  note.push("Questa e' solo un'anteprima: per pubblicare davvero usa \"Cucu Ridu &gt; Pubblica su GitHub\".");
+
+  var html = paginaJson_(dati.json, riepilogo, note.join("<hr>"));
+  ui.showModalDialog(
+    HtmlService.createHtmlOutput(html).setWidth(760).setHeight(620),
+    "names.json (anteprima)"
+  );
+}
+
 function paginaJson_(json, riepilogo, note) {
   return [
     '<!DOCTYPE html><html><head><meta charset="utf-8"><style>',
@@ -287,9 +522,6 @@ function paginaJson_(json, riepilogo, note) {
     '</div>',
     note ? '<div class="note">' + note + '</div>' : '',
     '<textarea id="json" readonly>', escapeHtml_(json), '</textarea>',
-    '<div class="riepilogo" style="margin-top:8px">',
-    'Incollalo in <code>application/include/names/names.json</code>',
-    '</div>',
     '<script>',
     'var area=document.getElementById("json");',
     'var esito=document.getElementById("esito");',
@@ -309,4 +541,35 @@ function paginaJson_(json, riepilogo, note) {
     '<\/script>',
     '</body></html>'
   ].join("");
+}
+
+// ----------------------------------------------------------- AUTOMATICA ----
+
+function scrivoLog_(esito, dettaglio) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var log = ss.getSheetByName("Log");
+  if (!log) {
+    log = ss.insertSheet("Log");
+    log.appendRow(["Quando", "Esito", "Dettaglio"]);
+  }
+  log.appendRow([new Date(), esito, dettaglio]);
+}
+
+/** Da collegare a un trigger a tempo (vedi header). Nessuna UI: logga su una scheda e manda una mail se fallisce. */
+function pubblicaAutomatica() {
+  try {
+    var risultato = pubblicaNomi_();
+    scrivoLog_(risultato.pubblicato ? "pubblicato" : "invariato", risultato.testo);
+  } catch (e) {
+    scrivoLog_("errore", e.message);
+    try {
+      MailApp.sendEmail(
+        Session.getActiveUser().getEmail(),
+        "Cucu Ridu: errore pubblicazione nomi/aggettivi",
+        e.message
+      );
+    } catch (e2) {
+      // se anche la mail fallisce non c'e' molto altro da fare, resta il log
+    }
+  }
 }
