@@ -730,7 +730,7 @@
       "genere": "f"
     },
     {
-      "nome": "I Fantastici 4",
+      "nome": "I Fantastici 104",
       "genere": "p"
     },
     {
@@ -1026,8 +1026,8 @@
       "genere": "p"
     },
     {
-      "nome": "I 104",
-      "genere": "p"
+      "nome": "Vannacci",
+      "genere": "m"
     }
   ],
   "adjectives": [
@@ -1846,6 +1846,24 @@
       "m": "Tettone",
       "f": "Tettona",
       "p": "Tettoni"
+    },
+    {
+      "n": "con una banana nel culo",
+      "m": "con una banana nel culo",
+      "f": "con una banana nel culo",
+      "p": "con una banana nel culo"
+    },
+    {
+      "n": "Remigrat*",
+      "m": "Remigrato",
+      "f": "Remigrata",
+      "p": "Remigrati"
+    },
+    {
+      "n": "Scem* Pagliacci*",
+      "m": "Scemo Pagliaccio",
+      "f": "Scema Pagliaccia",
+      "p": "Scemi Pagliacci"
     }
   ]
 }
