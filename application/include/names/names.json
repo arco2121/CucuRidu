@@ -594,7 +594,7 @@
       "genere": "m"
     },
     {
-      "nome": "Rosaana",
+      "nome": "Rossana",
       "genere": "f"
     },
     {
@@ -1032,6 +1032,50 @@
     {
       "nome": "I Ricchi e Poveri",
       "genere": "p"
+    },
+    {
+      "nome": "Fazzoletti Tempo",
+      "genere": "p"
+    },
+    {
+      "nome": "Edo",
+      "genere": "m"
+    },
+    {
+      "nome": "Nano da giardino",
+      "genere": "m"
+    },
+    {
+      "nome": "Lanabanana",
+      "genere": "n"
+    },
+    {
+      "nome": "Meggy",
+      "genere": "f"
+    },
+    {
+      "nome": "Zohran Mamdani",
+      "genere": "m"
+    },
+    {
+      "nome": "Elenoire Ferruzzi",
+      "genere": "f"
+    },
+    {
+      "nome": "Anna Tatangelo",
+      "genere": "f"
+    },
+    {
+      "nome": "Sabrina Carpenter",
+      "genere": "f"
+    },
+    {
+      "nome": "Ajello Giovanna Carmela Mar (PA)",
+      "genere": "f"
+    },
+    {
+      "nome": "Clero stronzo",
+      "genere": "m"
     }
   ],
   "adjectives": [
@@ -1868,6 +1912,18 @@
       "m": "Scemo Pagliaccio",
       "f": "Scema Pagliaccia",
       "p": "Scemi Pagliacci"
+    },
+    {
+      "n": "Sionista",
+      "m": "Sionista",
+      "f": "Sionista",
+      "p": "Sionisti"
+    },
+    {
+      "n": "Felicemente Cornut*",
+      "m": "Felicemente Cornuto",
+      "f": "Felicemente Cornuta",
+      "p": "Felicemente Cornuti"
     }
   ]
 }
