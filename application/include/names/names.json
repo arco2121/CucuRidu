@@ -1008,6 +1008,26 @@
     {
       "nome": "Adamo ed Eva",
       "genere": "p"
+    },
+    {
+      "nome": "Tristano",
+      "genere": "m"
+    },
+    {
+      "nome": "Isotta",
+      "genere": "f"
+    },
+    {
+      "nome": "Ficarra e Picone",
+      "genere": "p"
+    },
+    {
+      "nome": "Avengers",
+      "genere": "p"
+    },
+    {
+      "nome": "I 104",
+      "genere": "p"
     }
   ],
   "adjectives": [
@@ -1814,6 +1834,18 @@
       "m": "che favoreggia la prostituzione",
       "f": "che favoreggia la prostituzione",
       "p": "che favoreggia la prostituzione"
+    },
+    {
+      "n": "Mongoplettic*",
+      "m": "Mongoplettico",
+      "f": "Mongoplettica",
+      "p": "Mongoplettici"
+    },
+    {
+      "n": "Tetton*",
+      "m": "Tettone",
+      "f": "Tettona",
+      "p": "Tettoni"
     }
   ]
 }
