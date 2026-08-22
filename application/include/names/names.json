@@ -730,7 +730,7 @@
       "genere": "f"
     },
     {
-      "nome": "I Fantastici 4",
+      "nome": "I Fantastici 104",
       "genere": "p"
     },
     {
@@ -1007,6 +1007,30 @@
     },
     {
       "nome": "Adamo ed Eva",
+      "genere": "p"
+    },
+    {
+      "nome": "Tristano",
+      "genere": "m"
+    },
+    {
+      "nome": "Isotta",
+      "genere": "f"
+    },
+    {
+      "nome": "Ficarra e Picone",
+      "genere": "p"
+    },
+    {
+      "nome": "Avengers",
+      "genere": "p"
+    },
+    {
+      "nome": "Vannacci",
+      "genere": "m"
+    },
+    {
+      "nome": "I Ricchi e Poveri",
       "genere": "p"
     }
   ],
@@ -1814,6 +1838,36 @@
       "m": "che favoreggia la prostituzione",
       "f": "che favoreggia la prostituzione",
       "p": "che favoreggia la prostituzione"
+    },
+    {
+      "n": "Mongoplettic*",
+      "m": "Mongoplettico",
+      "f": "Mongoplettica",
+      "p": "Mongoplettici"
+    },
+    {
+      "n": "Tetton*",
+      "m": "Tettone",
+      "f": "Tettona",
+      "p": "Tettoni"
+    },
+    {
+      "n": "con una banana nel culo",
+      "m": "con una banana nel culo",
+      "f": "con una banana nel culo",
+      "p": "con una banana nel culo"
+    },
+    {
+      "n": "Remigrat*",
+      "m": "Remigrato",
+      "f": "Remigrata",
+      "p": "Remigrati"
+    },
+    {
+      "n": "Scem* Pagliacci*",
+      "m": "Scemo Pagliaccio",
+      "f": "Scema Pagliaccia",
+      "p": "Scemi Pagliacci"
     }
   ]
 }
