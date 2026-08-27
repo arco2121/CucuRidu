@@ -202,7 +202,7 @@
       "genere": "f"
     },
     {
-      "nome": "Gabibbo",
+      "nome": "Adolf Hitler",
       "genere": "m"
     },
     {
@@ -1076,6 +1076,26 @@
     {
       "nome": "Clero stronzo",
       "genere": "m"
+    },
+    {
+      "nome": "I Beati Paoli",
+      "genere": "p"
+    },
+    {
+      "nome": "Terea",
+      "genere": "f"
+    },
+    {
+      "nome": "Sadam Houssain",
+      "genere": "m"
+    },
+    {
+      "nome": "Bonolis",
+      "genere": "m"
+    },
+    {
+      "nome": "Loredana Bertè",
+      "genere": "f"
     }
   ],
   "adjectives": [
@@ -1087,7 +1107,7 @@
     },
     {
       "n": "Troia",
-      "m": "Troia",
+      "m": "Troio",
       "f": "Troia",
       "p": "Troie"
     },
@@ -1924,6 +1944,18 @@
       "m": "Felicemente Cornuto",
       "f": "Felicemente Cornuta",
       "p": "Felicemente Cornuti"
+    },
+    {
+      "n": "Figli* di troia",
+      "m": "Figlio di troia",
+      "f": "Figlia di troia",
+      "p": "Figli di troia"
+    },
+    {
+      "n": "Gran Minchion*",
+      "m": "Gran Minchione",
+      "f": "Gran Minchiona",
+      "p": "Gran Minchioni"
     }
   ]
 }
