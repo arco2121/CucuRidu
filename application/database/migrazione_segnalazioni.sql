@@ -16,7 +16,11 @@ CREATE TABLE IF NOT EXISTS public.segnalazioni (
     testo      text NOT NULL,
     nota       text,
     risolta    boolean NOT NULL DEFAULT false,
-    CONSTRAINT segnalazioni_tipo_valido CHECK (tipo IN ('frase', 'completamento'))
+    CONSTRAINT segnalazioni_tipo_valido CHECK (tipo IN (
+        'frase', 'completamento',
+        -- proposte di roba nuova, dal pannello "Suggerisci"
+        'suggerimento_frase', 'suggerimento_completamento'
+    ))
 );
 
 CREATE INDEX IF NOT EXISTS idx_segnalazioni_creato ON public.segnalazioni(creato_at DESC);

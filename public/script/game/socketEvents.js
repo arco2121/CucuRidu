@@ -93,6 +93,16 @@ if(controller instanceof Worker)
 //Utility
 let referenceGiocatore = new GiocatoreInterface(null);
 let referenceStanza = "";
+/*
+ * Che schermata stiamo mostrando in questo momento. Non serve a disegnare
+ * niente: serve solo a poterlo dire al server ogni tanto, che controlla se
+ * combacia con lo stato vero della stanza (vedi la sincronizzazione in fondo
+ * al file).
+ */
+let vistaCorrente = null;
+// finita la partita la stanza non esiste piu: da li in poi non ha senso
+// continuare a chiedere "sono in pari?"
+let sincronizzazioneAttiva = true;
 // la frase del round in corso, serve al pannello delle segnalazioni
 let fraseCorrente = null;
 const ricordaFrase = (domanda) => {
@@ -195,6 +205,10 @@ on("confermaStanza", async (data) => {
     const { reference, interroghi, primoRound } = data;
     referenceStanza = data["stanzaId"] || fromBackEnd["stanzaId"];
     referenceGiocatore = new GiocatoreInterface(reference);
+    // segnata subito, prima della fetch qui sotto: se quella ci mette troppo
+    // non vogliamo che nel frattempo il giro di sincronizzazione continui a
+    // dichiarare la schermata vecchia e a farsi riallineare di nuovo
+    vistaCorrente = "wait";
     const result = await (await fetch("/saveGameReference", {
         method: 'POST',
         headers: {
@@ -222,9 +236,13 @@ on("confermaStanza", async (data) => {
     }
 });
 
-on("stanzaLasciata", lasciaStanza);
+on("stanzaLasciata", () => {
+    sincronizzazioneAttiva = false;
+    lasciaStanza();
+});
 
 on("stanzaChiusa", () => {
+    sincronizzazioneAttiva = false;
     alert("NOOOOOOO, la chiusura della stanza NOOOOOOO");
     lasciaStanza();
 });
@@ -248,6 +266,7 @@ on("roundIniziato", async (data) => {
     if(reference) referenceGiocatore = new GiocatoreInterface(reference);
     if(stanza) referenceStanza = stanza
     ricordaFrase(domanda);
+    vistaCorrente = "choosingCards";
     await renderFragment(base, "choosingCards", {
         domanda: domanda,
         risposte: !referenceGiocatore.interrogationRole ? referenceGiocatore.mazzo : null,
@@ -259,6 +278,7 @@ on("roundIniziato", async (data) => {
 on("rispostaRegistrata", async (data) => {
     const { stanzaId } = data;
     if(stanzaId) referenceStanza = stanzaId;
+    vistaCorrente = "waitWinner";
     await renderFragment(base, "waitWinner", {
         stanzaId: referenceStanza
     });
@@ -273,6 +293,7 @@ on("sceltaVincitore", async (data) => {
     if(reference) referenceGiocatore = new GiocatoreInterface(reference);
     if(stanza) referenceStanza = stanza
     ricordaFrase(domanda);
+    vistaCorrente = "chooseWinner";
     await renderFragment(base, "chooseWinner", {
         domanda: domanda,
         risposte: risposte,
@@ -286,6 +307,7 @@ on("fineTurno", async (data) => {
     const { reference, vincitore, domanda, risposte, tutteLeRisposte, giocatori } = data;
     if(reference) referenceGiocatore = new GiocatoreInterface(reference);
     ricordaFrase(domanda);
+    vistaCorrente = "showWinner";
     await renderFragment(base, "showWinner", {
         domanda: domanda,
         risposte: risposte,
@@ -300,6 +322,8 @@ on("fineTurno", async (data) => {
 on("partitaTerminata", async (data) => {
     const { classifica } = data;
     const puntiMassimi = classifica[0]?.punti || 0;
+    vistaCorrente = "endGame";
+    sincronizzazioneAttiva = false;
     await renderFragment(base, "endGame", {
         classifica: classifica,
         primoPosto: classifica.filter(giocatore => giocatore.punti >= puntiMassimi),
@@ -307,6 +331,50 @@ on("partitaTerminata", async (data) => {
         idPrimoGiocatore: classifica[0].id
     });
 });
+
+/* ---------------------------------------------------------------------------
+ * Sincronizzazione della schermata
+ *
+ * Il server manda gli eventi di gioco (roundIniziato, fineTurno...) una volta
+ * sola: chi in quel momento aveva il socket morto o in riconnessione non li
+ * riceve piu e resta fermo alla schermata di prima - il classico "sono ancora
+ * in lobby mentre gli altri stanno gia giocando", che si risolveva solo
+ * ricaricando a mano.
+ *
+ * Qui diciamo al server, ogni tanto, che schermata stiamo mostrando. Se non
+ * combacia con lo stato vero della stanza ci rimanda lo stato giusto e la
+ * pagina si rimette in pari da sola, senza ricaricare. Se combacia il server
+ * non risponde nemmeno.
+ *
+ * Non chiediamo niente a scheda nascosta (non serve a nessuno aggiornare una
+ * pagina che non si sta guardando, e il telefono la congela comunque): al
+ * ritorno pero' chiediamo subito, che e' proprio il momento in cui e' piu
+ * probabile essersi persi qualcosa.
+ * --------------------------------------------------------------------------- */
+const INTERVALLO_SINCRONIZZAZIONE = 7000;
+
+const sincronizzaVista = () => {
+    if(!sincronizzazioneAttiva) return;
+    if(!referenceStanza || !vistaCorrente) return;
+    emit("__sincronizza__", {
+        id: referenceStanza,
+        vista: vistaCorrente
+    });
+};
+
+setInterval(() => {
+    if(document.hidden) return;
+    sincronizzaVista();
+}, INTERVALLO_SINCRONIZZAZIONE);
+
+document.addEventListener("visibilitychange", () => {
+    if(!document.hidden) sincronizzaVista();
+});
+
+// dopo una riconnessione il server manda gia lo stato da solo, ma se per
+// qualche motivo non arriva questo lo richiede
+on("connect", () => setTimeout(sincronizzaVista, 1000));
+on("reconnect", () => setTimeout(sincronizzaVista, 1000));
 
 if(controller instanceof Worker)
     controller.postMessage({

@@ -35,16 +35,28 @@ const marcatoriFrase = /[§$]+(?=_)/g;
 
 const pulisciFrase = (testo = "") => String(testo).replace(marcatoriFrase, "");
 
+/*
+ * La POSIZIONE conta: replacements[0] riempie il primo spazio, replacements[1]
+ * il secondo e cosi via. Un buco (null/undefined) lascia quello spazio vuoto
+ * invece di far scalare avanti tutti gli altri.
+ *
+ * Prima i buchi venivano filtrati via prima di riempire: se selezionavi due
+ * carte e poi toglievi quella col numerino 1, la carta rimasta continuava a
+ * mostrare il numerino 2 ma finiva a riempire lo spazio 1. Il numerino diceva
+ * una cosa e la frase ne faceva un'altra.
+ */
 const fillBlanks = (templateText, replacements) => {
     let index = 0;
-    replacements = (replacements || []).filter(rep => rep !== null && rep !== undefined);
+    replacements = replacements || [];
 
     return String(templateText).replace(/([§$]?)_/g, (match, marcatore, offset, fullString) => {
-        // spazio non ancora riempito: mostriamo il trattino nudo, senza marcatore
-        if (index >= replacements.length) return "_";
-
-        let word = String(replacements[index]);
+        const corrente = replacements[index];
         index++;
+
+        // spazio non ancora riempito: mostriamo il trattino nudo, senza marcatore
+        if (corrente === null || corrente === undefined) return "_";
+
+        let word = String(corrente);
 
         const tuttoMaiuscolo = marcatore === "§";
         const nomeProprio = bannedSymbols.split("").some(symbol => word.startsWith(symbol));

@@ -299,16 +299,34 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
 
             const daFare = righe.filter(r => !r.risolta).length;
 
+            // due famiglie nella stessa tabella: correzioni ("questo e'
+            // sbagliato") e suggerimenti ("aggiungete questo")
+            const eSuggerimento = (tipo) => String(tipo || "").startsWith("suggerimento_");
+            const etichette = {
+                frase: "Frase",
+                completamento: "Completamento",
+                suggerimento_frase: "Frase nuova",
+                suggerimento_completamento: "Carta nuova"
+            };
+            const classeRiga = (r) => [
+                String(r.tipo || "").includes("frase") ? "frase" : "compl",
+                eSuggerimento(r.tipo) ? "sugg" : "corr",
+                r.risolta ? "risolta" : ""
+            ].filter(Boolean).join(" ");
+
+            const quantiSuggerimenti = righe.filter(r => eSuggerimento(r.tipo)).length;
+            const quanteCorrezioni = righe.length - quantiSuggerimenti;
+
             const corpo = righe.length
-                ? righe.map(r => `<tr class="${r.tipo === "frase" ? "frase" : "compl"}${r.risolta ? " risolta" : ""}" data-id="${scappa(r.id)}">
+                ? righe.map(r => `<tr class="${classeRiga(r)}" data-id="${scappa(r.id)}">
                         <td class="fatto"><input type="checkbox" class="segnaFatto" ${r.risolta ? "checked" : ""} aria-label="Segna come fatta"></td>
                         <td class="quando">${scappa(quandoIt(r.creato_at))}</td>
-                        <td class="tipo">${scappa(r.tipo)}</td>
+                        <td class="tipo">${scappa(etichette[r.tipo] || r.tipo)}</td>
                         <td class="testo">${scappa(r.testo)}</td>
                         <td class="nota">${scappa(r.nota || "")}</td>
                         <td class="chi">${scappa(r.giocatore || "")}<br><small>${scappa(r.stanza_id || "")}</small></td>
                     </tr>`).join("")
-                : `<tr><td colspan="6" class="vuoto">Nessuna segnalazione, per ora tutto a posto</td></tr>`;
+                : `<tr><td colspan="6" class="vuoto">Niente di niente, per ora tutto a posto</td></tr>`;
 
             res.status(200).send(`<!doctype html><html lang="it"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -325,6 +343,11 @@ td.fatto{text-align:center;width:20px}
 td.fatto input{width:18px;height:18px;cursor:pointer}
 tr.frase .tipo{color:#a3560f;font-weight:600}
 tr.compl .tipo{color:#3a6ea5;font-weight:600}
+tr.sugg{background:#f6fbf5}
+tr.sugg .tipo{color:#2f7d4f;font-weight:600}
+tr.sugg .tipo::before{content:"+ "}
+body.soloCorrezioni tr.sugg{display:none}
+body.soloSuggerimenti tr.corr{display:none}
 tr.risolta{opacity:0.45}
 tr.risolta td.testo,tr.risolta td.nota{text-decoration:line-through}
 body.nascondiRisolte tr.risolta{display:none}
@@ -333,9 +356,15 @@ td.testo{font-weight:600;max-width:520px}
 td.nota{color:#555;max-width:320px}
 td.vuoto{text-align:center;color:#888;padding:30px}
 </style></head><body>
-<h1>Segnalazioni</h1>
-<p class="sotto">${righe.length} segnalazioni, dalla piu recente (${daFare} da sistemare). Frasi e completamenti che qualcuno ha marcato come sbagliati durante una partita.</p>
+<h1>Segnalazioni e suggerimenti</h1>
+<p class="sotto">${righe.length} righe dalla piu recente, ${daFare} ancora da sistemare: ${quanteCorrezioni} correzioni (roba sbagliata trovata giocando) e ${quantiSuggerimenti} suggerimenti (frasi e carte nuove proposte dai giocatori).</p>
 <label class="filtro"><input type="checkbox" id="nascondiRisolte">Nascondi quelle gia' fatte</label>
+<label class="filtro">Mostra:
+<select id="filtroTipo">
+<option value="tutto">tutto</option>
+<option value="correzioni">solo correzioni</option>
+<option value="suggerimenti">solo suggerimenti</option>
+</select></label>
 <table><thead><tr><th>Fatto</th><th>Quando</th><th>Tipo</th><th>Testo</th><th>Nota</th><th>Chi</th></tr></thead>
 <tbody>${corpo}</tbody></table>
 <script>
@@ -366,6 +395,11 @@ td.vuoto{text-align:center;color:#888;padding:30px}
     var nascondi = document.getElementById("nascondiRisolte");
     nascondi.addEventListener("change", function () {
         document.body.classList.toggle("nascondiRisolte", nascondi.checked);
+    });
+    var filtro = document.getElementById("filtroTipo");
+    filtro.addEventListener("change", function () {
+        document.body.classList.toggle("soloCorrezioni", filtro.value === "correzioni");
+        document.body.classList.toggle("soloSuggerimenti", filtro.value === "suggerimenti");
     });
 })();
 </script>

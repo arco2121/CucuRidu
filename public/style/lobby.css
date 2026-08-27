@@ -834,6 +834,68 @@
 }
 
 /* ---------------------------------------------------
+ >>> SUGGERIMENTI
+ Riusa quasi tutto dalle segnalazioni: qui c'e' solo quello che cambia,
+ cioe' la scelta del tipo e la crocetta per togliere una riga dalla lista.
+--------------------------------------------------- */
+.suggerisci_tipo_con {
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    margin: 4px 0 8px;
+}
+
+/* Il tipo non scelto resta li ma spento, cosi si vede a colpo d'occhio
+   quale dei due si sta scrivendo senza leggere.
+   width:auto perche' i bottoni piccoli sono larghi 105px fissi e le scritte
+   piu lunghe di "Opzioni" ci restano dentro tagliate a meta. */
+.suggerisci_tipo,
+.suggerisci_aggiungi {
+    width: auto;
+    min-width: 105px;
+    height: auto;
+    min-height: 42px;
+    padding: 8px 20px;
+}
+
+.suggerisci_tipo {
+    opacity: 0.5;
+    filter: saturate(0.4);
+    transition: all 0.12s ease-out;
+}
+
+.suggerisci_tipo_attivo {
+    opacity: 1;
+    filter: none;
+    box-shadow: 0 0 0 2px white;
+}
+
+.suggerisci_aiuto {
+    text-align: center;
+    margin: 0 0 8px;
+    font-size: 0.78rem;
+    color: var(--background-variant-outline);
+    min-height: 1.1rem;
+}
+
+.suggerisci_aggiungi {
+    margin-top: 8px;
+}
+
+.suggerisci_lista_con {
+    max-height: 30vh;
+    margin-top: 10px;
+}
+
+.suggerisci_togli {
+    flex-shrink: 0;
+    font-size: 1.3rem;
+    line-height: 1;
+    opacity: 0.7;
+    padding: 0 2px;
+}
+
+/* ---------------------------------------------------
  >>> CHAT
 --------------------------------------------------- */
 .chat_section {

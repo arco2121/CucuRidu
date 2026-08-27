@@ -2,7 +2,7 @@ const path = require("path");
 const { Stanza, StatoStanza } = require(path.join(__dirname, "../include/script/Stanza"));
 const { Giocatore } = require(path.join(__dirname, "../include/script/Giocatore"));
 const { NESSUNA_MODIFICA } = require(path.join(__dirname, "../include/script/concorrenza"));
-const { normalizzaRighe } = require(path.join(__dirname, "../include/script/Segnalazioni"));
+const { normalizzaRighe, TIPI_SUGGERIMENTO } = require(path.join(__dirname, "../include/script/Segnalazioni"));
 
 /**
  * Configura gli endpoint del ServerIO
@@ -20,6 +20,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
     const GRAZIA_DISCONNESSIONE = Math.min(Math.max((timeout / 60) * 3, 60000), 300000);
     // per non farsi riempire l'archivio da chi spamma il bottone
     const PAUSA_SEGNALAZIONI = 4000;
+    // ogni quanto, al massimo, un singolo socket puo chiedere di essere
+    // riallineato: il client chiede ogni ~7s, questo tiene a bada il resto
+    const PAUSA_SINCRONIZZA = 2500;
 
     /**
      * Nessun handler socket deve poter far cadere il processo: prima di questa
@@ -79,6 +82,29 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 .map(id => stanza.trovaGiocatore(id)?.toJSON())
                 .filter(Boolean)
         });
+    };
+
+    /*
+     * Quali schermate hanno senso, per QUESTO giocatore, con la stanza in
+     * questo stato. Serve alla risincronizzazione: il client dice cosa sta
+     * mostrando, e se non e' in questa lista vuol dire che si e' perso un
+     * evento per strada e va rimesso in pari.
+     *
+     * In WAIT le schermate valide sono tre perche' lo stato della stanza non
+     * distingue "sto aspettando in lobby" da "sto guardando chi ha vinto il
+     * round": sono la stessa cosa per il server, e nessuna delle due e'
+     * bloccata.
+     */
+    const vistaAttesa = (stanza, giocatore) => {
+        switch (stanza?.stato) {
+            case StatoStanza.WAIT: return ["wait", "showWinner", "endGame"];
+            case StatoStanza.CHOOSING_CARDS:
+                return stanza.round?.risposte?.has?.(giocatore?.id)
+                    ? ["waitWinner"]
+                    : ["choosingCards"];
+            case StatoStanza.CHOOSING_WINNER: return ["chooseWinner"];
+            default: return [];
+        }
     };
 
     const emitStatoStanza = async (stanzaId, ...sockets) => {
@@ -467,6 +493,67 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             inviaAttesaRisposte(stanza);
         }));
 
+        /*
+         * Rete di sicurezza contro la schermata rimasta indietro.
+         *
+         * Capitava (e capitava spesso) che uno restasse fermo in lobby mentre
+         * gli altri erano gia al turno dopo: bastava ricaricare la pagina, ma
+         * e' brutto e non e' colpa di chi gioca. Succede quando un evento
+         * (roundIniziato, fineTurno...) parte mentre quel socket e' morto o
+         * si sta riconnettendo: il server lo manda una volta sola e chi non
+         * c'era in quel momento non lo riceve piu.
+         *
+         * Qui il client dice ogni tanto "sto mostrando questa schermata"; se
+         * non e' una di quelle che ci aspettiamo per lo stato attuale della
+         * stanza, gli ributtiamo addosso lo stato vero e si rimette in pari
+         * da solo. Se invece e' tutto a posto non rispondiamo proprio, cosi
+         * il giro non costa niente.
+         *
+         * Se la stanza non esiste piu NON mandiamo stanzaChiusa: una lettura
+         * andata storta butterebbe fuori un giocatore che stava benissimo.
+         */
+        user.on("__sincronizza__", sicuro("__sincronizza__", async (data) => {
+            const adesso = Date.now();
+            if (adesso - (user.data.ultimaSincronizzazione || 0) < PAUSA_SINCRONIZZA) return;
+            user.data.ultimaSincronizzazione = adesso;
+
+            const stanzaId = data?.["id"] || user.data?.referenceStanza;
+            const vista = String(data?.["vista"] || "");
+            if (!stanzaId || !vista) return;
+
+            let stanza = await Stanze.get(stanzaId);
+            if (!stanza) return;
+
+            /*
+             * Prima di giudicare il client, controlliamo la stanza: se tutti
+             * quelli che dovevano rispondere hanno risposto ma lo stato e'
+             * rimasto a CHOOSING_CARDS, il bloccato non e' il giocatore, e'
+             * la stanza. In quel caso avanza e lo dice a tutti.
+             */
+            if (stanza.stato === StatoStanza.CHOOSING_CARDS
+                && stanza.giocatori.size > 1
+                && (stanza.round?.risposte?.size ?? 0) >= stanza.giocatori.size - 1) {
+                const esito = await Stanze.mutate(stanzaId,
+                    (attuale) => attuale.sincronizzaStato() ? true : NESSUNA_MODIFICA);
+                if (esito?.stanza) stanza = esito.stanza;
+                if (esito?.risultato) {
+                    const tutti = await server.in(stanzaId).fetchSockets();
+                    await emitStatoStanza(stanza, ...tutti);
+                    console.log("Stanza sbloccata dalla sincronizzazione => " + stanzaId);
+                    return;
+                }
+            }
+
+            const giocatore = giocatoreDi(user, stanza);
+            if (vistaAttesa(stanza, giocatore).includes(vista)) return;
+
+            console.log("Riallineo " + (giocatore?.username || "un giocatore")
+                + " (era su " + vista + ") nella stanza " + stanzaId);
+            await emitStatoStanza(stanza, user);
+            inviaListe(stanza);
+            inviaAttesaRisposte(stanza);
+        }));
+
         user.on("aggiornaChat", sicuro("aggiornaChat", async (data) => {
             const stanzaId = data?.["stanzaId"] || user.data?.referenceStanza;
             const stanza = await Stanze.get(stanzaId);
@@ -535,6 +622,35 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             await archivioSegnalazioni.aggiungi(righe);
             console.log("Segnalazioni ricevute => " + righe.length + " da " + stanzaId);
             user.emit("segnalazioneEsito", { ok: true, quante: righe.length });
+        }));
+
+        /*
+         * Frasi e completamenti NUOVI proposti dai giocatori. Stessa tabella
+         * delle segnalazioni, tipi diversi (suggerimento_*): li' dentro
+         * restano separati e li si spunta allo stesso modo quando entrano
+         * davvero nel gioco.
+         */
+        user.on("suggerisci", sicuro("suggerisci", async (data) => {
+            if (!archivioSegnalazioni) return user.emit("suggerimentoEsito", { ok: false });
+
+            const adesso = Date.now();
+            if (adesso - (user.data.ultimoSuggerimento || 0) < PAUSA_SEGNALAZIONI)
+                return user.emit("suggerimentoEsito", { ok: false, messaggio: "Aspetta un attimo prima di mandarne altri" });
+            user.data.ultimoSuggerimento = adesso;
+
+            const stanzaId = data?.["id"] ?? user.data?.referenceStanza;
+            const righe = normalizzaRighe(data?.["elementi"], {
+                stanzaId: stanzaId,
+                giocatore: user.data?.referenceGiocatore?.username,
+                nota: data?.["nota"]
+            }, TIPI_SUGGERIMENTO);
+
+            if (!righe.length)
+                return user.emit("suggerimentoEsito", { ok: false, messaggio: "Non hai scritto niente da suggerire" });
+
+            await archivioSegnalazioni.aggiungi(righe);
+            console.log("Suggerimenti ricevuti => " + righe.length + " da " + stanzaId);
+            user.emit("suggerimentoEsito", { ok: true, quante: righe.length });
         }));
 
         user.on("webrtcOfferta", (data) => {

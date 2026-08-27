@@ -1,0 +1,44 @@
+<div class="section hidden sectionToHide showByConnectionManager" id="suggerisciMenu">
+    <div class="floatSection packs_section btn_doubleBorder pauseSection">
+        <div class="options_exit_btn upper sour_gummy_extra" >
+            <h1 class="panel_title sour_gummy_bold">Suggerisci</h1>
+            <h1 class="active_Btn" id="exitSuggerisciBtn">X</h1>
+        </div>
+        <div class="pause_content sour_gummy_medium">
+            <h4 class="segnala_spiega sour_gummy_regular_italic">
+                Ti è venuta in mente una frase o un completamento da mettere nel gioco? Scrivilo qui.
+            </h4>
+
+            <div class="row suggerisci_tipo_con flex_gap_10">
+                <button type="button"
+                        class="button btn_smallText btn_style_1 sour_gummy_bold suggerisci_tipo suggerisci_tipo_attivo"
+                        data-tipo="completamento">Carta</button>
+                <button type="button"
+                        class="button btn_smallText btn_style_2 sour_gummy_bold suggerisci_tipo"
+                        data-tipo="frase">Frase</button>
+            </div>
+
+            <h5 class="suggerisci_aiuto sour_gummy_regular_italic" id="suggerisciAiuto"></h5>
+
+            <textarea class="input segnala_nota sour_gummy_medium"
+                      id="suggerisciTesto"
+                      rows="2"
+                      maxlength="400"
+                      placeholder="Scrivi qui"></textarea>
+
+            <button type="button"
+                    class="button btn_smallText btn_style_3 sour_gummy_bold suggerisci_aggiungi"
+                    id="aggiungiSuggerimentoBtn">+ Aggiungi alla lista</button>
+
+            <div class="segnala_lista_con suggerisci_lista_con" id="suggerisciLista"></div>
+        </div>
+        <div class="pause_footer_con column">
+            <div class="wait_players_list_hr"></div>
+            <div class="column segnala_footer pause_footer_margin flex_gap_10">
+                <button id="inviaSuggerimentoBtn" class="button btn_mediumText btn_style_2 sour_gummy_bold btn_doubleBorder">Invia</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="<%= scripts %>/views/components/suggerisciPanel.js"></script>
