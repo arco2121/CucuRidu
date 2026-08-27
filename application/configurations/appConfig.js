@@ -468,7 +468,11 @@ td.vuoto{text-align:center;color:#888;padding:30px}
         const packs = [];
         for(const pair of packsPair) {
             const righe = translateToPack(pair);
-            if(Mazzo.controllaMazzo(righe)) {
+            // qui il mazzo lo stiamo creando ADESSO: l'hash non esiste ancora,
+            // quindi si controlla solo che il contenuto stia in piedi. Prima
+            // si chiamava controllaMazzo, che pretende anche la firma: la
+            // pagina /creaMazzo rispondeva 400 a qualsiasi mazzo, sempre.
+            if(Mazzo.problemaMazzo(righe) === null) {
                 const mazzoFinale = {
                     frasi: righe[0],
                     completamenti: righe[1],

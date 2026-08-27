@@ -1,6 +1,7 @@
 const path = require("path");
 const { Stanza, StatoStanza } = require(path.join(__dirname, "../include/script/Stanza"));
 const { Giocatore } = require(path.join(__dirname, "../include/script/Giocatore"));
+const { Mazzo } = require(path.join(__dirname, "../include/script/Mazzo"));
 const { NESSUNA_MODIFICA } = require(path.join(__dirname, "../include/script/concorrenza"));
 const { normalizzaRighe, TIPI_SUGGERIMENTO } = require(path.join(__dirname, "../include/script/Segnalazioni"));
 
@@ -595,10 +596,17 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             if (esito && esito.risultato) {
                 user.emit("mazzoAggiunto");
                 console.log("Mazzo cambiato nella stanza => " + stanzaId);
-            } else
+            } else {
+                // un "non mi piacciono" e basta non aiuta nessuno a capire
+                // cosa fare: se il problema e' il contenuto lo diciamo
+                let motivo = null;
+                try { motivo = Mazzo.problemaMazzo(...(Array.isArray(data?.["packs"]) ? data["packs"] : [])); }
+                catch { motivo = null; }
                 user.emit("mazzoErrore", {
-                    message: "Mannaggia, mi sa che al server non sono piaciuti :("
+                    message: motivo
+                        || "Non riesco a cambiare i mazzi adesso: a partita iniziata non si puo' piu fare"
                 });
+            }
         }));
 
         user.on("segnala", sicuro("segnala", async (data) => {
