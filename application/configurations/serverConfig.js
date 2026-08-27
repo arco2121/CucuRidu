@@ -356,7 +356,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             }
 
             user.emit("aspettaAltri", {
-                message: "Girl non ci sono chatbot ai che fingano di esserti amico. Go touch some grass e non fare come Calipso"
+                message: "Girl non ci sono chatbot ai che fingano di esserti amico. Go touch some grass"
             });
         }));
 
