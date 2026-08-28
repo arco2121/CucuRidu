@@ -1096,6 +1096,10 @@
     {
       "nome": "Loredana Bertè",
       "genere": "f"
+    },
+    {
+      "nome": "Netanyahu",
+      "genere": "m"
     }
   ],
   "adjectives": [
@@ -1956,6 +1960,36 @@
       "m": "Gran Minchione",
       "f": "Gran Minchiona",
       "p": "Gran Minchioni"
+    },
+    {
+      "n": "Chan",
+      "m": "Chan",
+      "f": "Chan",
+      "p": "Chan"
+    },
+    {
+      "n": "Kawaii :3",
+      "m": "Kawaii :3",
+      "f": "Kawaii :3",
+      "p": "Kawaii :3"
+    },
+    {
+      "n": "Orripilante",
+      "m": "Orripilante",
+      "f": "Orripilante",
+      "p": "Orripilanti"
+    },
+    {
+      "n": "Sburrastic*",
+      "m": "Sburrastico",
+      "f": "Sburrastica",
+      "p": "Sburrastici"
+    },
+    {
+      "n": "Pedofil*",
+      "m": "Pedofilo",
+      "f": "Pedofila",
+      "p": "Pedofili"
     }
   ]
 }
