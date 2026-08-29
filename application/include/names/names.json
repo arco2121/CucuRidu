@@ -1100,6 +1100,26 @@
     {
       "nome": "Netanyahu",
       "genere": "m"
+    },
+    {
+      "nome": "Monika",
+      "genere": "f"
+    },
+    {
+      "nome": "Spiderman",
+      "genere": "m"
+    },
+    {
+      "nome": "Wonder Woman",
+      "genere": "f"
+    },
+    {
+      "nome": "Spermatozoi",
+      "genere": "p"
+    },
+    {
+      "nome": "Bambini Cinesi",
+      "genere": "p"
     }
   ],
   "adjectives": [
@@ -1990,6 +2010,24 @@
       "m": "Pedofilo",
       "f": "Pedofila",
       "p": "Pedofili"
+    },
+    {
+      "n": "Focomelic*",
+      "m": "Focomelico",
+      "f": "Focomelica",
+      "p": "Focomelici"
+    },
+    {
+      "n": "Digievolut*",
+      "m": "Digievoluto",
+      "f": "Digievoluta",
+      "p": "Digievoluti"
+    },
+    {
+      "n": "Abortit*",
+      "m": "Abortito",
+      "f": "Abortita",
+      "p": "Abortiti"
     }
   ]
 }
