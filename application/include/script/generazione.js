@@ -33,48 +33,86 @@ const getknownPacks = () => {
 /*
  * Generazione Nome Casuale
  *
- * names.json versione 2:
- *   names:      { nome, genere }  con genere m | f | n | p | fp
- *   adjectives: { m, f, n, p, fp }    n = forma neutra, quella con l'asterisco
+ * names.json versione 3:
+ *   names:      { nome, genere, peso? }  con genere m | f | n | p | fp
+ *   adjectives: { n, m, f, p, fp, peso? }    n = forma neutra, quella con l'asterisco
  *   fp = femminile plurale, per i nomi che sono un gruppo di sole donne
  *   (es. "Le Amazzoni Stronze" invece di "Le Amazzoni Stronzi").
+ *   peso: quanto e' probabile che esca in un'estrazione, di default 1. Un
+ *   nome/aggettivo "raro" ha un peso minore di 1 (es. 0.2 = circa 1 volta su
+ *   5 rispetto a uno normale) invece di duplicare tutti gli altri per
+ *   diluirlo: stesso risultato, ma senza gonfiare il file ne' limitarsi a
+ *   rapporti interi. Il peso e' assente sulla stragrande maggioranza delle
+ *   voci (equivale a 1), quindi manca quasi ovunque nel JSON.
  * L'aggettivo viene scelto nella forma che concorda col genere del nome, cosi
  * non serve piu l'asterisco per cavarsela: "Petunia Stronza" invece di
  * "Petunia Stronz*". Il vecchio formato a liste di stringhe continua a
- * funzionare, viene trattato come tutto neutro.
+ * funzionare, viene trattato come tutto neutro e peso 1.
  */
 let datiNomi = null;
+
+/** Precalcola i pesi cumulativi di una lista, per estrarre un elemento a caso ma pesato. */
+const preparaEstrazione = (lista, pesoDi) => {
+    let totale = 0;
+    const cumulativi = lista.map(elemento => {
+        totale += pesoDi(elemento);
+        return totale;
+    });
+    return { lista, cumulativi, totale };
+};
+
+/**
+ * Estrae un elemento pesato: piu' alto e' il peso, piu' probabile e' che
+ * esca. Le liste sono poche centinaia di elementi, quindi una scansione
+ * lineare del cumulativo va benissimo, non serve una ricerca binaria.
+ */
+const scegliPesato = ({ lista, cumulativi, totale }) => {
+    if (!lista.length) return undefined;
+    const punto = Math.random() * totale;
+    for (let i = 0; i < cumulativi.length; i++) {
+        if (punto < cumulativi[i]) return lista[i];
+    }
+    return lista[lista.length - 1]; // margine per arrotondamenti in virgola mobile
+};
+
+const pesoDi = (elemento) => (elemento.peso > 0 ? elemento.peso : 1);
 
 const caricaNomi = () => {
     if (datiNomi) return datiNomi;
     try {
         const filePath = path.join(__dirname, '../names/names.json');
         const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        const names = (data.names || [])
+            .map(n => typeof n === "string" ? { nome: n, genere: "n" } : n)
+            .filter(n => n && n.nome);
+        const adjectives = (data.adjectives || [])
+            .map(a => typeof a === "string" ? { n: a, m: a, f: a, p: a, fp: a } : a)
+            .filter(Boolean);
         datiNomi = {
-            names: (data.names || [])
-                .map(n => typeof n === "string" ? { nome: n, genere: "n" } : n)
-                .filter(n => n && n.nome),
-            adjectives: (data.adjectives || [])
-                .map(a => typeof a === "string" ? { n: a, m: a, f: a, p: a, fp: a } : a)
-                .filter(Boolean)
+            names,
+            adjectives,
+            estrazioneNomi: preparaEstrazione(names, pesoDi),
+            estrazioneAggettivi: preparaEstrazione(adjectives, pesoDi)
         };
     } catch (error) {
         console.error('Errore durante la lettura del file JSON:', error.message);
-        datiNomi = { names: [], adjectives: [] };
+        datiNomi = {
+            names: [], adjectives: [],
+            estrazioneNomi: preparaEstrazione([], pesoDi),
+            estrazioneAggettivi: preparaEstrazione([], pesoDi)
+        };
     }
     return datiNomi;
 };
-
-const scegliACaso = (lista) => lista[Math.floor(Math.random() * lista.length)];
 
 const generateName = () => {
     const dati = caricaNomi();
     if (!dati.names.length) return "Giocatore Anonimo";
 
-    const nome = scegliACaso(dati.names);
+    const nome = scegliPesato(dati.estrazioneNomi);
     if (!dati.adjectives.length) return nome.nome;
 
-    const aggettivo = scegliACaso(dati.adjectives);
+    const aggettivo = scegliPesato(dati.estrazioneAggettivi);
     const genere = ["m", "f", "n", "p", "fp"].includes(nome.genere) ? nome.genere : "n";
     const forma = aggettivo[genere] || aggettivo.n || aggettivo.m || aggettivo.f || aggettivo.p || "";
 

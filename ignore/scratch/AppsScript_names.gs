@@ -48,9 +48,9 @@
  *   in questo foglio.
  *
  * COME DEVE ESSERE FATTO IL FOGLIO
- *   Un foglio chiamato "Nomi" con le colonne:        nome | genere
+ *   Un foglio chiamato "Nomi" con le colonne:        nome | genere | raro
  *   Un foglio chiamato "Aggettivi" con le colonne:
- *       neutro | maschile | femminile | plurale | femminileplurale
+ *       neutro | maschile | femminile | plurale | femminileplurale | raro
  *
  *   Le intestazioni vanno sulla prima riga. L'ordine delle colonne non conta,
  *   vengono cercate per nome. Le colonne in piu (note, appunti) vengono ignorate.
@@ -71,6 +71,15 @@
  *   neutro): comodo per buttare dentro un aggettivo al volo e sistemarlo dopo
  *   (i CSV pubblicati mantengono le caselle vuote cosi' come sono nel foglio,
  *   solo names.json ha le forme gia' riempite).
+ *
+ *   La colonna "raro" (sia per i nomi che per gli aggettivi) e' facoltativa:
+ *   vuota = normale. Ci puoi scrivere "raro" (esce circa 1 volta su 5
+ *   rispetto a uno normale), "molto raro"/"rarissimo" (1 su 20), oppure un
+ *   numero a piacere per un controllo piu' fine (es. 0.02 per rarissimo su
+ *   misura, o anche un numero maggiore di 1 per renderlo PIU' comune del
+ *   normale). Invece di duplicare tutte le altre righe per "diluire" quella
+ *   rara (che gonfierebbe il file e funziona solo con rapporti interi), ogni
+ *   nome/aggettivo porta il suo peso e il gioco estrae pesando le probabilita'.
  */
 
 // ---------------------------------------------------------------- CONFIG ---
@@ -96,6 +105,14 @@ var ALIAS_GENERE = {
   "p": "p", "plurale": "p", "plurali": "p",
   "fp": "fp", "plurale femminile": "fp", "femminile plurale": "fp",
   "plurali femminili": "fp", "donne": "fp"
+};
+
+// come scrivere la rarita' nel foglio: a sinistra quello che puoi digitare,
+// a destra il peso che finisce nel JSON (1 = normale, meno di 1 = piu' raro)
+var ALIAS_RARITA = {
+  "": 1, "no": 1, "normale": 1, "comune": 1,
+  "raro": 0.2, "r": 0.2, "si": 0.2, "x": 0.2,
+  "molto raro": 0.05, "rarissimo": 0.05, "mr": 0.05
 };
 
 // ------------------------------------------------------------------ MENU ---
@@ -174,6 +191,20 @@ function normalizzaGenere_(valore) {
   return GENERI_VALIDI.indexOf(genere) !== -1 ? genere : "n";
 }
 
+/**
+ * Legge la colonna "raro": vuoto/non scritto => 1 (normale), una delle parole
+ * di ALIAS_RARITA => il peso associato, altrimenti un numero a piacere
+ * (accetta sia la virgola che il punto come separatore decimale). Ritorna
+ * null se il valore non e' vuoto ma non si riesce a interpretare.
+ */
+function normalizzaPeso_(valore) {
+  var testo = String(valore == null ? "" : valore).trim().toLowerCase();
+  if (testo === "") return 1;
+  if (testo in ALIAS_RARITA) return ALIAS_RARITA[testo];
+  var numero = parseFloat(testo.replace(",", "."));
+  return isFinite(numero) && numero > 0 ? numero : null;
+}
+
 // --------------------------------------------------------- COSTRUZIONE -----
 
 /**
@@ -227,8 +258,17 @@ function costruisciDati_() {
     var nomeFinale = nome.charAt(0).toUpperCase() + nome.slice(1);
     var genereFinale = normalizzaGenere_(grezzo);
 
-    nomi.push({ nome: nomeFinale, genere: genereFinale });
-    csvNomi.push([nomeFinale, genereFinale]);
+    var pesoGrezzo = riga["raro"];
+    var peso = normalizzaPeso_(pesoGrezzo);
+    if (peso === null) {
+      avvisi.push("Riga " + riga._riga + " dei nomi: \"raro\" = \"" + pesoGrezzo + "\" non riconosciuto, uso peso 1 (" + nomeFinale + ")");
+      peso = 1;
+    }
+
+    var oggettoNome = { nome: nomeFinale, genere: genereFinale };
+    if (peso !== 1) oggettoNome.peso = peso;
+    nomi.push(oggettoNome);
+    csvNomi.push([nomeFinale, genereFinale, String(riga["raro"] || "").trim()]);
   }
 
   // --- AGGETTIVI, le forme vuote ricadono su quella migliore disponibile ---
@@ -254,20 +294,29 @@ function costruisciDati_() {
     if (mancanti.length)
       avvisi.push("Riga " + r._riga + " degli aggettivi (" + base + "): manca " + mancanti.join(", ") + ", ho usato la forma migliore disponibile");
 
-    aggettivi.push({
+    var pesoGrezzoAgg = r["raro"];
+    var pesoAgg = normalizzaPeso_(pesoGrezzoAgg);
+    if (pesoAgg === null) {
+      avvisi.push("Riga " + r._riga + " degli aggettivi: \"raro\" = \"" + pesoGrezzoAgg + "\" non riconosciuto, uso peso 1 (" + base + ")");
+      pesoAgg = 1;
+    }
+
+    var oggettoAgg = {
       n: neutro || base,
       m: maschile || neutro || base,
       f: femminile || neutro || base,
       p: plurale || maschile || neutro || base,
       fp: femminilePlurale || plurale || femminile || neutro || base
-    });
-    csvAggettivi.push([neutro, maschile, femminile, plurale, femminilePlurale]);
+    };
+    if (pesoAgg !== 1) oggettoAgg.peso = pesoAgg;
+    aggettivi.push(oggettoAgg);
+    csvAggettivi.push([neutro, maschile, femminile, plurale, femminilePlurale, String(r["raro"] || "").trim()]);
   }
 
   if (!nomi.length) throw new Error("Il foglio dei nomi e' vuoto.");
   if (!aggettivi.length) throw new Error("Il foglio degli aggettivi e' vuoto.");
 
-  var finale = { version: 2, names: nomi, adjectives: aggettivi };
+  var finale = { version: 3, names: nomi, adjectives: aggettivi };
 
   return {
     json: JSON.stringify(finale, null, 2) + "\n",
@@ -286,6 +335,12 @@ function contaGeneri_(nomi) {
   return conteggi;
 }
 
+function contaRari_(lista) {
+  var rari = 0;
+  for (var i = 0; i < lista.length; i++) if (lista[i].peso && lista[i].peso < 1) rari++;
+  return rari;
+}
+
 // -------------------------------------------------------------------- CSV --
 
 function csvCella_(valore) {
@@ -299,13 +354,13 @@ function csvRiga_(celle) {
 }
 
 function costruisciCsvNomi_(csvNomi) {
-  var righe = ["nome,genere"];
+  var righe = ["nome,genere,raro"];
   for (var i = 0; i < csvNomi.length; i++) righe.push(csvRiga_(csvNomi[i]));
   return righe.join("\n") + "\n";
 }
 
 function costruisciCsvAggettivi_(csvAggettivi) {
-  var righe = ["neutro,maschile,femminile,plurale,femminileplurale"];
+  var righe = ["neutro,maschile,femminile,plurale,femminileplurale,raro"];
   for (var i = 0; i < csvAggettivi.length; i++) righe.push(csvRiga_(csvAggettivi[i]));
   return righe.join("\n") + "\n";
 }
@@ -409,8 +464,8 @@ function pubblicaNomi_() {
 
   var g = contaGeneri_(dati.nomi);
   var righeRiepilogo = [
-    "Nomi: " + dati.nomi.length + " (m " + g.m + ", f " + g.f + ", n " + g.n + ", p " + g.p + ", fp " + g.fp + ")",
-    "Aggettivi: " + dati.aggettivi.length
+    "Nomi: " + dati.nomi.length + " (m " + g.m + ", f " + g.f + ", n " + g.n + ", p " + g.p + ", fp " + g.fp + ") — rari: " + contaRari_(dati.nomi),
+    "Aggettivi: " + dati.aggettivi.length + " — rari: " + contaRari_(dati.aggettivi)
   ];
   if (dati.doppioni.length) righeRiepilogo.push("Nomi doppi tolti: " + dati.doppioni.join(", "));
   if (dati.avvisi.length) righeRiepilogo.push("Avvisi: " + dati.avvisi.join(" / "));
@@ -462,7 +517,9 @@ function mostraControlli() {
     "  neutri: " + g.n,
     "  plurali: " + g.p,
     "  plurali femminili: " + g.fp,
+    "  rari: " + contaRari_(dati.nomi),
     "Aggettivi validi: " + dati.aggettivi.length,
+    "  rari: " + contaRari_(dati.aggettivi),
     ""
   ];
 
@@ -498,8 +555,8 @@ function mostraJson() {
   }
 
   var g = contaGeneri_(dati.nomi);
-  var riepilogo = dati.nomi.length + " nomi (m " + g.m + ", f " + g.f + ", n " + g.n + ", p " + g.p + ", fp " + g.fp + ")"
-    + " e " + dati.aggettivi.length + " aggettivi";
+  var riepilogo = dati.nomi.length + " nomi (m " + g.m + ", f " + g.f + ", n " + g.n + ", p " + g.p + ", fp " + g.fp + ", rari " + contaRari_(dati.nomi) + ")"
+    + " e " + dati.aggettivi.length + " aggettivi (rari " + contaRari_(dati.aggettivi) + ")";
 
   var note = [];
   if (dati.doppioni.length)

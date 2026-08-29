@@ -2,12 +2,21 @@
  * Genera application/include/names/names.json a partire dai due CSV in
  * ignore/scratch/raw/names/ :
  *
- *   nomi.csv       nome,genere                       genere: m | f | n | p | fp
- *   aggettivi.csv  neutro,maschile,femminile,plurale,femminileplurale
+ *   nomi.csv       nome,genere,raro                  genere: m | f | n | p | fp
+ *   aggettivi.csv  neutro,maschile,femminile,plurale,femminileplurale,raro
  *
  *   fp = "femminile plurale": per i nomi che sono un gruppo di sole donne
  *   (es. "Le Amazzoni"), cosi' l'aggettivo concorda sia in genere che in
  *   numero (es. "Le Amazzoni Stronze", non "Le Amazzoni Stronzi").
+ *
+ *   raro: invece di duplicare tutte le altre righe per "diluire" quella
+ *   rara (che gonfierebbe il JSON e funziona solo con rapporti interi), ogni
+ *   nome/aggettivo ha un peso nell'estrazione casuale. Vuoto = peso 1
+ *   (normale). Si puo' scrivere "raro" (peso 0.2, cioe' circa 1 volta su 5
+ *   rispetto a uno normale), "molto raro"/"rarissimo" (peso 0.05), oppure un
+ *   numero a piacere (es. 0.02 per rarissimo su misura, o anche >1 per un
+ *   nome/aggettivo piu' comune del normale). Il numero finisce nel JSON come
+ *   "peso" solo se diverso da 1, il resto degli oggetti resta come prima.
  *
  * Gli stessi CSV si possono tenere su Google Sheets: in quel caso il JSON lo
  * genera lo script in ignore/scratch/AppsScript_names.gs, che fa esattamente
@@ -29,6 +38,14 @@ const ALIAS_GENERE = {
     p: "p", plurale: "p", plurali: "p",
     fp: "fp", "plurale femminile": "fp", "femminile plurale": "fp",
     "plurali femminili": "fp", donne: "fp"
+};
+
+// come scrivere la rarita' nel foglio: a sinistra quello che puoi digitare,
+// a destra il peso che finisce nel JSON (1 = normale, meno di 1 = piu' raro)
+const ALIAS_RARITA = {
+    "": 1, no: 1, normale: 1, comune: 1,
+    raro: 0.2, r: 0.2, si: 0.2, x: 0.2,
+    "molto raro": 0.05, rarissimo: 0.05, mr: 0.05
 };
 
 /** Parser CSV completo: gestisce virgolette, virgole dentro le celle e a capo. */
@@ -76,6 +93,21 @@ const normalizzaGenere = (valore) => {
     return GENERI_VALIDI.includes(genere) ? genere : "n";
 };
 
+/**
+ * Legge la colonna "raro": vuoto/non scritto => 1 (normale), una delle parole
+ * di ALIAS_RARITA => il peso associato, altrimenti un numero a piacere
+ * (accetta sia la virgola che il punto come separatore decimale). Ritorna
+ * null se il valore non e' vuoto ma non si riesce a interpretare, cosi' chi
+ * chiama puo' avvisare e usare 1 di default.
+ */
+const normalizzaPeso = (valore) => {
+    const testo = String(valore ?? "").trim().toLowerCase();
+    if (testo === "") return 1;
+    if (testo in ALIAS_RARITA) return ALIAS_RARITA[testo];
+    const numero = parseFloat(testo.replace(",", "."));
+    return Number.isFinite(numero) && numero > 0 ? numero : null;
+};
+
 const generateCombinedJSON = () => {
     const inputFolder = path.join(__dirname, "raw/names");
     const outputFolder = path.join(__dirname, "..", "../application/include/names/");
@@ -92,6 +124,7 @@ const generateCombinedJSON = () => {
         const visti = new Map();
         const doppioni = [];
         const nomi = [];
+        const pesiNomiNonRiconosciuti = [];
 
         for (const riga of leggiFile("nomi.csv")) {
             const nome = String(riga["nome"] ?? "").trim();
@@ -101,15 +134,21 @@ const generateCombinedJSON = () => {
             if (visti.has(chiave)) { doppioni.push(nome); continue; }
             visti.set(chiave, true);
 
-            nomi.push({
+            let peso = normalizzaPeso(riga["raro"]);
+            if (peso === null) { pesiNomiNonRiconosciuti.push(nome); peso = 1; }
+
+            const oggetto = {
                 nome: nome.charAt(0).toUpperCase() + nome.slice(1),
                 genere: normalizzaGenere(riga["genere"])
-            });
+            };
+            if (peso !== 1) oggetto.peso = peso;
+            nomi.push(oggetto);
         }
 
         // --- AGGETTIVI: le forme mancanti ricadono sul neutro ----------------
         const aggettivi = [];
         const incompleti = [];
+        const pesiAggettiviNonRiconosciuti = [];
 
         for (const riga of leggiFile("aggettivi.csv")) {
             const neutro = String(riga["neutro"] ?? "").trim();
@@ -122,19 +161,24 @@ const generateCombinedJSON = () => {
             if (!base) continue;
             if (!maschile || !femminile || !plurale || !femminilePlurale) incompleti.push(base);
 
-            aggettivi.push({
+            let peso = normalizzaPeso(riga["raro"]);
+            if (peso === null) { pesiAggettiviNonRiconosciuti.push(base); peso = 1; }
+
+            const oggetto = {
                 n: neutro || base,
                 m: maschile || neutro || base,
                 f: femminile || neutro || base,
                 p: plurale || maschile || neutro || base,
                 fp: femminilePlurale || plurale || femminile || neutro || base
-            });
+            };
+            if (peso !== 1) oggetto.peso = peso;
+            aggettivi.push(oggetto);
         }
 
         if (!nomi.length) throw new Error("nomi.csv non contiene nessun nome valido");
         if (!aggettivi.length) throw new Error("aggettivi.csv non contiene nessun aggettivo valido");
 
-        const finalData = { version: 2, names: nomi, adjectives: aggettivi };
+        const finalData = { version: 3, names: nomi, adjectives: aggettivi };
 
         if (!fs.existsSync(outputFolder)) fs.mkdirSync(outputFolder, { recursive: true });
         const outputPath = path.join(outputFolder, "names.json");
@@ -144,13 +188,20 @@ const generateCombinedJSON = () => {
             .map(g => `${g}: ${nomi.filter(n => n.genere === g).length}`)
             .join(", ");
 
+        const nomiRari = nomi.filter(n => n.peso && n.peso < 1).length;
+        const aggettiviRari = aggettivi.filter(a => a.peso && a.peso < 1).length;
+
         console.log(`Tutto pronto tesoro! Il file è stato generato in: ${outputPath}`);
-        console.log(`  nomi: ${nomi.length} (${perGenere})`);
-        console.log(`  aggettivi: ${aggettivi.length}`);
+        console.log(`  nomi: ${nomi.length} (${perGenere}) — rari: ${nomiRari}`);
+        console.log(`  aggettivi: ${aggettivi.length} — rari: ${aggettiviRari}`);
         if (doppioni.length)
             console.log(`  doppioni tolti: ${doppioni.length} => ${doppioni.join(", ")}`);
         if (incompleti.length)
             console.log(`  aggettivi con qualche forma vuota (ho usato il neutro): ${incompleti.join(", ")}`);
+        if (pesiNomiNonRiconosciuti.length)
+            console.log(`  nomi con colonna "raro" non capita (ho usato peso 1): ${pesiNomiNonRiconosciuti.join(", ")}`);
+        if (pesiAggettiviNonRiconosciuti.length)
+            console.log(`  aggettivi con colonna "raro" non capita (ho usato peso 1): ${pesiAggettiviNonRiconosciuti.join(", ")}`);
         return true;
 
     } catch (error) {
