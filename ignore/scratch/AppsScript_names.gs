@@ -49,19 +49,28 @@
  *
  * COME DEVE ESSERE FATTO IL FOGLIO
  *   Un foglio chiamato "Nomi" con le colonne:        nome | genere
- *   Un foglio chiamato "Aggettivi" con le colonne:   neutro | maschile | femminile | plurale
+ *   Un foglio chiamato "Aggettivi" con le colonne:
+ *       neutro | maschile | femminile | plurale | femminileplurale
  *
  *   Le intestazioni vanno sulla prima riga. L'ordine delle colonne non conta,
  *   vengono cercate per nome. Le colonne in piu (note, appunti) vengono ignorate.
  *
- *   Nella colonna genere puoi scrivere m / f / n / p oppure per esteso
- *   (maschile, femminile, neutro, plurale). Se la lasci vuota vale neutro.
+ *   Nella colonna genere puoi scrivere m / f / n / p / fp oppure per esteso
+ *   (maschile, femminile, neutro, plurale, femminile plurale). Se la lasci
+ *   vuota vale neutro. "fp" e' la categoria nuova: serve per i nomi che sono
+ *   un GRUPPO DI SOLE DONNE (es. "Le Amazzoni"), cosi' l'aggettivo concorda
+ *   sia in genere che in numero: "Le Amazzoni Stronze" invece di "Le Amazzoni
+ *   Stronzi" o "Le Amazzoni Stronza". Per un gruppo misto o generico continua
+ *   a andare bene "p" (plurale) come prima.
+ *
  *   Per gli aggettivi che non cambiano forma ripeti la stessa parola nelle
- *   prime tre colonne. Se lasci vuote maschile, femminile o plurale, il
- *   gioco usa il neutro al loro posto: comodo per buttare dentro un
- *   aggettivo al volo e sistemarlo dopo (i CSV pubblicati mantengono le
- *   caselle vuote cosi' come sono nel foglio, solo names.json ha le forme
- *   gia' riempite).
+ *   prime tre colonne (e anche in plurale/femminileplurale se restano
+ *   uguali). Se lasci vuote maschile, femminile, plurale o femminileplurale,
+ *   il gioco usa la forma migliore che trova al loro posto (per
+ *   femminileplurale l'ordine di ripiego e' plurale, poi femminile, poi
+ *   neutro): comodo per buttare dentro un aggettivo al volo e sistemarlo dopo
+ *   (i CSV pubblicati mantengono le caselle vuote cosi' come sono nel foglio,
+ *   solo names.json ha le forme gia' riempite).
  */
 
 // ---------------------------------------------------------------- CONFIG ---
@@ -78,13 +87,15 @@ var PERCORSO_JSON = "application/include/names/names.json";
 var FOGLI_NOMI = ["Nomi", "nomi", "nomi.csv", "Names"];
 var FOGLI_AGGETTIVI = ["Aggettivi", "aggettivi", "aggettivi.csv", "Adjectives"];
 
-var GENERI_VALIDI = ["m", "f", "n", "p"];
+var GENERI_VALIDI = ["m", "f", "n", "p", "fp"];
 
 var ALIAS_GENERE = {
   "m": "m", "maschile": "m", "maschio": "m", "uomo": "m",
   "f": "f", "femminile": "f", "femmina": "f", "donna": "f",
   "n": "n", "neutro": "n", "neutrale": "n", "": "n",
-  "p": "p", "plurale": "p", "plurali": "p"
+  "p": "p", "plurale": "p", "plurali": "p",
+  "fp": "fp", "plurale femminile": "fp", "femminile plurale": "fp",
+  "plurali femminili": "fp", "donne": "fp"
 };
 
 // ------------------------------------------------------------------ MENU ---
@@ -180,7 +191,7 @@ function costruisciDati_() {
   if (!foglioNomi)
     throw new Error("Non trovo il foglio dei nomi. Deve chiamarsi \"Nomi\" e avere le colonne nome e genere.");
   if (!foglioAgg)
-    throw new Error("Non trovo il foglio degli aggettivi. Deve chiamarsi \"Aggettivi\" e avere le colonne neutro, maschile, femminile, plurale.");
+    throw new Error("Non trovo il foglio degli aggettivi. Deve chiamarsi \"Aggettivi\" e avere le colonne neutro, maschile, femminile, plurale, femminileplurale.");
 
   var avvisi = [];
   var righeNomi = leggiFoglio_(foglioNomi);
@@ -220,7 +231,7 @@ function costruisciDati_() {
     csvNomi.push([nomeFinale, genereFinale]);
   }
 
-  // --- AGGETTIVI, le forme vuote ricadono sul neutro (solo nel JSON) -------
+  // --- AGGETTIVI, le forme vuote ricadono su quella migliore disponibile ---
   var aggettivi = [];
   var csvAggettivi = [];
 
@@ -230,6 +241,7 @@ function costruisciDati_() {
     var maschile = String(r["maschile"] || "").trim();
     var femminile = String(r["femminile"] || "").trim();
     var plurale = String(r["plurale"] || "").trim();
+    var femminilePlurale = String(r["femminileplurale"] || "").trim();
 
     var base = neutro || maschile || femminile || plurale;
     if (!base) continue;
@@ -238,16 +250,18 @@ function costruisciDati_() {
     if (!maschile) mancanti.push("maschile");
     if (!femminile) mancanti.push("femminile");
     if (!plurale) mancanti.push("plurale");
+    if (!femminilePlurale) mancanti.push("femminile plurale");
     if (mancanti.length)
-      avvisi.push("Riga " + r._riga + " degli aggettivi (" + base + "): manca " + mancanti.join(", ") + ", ho usato il neutro");
+      avvisi.push("Riga " + r._riga + " degli aggettivi (" + base + "): manca " + mancanti.join(", ") + ", ho usato la forma migliore disponibile");
 
     aggettivi.push({
       n: neutro || base,
       m: maschile || neutro || base,
       f: femminile || neutro || base,
-      p: plurale || maschile || neutro || base
+      p: plurale || maschile || neutro || base,
+      fp: femminilePlurale || plurale || femminile || neutro || base
     });
-    csvAggettivi.push([neutro, maschile, femminile, plurale]);
+    csvAggettivi.push([neutro, maschile, femminile, plurale, femminilePlurale]);
   }
 
   if (!nomi.length) throw new Error("Il foglio dei nomi e' vuoto.");
@@ -267,7 +281,7 @@ function costruisciDati_() {
 }
 
 function contaGeneri_(nomi) {
-  var conteggi = { m: 0, f: 0, n: 0, p: 0 };
+  var conteggi = { m: 0, f: 0, n: 0, p: 0, fp: 0 };
   for (var i = 0; i < nomi.length; i++) conteggi[nomi[i].genere]++;
   return conteggi;
 }
@@ -291,7 +305,7 @@ function costruisciCsvNomi_(csvNomi) {
 }
 
 function costruisciCsvAggettivi_(csvAggettivi) {
-  var righe = ["neutro,maschile,femminile,plurale"];
+  var righe = ["neutro,maschile,femminile,plurale,femminileplurale"];
   for (var i = 0; i < csvAggettivi.length; i++) righe.push(csvRiga_(csvAggettivi[i]));
   return righe.join("\n") + "\n";
 }
@@ -395,7 +409,7 @@ function pubblicaNomi_() {
 
   var g = contaGeneri_(dati.nomi);
   var righeRiepilogo = [
-    "Nomi: " + dati.nomi.length + " (m " + g.m + ", f " + g.f + ", n " + g.n + ", p " + g.p + ")",
+    "Nomi: " + dati.nomi.length + " (m " + g.m + ", f " + g.f + ", n " + g.n + ", p " + g.p + ", fp " + g.fp + ")",
     "Aggettivi: " + dati.aggettivi.length
   ];
   if (dati.doppioni.length) righeRiepilogo.push("Nomi doppi tolti: " + dati.doppioni.join(", "));
@@ -447,6 +461,7 @@ function mostraControlli() {
     "  femminili: " + g.f,
     "  neutri: " + g.n,
     "  plurali: " + g.p,
+    "  plurali femminili: " + g.fp,
     "Aggettivi validi: " + dati.aggettivi.length,
     ""
   ];
@@ -483,7 +498,7 @@ function mostraJson() {
   }
 
   var g = contaGeneri_(dati.nomi);
-  var riepilogo = dati.nomi.length + " nomi (m " + g.m + ", f " + g.f + ", n " + g.n + ", p " + g.p + ")"
+  var riepilogo = dati.nomi.length + " nomi (m " + g.m + ", f " + g.f + ", n " + g.n + ", p " + g.p + ", fp " + g.fp + ")"
     + " e " + dati.aggettivi.length + " aggettivi";
 
   var note = [];

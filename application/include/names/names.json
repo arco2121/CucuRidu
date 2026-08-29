@@ -1127,907 +1127,1058 @@
       "n": "Cane",
       "m": "Cane",
       "f": "Cagna",
-      "p": "Cani"
+      "p": "Cani",
+      "fp": "Cagne"
     },
     {
       "n": "Troia",
       "m": "Troio",
       "f": "Troia",
-      "p": "Troie"
+      "p": "Troie",
+      "fp": "Troie"
     },
     {
       "n": "Puttan*",
       "m": "Puttano",
       "f": "Puttana",
-      "p": "Puttani"
+      "p": "Puttani",
+      "fp": "Puttane"
     },
     {
       "n": "Ebete",
       "m": "Ebete",
       "f": "Ebete",
-      "p": "Ebeti"
+      "p": "Ebeti",
+      "fp": "Ebeti"
     },
     {
       "n": "Rincoglionit*",
       "m": "Rincoglionito",
       "f": "Rincoglionita",
-      "p": "Rincoglioniti"
+      "p": "Rincoglioniti",
+      "fp": "Rincoglionite"
     },
     {
       "n": "Maltrattat*",
       "m": "Maltrattato",
       "f": "Maltrattata",
-      "p": "Maltrattati"
+      "p": "Maltrattati",
+      "fp": "Maltrattate"
     },
     {
       "n": "Demente",
       "m": "Demente",
       "f": "Demente",
-      "p": "Dementi"
+      "p": "Dementi",
+      "fp": "Dementi"
     },
     {
       "n": "Porc*",
       "m": "Porco",
       "f": "Porca",
-      "p": "Porci"
+      "p": "Porci",
+      "fp": "Porche"
     },
     {
       "n": "Termosifone",
       "m": "Termosifone",
       "f": "Termosifone",
-      "p": "Termosifoni"
+      "p": "Termosifoni",
+      "fp": "Termosifoni"
     },
     {
       "n": "Stradale",
       "m": "Stradale",
       "f": "Stradale",
-      "p": "Stradali"
+      "p": "Stradali",
+      "fp": "Stradali"
     },
     {
       "n": "Dismorf*",
       "m": "Dismorfo",
       "f": "Dismorfa",
-      "p": "Dismorfi"
+      "p": "Dismorfi",
+      "fp": "Dismorfe"
     },
     {
       "n": "Campione di sperma",
       "m": "Campione di sperma",
       "f": "Campionessa di sperma",
-      "p": "Campioni di sperma"
+      "p": "Campioni di sperma",
+      "fp": "Campionesse di sperma"
     },
     {
       "n": "Triceratopo",
       "m": "Triceratopo",
       "f": "Triceratopo",
-      "p": "Triceratopi"
+      "p": "Triceratopi",
+      "fp": "Triceratopi"
     },
     {
       "n": "Terron*",
       "m": "Terrone",
       "f": "Terrona",
-      "p": "Terroni"
+      "p": "Terroni",
+      "fp": "Terrone"
     },
     {
       "n": "Accoltellat*",
       "m": "Accoltellato",
       "f": "Accoltellata",
-      "p": "Accoltellati"
+      "p": "Accoltellati",
+      "fp": "Accoltellate"
     },
     {
       "n": "Serbatoio idraulico",
       "m": "Serbatoio idraulico",
       "f": "Serbatoio idraulico",
-      "p": "Serbatoi idraulici"
+      "p": "Serbatoi idraulici",
+      "fp": "Serbatoi idraulici"
     },
     {
       "n": "Condominio",
       "m": "Condominio",
       "f": "Condominio",
-      "p": "Condomini"
+      "p": "Condomini",
+      "fp": "Condomini"
     },
     {
       "n": "Inalante di cocaina",
       "m": "Inalante di cocaina",
       "f": "Inalante di cocaina",
-      "p": "Inalanti di cocaina"
+      "p": "Inalanti di cocaina",
+      "fp": "Inalanti di cocaina"
     },
     {
       "n": "Leprecauno",
       "m": "Leprecauno",
       "f": "Leprecauna",
-      "p": "Leprecauni"
+      "p": "Leprecauni",
+      "fp": "Leprecaune"
     },
     {
       "n": "Trifosfato",
       "m": "Trifosfato",
       "f": "Trifosfato",
-      "p": "Trifosfati"
+      "p": "Trifosfati",
+      "fp": "Trifosfati"
     },
     {
       "n": "Lerci*",
       "m": "Lercio",
       "f": "Lercia",
-      "p": "Lerci"
+      "p": "Lerci",
+      "fp": "Lerce"
     },
     {
       "n": "Slinguazzat* da suo padre",
       "m": "Slinguazzato da suo padre",
       "f": "Slinguazzata da suo padre",
-      "p": "Slinguazzati dal padre"
+      "p": "Slinguazzati dal padre",
+      "fp": "Slinguazzate dal padre"
     },
     {
       "n": "Megazord",
       "m": "Megazord",
       "f": "Megazord",
-      "p": "Megazord"
+      "p": "Megazord",
+      "fp": "Megazord"
     },
     {
       "n": "Ebre*",
       "m": "Ebreo",
       "f": "Ebrea",
-      "p": "Ebrei"
+      "p": "Ebrei",
+      "fp": "Ebree"
     },
     {
       "n": "Scalz* nella valle dei chiodi arrugginiti",
       "m": "Scalzo nella valle dei chiodi arrugginiti",
       "f": "Scalza nella valle dei chiodi arrugginiti",
-      "p": "Scalzi nella valle dei chiodi arrugginiti"
+      "p": "Scalzi nella valle dei chiodi arrugginiti",
+      "fp": "Scalze nella valle dei chiodi arrugginiti"
     },
     {
       "n": "Sciocchin*",
       "m": "Sciocchino",
       "f": "Sciocchina",
-      "p": "Sciocchini"
+      "p": "Sciocchini",
+      "fp": "Sciocchine"
     },
     {
       "n": "Disadattat*",
       "m": "Disadattato",
       "f": "Disadattata",
-      "p": "Disadattati"
+      "p": "Disadattati",
+      "fp": "Disadattate"
     },
     {
       "n": "Imbecille",
       "m": "Imbecille",
       "f": "Imbecille",
-      "p": "Imbecilli"
+      "p": "Imbecilli",
+      "fp": "Imbecilli"
     },
     {
       "n": "Mongoloide",
       "m": "Mongoloide",
       "f": "Mongoloide",
-      "p": "Mongoloidi"
+      "p": "Mongoloidi",
+      "fp": "Mongoloidi"
     },
     {
       "n": "Gatto",
       "m": "Gatto",
       "f": "Gatta",
-      "p": "Gatti"
+      "p": "Gatti",
+      "fp": "Gatte"
     },
     {
       "n": "Coniglio",
       "m": "Coniglio",
       "f": "Coniglia",
-      "p": "Conigli"
+      "p": "Conigli",
+      "fp": "Coniglie"
     },
     {
       "n": "Cretin*",
       "m": "Cretino",
       "f": "Cretina",
-      "p": "Cretini"
+      "p": "Cretini",
+      "fp": "Cretine"
     },
     {
       "n": "Anfibio",
       "m": "Anfibio",
       "f": "Anfibia",
-      "p": "Anfibi"
+      "p": "Anfibi",
+      "fp": "Anfibie"
     },
     {
       "n": "Stronz*",
       "m": "Stronzo",
       "f": "Stronza",
-      "p": "Stronzi"
+      "p": "Stronzi",
+      "fp": "Stronze"
     },
     {
       "n": "Zoccol*",
       "m": "Zoccolo",
       "f": "Zoccola",
-      "p": "Zoccoli"
+      "p": "Zoccoli",
+      "fp": "Zoccole"
     },
     {
       "n": "Puttanier*",
       "m": "Puttaniere",
       "f": "Puttaniera",
-      "p": "Puttanieri"
+      "p": "Puttanieri",
+      "fp": "Puttaniere"
     },
     {
       "n": "Mozzarella bio",
       "m": "Mozzarella bio",
       "f": "Mozzarella bio",
-      "p": "Mozzarelle bio"
+      "p": "Mozzarelle bio",
+      "fp": "Mozzarelle bio"
     },
     {
       "n": "Cancro",
       "m": "Cancro",
       "f": "Cancro",
-      "p": "Cancri"
+      "p": "Cancri",
+      "fp": "Cancri"
     },
     {
       "n": "Negr*",
       "m": "Negro",
       "f": "Negra",
-      "p": "Negri"
+      "p": "Negri",
+      "fp": "Negre"
     },
     {
       "n": "Con una grave malattia terminale",
       "m": "Con una grave malattia terminale",
       "f": "Con una grave malattia terminale",
-      "p": "Con una grave malattia terminale"
+      "p": "Con una grave malattia terminale",
+      "fp": "Con una grave malattia terminale"
     },
     {
       "n": "Gravemente omosessuale",
       "m": "Gravemente omosessuale",
       "f": "Gravemente omosessuale",
-      "p": "Gravemente omosessuali"
+      "p": "Gravemente omosessuali",
+      "fp": "Gravemente omosessuali"
     },
     {
       "n": "Mattacchion*",
       "m": "Mattacchione",
       "f": "Mattacchiona",
-      "p": "Mattacchioni"
+      "p": "Mattacchioni",
+      "fp": "Mattacchione"
     },
     {
       "n": "Proveniente dalla bollente provincia napoletana",
       "m": "Proveniente dalla bollente provincia napoletana",
       "f": "Proveniente dalla bollente provincia napoletana",
-      "p": "Provenienti dalla bollente provincia napoletana"
+      "p": "Provenienti dalla bollente provincia napoletana",
+      "fp": "Provenienti dalla bollente provincia napoletana"
     },
     {
       "n": "Soprammobile",
       "m": "Soprammobile",
       "f": "Soprammobile",
-      "p": "Soprammobili"
+      "p": "Soprammobili",
+      "fp": "Soprammobili"
     },
     {
       "n": "Flagello del mondo",
       "m": "Flagello del mondo",
       "f": "Flagello del mondo",
-      "p": "Flagelli del mondo"
+      "p": "Flagelli del mondo",
+      "fp": "Flagelli del mondo"
     },
     {
       "n": "Buco di culo",
       "m": "Buco di culo",
       "f": "Buco di culo",
-      "p": "Buchi di culo"
+      "p": "Buchi di culo",
+      "fp": "Buchi di culo"
     },
     {
       "n": "Con un forte accento bergamasco",
       "m": "Con un forte accento bergamasco",
       "f": "Con un forte accento bergamasco",
-      "p": "Con un forte accento bergamasco"
+      "p": "Con un forte accento bergamasco",
+      "fp": "Con un forte accento bergamasco"
     },
     {
       "n": "Asdrubalante",
       "m": "Asdrubalante",
       "f": "Asdrubalante",
-      "p": "Asdrubalanti"
+      "p": "Asdrubalanti",
+      "fp": "Asdrubalanti"
     },
     {
       "n": "Vibrante",
       "m": "Vibrante",
       "f": "Vibrante",
-      "p": "Vibranti"
+      "p": "Vibranti",
+      "fp": "Vibranti"
     },
     {
       "n": "Caliente",
       "m": "Caliente",
       "f": "Caliente",
-      "p": "Calienti"
+      "p": "Calienti",
+      "fp": "Calienti"
     },
     {
       "n": "Eccitante",
       "m": "Eccitante",
       "f": "Eccitante",
-      "p": "Eccitanti"
+      "p": "Eccitanti",
+      "fp": "Eccitanti"
     },
     {
       "n": "Segante",
       "m": "Segante",
       "f": "Segante",
-      "p": "Seganti"
+      "p": "Seganti",
+      "fp": "Seganti"
     },
     {
       "n": "Scopante",
       "m": "Scopante",
       "f": "Scopante",
-      "p": "Scopanti"
+      "p": "Scopanti",
+      "fp": "Scopanti"
     },
     {
       "n": "Cagarellante",
       "m": "Cagarellante",
       "f": "Cagarellante",
-      "p": "Cagarellanti"
+      "p": "Cagarellanti",
+      "fp": "Cagarellanti"
     },
     {
       "n": "Macchiante",
       "m": "Macchiante",
       "f": "Macchiante",
-      "p": "Macchianti"
+      "p": "Macchianti",
+      "fp": "Macchianti"
     },
     {
       "n": "Incontinente",
       "m": "Incontinente",
       "f": "Incontinente",
-      "p": "Incontinenti"
+      "p": "Incontinenti",
+      "fp": "Incontinenti"
     },
     {
       "n": "Gemente",
       "m": "Gemente",
       "f": "Gemente",
-      "p": "Gementi"
+      "p": "Gementi",
+      "fp": "Gementi"
     },
     {
       "n": "Performante",
       "m": "Performante",
       "f": "Performante",
-      "p": "Performanti"
+      "p": "Performanti",
+      "fp": "Performanti"
     },
     {
       "n": "Sniffante",
       "m": "Sniffante",
       "f": "Sniffante",
-      "p": "Sniffanti"
+      "p": "Sniffanti",
+      "fp": "Sniffanti"
     },
     {
       "n": "Folgorante",
       "m": "Folgorante",
       "f": "Folgorante",
-      "p": "Folgoranti"
+      "p": "Folgoranti",
+      "fp": "Folgoranti"
     },
     {
       "n": "Gocciolante",
       "m": "Gocciolante",
       "f": "Gocciolante",
-      "p": "Gocciolanti"
+      "p": "Gocciolanti",
+      "fp": "Gocciolanti"
     },
     {
       "n": "Rizzante",
       "m": "Rizzante",
       "f": "Rizzante",
-      "p": "Rizzanti"
+      "p": "Rizzanti",
+      "fp": "Rizzanti"
     },
     {
       "n": "Scompisciante",
       "m": "Scompisciante",
       "f": "Scompisciante",
-      "p": "Scompiscianti"
+      "p": "Scompiscianti",
+      "fp": "Scompiscianti"
     },
     {
       "n": "Sburrante",
       "m": "Sburrante",
       "f": "Sburrante",
-      "p": "Sburranti"
+      "p": "Sburranti",
+      "fp": "Sburranti"
     },
     {
       "n": "Ninfomane",
       "m": "Ninfomane",
       "f": "Ninfomane",
-      "p": "Ninfomani"
+      "p": "Ninfomani",
+      "fp": "Ninfomani"
     },
     {
       "n": "Abominevole",
       "m": "Abominevole",
       "f": "Abominevole",
-      "p": "Abominevoli"
+      "p": "Abominevoli",
+      "fp": "Abominevoli"
     },
     {
       "n": "Gigante",
       "m": "Gigante",
       "f": "Gigantessa",
-      "p": "Giganti"
+      "p": "Giganti",
+      "fp": "Gigantesse"
     },
     {
       "n": "Piacevole",
       "m": "Piacevole",
       "f": "Piacevole",
-      "p": "Piacevoli"
+      "p": "Piacevoli",
+      "fp": "Piacevoli"
     },
     {
       "n": "Sensuale",
       "m": "Sensuale",
       "f": "Sensuale",
-      "p": "Sensuali"
+      "p": "Sensuali",
+      "fp": "Sensuali"
     },
     {
       "n": "Omosessuale",
       "m": "Omosessuale",
       "f": "Omosessuale",
-      "p": "Omosessuali"
+      "p": "Omosessuali",
+      "fp": "Omosessuali"
     },
     {
       "n": "Petulante",
       "m": "Petulante",
       "f": "Petulante",
-      "p": "Petulanti"
+      "p": "Petulanti",
+      "fp": "Petulanti"
     },
     {
       "n": "Pizzicolante",
       "m": "Pizzicolante",
       "f": "Pizzicolante",
-      "p": "Pizzicolanti"
+      "p": "Pizzicolanti",
+      "fp": "Pizzicolanti"
     },
     {
       "n": "Orgasmante",
       "m": "Orgasmante",
       "f": "Orgasmante",
-      "p": "Orgasmanti"
+      "p": "Orgasmanti",
+      "fp": "Orgasmanti"
     },
     {
       "n": "Vegetante",
       "m": "Vegetante",
       "f": "Vegetante",
-      "p": "Vegetanti"
+      "p": "Vegetanti",
+      "fp": "Vegetanti"
     },
     {
       "n": "Indulgente",
       "m": "Indulgente",
       "f": "Indulgente",
-      "p": "Indulgenti"
+      "p": "Indulgenti",
+      "fp": "Indulgenti"
     },
     {
       "n": "Bocca larga",
       "m": "Bocca larga",
       "f": "Bocca larga",
-      "p": "Bocche larghe"
+      "p": "Bocche larghe",
+      "fp": "Bocche larghe"
     },
     {
       "n": "Culo stretto",
       "m": "Culo stretto",
       "f": "Culo stretto",
-      "p": "Culi stretti"
+      "p": "Culi stretti",
+      "fp": "Culi stretti"
     },
     {
       "n": "Mani rapide",
       "m": "Mani rapide",
       "f": "Mani rapide",
-      "p": "Mani rapide"
+      "p": "Mani rapide",
+      "fp": "Mani rapide"
     },
     {
       "n": "Imprecante",
       "m": "Imprecante",
       "f": "Imprecante",
-      "p": "Imprecanti"
+      "p": "Imprecanti",
+      "fp": "Imprecanti"
     },
     {
       "n": "Salivante",
       "m": "Salivante",
       "f": "Salivante",
-      "p": "Salivanti"
+      "p": "Salivanti",
+      "fp": "Salivanti"
     },
     {
       "n": "Ortofruttante",
       "m": "Ortofruttante",
       "f": "Ortofruttante",
-      "p": "Ortofruttanti"
+      "p": "Ortofruttanti",
+      "fp": "Ortofruttanti"
     },
     {
       "n": "Strimpellante",
       "m": "Strimpellante",
       "f": "Strimpellante",
-      "p": "Strimpellanti"
+      "p": "Strimpellanti",
+      "fp": "Strimpellanti"
     },
     {
       "n": "Seno esplosivo",
       "m": "Seno esplosivo",
       "f": "Seno esplosivo",
-      "p": "Seni esplosivi"
+      "p": "Seni esplosivi",
+      "fp": "Seni esplosivi"
     },
     {
       "n": "Passione fisting",
       "m": "Passione fisting",
       "f": "Passione fisting",
-      "p": "Passione fisting"
+      "p": "Passione fisting",
+      "fp": "Passione fisting"
     },
     {
       "n": "Saccente",
       "m": "Saccente",
       "f": "Saccente",
-      "p": "Saccenti"
+      "p": "Saccenti",
+      "fp": "Saccenti"
     },
     {
       "n": "Orifizio dilatato",
       "m": "Orifizio dilatato",
       "f": "Orifizio dilatato",
-      "p": "Orifizi dilatati"
+      "p": "Orifizi dilatati",
+      "fp": "Orifizi dilatati"
     },
     {
       "n": "Comunista",
       "m": "Comunista",
       "f": "Comunista",
-      "p": "Comunisti"
+      "p": "Comunisti",
+      "fp": "Comunisti"
     },
     {
       "n": "Fascista",
       "m": "Fascista",
       "f": "Fascista",
-      "p": "Fascisti"
+      "p": "Fascisti",
+      "fp": "Fascisti"
     },
     {
       "n": "Eccessivamente omosessuale",
       "m": "Eccessivamente omosessuale",
       "f": "Eccessivamente omosessuale",
-      "p": "Eccessivamente omosessuali"
+      "p": "Eccessivamente omosessuali",
+      "fp": "Eccessivamente omosessuali"
     },
     {
       "n": "Che salta sui tetti",
       "m": "Che salta sui tetti",
       "f": "Che salta sui tetti",
-      "p": "Che saltano sui tetti"
+      "p": "Che saltano sui tetti",
+      "fp": "Che saltano sui tetti"
     },
     {
       "n": "Che corre nei campi",
       "m": "Che corre nei campi",
       "f": "Che corre nei campi",
-      "p": "Che corrono nei campi"
+      "p": "Che corrono nei campi",
+      "fp": "Che corrono nei campi"
     },
     {
       "n": "Provocante",
       "m": "Provocante",
       "f": "Provocante",
-      "p": "Provocanti"
+      "p": "Provocanti",
+      "fp": "Provocanti"
     },
     {
       "n": "Effervescente",
       "m": "Effervescente",
       "f": "Effervescente",
-      "p": "Effervescenti"
+      "p": "Effervescenti",
+      "fp": "Effervescenti"
     },
     {
       "n": "Con la felpa di Salvini",
       "m": "Con la felpa di Salvini",
       "f": "Con la felpa di Salvini",
-      "p": "Con le felpe di Salvini"
+      "p": "Con le felpe di Salvini",
+      "fp": "Con le felpe di Salvini"
     },
     {
       "n": "Fessa dentata",
       "m": "Fessa dentata",
       "f": "Fessa dentata",
-      "p": "Fesse dentate"
+      "p": "Fesse dentate",
+      "fp": "Fesse dentate"
     },
     {
       "n": "Culo peloso",
       "m": "Culo peloso",
       "f": "Culo peloso",
-      "p": "Culi pelosi"
+      "p": "Culi pelosi",
+      "fp": "Culi pelosi"
     },
     {
       "n": "Down",
       "m": "Down",
       "f": "Down",
-      "p": "Down"
+      "p": "Down",
+      "fp": "Down"
     },
     {
       "n": "Su una sedia a rotelle",
       "m": "Su una sedia a rotelle",
       "f": "Su una sedia a rotelle",
-      "p": "Su una sedia a rotelle"
+      "p": "Su una sedia a rotelle",
+      "fp": "Su una sedia a rotelle"
     },
     {
       "n": "Intollerante al lattosio",
       "m": "Intollerante al lattosio",
       "f": "Intollerante al lattosio",
-      "p": "Intolleranti al lattosio"
+      "p": "Intolleranti al lattosio",
+      "fp": "Intolleranti al lattosio"
     },
     {
       "n": "Bocchinante",
       "m": "Bocchinante",
       "f": "Bocchinante",
-      "p": "Bocchinanti"
+      "p": "Bocchinanti",
+      "fp": "Bocchinanti"
     },
     {
       "n": "Naso imponente",
       "m": "Naso imponente",
       "f": "Naso imponente",
-      "p": "Nasi imponenti"
+      "p": "Nasi imponenti",
+      "fp": "Nasi imponenti"
     },
     {
       "n": "Dissacrante",
       "m": "Dissacrante",
       "f": "Dissacrante",
-      "p": "Dissacranti"
+      "p": "Dissacranti",
+      "fp": "Dissacranti"
     },
     {
       "n": "Elefante",
       "m": "Elefante",
       "f": "Elefantessa",
-      "p": "Elefanti"
+      "p": "Elefanti",
+      "fp": "Elefantesse"
     },
     {
       "n": "Feticista",
       "m": "Feticista",
       "f": "Feticista",
-      "p": "Feticisti"
+      "p": "Feticisti",
+      "fp": "Feticisti"
     },
     {
       "n": "Sconvolgente",
       "m": "Sconvolgente",
       "f": "Sconvolgente",
-      "p": "Sconvolgenti"
+      "p": "Sconvolgenti",
+      "fp": "Sconvolgenti"
     },
     {
       "n": "Saltasburellante",
       "m": "Saltasburellante",
       "f": "Saltasburellante",
-      "p": "Saltasburellanti"
+      "p": "Saltasburellanti",
+      "fp": "Saltasburellanti"
     },
     {
       "n": "Necromante",
       "m": "Necromante",
       "f": "Necromante",
-      "p": "Necromanti"
+      "p": "Necromanti",
+      "fp": "Necromanti"
     },
     {
       "n": "Che picchia i bambini",
       "m": "Che picchia i bambini",
       "f": "Che picchia i bambini",
-      "p": "Che picchiano i bambini"
+      "p": "Che picchiano i bambini",
+      "fp": "Che picchiano i bambini"
     },
     {
       "n": "Che deruba le vecchie",
       "m": "Che deruba le vecchie",
       "f": "Che deruba le vecchie",
-      "p": "Che derubano le vecchie"
+      "p": "Che derubano le vecchie",
+      "fp": "Che derubano le vecchie"
     },
     {
       "n": "Pluriomicida",
       "m": "Pluriomicida",
       "f": "Pluriomicida",
-      "p": "Pluriomicidi"
+      "p": "Pluriomicidi",
+      "fp": "Pluriomicidi"
     },
     {
       "n": "Sodomita",
       "m": "Sodomita",
       "f": "Sodomita",
-      "p": "Sodomiti"
+      "p": "Sodomiti",
+      "fp": "Sodomiti"
     },
     {
       "n": "Filibustier*",
       "m": "Filibustiere",
       "f": "Filibustiera",
-      "p": "Filibustieri"
+      "p": "Filibustieri",
+      "fp": "Filibustiere"
     },
     {
       "n": "Alito fetente",
       "m": "Alito fetente",
       "f": "Alito fetente",
-      "p": "Aliti fetenti"
+      "p": "Aliti fetenti",
+      "fp": "Aliti fetenti"
     },
     {
       "n": "Senpai",
       "m": "Senpai",
       "f": "Senpai",
-      "p": "Senpai"
+      "p": "Senpai",
+      "fp": "Senpai"
     },
     {
       "n": "Bueo",
       "m": "Bueo",
       "f": "Buea",
-      "p": "Buei"
+      "p": "Buei",
+      "fp": "Buee"
     },
     {
       "n": "Con il parrucchino",
       "m": "Con il parrucchino",
       "f": "Con il parrucchino",
-      "p": "Con il parrucchino"
+      "p": "Con il parrucchino",
+      "fp": "Con il parrucchino"
     },
     {
       "n": "A forma di scarpiera",
       "m": "A forma di scarpiera",
       "f": "A forma di scarpiera",
-      "p": "A forma di scarpiera"
+      "p": "A forma di scarpiera",
+      "fp": "A forma di scarpiera"
     },
     {
       "n": "Geneticamente modificat*",
       "m": "Geneticamente modificato",
       "f": "Geneticamente modificata",
-      "p": "Geneticamente modificati"
+      "p": "Geneticamente modificati",
+      "fp": "Geneticamente modificate"
     },
     {
       "n": "Che brilla al buio",
       "m": "Che brilla al buio",
       "f": "Che brilla al buio",
-      "p": "Che brillano al buio"
+      "p": "Che brillano al buio",
+      "fp": "Che brillano al buio"
     },
     {
       "n": "Fetente",
       "m": "Fetente",
       "f": "Fetente",
-      "p": "Fetenti"
+      "p": "Fetenti",
+      "fp": "Fetenti"
     },
     {
       "n": "Costosett*",
       "m": "Costosetto",
       "f": "Costosetta",
-      "p": "Costosetti"
+      "p": "Costosetti",
+      "fp": "Costosette"
     },
     {
       "n": "Un po' cesso",
       "m": "Un po' cesso",
       "f": "Un po' cesso",
-      "p": "Un po' cessi"
+      "p": "Un po' cessi",
+      "fp": "Un po' cessi"
     },
     {
       "n": "E la sua bussy",
       "m": "E la sua bussy",
       "f": "E la sua bussy",
-      "p": "E la loro bussy"
+      "p": "E la loro bussy",
+      "fp": "E la loro bussy"
     },
     {
       "n": "Mastodontic*",
       "m": "Mastodontico",
       "f": "Mastodontica",
-      "p": "Mastodontici"
+      "p": "Mastodontici",
+      "fp": "Mastodontiche"
     },
     {
       "n": "In plastica riciclabile",
       "m": "In plastica riciclabile",
       "f": "In plastica riciclabile",
-      "p": "In plastica riciclabile"
+      "p": "In plastica riciclabile",
+      "fp": "In plastica riciclabile"
     },
     {
       "n": "7 ore prima dell'arresto",
       "m": "7 ore prima dell'arresto",
       "f": "7 ore prima dell'arresto",
-      "p": "7 ore prima dell'arresto"
+      "p": "7 ore prima dell'arresto",
+      "fp": "7 ore prima dell'arresto"
     },
     {
       "n": "Impestat*",
       "m": "Impestato",
       "f": "Impestata",
-      "p": "Impestati"
+      "p": "Impestati",
+      "fp": "Impestate"
     },
     {
       "n": "Malat* di AIDS",
       "m": "Malato di AIDS",
       "f": "Malata di AIDS",
-      "p": "Malati di AIDS"
+      "p": "Malati di AIDS",
+      "fp": "Malate di AIDS"
     },
     {
       "n": "Fulminat* sulla via di damasco",
       "m": "Fulminato sulla via di damasco",
       "f": "Fulminata sulla via di damasco",
-      "p": "Fulminati sulla via di damasco"
+      "p": "Fulminati sulla via di damasco",
+      "fp": "Fulminate sulla via di damasco"
     },
     {
       "n": "e le sue personalità multiple",
       "m": "e le sue personalità multiple",
       "f": "e le sue personalità multiple",
-      "p": "e le sue personalità multiple"
+      "p": "e le sue personalità multiple",
+      "fp": "e le sue personalità multiple"
     },
     {
       "n": "e la sua ciola",
       "m": "e la sua ciola",
       "f": "e la sua ciola",
-      "p": "e la sua ciola"
+      "p": "e la sua ciola",
+      "fp": "e la sua ciola"
     },
     {
       "n": "Faccendier* di mafia",
       "m": "Faccendiere di mafia",
       "f": "Faccendiera di mafia",
-      "p": "Faccendieri di mafia"
+      "p": "Faccendieri di mafia",
+      "fp": "Faccendiere di mafia"
     },
     {
       "n": "da troie accompagnat*",
       "m": "da troie accompagnato",
       "f": "da troie accompagnata",
-      "p": "da troie accompagnati"
+      "p": "da troie accompagnati",
+      "fp": "da troie accompagnate"
     },
     {
       "n": "che favoreggia la prostituzione",
       "m": "che favoreggia la prostituzione",
       "f": "che favoreggia la prostituzione",
-      "p": "che favoreggia la prostituzione"
+      "p": "che favoreggia la prostituzione",
+      "fp": "che favoreggia la prostituzione"
     },
     {
       "n": "Mongoplettic*",
       "m": "Mongoplettico",
       "f": "Mongoplettica",
-      "p": "Mongoplettici"
+      "p": "Mongoplettici",
+      "fp": "Mongoplettiche"
     },
     {
       "n": "Tetton*",
       "m": "Tettone",
       "f": "Tettona",
-      "p": "Tettoni"
+      "p": "Tettoni",
+      "fp": "Tettone"
     },
     {
       "n": "con una banana nel culo",
       "m": "con una banana nel culo",
       "f": "con una banana nel culo",
-      "p": "con una banana nel culo"
+      "p": "con una banana nel culo",
+      "fp": "con una banana nel culo"
     },
     {
       "n": "Remigrat*",
       "m": "Remigrato",
       "f": "Remigrata",
-      "p": "Remigrati"
+      "p": "Remigrati",
+      "fp": "Remigrate"
     },
     {
       "n": "Scem* Pagliacci*",
       "m": "Scemo Pagliaccio",
       "f": "Scema Pagliaccia",
-      "p": "Scemi Pagliacci"
+      "p": "Scemi Pagliacci",
+      "fp": "Sceme Pagliacce"
     },
     {
       "n": "Sionista",
       "m": "Sionista",
       "f": "Sionista",
-      "p": "Sionisti"
+      "p": "Sionisti",
+      "fp": "Sionisti"
     },
     {
       "n": "Felicemente Cornut*",
       "m": "Felicemente Cornuto",
       "f": "Felicemente Cornuta",
-      "p": "Felicemente Cornuti"
+      "p": "Felicemente Cornuti",
+      "fp": "Felicemente Cornute"
     },
     {
       "n": "Figli* di troia",
       "m": "Figlio di troia",
       "f": "Figlia di troia",
-      "p": "Figli di troia"
+      "p": "Figli di troia",
+      "fp": "Figlie di troia"
     },
     {
       "n": "Gran Minchion*",
       "m": "Gran Minchione",
       "f": "Gran Minchiona",
-      "p": "Gran Minchioni"
+      "p": "Gran Minchioni",
+      "fp": "Gran Minchione"
     },
     {
       "n": "Chan",
       "m": "Chan",
       "f": "Chan",
-      "p": "Chan"
+      "p": "Chan",
+      "fp": "Chan"
     },
     {
       "n": "Kawaii :3",
       "m": "Kawaii :3",
       "f": "Kawaii :3",
-      "p": "Kawaii :3"
+      "p": "Kawaii :3",
+      "fp": "Kawaii :3"
     },
     {
       "n": "Orripilante",
       "m": "Orripilante",
       "f": "Orripilante",
-      "p": "Orripilanti"
+      "p": "Orripilanti",
+      "fp": "Orripilanti"
     },
     {
       "n": "Sburrastic*",
       "m": "Sburrastico",
       "f": "Sburrastica",
-      "p": "Sburrastici"
+      "p": "Sburrastici",
+      "fp": "Sburrastiche"
     },
     {
       "n": "Pedofil*",
       "m": "Pedofilo",
       "f": "Pedofila",
-      "p": "Pedofili"
+      "p": "Pedofili",
+      "fp": "Pedofile"
     },
     {
       "n": "Focomelic*",
       "m": "Focomelico",
       "f": "Focomelica",
-      "p": "Focomelici"
+      "p": "Focomelici",
+      "fp": "Focomeliche"
     },
     {
       "n": "Digievolut*",
       "m": "Digievoluto",
       "f": "Digievoluta",
-      "p": "Digievoluti"
+      "p": "Digievoluti",
+      "fp": "Digievolute"
     },
     {
       "n": "Abortit*",
       "m": "Abortito",
       "f": "Abortita",
-      "p": "Abortiti"
+      "p": "Abortiti",
+      "fp": "Abortite"
     }
   ]
 }

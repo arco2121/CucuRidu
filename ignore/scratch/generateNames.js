@@ -2,8 +2,12 @@
  * Genera application/include/names/names.json a partire dai due CSV in
  * ignore/scratch/raw/names/ :
  *
- *   nomi.csv       nome,genere                       genere: m | f | n | p
- *   aggettivi.csv  neutro,maschile,femminile,plurale
+ *   nomi.csv       nome,genere                       genere: m | f | n | p | fp
+ *   aggettivi.csv  neutro,maschile,femminile,plurale,femminileplurale
+ *
+ *   fp = "femminile plurale": per i nomi che sono un gruppo di sole donne
+ *   (es. "Le Amazzoni"), cosi' l'aggettivo concorda sia in genere che in
+ *   numero (es. "Le Amazzoni Stronze", non "Le Amazzoni Stronzi").
  *
  * Gli stessi CSV si possono tenere su Google Sheets: in quel caso il JSON lo
  * genera lo script in ignore/scratch/AppsScript_names.gs, che fa esattamente
@@ -14,7 +18,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const GENERI_VALIDI = ["m", "f", "n", "p"];
+const GENERI_VALIDI = ["m", "f", "n", "p", "fp"];
 
 // come scrivere il genere nel foglio: a sinistra quello che puoi digitare,
 // a destra quello che finisce nel JSON
@@ -22,7 +26,9 @@ const ALIAS_GENERE = {
     m: "m", maschile: "m", maschio: "m", uomo: "m",
     f: "f", femminile: "f", femmina: "f", donna: "f",
     n: "n", neutro: "n", neutrale: "n", "": "n",
-    p: "p", plurale: "p", plurali: "p"
+    p: "p", plurale: "p", plurali: "p",
+    fp: "fp", "plurale femminile": "fp", "femminile plurale": "fp",
+    "plurali femminili": "fp", donne: "fp"
 };
 
 /** Parser CSV completo: gestisce virgolette, virgole dentro le celle e a capo. */
@@ -110,16 +116,18 @@ const generateCombinedJSON = () => {
             const maschile = String(riga["maschile"] ?? "").trim();
             const femminile = String(riga["femminile"] ?? "").trim();
             const plurale = String(riga["plurale"] ?? "").trim();
+            const femminilePlurale = String(riga["femminileplurale"] ?? "").trim();
 
             const base = neutro || maschile || femminile || plurale;
             if (!base) continue;
-            if (!maschile || !femminile || !plurale) incompleti.push(base);
+            if (!maschile || !femminile || !plurale || !femminilePlurale) incompleti.push(base);
 
             aggettivi.push({
                 n: neutro || base,
                 m: maschile || neutro || base,
                 f: femminile || neutro || base,
-                p: plurale || maschile || neutro || base
+                p: plurale || maschile || neutro || base,
+                fp: femminilePlurale || plurale || femminile || neutro || base
             });
         }
 

@@ -34,8 +34,10 @@ const getknownPacks = () => {
  * Generazione Nome Casuale
  *
  * names.json versione 2:
- *   names:      { nome, genere }  con genere m | f | n | p
- *   adjectives: { m, f, n, p }    n = forma neutra, quella con l'asterisco
+ *   names:      { nome, genere }  con genere m | f | n | p | fp
+ *   adjectives: { m, f, n, p, fp }    n = forma neutra, quella con l'asterisco
+ *   fp = femminile plurale, per i nomi che sono un gruppo di sole donne
+ *   (es. "Le Amazzoni Stronze" invece di "Le Amazzoni Stronzi").
  * L'aggettivo viene scelto nella forma che concorda col genere del nome, cosi
  * non serve piu l'asterisco per cavarsela: "Petunia Stronza" invece di
  * "Petunia Stronz*". Il vecchio formato a liste di stringhe continua a
@@ -53,7 +55,7 @@ const caricaNomi = () => {
                 .map(n => typeof n === "string" ? { nome: n, genere: "n" } : n)
                 .filter(n => n && n.nome),
             adjectives: (data.adjectives || [])
-                .map(a => typeof a === "string" ? { n: a, m: a, f: a, p: a } : a)
+                .map(a => typeof a === "string" ? { n: a, m: a, f: a, p: a, fp: a } : a)
                 .filter(Boolean)
         };
     } catch (error) {
@@ -73,8 +75,8 @@ const generateName = () => {
     if (!dati.adjectives.length) return nome.nome;
 
     const aggettivo = scegliACaso(dati.adjectives);
-    const genere = ["m", "f", "n", "p"].includes(nome.genere) ? nome.genere : "n";
-    const forma = aggettivo[genere] || aggettivo.n || aggettivo.m || aggettivo.f || "";
+    const genere = ["m", "f", "n", "p", "fp"].includes(nome.genere) ? nome.genere : "n";
+    const forma = aggettivo[genere] || aggettivo.n || aggettivo.m || aggettivo.f || aggettivo.p || "";
 
     return (nome.nome + " " + forma).trim();
 }
