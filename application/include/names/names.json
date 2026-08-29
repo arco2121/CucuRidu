@@ -1047,7 +1047,8 @@
     },
     {
       "nome": "Lanabanana",
-      "genere": "n"
+      "genere": "n",
+      "peso": 0.2
     },
     {
       "nome": "Meggy",
@@ -1136,6 +1137,54 @@
     {
       "nome": "Suffragette",
       "genere": "fp"
+    },
+    {
+      "nome": "Mikeshowsha",
+      "genere": "m"
+    },
+    {
+      "nome": "Gioventa",
+      "genere": "f"
+    },
+    {
+      "nome": "Jeffrey Epstein",
+      "genere": "m"
+    },
+    {
+      "nome": "Tette",
+      "genere": "fp"
+    },
+    {
+      "nome": "Bambino",
+      "genere": "m"
+    },
+    {
+      "nome": "La Bella Lavanderina",
+      "genere": "f"
+    },
+    {
+      "nome": "Britney Spears",
+      "genere": "f"
+    },
+    {
+      "nome": "Paperotte",
+      "genere": "fp"
+    },
+    {
+      "nome": "Tatiana",
+      "genere": "f"
+    },
+    {
+      "nome": "Jannik Sinner",
+      "genere": "m"
+    },
+    {
+      "nome": "Hailie McAnally",
+      "genere": "f"
+    },
+    {
+      "nome": "Charles Leclerc",
+      "genere": "m"
     }
   ],
   "adjectives": [
@@ -2202,6 +2251,69 @@
       "f": "Malata di figa",
       "p": "Malati di figa",
       "fp": "Malate di figa"
+    },
+    {
+      "n": "nei dintorni",
+      "m": "nei dintorni",
+      "f": "nei dintorni",
+      "p": "nei dintorni",
+      "fp": "nei dintorni"
+    },
+    {
+      "n": "Fresc* di Zona",
+      "m": "Fresco di Zona",
+      "f": "Fresca di Zona",
+      "p": "Freschi di Zona",
+      "fp": "Fresche di Zona"
+    },
+    {
+      "n": "Bel Giuovinott*",
+      "m": "Bel Giuovinotto",
+      "f": "Bella Giuovinotta",
+      "p": "Bei Giuovinotti",
+      "fp": "Belle Giuovinotte"
+    },
+    {
+      "n": "Orfanenell*",
+      "m": "Orfanenello",
+      "f": "Orfanenella",
+      "p": "Orfanenelli",
+      "fp": "Orfanenelle"
+    },
+    {
+      "n": "Scem*",
+      "m": "Scemo",
+      "f": "Scema",
+      "p": "Scemi",
+      "fp": "Sceme"
+    },
+    {
+      "n": "Roman* de Roma AOOO",
+      "m": "Romano de Roma AOOO",
+      "f": "Romana de Roma AOOO",
+      "p": "Romani de Roma AOOO",
+      "fp": "Romane de Roma AOOO"
+    },
+    {
+      "n": "Inopportun*",
+      "m": "Inopportuno",
+      "f": "Inopportuna",
+      "p": "Inopportuni",
+      "fp": "Inopportune"
+    },
+    {
+      "n": "Bell* ma Stronz*",
+      "m": "Bello ma Stronzo",
+      "f": "Bella ma Stronza",
+      "p": "Belli ma Stronzi",
+      "fp": "Belle ma Stronze"
+    },
+    {
+      "n": "Calcol* Renale",
+      "m": "Calcolo Renale",
+      "f": "Calcolo Renale",
+      "p": "Calcoli Renale",
+      "fp": "Calcoli Renale"
     }
   ]
 }
