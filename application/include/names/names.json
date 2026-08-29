@@ -1120,6 +1120,22 @@
     {
       "nome": "Bambini Cinesi",
       "genere": "p"
+    },
+    {
+      "nome": "La Nina, la Pinta e la Santa Maria",
+      "genere": "fp"
+    },
+    {
+      "nome": "Suorine",
+      "genere": "fp"
+    },
+    {
+      "nome": "Le Ragazze di Porta Venezia",
+      "genere": "fp"
+    },
+    {
+      "nome": "Suffragette",
+      "genere": "fp"
     }
   ],
   "adjectives": [
@@ -1212,7 +1228,7 @@
       "m": "Triceratopo",
       "f": "Triceratopo",
       "p": "Triceratopi",
-      "fp": "Triceratopi"
+      "fp": "Triceratope"
     },
     {
       "n": "Terron*",
@@ -1240,7 +1256,7 @@
       "m": "Condominio",
       "f": "Condominio",
       "p": "Condomini",
-      "fp": "Condomini"
+      "fp": "Condominie"
     },
     {
       "n": "Inalante di cocaina",
@@ -1261,7 +1277,7 @@
       "m": "Trifosfato",
       "f": "Trifosfato",
       "p": "Trifosfati",
-      "fp": "Trifosfati"
+      "fp": "Trifosfate"
     },
     {
       "n": "Lerci*",
@@ -1436,7 +1452,7 @@
       "m": "Flagello del mondo",
       "f": "Flagello del mondo",
       "p": "Flagelli del mondo",
-      "fp": "Flagelli del mondo"
+      "fp": "Flagelle del mondo"
     },
     {
       "n": "Buco di culo",
@@ -1730,14 +1746,14 @@
       "m": "Comunista",
       "f": "Comunista",
       "p": "Comunisti",
-      "fp": "Comunisti"
+      "fp": "Comuniste"
     },
     {
       "n": "Fascista",
       "m": "Fascista",
       "f": "Fascista",
       "p": "Fascisti",
-      "fp": "Fascisti"
+      "fp": "Fasciste"
     },
     {
       "n": "Eccessivamente omosessuale",
@@ -1849,7 +1865,7 @@
       "m": "Feticista",
       "f": "Feticista",
       "p": "Feticisti",
-      "fp": "Feticisti"
+      "fp": "Feticiste"
     },
     {
       "n": "Sconvolgente",
@@ -1891,14 +1907,14 @@
       "m": "Pluriomicida",
       "f": "Pluriomicida",
       "p": "Pluriomicidi",
-      "fp": "Pluriomicidi"
+      "fp": "Pluriomicide"
     },
     {
       "n": "Sodomita",
       "m": "Sodomita",
       "f": "Sodomita",
       "p": "Sodomiti",
-      "fp": "Sodomiti"
+      "fp": "Sodomite"
     },
     {
       "n": "Filibustier*",
@@ -1975,7 +1991,7 @@
       "m": "Un po' cesso",
       "f": "Un po' cesso",
       "p": "Un po' cessi",
-      "fp": "Un po' cessi"
+      "fp": "Un po' cesse"
     },
     {
       "n": "E la sua bussy",
@@ -2030,15 +2046,15 @@
       "n": "e le sue personalità multiple",
       "m": "e le sue personalità multiple",
       "f": "e le sue personalità multiple",
-      "p": "e le sue personalità multiple",
-      "fp": "e le sue personalità multiple"
+      "p": "e le loro personalità multiple",
+      "fp": "e le loro personalità multiple"
     },
     {
       "n": "e la sua ciola",
       "m": "e la sua ciola",
       "f": "e la sua ciola",
-      "p": "e la sua ciola",
-      "fp": "e la sua ciola"
+      "p": "e le loro ciole",
+      "fp": "e le loro ciole"
     },
     {
       "n": "Faccendier* di mafia",
@@ -2058,8 +2074,8 @@
       "n": "che favoreggia la prostituzione",
       "m": "che favoreggia la prostituzione",
       "f": "che favoreggia la prostituzione",
-      "p": "che favoreggia la prostituzione",
-      "fp": "che favoreggia la prostituzione"
+      "p": "che favoreggiano la prostituzione",
+      "fp": "che favoreggiano la prostituzione"
     },
     {
       "n": "Mongoplettic*",
@@ -2101,7 +2117,7 @@
       "m": "Sionista",
       "f": "Sionista",
       "p": "Sionisti",
-      "fp": "Sionisti"
+      "fp": "Sioniste"
     },
     {
       "n": "Felicemente Cornut*",
@@ -2179,6 +2195,13 @@
       "f": "Abortita",
       "p": "Abortiti",
       "fp": "Abortite"
+    },
+    {
+      "n": "Malat* di figa",
+      "m": "Malato di figa",
+      "f": "Malata di figa",
+      "p": "Malati di figa",
+      "fp": "Malate di figa"
     }
   ]
 }
