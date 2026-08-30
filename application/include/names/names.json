@@ -714,7 +714,7 @@
       "genere": "f"
     },
     {
-      "nome": "Zagara",
+      "nome": "Zingara",
       "genere": "f"
     },
     {
@@ -1185,6 +1185,10 @@
     {
       "nome": "Charles Leclerc",
       "genere": "m"
+    },
+    {
+      "nome": "Rosa Parks",
+      "genere": "f"
     }
   ],
   "adjectives": [
@@ -2314,6 +2318,41 @@
       "f": "Calcolo Renale",
       "p": "Calcoli Renale",
       "fp": "Calcoli Renale"
+    },
+    {
+      "n": "Tirolese",
+      "m": "Tirolese",
+      "f": "Tirolese",
+      "p": "Tirolesi",
+      "fp": "Tirolesi"
+    },
+    {
+      "n": "Hypertroi*",
+      "m": "Hypertroio",
+      "f": "Hypertroia",
+      "p": "Hypertroii",
+      "fp": "Hypertroie"
+    },
+    {
+      "n": "Trepidante",
+      "m": "Trepidante",
+      "f": "Trepidante",
+      "p": "Trepidanti",
+      "fp": "Trepidanti"
+    },
+    {
+      "n": "Dislessic*",
+      "m": "Dislessico",
+      "f": "Dislessica",
+      "p": "Dislessici",
+      "fp": "Dislessiche"
+    },
+    {
+      "n": "Decurtat*",
+      "m": "Decurtato",
+      "f": "Decurtata",
+      "p": "Decurtati",
+      "fp": "Decurtate"
     }
   ]
 }
