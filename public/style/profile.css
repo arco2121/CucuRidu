@@ -53,12 +53,22 @@
 /* Solo nel pannello "Seleziona Pfp": l'header (titolo + X) resta fisso
    sopra la griglia delle foto, che scorre sotto di lui. Cosi' non serve
    risalire fino in cima per chiudere il pannello. */
+#selectPfp .floatSection {
+    /* Il padding superiore del pannello lascerebbe uno spazio "vuoto"
+       tra il bordo arrotondato e l'header sticky, dove si intravedono
+       le pfp che scorrono sotto: lo spostiamo dentro l'header stesso
+       (vedi sotto) cosi' resta coperto dallo sfondo opaco. */
+    padding-top: 0;
+}
+
 #selectPfp .options_exit_btn {
     position: sticky;
     top: 0;
     z-index: 2;
     flex-shrink: 0;
     background: var(--background-variant);
+    margin-top: 0;
+    padding-top: 10px;
 }
 
 #changeNameBtn {
