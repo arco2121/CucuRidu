@@ -1189,6 +1189,26 @@
     {
       "nome": "Rosa Parks",
       "genere": "f"
+    },
+    {
+      "nome": "Edoardo Lupo Lucia",
+      "genere": "m"
+    },
+    {
+      "nome": "Nicoletta",
+      "genere": "f"
+    },
+    {
+      "nome": "Ispettore Gennaro",
+      "genere": "m"
+    },
+    {
+      "nome": "Renesmee",
+      "genere": "f"
+    },
+    {
+      "nome": "Edward Cullen",
+      "genere": "m"
     }
   ],
   "adjectives": [
