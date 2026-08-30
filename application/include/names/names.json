@@ -1209,6 +1209,14 @@
     {
       "nome": "Edward Cullen",
       "genere": "m"
+    },
+    {
+      "nome": "Sailor Moon",
+      "genere": "f"
+    },
+    {
+      "nome": "Mastrolindo",
+      "genere": "m"
     }
   ],
   "adjectives": [
@@ -2373,6 +2381,97 @@
       "f": "Decurtata",
       "p": "Decurtati",
       "fp": "Decurtate"
+    },
+    {
+      "n": "nel suo prime con un cazzo in culo",
+      "m": "nel suo prime con un cazzo in culo",
+      "f": "nel suo prime con un cazzo in culo",
+      "p": "nel loro prime con dei cazzi in culo",
+      "fp": "nel loro prime con dei cazzi in culo"
+    },
+    {
+      "n": "Pirla",
+      "m": "Pirla",
+      "f": "Pirla",
+      "p": "Pirla",
+      "fp": "Pirla"
+    },
+    {
+      "n": "Disagiat*",
+      "m": "Disagiato",
+      "f": "Disagiata",
+      "p": "Disagiati",
+      "fp": "Disagiate"
+    },
+    {
+      "n": "Mona",
+      "m": "Mona",
+      "f": "Mona",
+      "p": "Mona",
+      "fp": "Mona"
+    },
+    {
+      "n": "Lamenton*",
+      "m": "Lamentone",
+      "f": "Lamentona",
+      "p": "Lamentoni",
+      "fp": "Lamentone"
+    },
+    {
+      "n": "con 7 figli illegittimi",
+      "m": "con 7 figli illegittimi",
+      "f": "con 7 figli illegittimi",
+      "p": "con 7 figli illegittimi",
+      "fp": "con 7 figli illegittimi"
+    },
+    {
+      "n": "un po' cinese",
+      "m": "un po' cinese",
+      "f": "un po' cinese",
+      "p": "un po' cinesi",
+      "fp": "un po' cinesi"
+    },
+    {
+      "n": "Contro Natura",
+      "m": "Contro Natura",
+      "f": "Contro Natura",
+      "p": "Contro Natura",
+      "fp": "Contro Natura"
+    },
+    {
+      "n": "Tutt* Fatt*",
+      "m": "Tutto Fatto",
+      "f": "Tutta Fatta",
+      "p": "Tutti Fatti",
+      "fp": "Tutte Fatte"
+    },
+    {
+      "n": "Inutile",
+      "m": "Inutile",
+      "f": "Inutile",
+      "p": "Inutili",
+      "fp": "Inutili"
+    },
+    {
+      "n": "Dispers* nei Campi Flegrei",
+      "m": "Disperso nei Campi Flegrei",
+      "f": "Dispersa nei Campi Flegrei",
+      "p": "Dispersi nei Campi Flegrei",
+      "fp": "Disperse nei Campi Flegrei"
+    },
+    {
+      "n": "con il potere del cristallo di luna",
+      "m": "con il potere del cristallo di luna",
+      "f": "con il potere del cristallo di luna",
+      "p": "con il potere del cristallo di luna",
+      "fp": "con il potere del cristallo di luna"
+    },
+    {
+      "n": "Tord*",
+      "m": "Tordo",
+      "f": "Torda",
+      "p": "Tordi",
+      "fp": "Torde"
     }
   ]
 }
