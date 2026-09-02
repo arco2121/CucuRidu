@@ -790,7 +790,7 @@
       "genere": "f"
     },
     {
-      "nome": "Alesandro",
+      "nome": "Alessandro",
       "genere": "m"
     },
     {
@@ -1217,6 +1217,14 @@
     {
       "nome": "Mastrolindo",
       "genere": "m"
+    },
+    {
+      "nome": "Giovanni Rana",
+      "genere": "m"
+    },
+    {
+      "nome": "Una Pesca Succosa",
+      "genere": "f"
     }
   ],
   "adjectives": [
@@ -2472,6 +2480,55 @@
       "f": "Torda",
       "p": "Tordi",
       "fp": "Torde"
+    },
+    {
+      "n": "rapit* dall'uomo nero",
+      "m": "rapito dall'uomo nero",
+      "f": "rapita dall'uomo nero",
+      "p": "rapiti dall'uomo nero",
+      "fp": "rapite dall'uomo nero"
+    },
+    {
+      "n": "Paravent*",
+      "m": "Paravento",
+      "f": "Paraventa",
+      "p": "Paraventi",
+      "fp": "Paravente"
+    },
+    {
+      "n": "nascost* nel cavallo di Troia",
+      "m": "nascosto nel cavallo di Troia",
+      "f": "nascosta nel cavallo di Troia",
+      "p": "nascosti nel cavallo di Troia",
+      "fp": "nascoste nel cavallo di Troia"
+    },
+    {
+      "n": "Dolomitista",
+      "m": "Dolomitista",
+      "f": "Dolomitista",
+      "p": "Dolomitisti",
+      "fp": "Dolomitiste"
+    },
+    {
+      "n": "Sdrumante",
+      "m": "Sdrumante",
+      "f": "Sdrumante",
+      "p": "Sdrumanti",
+      "fp": "Sdrumanti"
+    },
+    {
+      "n": "che suona la fisarmonica",
+      "m": "che suona la fisarmonica",
+      "f": "che suona la fisarmonica",
+      "p": "che suonanano la fisarmonica",
+      "fp": "che suonanano la fisarmonica"
+    },
+    {
+      "n": "con delle belle tette",
+      "m": "con delle belle tette",
+      "f": "con delle belle tette",
+      "p": "con delle belle tette",
+      "fp": "con delle belle tette"
     }
   ]
 }
