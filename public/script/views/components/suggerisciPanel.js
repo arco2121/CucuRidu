@@ -143,8 +143,16 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        inviaBtn.disabled = true;
-        inviaBtn.textContent = "Invio...";
+        // L'emit parte subito (il socket lo mette in coda anche se in quel
+        // momento la connessione sta riconnettendo) e la risposta arriva dal
+        // listener "suggerimentoEsito" qui sotto, che resta attivo A
+        // PRESCINDERE dal pannello: prima si chiudeva il pannello solo dopo
+        // l'ok del server, quindi chi aveva fretta e uscisse subito (o il
+        // giro fosse lento/la connessione ballerina) rischiava di credere
+        // che l'invio fosse partito mentre in realta' l'utente era ancora li
+        // fermo ad aspettare "Invio...". Ora si torna a giocare subito, il
+        // risultato (compreso un eventuale errore) arriva comunque con un
+        // alert quando arriva, anche a pannello gia' chiuso.
         emit("suggerisci", {
             id: referenceStanza,
             elementi: elementi.map(e => ({
@@ -152,17 +160,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 testo: e.testo
             }))
         });
+
+        elementi.length = 0;
+        testo.value = "";
+        disegnaLista();
+        chiudi();
     });
 
     off("suggerimentoEsito");
     on("suggerimentoEsito", (data) => {
         if (inviaBtn) { inviaBtn.disabled = false; inviaBtn.textContent = testoInvia; }
         if (data && data.ok) {
-            elementi.length = 0;
-            testo.value = "";
-            disegnaLista();
             alert("Ricevuto, grazie. Se e' bella la mettiamo dentro");
-            chiudi();
         } else {
             alert((data && data.messaggio) || "Non sono riuscito a inviare il suggerimento");
         }
