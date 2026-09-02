@@ -627,7 +627,20 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             if (!righe.length)
                 return user.emit("segnalazioneEsito", { ok: false, messaggio: "Non hai selezionato niente da segnalare" });
 
-            await archivioSegnalazioni.aggiungi(righe);
+            try {
+                await archivioSegnalazioni.aggiungi(righe);
+            } catch (e) {
+                // Se il DB rifiuta l'insert (es. errore di connessione, o un
+                // CHECK non ancora allargato) il "sicuro()" qui intorno lo
+                // avrebbe solo loggato sul server: il client restava li in
+                // silenzio senza sapere che non e' arrivato nulla. Meglio
+                // avvisarlo sempre.
+                console.error("[socket:segnala] salvataggio fallito ->", e?.message || e);
+                return user.emit("segnalazioneEsito", {
+                    ok: false,
+                    messaggio: "Non sono riuscito a salvare la segnalazione, riprova"
+                });
+            }
             console.log("Segnalazioni ricevute => " + righe.length + " da " + stanzaId);
             user.emit("segnalazioneEsito", { ok: true, quante: righe.length });
         }));
@@ -656,7 +669,21 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             if (!righe.length)
                 return user.emit("suggerimentoEsito", { ok: false, messaggio: "Non hai scritto niente da suggerire" });
 
-            await archivioSegnalazioni.aggiungi(righe);
+            try {
+                await archivioSegnalazioni.aggiungi(righe);
+            } catch (e) {
+                // Stesso discorso di "segnala" sopra: senza questo try/catch
+                // un insert rifiutato dal DB (es. il CHECK sul tipo non
+                // ancora allargato da migrazione_suggerimenti.sql) veniva
+                // solo loggato sul server via "sicuro()", il client restava
+                // in silenzio - "Invio..." per sempre, nessun errore, niente
+                // nel DB. Ora il client viene sempre avvisato.
+                console.error("[socket:suggerisci] salvataggio fallito ->", e?.message || e);
+                return user.emit("suggerimentoEsito", {
+                    ok: false,
+                    messaggio: "Non sono riuscito a salvare il suggerimento, riprova"
+                });
+            }
             console.log("Suggerimenti ricevuti => " + righe.length + " da " + stanzaId);
             user.emit("suggerimentoEsito", { ok: true, quante: righe.length });
         }));
