@@ -1225,6 +1225,26 @@
     {
       "nome": "Una Pesca Succosa",
       "genere": "f"
+    },
+    {
+      "nome": "Papa Urbano II",
+      "genere": "m"
+    },
+    {
+      "nome": "Kandida",
+      "genere": "f"
+    },
+    {
+      "nome": "Katia",
+      "genere": "f"
+    },
+    {
+      "nome": "Filippo",
+      "genere": "m"
+    },
+    {
+      "nome": "Carlo Conti",
+      "genere": "m"
     }
   ],
   "adjectives": [
@@ -2529,6 +2549,41 @@
       "f": "con delle belle tette",
       "p": "con delle belle tette",
       "fp": "con delle belle tette"
+    },
+    {
+      "n": "Formaggios*",
+      "m": "Formaggioso",
+      "f": "Formaggiosa",
+      "p": "Formaggiosi",
+      "fp": "Formaggiose"
+    },
+    {
+      "n": "Detenut*",
+      "m": "Detenuto",
+      "f": "Detenuta",
+      "p": "Detenuti",
+      "fp": "Detenute"
+    },
+    {
+      "n": "su un volo Ryanair par Auschwitz",
+      "m": "su un volo Ryanair par Auschwitz",
+      "f": "su un volo Ryanair par Auschwitz",
+      "p": "su un volo Ryanair par Auschwitz",
+      "fp": "su un volo Ryanair par Auschwitz"
+    },
+    {
+      "n": "che va a ballare in puglia",
+      "m": "che va a ballare in puglia",
+      "f": "che va a ballare in puglia",
+      "p": "che vanno a ballare in puglia",
+      "fp": "che vanno a ballare in puglia"
+    },
+    {
+      "n": "con la disfunzione erettile",
+      "m": "con la disfunzione erettile",
+      "f": "con la disfunzione erettile",
+      "p": "con la disfunzione erettile",
+      "fp": "con la disfunzione erettile"
     }
   ]
 }
