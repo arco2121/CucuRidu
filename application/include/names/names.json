@@ -1245,6 +1245,10 @@
     {
       "nome": "Carlo Conti",
       "genere": "m"
+    },
+    {
+      "nome": "Ape Maia",
+      "genere": "f"
     }
   ],
   "adjectives": [
@@ -2565,18 +2569,18 @@
       "fp": "Detenute"
     },
     {
-      "n": "su un volo Ryanair par Auschwitz",
-      "m": "su un volo Ryanair par Auschwitz",
-      "f": "su un volo Ryanair par Auschwitz",
-      "p": "su un volo Ryanair par Auschwitz",
-      "fp": "su un volo Ryanair par Auschwitz"
+      "n": "su un volo Ryanair per Auschwitz",
+      "m": "su un volo Ryanair per Auschwitz",
+      "f": "su un volo Ryanair per Auschwitz",
+      "p": "su un volo Ryanair per Auschwitz",
+      "fp": "su un volo Ryanair per Auschwitz"
     },
     {
-      "n": "che va a ballare in puglia",
-      "m": "che va a ballare in puglia",
-      "f": "che va a ballare in puglia",
-      "p": "che vanno a ballare in puglia",
-      "fp": "che vanno a ballare in puglia"
+      "n": "che va a ballare in Puglia",
+      "m": "che va a ballare in Puglia",
+      "f": "che va a ballare in Puglia",
+      "p": "che vanno a ballare in Puglia",
+      "fp": "che vanno a ballare in Puglia"
     },
     {
       "n": "con la disfunzione erettile",
@@ -2584,6 +2588,62 @@
       "f": "con la disfunzione erettile",
       "p": "con la disfunzione erettile",
       "fp": "con la disfunzione erettile"
+    },
+    {
+      "n": "Decapitat*",
+      "m": "Decapitato",
+      "f": "Decapitata",
+      "p": "Decapitati",
+      "fp": "Decapitate"
+    },
+    {
+      "n": "Sibarista",
+      "m": "Sibarista",
+      "f": "Sibarista",
+      "p": "Sibaristi",
+      "fp": "Sibariste"
+    },
+    {
+      "n": "Caca Sbura",
+      "m": "Caca Sbura",
+      "f": "Caca Sbura",
+      "p": "Caca Sbura",
+      "fp": "Caca Sbura"
+    },
+    {
+      "n": "Inculat*",
+      "m": "Inculato",
+      "f": "Inculata",
+      "p": "Inculati",
+      "fp": "Inculate"
+    },
+    {
+      "n": "senza trucco e senza inganno",
+      "m": "senza trucco e senza inganno",
+      "f": "senza trucco e senza inganno",
+      "p": "senza trucco e senza inganno",
+      "fp": "senza trucco e senza inganno"
+    },
+    {
+      "n": "Allampanat*",
+      "m": "Allampanato",
+      "f": "Allampanata",
+      "p": "Allampanati",
+      "fp": "Allampanate"
+    },
+    {
+      "n": "creat* con la deficenza artificiale",
+      "m": "creato con la deficenza artificiale",
+      "f": "creata con la deficenza artificiale",
+      "p": "creati con la deficenza artificiale",
+      "fp": "create con la deficenza artificiale"
+    },
+    {
+      "n": "Presidente di stocazzo",
+      "m": "Presidente di stocazzo",
+      "f": "Presidente di stocazzo",
+      "p": "Presidenti di stocazzo",
+      "fp": "Presidenti di stocazzo"
     }
   ]
 }
