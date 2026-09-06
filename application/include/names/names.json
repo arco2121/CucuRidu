@@ -1249,6 +1249,70 @@
     {
       "nome": "Ape Maia",
       "genere": "f"
+    },
+    {
+      "nome": "Grazia, Graziella e Grazie Al Cazzo",
+      "genere": "fp"
+    },
+    {
+      "nome": "Gigi D'Alessio",
+      "genere": "m"
+    },
+    {
+      "nome": "Maurizia",
+      "genere": "f"
+    },
+    {
+      "nome": "Manola",
+      "genere": "f"
+    },
+    {
+      "nome": "Marino Cavalluccio",
+      "genere": "m"
+    },
+    {
+      "nome": "Katy Perry",
+      "genere": "f"
+    },
+    {
+      "nome": "Bruno Mars",
+      "genere": "m"
+    },
+    {
+      "nome": "Dorotea",
+      "genere": "f"
+    },
+    {
+      "nome": "Lo zio Massimo",
+      "genere": "m"
+    },
+    {
+      "nome": "Tom & Jerry",
+      "genere": "p"
+    },
+    {
+      "nome": "I Me contro Te",
+      "genere": "p"
+    },
+    {
+      "nome": "I pinguini di Madagascar",
+      "genere": "p"
+    },
+    {
+      "nome": "Mohammed",
+      "genere": "m"
+    },
+    {
+      "nome": "Alvaro Soler",
+      "genere": "m"
+    },
+    {
+      "nome": "La Signorina Rottenmeier",
+      "genere": "f"
+    },
+    {
+      "nome": "Giorgia Meloni",
+      "genere": "f"
     }
   ],
   "adjectives": [
@@ -2651,6 +2715,27 @@
       "f": "ai margini della società",
       "p": "ai margini della società",
       "fp": "ai margini della società"
+    },
+    {
+      "n": "con la cataratta",
+      "m": "con la cataratta",
+      "f": "con la cataratta",
+      "p": "con la cataratta",
+      "fp": "con la cataratta"
+    },
+    {
+      "n": "Diva",
+      "m": "Diva",
+      "f": "Diva",
+      "p": "Dive",
+      "fp": "Dive"
+    },
+    {
+      "n": "Petttegol*",
+      "m": "Petttegolo",
+      "f": "Petttegola",
+      "p": "Petttegoli",
+      "fp": "Petttegole"
     }
   ]
 }
