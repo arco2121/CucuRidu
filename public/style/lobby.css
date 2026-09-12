@@ -93,6 +93,11 @@
 
 .wait_code_con {
     flex-shrink: 0;
+    /* senza questo, un .wait_code_con con dentro una frase completata molto
+       lunga (game_choice_asnwer_card_domanda) si dimensiona sul contenuto
+       (flex-basis:auto + flex-shrink:0 = niente a-capo, niente restringimento)
+       e sborda a sinistra e a destra del viewport invece di andare a capo */
+    max-width: 100%;
 }
 
 .wait_code_text {
@@ -387,8 +392,8 @@
  >>> GAME PAGE
 --------------------------------------------------- */
 #landpoint:has(.game_main_con_selectCards) {
-    justify-content: flex-start;
-    overflow-y: hidden;
+    justify-content: center;
+    overflow-y: auto;
     height: 100%;
     flex-grow: unset;
 }
@@ -618,7 +623,7 @@
     width: 40%;
 }
 
-.game_main_con:has(.game_side_choice_l) {
+.game_main_con:has(.game_side_choice_r) {
     justify-content: center;
     align-items: center;
 }
@@ -644,7 +649,7 @@
         width: 100%;
     }
 
-    .game_main_con:has(.game_side_choice_l) {
+    .game_main_con:has(.game_side_choice_r) {
         width: 95%;
     }
 

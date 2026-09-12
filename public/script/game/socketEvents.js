@@ -92,7 +92,10 @@ if(controller instanceof Worker)
 
 //Utility
 let referenceGiocatore = new GiocatoreInterface(null);
-let referenceStanza = "";
+// gia' nota dal caricamento della pagina (fromBackEnd), non solo dopo il
+// primo evento socket: serve a poter chiedere un riallineamento anche prima
+// che sia arrivato qualsiasi evento di gioco (vedi sincronizzaVista sotto)
+let referenceStanza = fromBackEnd["stanzaId"] || "";
 /*
  * Che schermata stiamo mostrando in questo momento. Non serve a disegnare
  * niente: serve solo a poterlo dire al server ogni tanto, che controlla se
@@ -355,10 +358,14 @@ const INTERVALLO_SINCRONIZZAZIONE = 7000;
 
 const sincronizzaVista = () => {
     if(!sincronizzazioneAttiva) return;
-    if(!referenceStanza || !vistaCorrente) return;
+    if(!referenceStanza) return;
+    // vistaCorrente vuoto (pagina appena aperta, nessun evento di gioco
+    // ancora arrivato) e' un caso valido da segnalare, non da saltare: e'
+    // il client stesso a dover chiedere cosa mostrare, il server non lo fa
+    // piu' alla cieca in WAIT (vedi commento sul connection handler lato server)
     emit("__sincronizza__", {
         id: referenceStanza,
-        vista: vistaCorrente
+        vista: vistaCorrente || ""
     });
 };
 
@@ -371,10 +378,15 @@ document.addEventListener("visibilitychange", () => {
     if(!document.hidden) sincronizzaVista();
 });
 
-// dopo una riconnessione il server manda gia lo stato da solo, ma se per
-// qualche motivo non arriva questo lo richiede
-on("connect", () => setTimeout(sincronizzaVista, 1000));
-on("reconnect", () => setTimeout(sincronizzaVista, 1000));
+/*
+ * Il server non forza piu' una schermata alla cieca quando la stanza e' in
+ * WAIT (vedi il connection handler lato server): li' decide il client,
+ * dicendo subito cosa ha davvero davanti. Un ritardo piccolo basta solo a
+ * lasciar respirare l'handshake appena aperto; niente a che vedere col
+ * vecchio "backup dopo un secondo nel caso il server non rispondesse".
+ */
+on("connect", () => setTimeout(sincronizzaVista, 150));
+on("reconnect", () => setTimeout(sincronizzaVista, 150));
 
 if(controller instanceof Worker)
     controller.postMessage({

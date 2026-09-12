@@ -234,7 +234,22 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 if (!user.data?.referenceStanza) return;
                 const stanza = await Stanze.get(user.data.referenceStanza);
                 if (!stanza) return user.emit("stanzaChiusa");
-                await emitStatoStanza(stanza, user);
+                /*
+                 * In WAIT non possiamo sapere, in questo preciso istante, se chi si
+                 * sta (ri)connettendo ha gia' davanti la schermata giusta (era li' da
+                 * prima, magari e' proprio il vincitore che guarda showWinner, e questa
+                 * connessione e' solo un socket che si e' riallacciato da solo dopo un
+                 * intoppo di rete silenzioso, invisibile a chi gioca) oppure ha lo
+                 * schermo vuoto (prima apertura pagina) e serve davvero qualcosa: da
+                 * qui dentro sono indistinguibili. Decide il client, mandando subito un
+                 * __sincronizza__ con la vista che ha per davvero (vedi socketEvents.js):
+                 * se combacia (wait/showWinner/endGame sono tutte valide in WAIT) non
+                 * succede nulla, altrimenti si riallinea da solo. Forzare qui alla cieca
+                 * strapperebbe a chi era gia' su showWinner la schermata sotto al naso:
+                 * e' il bottone "Avanti" che sembra premersi da solo senza che nessuno
+                 * abbia lasciato la stanza.
+                 */
+                if (stanza.stato !== StatoStanza.WAIT) await emitStatoStanza(stanza, user);
                 inviaListe(stanza);
                 inviaAttesaRisposte(stanza);
             } catch (e) { console.error("[connection]", e?.message || e); }
@@ -519,8 +534,16 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             user.data.ultimaSincronizzazione = adesso;
 
             const stanzaId = data?.["id"] || user.data?.referenceStanza;
+            /*
+             * Vista vuota = il client non aveva NESSUNA schermata da riportare
+             * (prima apertura pagina, oppure una riconnessione dopo un buco
+             * cosi lungo da non aver mai fatto in tempo a renderizzare
+             * niente). Non e' un caso da ignorare: e' il caso che ha piu
+             * bisogno di essere rimesso in pari, quindi non fa match con
+             * nessuna vista valida qui sotto e cade dritto nel riallineamento.
+             */
             const vista = String(data?.["vista"] || "");
-            if (!stanzaId || !vista) return;
+            if (!stanzaId) return;
 
             let stanza = await Stanze.get(stanzaId);
             if (!stanza) return;
@@ -549,7 +572,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             if (vistaAttesa(stanza, giocatore).includes(vista)) return;
 
             console.log("Riallineo " + (giocatore?.username || "un giocatore")
-                + " (era su " + vista + ") nella stanza " + stanzaId);
+                + " (era su " + (vista || "schermo vuoto") + ") nella stanza " + stanzaId);
             await emitStatoStanza(stanza, user);
             inviaListe(stanza);
             inviaAttesaRisposte(stanza);
@@ -722,7 +745,17 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             console.log("Giocatore ha abbandonato la Stanza => " + stanzaId);
             const sockets = await server.in(stanzaId).fetchSockets();
             aggiornaReference(esito.stanza, sockets);
-            await emitStatoStanza(esito.stanza, ...sockets);
+            /*
+             * In WAIT "wait", "showWinner" ed "endGame" sono tutte schermate
+             * valide (vedi vistaAttesa sopra): forzare qui il fragment "wait"
+             * su TUTTI strapperebbe a chi sta ancora guardando chi ha vinto il
+             * round (spesso proprio il vincitore, mentre genera/scarica
+             * l'immagine) la schermata sotto al naso, indistinguibile da un
+             * "Avanti" premuto da solo. Chi se ne va non cambia cosa hanno gia
+             * davanti agli occhi gli altri, quindi qui si forza la vista SOLO
+             * se lo stato e' davvero cambiato in qualcosa di non ambiguo.
+             */
+            if (esito.stanza.stato !== StatoStanza.WAIT) await emitStatoStanza(esito.stanza, ...sockets);
             inviaListe(esito.stanza);
             inviaAttesaRisposte(esito.stanza);
         }));
@@ -780,7 +813,10 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                     console.log("Giocatore rimosso per inattivita => " + stanzaId);
                     const sockets = await server.in(stanzaId).fetchSockets();
                     aggiornaReference(esito.stanza, sockets);
-                    await emitStatoStanza(esito.stanza, ...sockets);
+                    // stessa cautela della lasciaStanza sopra: non strappare la
+                    // schermata a chi e' fermo su showWinner/endGame se lo
+                    // stato resta WAIT
+                    if (esito.stanza.stato !== StatoStanza.WAIT) await emitStatoStanza(esito.stanza, ...sockets);
                     inviaListe(esito.stanza);
                     inviaAttesaRisposte(esito.stanza);
                 } catch (innerError) {
