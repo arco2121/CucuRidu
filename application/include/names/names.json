@@ -1313,6 +1313,30 @@
     {
       "nome": "Giorgia Meloni",
       "genere": "f"
+    },
+    {
+      "nome": "Antonio",
+      "genere": "m"
+    },
+    {
+      "nome": "Griselda",
+      "genere": "f"
+    },
+    {
+      "nome": "Dei bambini neri",
+      "genere": "p"
+    },
+    {
+      "nome": "Spose bambine",
+      "genere": "fp"
+    },
+    {
+      "nome": "Ottavia Maria",
+      "genere": "f"
+    },
+    {
+      "nome": "San Lazzaro",
+      "genere": "m"
     }
   ],
   "adjectives": [
@@ -2736,6 +2760,55 @@
       "f": "Petttegola",
       "p": "Petttegoli",
       "fp": "Petttegole"
+    },
+    {
+      "n": "Anarchic*",
+      "m": "Anarchico",
+      "f": "Anarchica",
+      "p": "Anarchici",
+      "fp": "Anarchiche"
+    },
+    {
+      "n": "Molest*",
+      "m": "Molesto",
+      "f": "Molesta",
+      "p": "Molesti",
+      "fp": "Moleste"
+    },
+    {
+      "n": "Rimast*",
+      "m": "Rimasto",
+      "f": "Rimasta",
+      "p": "Rimasti",
+      "fp": "Rimaste"
+    },
+    {
+      "n": "Schiavizzat*",
+      "m": "Schiavizzato",
+      "f": "Schiavizzata",
+      "p": "Schiavizzati",
+      "fp": "Schiavizzate"
+    },
+    {
+      "n": "Radical Chic di Brescia",
+      "m": "il Radical Chic di Brescia",
+      "f": "la Radical Chic di Brescia",
+      "p": "i Radical Chic di Brescia",
+      "fp": "le Radical Chic di Brescia"
+    },
+    {
+      "n": "Mononeuronale",
+      "m": "Mononeuronale",
+      "f": "Mononeuronale",
+      "p": "Mononeuronali",
+      "fp": "Mononeuronali"
+    },
+    {
+      "n": "Calabrese",
+      "m": "Calabrese",
+      "f": "Calabrese",
+      "p": "Calabresi",
+      "fp": "Calabresi"
     }
   ]
 }
