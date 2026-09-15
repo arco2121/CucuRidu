@@ -1337,6 +1337,30 @@
     {
       "nome": "San Lazzaro",
       "genere": "m"
+    },
+    {
+      "nome": "Topolotto",
+      "genere": "m"
+    },
+    {
+      "nome": "Emma",
+      "genere": "f"
+    },
+    {
+      "nome": "Ulisse",
+      "genere": "m"
+    },
+    {
+      "nome": "Pasifae",
+      "genere": "f"
+    },
+    {
+      "nome": "Clarabella",
+      "genere": "f"
+    },
+    {
+      "nome": "Robespierre",
+      "genere": "m"
     }
   ],
   "adjectives": [
@@ -2809,6 +2833,48 @@
       "f": "Calabrese",
       "p": "Calabresi",
       "fp": "Calabresi"
+    },
+    {
+      "n": "Cazzo Lungo",
+      "m": "Cazzo Lungo",
+      "f": "Cazzo Lungo",
+      "p": "Cazzi Lunghi",
+      "fp": "Cazzi Lunghi"
+    },
+    {
+      "n": "Imbecille",
+      "m": "Imbecille",
+      "f": "Imbecille",
+      "p": "Imbecilli",
+      "fp": "Imbecilli"
+    },
+    {
+      "n": "Bifolc*",
+      "m": "Bifolco",
+      "f": "Bifolca",
+      "p": "Bifolchi",
+      "fp": "Bifolche"
+    },
+    {
+      "n": "Segretamente una mamma pancina",
+      "m": "Segretamente una mamma pancina",
+      "f": "Segretamente una mamma pancina",
+      "p": "Segretamente delle mamme pancine",
+      "fp": "Segretamente delle mamme pancine"
+    },
+    {
+      "n": "Sbricolat*",
+      "m": "Sbricolato",
+      "f": "Sbricolata",
+      "p": "Sbricolati",
+      "fp": "Sbricolate"
+    },
+    {
+      "n": "Sbrodolin*",
+      "m": "Sbrodolino",
+      "f": "Sbrodolina",
+      "p": "Sbrodolini",
+      "fp": "Sbrodoline"
     }
   ]
 }
