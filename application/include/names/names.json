@@ -1377,6 +1377,54 @@
     {
       "nome": "Italo",
       "genere": "m"
+    },
+    {
+      "nome": "Marilù",
+      "genere": "f"
+    },
+    {
+      "nome": "Giustino",
+      "genere": "m"
+    },
+    {
+      "nome": "Leone Il Cane Fifone",
+      "genere": "m"
+    },
+    {
+      "nome": "Aisha",
+      "genere": "f"
+    },
+    {
+      "nome": "Fabiola",
+      "genere": "f"
+    },
+    {
+      "nome": "Federico",
+      "genere": "m"
+    },
+    {
+      "nome": "Giovanna",
+      "genere": "f"
+    },
+    {
+      "nome": "Bugs Bunny",
+      "genere": "m"
+    },
+    {
+      "nome": "Daffy Duck",
+      "genere": "m"
+    },
+    {
+      "nome": "Lola Bunny",
+      "genere": "f"
+    },
+    {
+      "nome": "Kuromi",
+      "genere": "f"
+    },
+    {
+      "nome": "Silvestro",
+      "genere": "m"
     }
   ],
   "adjectives": [
@@ -2891,6 +2939,13 @@
       "f": "Sbrodolina",
       "p": "Sbrodolini",
       "fp": "Sbrodoline"
+    },
+    {
+      "n": "The Fascista",
+      "m": "Il Fascista",
+      "f": "La Fascista",
+      "p": "I Fascisti",
+      "fp": "Le Fasciste"
     }
   ]
 }
