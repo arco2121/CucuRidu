@@ -32,9 +32,18 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
         idleTimeoutMillis: timeout/100,
         connectionTimeoutMillis: timeout/1000,
     });
+    // Senza un listener 'error' un errore su una connessione INATTIVA (il pooler
+    // che la chiude, un blip di rete) e' un'eccezione non gestita e fa cadere
+    // tutto il processo.
+    adapter.on("error", (e) => console.error("[pg:adapter] errore su connessione inattiva ->", e?.message || e));
     const pool = new Pool({
-        connectionString: poolStringForSessions
+        connectionString: poolStringForSessions,
+        max: 5,
+        idleTimeoutMillis: 10000,
+        // meglio un errore rapido (gestito da StoreTollerante) di una coda infinita
+        connectionTimeoutMillis: 5000
     });
+    pool.on("error", (e) => console.error("[pg:sessioni] errore su connessione inattiva ->", e?.message || e));
 
     const app = express();
     const sessionsMap = new ClusterMap(database, machineId);

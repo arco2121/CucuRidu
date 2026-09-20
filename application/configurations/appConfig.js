@@ -51,11 +51,23 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         });
     }
 
+    /*
+     * Se il giocatore ha gia una stanza aperta lo rimanda in partita, altrimenti
+     * lascia passare. Il controllo e' solo una comodita': se non riesce
+     * (database irraggiungibile, stanza salvata in un formato che non si
+     * legge...) NON deve impedire di aprire "Crea stanza" o "Partecipa", quindi
+     * l'errore si scrive nei log e si prosegue come se la stanza non ci fosse.
+     * Prima qualsiasi eccezione qui dentro diventava un 500 sulla pagina.
+     */
     const preCheck = async (req, res, next) => {
-        const { userId, stanzaId } = await serverSession.get(req, req.query?.token);
-        const redirecting = req.query?.token ? "?token=" + req.query.token : "";
-        if(userId && (await Stanze.get(stanzaId))?.trovaGiocatore(userId)) return res.redirect("/game" + redirecting);
         req.deleteToken = !!req.query?.token;
+        try {
+            const { userId, stanzaId } = await serverSession.get(req, req.query?.token);
+            const redirecting = req.query?.token ? "?token=" + req.query.token : "";
+            if(userId && (await Stanze.get(stanzaId))?.trovaGiocatore(userId)) return res.redirect("/game" + redirecting);
+        } catch (e) {
+            console.error(`[preCheck] ${req.method} ${req.originalUrl} -> controllo stanza esistente fallito, proseguo:`, e?.stack || e);
+        }
         next();
     };
 
@@ -495,6 +507,23 @@ td.vuoto{text-align:center;color:#888;padding:30px}
     });
 
     app.use((req, res) => res.redirect("/error"));
+
+    /*
+     * Ultima rete: qualunque errore non gestito finisce nei log CON lo stack
+     * (prima Express rispondeva "Internal Server Error" e il motivo non si
+     * vedeva da nessuna parte) e il giocatore riceve una pagina che lo
+     * riporta alla home. Niente redirect a /error da qui: se il guasto e'
+     * globale (sessioni, database) anche /error fallirebbe e si girerebbe in
+     * tondo.
+     */
+    app.use((err, req, res, next) => {
+        console.error(`[http] ${req.method} ${req.originalUrl} ->`, err?.stack || err);
+        if (res.headersSent) return next(err);
+        res.status(500).type("html").send(`<!doctype html><html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Cucu Ridu</title>
+<style>body{font-family:system-ui,Arial,sans-serif;display:flex;min-height:100vh;margin:0;align-items:center;justify-content:center;text-align:center;background:#faf7f2;color:#2b2b2b}a{color:#a3560f;font-weight:600}</style>
+</head><body><div><h1>Ops, qualcosa si e' rotto</h1><p>Riprova fra qualche secondo.</p><p><a href="/">Torna alla home</a></p></div></body></html>`);
+    });
 };
 
 module.exports = appConfig;
