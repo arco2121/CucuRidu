@@ -1425,6 +1425,14 @@
     {
       "nome": "Silvestro",
       "genere": "m"
+    },
+    {
+      "nome": "Pinkie Pie",
+      "genere": "f"
+    },
+    {
+      "nome": "Riccardo",
+      "genere": "m"
     }
   ],
   "adjectives": [
@@ -2946,6 +2954,27 @@
       "f": "La Fascista",
       "p": "I Fascisti",
       "fp": "Le Fasciste"
+    },
+    {
+      "n": "Appassionat* di bambini",
+      "m": "Appassionato di bambini",
+      "f": "Appassionata di bambini",
+      "p": "Appassionati di bambini",
+      "fp": "Appassionate di bambini"
+    },
+    {
+      "n": "Beccat* ad un'orgia",
+      "m": "Beccato ad un'orgia",
+      "f": "Beccata ad un'orgia",
+      "p": "Beccati ad un'orgia",
+      "fp": "Beccate ad un'orgia"
+    },
+    {
+      "n": "Amante di My Little Pony",
+      "m": "Amante di My Little Pony",
+      "f": "Amante di My Little Pony",
+      "p": "Amanti di My Little Pony",
+      "fp": "Amanti di My Little Pony"
     }
   ]
 }
