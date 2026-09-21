@@ -1433,6 +1433,14 @@
     {
       "nome": "Riccardo",
       "genere": "m"
+    },
+    {
+      "nome": "Steven Hawking",
+      "genere": "m"
+    },
+    {
+      "nome": "Ariana Grande",
+      "genere": "f"
     }
   ],
   "adjectives": [
