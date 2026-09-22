@@ -1463,8 +1463,88 @@
       "genere": "f"
     },
     {
+      "nome": "Giuseppe Cruciani",
+      "genere": "m"
+    },
+    {
+      "nome": "Laura Pausini",
+      "genere": "f"
+    },
+    {
       "nome": "Strecatto",
       "genere": "m"
+    },
+    {
+      "nome": "Bryan",
+      "genere": "m"
+    },
+    {
+      "nome": "Michelle Hunziker",
+      "genere": "f"
+    },
+    {
+      "nome": "Loretta Goggi",
+      "genere": "f"
+    },
+    {
+      "nome": "Max Pezzali",
+      "genere": "m"
+    },
+    {
+      "nome": "Gli 883",
+      "genere": "p"
+    },
+    {
+      "nome": "Qui, Quo e Qua",
+      "genere": "p"
+    },
+    {
+      "nome": "Pandora",
+      "genere": "f"
+    },
+    {
+      "nome": "Harry Styles",
+      "genere": "m"
+    },
+    {
+      "nome": "Fabio Rovazzi",
+      "genere": "m"
+    },
+    {
+      "nome": "Caparezza",
+      "genere": "m"
+    },
+    {
+      "nome": "Shannon De' Bussy",
+      "genere": "f"
+    },
+    {
+      "nome": "Annalisa",
+      "genere": "f"
+    },
+    {
+      "nome": "Deadpool & Wolverine",
+      "genere": "p"
+    },
+    {
+      "nome": "Biancaneve e I Sette Nani",
+      "genere": "p"
+    },
+    {
+      "nome": "Rosa Ricci",
+      "genere": "f"
+    },
+    {
+      "nome": "Ciro",
+      "genere": "m"
+    },
+    {
+      "nome": "Rocco",
+      "genere": "m"
+    },
+    {
+      "nome": "Moana",
+      "genere": "f"
     }
   ],
   "adjectives": [
@@ -3035,6 +3115,13 @@
       "f": "La Più Gaia Del Pollaio",
       "p": "I Più Gai Di Pollai",
       "fp": "Le Più Gaie Del Pollaio"
+    },
+    {
+      "n": "in tour in Burkina Faso",
+      "m": "in tour in Burkina Faso",
+      "f": "in tour in Burkina Faso",
+      "p": "in tour in Burkina Faso",
+      "fp": "in tour in Burkina Faso"
     }
   ]
 }
