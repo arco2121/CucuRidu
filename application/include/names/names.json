@@ -1441,6 +1441,30 @@
     {
       "nome": "Ariana Grande",
       "genere": "f"
+    },
+    {
+      "nome": "Hatsune Miku",
+      "genere": "f"
+    },
+    {
+      "nome": "Carlo Antonio",
+      "genere": "m"
+    },
+    {
+      "nome": "Carletto",
+      "genere": "m"
+    },
+    {
+      "nome": "Marilùùù",
+      "genere": "f"
+    },
+    {
+      "nome": "Mirella",
+      "genere": "f"
+    },
+    {
+      "nome": "Strecatto",
+      "genere": "m"
     }
   ],
   "adjectives": [
@@ -2983,6 +3007,34 @@
       "f": "Amante di My Little Pony",
       "p": "Amanti di My Little Pony",
       "fp": "Amanti di My Little Pony"
+    },
+    {
+      "n": "Catafratt*",
+      "m": "Catafratto",
+      "f": "Catafratta",
+      "p": "Catafratti",
+      "fp": "Catafratte"
+    },
+    {
+      "n": "Fatiscente",
+      "m": "Fatiscente",
+      "f": "Fatiscente",
+      "p": "Fatiscenti",
+      "fp": "Fatiscenti"
+    },
+    {
+      "n": "Trivellat*",
+      "m": "Trivellato",
+      "f": "Trivellata",
+      "p": "Trivellati",
+      "fp": "Trivellate"
+    },
+    {
+      "n": "The Più Gaio Del Pollaio",
+      "m": "Il Più Gaio Del Pollaio",
+      "f": "La Più Gaia Del Pollaio",
+      "p": "I Più Gai Di Pollai",
+      "fp": "Le Più Gaie Del Pollaio"
     }
   ]
 }
