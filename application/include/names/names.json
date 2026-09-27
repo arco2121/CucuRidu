@@ -1545,6 +1545,26 @@
     {
       "nome": "Moana",
       "genere": "f"
+    },
+    {
+      "nome": "Le Civette Sul Comò",
+      "genere": "fp"
+    },
+    {
+      "nome": "Enrico Papi",
+      "genere": "m"
+    },
+    {
+      "nome": "Valentina Persia",
+      "genere": "f"
+    },
+    {
+      "nome": "Mario Giordano",
+      "genere": "m"
+    },
+    {
+      "nome": "Elisea",
+      "genere": "f"
     }
   ],
   "adjectives": [
@@ -3122,6 +3142,62 @@
       "f": "in tour in Burkina Faso",
       "p": "in tour in Burkina Faso",
       "fp": "in tour in Burkina Faso"
+    },
+    {
+      "n": "Brutt* come la tavoletta del cesso",
+      "m": "Brutto come la tavoletta del cesso",
+      "f": "Brutta come la tavoletta del cesso",
+      "p": "Brutti come tavolette di cessi",
+      "fp": "Brutte come tavolette di cessi"
+    },
+    {
+      "n": "Bucolic*",
+      "m": "Bucolico",
+      "f": "Bucolica",
+      "p": "Bucolici",
+      "fp": "Bucoliche"
+    },
+    {
+      "n": "Sboccat*",
+      "m": "Sboccato",
+      "f": "Sboccata",
+      "p": "Sboccati",
+      "fp": "Sboccate"
+    },
+    {
+      "n": "Caciottar*",
+      "m": "Caciottaro",
+      "f": "Caciottara",
+      "p": "Caciottari",
+      "fp": "Caciottare"
+    },
+    {
+      "n": "Madrelingua Cipriota",
+      "m": "Madrelingua Cipriota",
+      "f": "Madrelingua Cipriota",
+      "p": "Madrelingua Ciprioti",
+      "fp": "Madrelingua Ciprioti"
+    },
+    {
+      "n": "Fringuello Di Campo",
+      "m": "Fringuello Di Campo",
+      "f": "Fringuello Di Campo",
+      "p": "Fringuelli Di Campo",
+      "fp": "Fringuelli Di Campo"
+    },
+    {
+      "n": "Granciporro",
+      "m": "Granciporro",
+      "f": "Granciporro",
+      "p": "Granciporri",
+      "fp": "Granciporre"
+    },
+    {
+      "n": "Lezios*",
+      "m": "Lezioso",
+      "f": "Leziosa",
+      "p": "Leziosi",
+      "fp": "Leziose"
     }
   ]
 }
