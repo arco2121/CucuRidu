@@ -1565,6 +1565,46 @@
     {
       "nome": "Elisea",
       "genere": "f"
+    },
+    {
+      "nome": "Orlando",
+      "genere": "m"
+    },
+    {
+      "nome": "Rebecca",
+      "genere": "f"
+    },
+    {
+      "nome": "Federica La Mano Amica",
+      "genere": "f"
+    },
+    {
+      "nome": "Nando",
+      "genere": "m"
+    },
+    {
+      "nome": "Utente_deficente96",
+      "genere": "n"
+    },
+    {
+      "nome": "Pamela Prati",
+      "genere": "f"
+    },
+    {
+      "nome": "Marc Caltagirone",
+      "genere": "m"
+    },
+    {
+      "nome": "Barattolino di Nutella",
+      "genere": "m"
+    },
+    {
+      "nome": "Eliana",
+      "genere": "f"
+    },
+    {
+      "nome": "Sere Nere",
+      "genere": "fp"
     }
   ],
   "adjectives": [
@@ -3198,6 +3238,13 @@
       "f": "Leziosa",
       "p": "Leziosi",
       "fp": "Leziose"
+    },
+    {
+      "n": "Simpaticon*",
+      "m": "Simpaticone",
+      "f": "Simpaticona",
+      "p": "Simpaticoni",
+      "fp": "Simpaticone"
     }
   ]
 }
