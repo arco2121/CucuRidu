@@ -1605,6 +1605,14 @@
     {
       "nome": "Sere Nere",
       "genere": "fp"
+    },
+    {
+      "nome": "Il Katalicammello",
+      "genere": "m"
+    },
+    {
+      "nome": "Mariella",
+      "genere": "f"
     }
   ],
   "adjectives": [
@@ -3245,6 +3253,62 @@
       "f": "Simpaticona",
       "p": "Simpaticoni",
       "fp": "Simpaticone"
+    },
+    {
+      "n": "Bell* come un dito in culo mentre si caga",
+      "m": "Bello come un dito in culo mentre si caga",
+      "f": "Bella come un dito in culo mentre si caga",
+      "p": "Belli come un dito in culo mentre si caga",
+      "fp": "Belle come un dito in culo mentre si caga"
+    },
+    {
+      "n": "Albanese",
+      "m": "Albanese",
+      "f": "Albanese",
+      "p": "Albanesi",
+      "fp": "Albanesi"
+    },
+    {
+      "n": "Vecchia Infradito",
+      "m": "Vecchia Infradito",
+      "f": "Vecchia Infradito",
+      "p": "Vecchie Infradito",
+      "fp": "Vecchie Infradito"
+    },
+    {
+      "n": "che lancia soldi alle stripper",
+      "m": "che lancia soldi alle stripper",
+      "f": "che lancia soldi alle stripper",
+      "p": "che lanciano soldi alle stripper",
+      "fp": "che lanciano soldi alle stripper"
+    },
+    {
+      "n": "Spompinable",
+      "m": "Spompinable",
+      "f": "Spompinable",
+      "p": "Spompinabli",
+      "fp": "Spompinabli"
+    },
+    {
+      "n": "Lesbic*",
+      "m": "Lesbico",
+      "f": "Lesbica",
+      "p": "Lesbici",
+      "fp": "Lesbiche"
+    },
+    {
+      "n": "Versacchios*",
+      "m": "Versacchioso",
+      "f": "Versacchiosa",
+      "p": "Versacchiosi",
+      "fp": "Versacchiose"
+    },
+    {
+      "n": "Nan* Puttan*",
+      "m": "Nano Puttano",
+      "f": "Nana Puttana",
+      "p": "Nani Puttani",
+      "fp": "Nane Puttane"
     }
   ]
 }
