@@ -28,10 +28,27 @@ const generateId = (memory) => {
  *                                     maiuscola (nome proprio). Es. "§Gabibbo"
  *   §  davanti a uno SPAZIO VUOTO  -> tutto il completamento va in maiuscolo.
  *                                     Es. "NON PUOI METTERTI A §_"
+ *   %b% davanti a uno SPAZIO VUOTO -> il completamento prende "barba" davanti,
+ *                                     a meno che non inizi gia' con "barba":
+ *                                     in quel caso il marcatore sparisce e basta.
+ *                                     Es. "andiamo a %b%_" + "Essere rapiti"
+ *                                         -> "andiamo a barbaessere rapiti"
+ *                                         "andiamo a %b%_" + "Barbachiamare..."
+ *                                         -> "andiamo a barbachiamare..."
+ *                                     Maiuscole come sempre: a inizio frase
+ *                                     "Barba...", in mezzo "barba...".
+ *   %p% davanti a uno SPAZIO VUOTO -> stessa identica regola, ma con "puff".
+ *                                     Es. "%p%_" + "Correre" -> "Puffcorrere"
+ *                                         "%p%_" + "Puffare"  -> "Puffare"
+ *   I prefissi stanno in PREFISSI_SPAZIO: per aggiungerne uno nuovo basta una
+ *   riga li' (lettera del marcatore -> parola).
+ *   I marcatori dello spazio si possono combinare in qualsiasi ordine:
+ *   "%b%§_" (o "§%b%_") = "BARBA..." tutto maiuscolo, "%b%%p%_" = "barbapuff...".
  * I marcatori non devono mai finire sotto gli occhi di chi gioca: pulisciFrase
  * li toglie dal testo mostrato, fillBlanks li consuma mentre riempie.
  */
-const marcatoriFrase = /[§$]+(?=_)/g;
+const PREFISSI_SPAZIO = { b: "barba", p: "puff" };
+const marcatoriFrase = /(?:[§$]|%[a-z]%)+(?=_)/gi;
 
 const pulisciFrase = (testo = "") => String(testo).replace(marcatoriFrase, "");
 
@@ -49,7 +66,7 @@ const fillBlanks = (templateText, replacements) => {
     let index = 0;
     replacements = replacements || [];
 
-    return String(templateText).replace(/([§$]?)_/g, (match, marcatore, offset, fullString) => {
+    return String(templateText).replace(/((?:[§$]|%[a-z]%)*)_/gi, (match, marcatori, offset, fullString) => {
         const corrente = replacements[index];
         index++;
 
@@ -58,21 +75,33 @@ const fillBlanks = (templateText, replacements) => {
 
         let word = String(corrente);
 
-        const tuttoMaiuscolo = marcatore === "§";
+        const tuttoMaiuscolo = marcatori.includes("§");
         const nomeProprio = bannedSymbols.split("").some(symbol => word.startsWith(symbol));
         if (nomeProprio) word = word.slice(1);
 
-        if (tuttoMaiuscolo) return word.toUpperCase();
-        if (nomeProprio) return word.charAt(0).toUpperCase() + word.slice(1);
+        // ogni prefisso (barba, puff...) va davanti solo se il completamento
+        // non inizia gia' con quella parola. Marcatori sconosciuti: ignorati.
+        let prefisso = "";
+        for (const [, lettera] of marcatori.matchAll(/%([a-z])%/gi)) {
+            const parola = PREFISSI_SPAZIO[lettera.toLowerCase()];
+            if (!parola) continue;
+            if (!(prefisso + word).toLowerCase().startsWith(parola) && !word.toLowerCase().startsWith(parola))
+                prefisso += parola;
+        }
+
+        if (tuttoMaiuscolo) return (prefisso + word).toUpperCase();
 
         const textBefore = pulisciFrase(fullString.slice(0, offset));
         const isStartOfSentence = textBefore.trim().length === 0 || /[.!?]\s*$/.test(textBefore);
+        const maiuscola = s => s.charAt(0).toUpperCase() + s.slice(1);
+        const minuscola = s => s.charAt(0).toLowerCase() + s.slice(1);
 
-        if (isStartOfSentence) {
-            return word.charAt(0).toUpperCase() + word.slice(1);
-        } else {
-            return word.charAt(0).toLowerCase() + word.slice(1);
-        }
+        // il nome proprio tiene la sua maiuscola anche dopo il prefisso (barbaGabibbo)
+        if (nomeProprio) word = maiuscola(word);
+        else word = minuscola(word);
+
+        const risultato = prefisso + word;
+        return isStartOfSentence ? maiuscola(risultato) : risultato;
     });
 };
 const memory = new Set();
