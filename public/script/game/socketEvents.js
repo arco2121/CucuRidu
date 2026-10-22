@@ -130,7 +130,7 @@ const lasciaStanza = () => {
             token: token || null
         })
     }).catch(err => console.error(err))
-        .finally(() => navigateWithLoading("/"));
+        .finally(() => navigateWithLoading("/", true));
 };
 
 //Listeners

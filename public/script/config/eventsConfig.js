@@ -21,14 +21,18 @@ const showPanelCond = new Event("showPanelCond", {
 const hidePanelCond = new Event("hidePanelCond", {
     bubbles: true
 });
-const navigateWithLoading = (url) => {
+const navigateWithLoading = (url, forget = false) => {
     document.dispatchEvent(loadScreen);
 
     setTimeout(() => {
         if(typeof url === "function")
             return url();
-        else
-            window.location.href = url;
+        else {
+            if(!forget)
+                window.location.href = url;
+            else
+                window.location.replace(url)
+        }
     }, timing);
 };
 const fragmentRendered = new Event("fragmentRendered");
