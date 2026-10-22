@@ -52,6 +52,10 @@ Vuoi creare il tuo mazzo? [Qui c'è la guida →](https://github.com/arco2121/Cu
 
 ---
 
+## 🚀 Gioco online
+
+### Torna su e clicca sul link per giocarci subito
+
 ## 🚀 Installazione locale
 
 ### Sarebbe meglio scaricare una delle ultime release
