@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - '../../ignore/hosting/cucuriduportal.web.app/**'
+      - '/ignore/hosting/cucuridu-portal.web.app/**'
   workflow_dispatch:
 
 env:
@@ -25,4 +25,4 @@ jobs:
           firebaseServiceAccount: '${{ secrets.FIREBASE_KEY }}'
           channelId: live
           projectId: cucuridu-portal
-          entryPoint: ./ignore/hosting/cucuriduportal.web.app/
+          entryPoint: ./ignore/hosting/cucuridu-portal.web.app/
