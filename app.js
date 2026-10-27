@@ -18,7 +18,7 @@ const ENV = {
 };
 
 const allowedOrigins = [
-    "https://cucuridu.web.app",
+    "https://cucuridu-portal.web.app",
     'https://cucuridu.onrender.com',
     'https://arco2120-cucuridu.hf.space',
     'https://cucuridu-gmgv.onrender.com',

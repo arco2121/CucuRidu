@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "cucuridu",
+    "site": "cucuridu-portal",
     "public": "public",
     "ignore": [
       "firebase.json",

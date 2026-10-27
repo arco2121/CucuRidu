@@ -1,11 +1,11 @@
-name: Deploy to Firebase Hosting - cucuridu.web.app
+name: Deploy to Firebase Hosting - cucuridu-portal.web.app
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'ignore/hosting/cucuridu.web.app/**'
+      - '../../ignore/hosting/cucuridu-portal.web.app/**'
   workflow_dispatch:
 
 env:
@@ -24,5 +24,5 @@ jobs:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_KEY }}'
           channelId: live
-          projectId: cucuridu21
-          entryPoint: ./ignore/hosting/cucuridu.web.app/
+          projectId: cucuridu-portal
+          entryPoint: ./ignore/hosting/cucuridu-portal.web.app/
