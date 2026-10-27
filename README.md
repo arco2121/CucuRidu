@@ -11,7 +11,7 @@
 
 Semplice. Devastante. Adatto a persone con poco senso del pudore e tanta voglia di ridere.
 
-🔗 **Gioca subito — senza scuse:** [Cucu Ridu](https://cucuridu.web.app)
+🔗 **Gioca subito — senza scuse:** [Cucu Ridu](https://cucuridu-portal.web.app)
 
 ---
 
