@@ -58,7 +58,7 @@ showQrcode.addEventListener("click", () => {
     };
     qrCode.onerror = () => alert("Evitiamo di piangere sul un QrCode rotto 😭");
 
-    qrCode.src = "/qrCode?padding=2&url=" + encodeURIComponent(window.location.origin + url);
+    qrCode.src = "/qrCode?padding=2&url=" + encodeURIComponent('https://cucuridu-portal.web.app' + url);
 });
 
 qrcodeSharing.addEventListener("click", () => {
