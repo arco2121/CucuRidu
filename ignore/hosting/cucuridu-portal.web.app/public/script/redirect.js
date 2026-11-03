@@ -44,7 +44,11 @@
     function handleFailure() {
         completed++;
         if (completed === HOSTS.length && !found) {
-            document.body.innerHTML = "<h1 class='sour_gummy_bold'>Nessun server disponibile. Prova a ricaricare.</h1>";
+            var statusElem = document.getElementById('status-text');
+            if (statusElem) {
+                statusElem.textContent = "Nessun server disponibile al momento. Prova a ricaricare la pagina.";
+                statusElem.style.color = "#d9534f";
+            }
         }
     }
 
