@@ -27,7 +27,7 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-
+    overflow-y: scroll;
     height: 100%;
     flex-grow: unset;
 }
@@ -89,6 +89,7 @@
     margin: 0 auto;
     padding: 0 24px;
     height: 100%;
+    overflow-y: scroll;
 }
 
 .wait_code_con {
