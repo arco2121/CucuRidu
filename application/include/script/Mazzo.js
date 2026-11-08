@@ -258,8 +258,8 @@ class Mazzo {
 
 /*
  * Quanti completamenti servono, in tutto, perche' una selezione di mazzi
- * stia in piedi. Le mani sono da Stanza.CARTE_IN_MANO (11) carte e il minimo
- * di giocatori nel codice e' 2, quindi 22 e' il primo giro completo: si tiene
+ * stia in piedi. Le mani sono da Stanza.CARTE_IN_MANO (13) carte e il minimo
+ * di giocatori nel codice e' 2, quindi 26 e' il primo giro completo: si tiene
  * 20 apposta per essere di manica larga, perche' gli scarti rientrano nel
  * mazzo da soli (Stanza.controllaMazzi) e i mazzetti a tema sono nati per
  * essere scelti INSIEME a uno grande, non da soli. Serve solo a fermare il

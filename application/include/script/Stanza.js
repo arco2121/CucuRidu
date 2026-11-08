@@ -418,6 +418,6 @@ class Stanza {
     }
 }
 
-Stanza.CARTE_IN_MANO = 11;
+Stanza.CARTE_IN_MANO = 13;
 
 module.exports = { Stanza, StatoStanza };
