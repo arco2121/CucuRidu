@@ -1,5 +1,5 @@
 <% giocatori.forEach(giocatore => { %>
-    <div class="row pause_players_list_row flex_gap_5">
+    <div class="row pause_players_list_row flex_gap_5<%= giocatore["online"] === false ? " pause_players_offline" : "" %>">
 
         <img src="<%= giocatore["pfp"] %>" alt="imgGiocatore"
              class="giocatorePfpWaiting pause_players_list_pfp shrinks_on_active_for_no_reason pfp_viewable">
@@ -7,6 +7,11 @@
 
             <% if(giocatore["punti"] > 0) { %>
                 <p class="pause_players_list_score sour_gummy_medium"> - <%= giocatore["punti"] %>p</p>
+            <% } %>
+
+            <%# solo il master vede la X, e mai accanto a se stesso %>
+            <% if(typeof seiMaster !== "undefined" && seiMaster && giocatore["id"] !== mioId) { %>
+                <button class="kick_btn sour_gummy_bold" data-id="<%= giocatore["id"] %>" data-nome="<%= giocatore["username"] %>" title="Caccia dalla stanza">&#10005;</button>
             <% } %>
 
     </div>

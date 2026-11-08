@@ -734,7 +734,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
 
         user.on("lasciaStanza", sicuro("lasciaStanza", async (data) => {
             const stanzaId = data?.["id"] ?? user.data?.referenceStanza;
-            const giocatoreId = data?.["giocatore"] ?? user.data?.giocatoreId;
+            // si puo' far uscire solo SE STESSI: prima l'id arrivava dal client
+            // e chiunque poteva togliere chiunque (per cacciare c'e' cacciaGiocatore)
+            const giocatoreId = user.data?.giocatoreId ?? data?.["giocatore"];
             user.emit("stanzaLasciata");
             if (!stanzaId || !giocatoreId) return;
 
@@ -761,6 +763,49 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
              * se lo stato e' davvero cambiato in qualcosa di non ambiguo.
              */
             if (esito.stanza.stato !== StatoStanza.WAIT) await emitStatoStanza(esito.stanza, ...sockets);
+            inviaListe(esito.stanza);
+            inviaAttesaRisposte(esito.stanza);
+        }));
+
+        /*
+         * Il master caccia un giocatore (fantasmi rimasti dentro, gente che
+         * non risponde piu...). Solo il master, mai se stesso. Il cacciato
+         * riceve "cacciato" su qualsiasi istanza sia collegato, esce dalla
+         * stanza e torna alla home; per gli altri e' come se avesse lasciato.
+         */
+        user.on("cacciaGiocatore", sicuro("cacciaGiocatore", async (data) => {
+            const stanzaId = data?.["id"] ?? user.data?.referenceStanza;
+            const chiCaccia = user.data?.giocatoreId;
+            const daCacciare = data?.["giocatore"];
+            if (!stanzaId || !chiCaccia || !daCacciare || chiCaccia === daCacciare) return;
+
+            const esito = await Stanze.mutate(stanzaId, (stanza) => {
+                if (stanza.master?.id !== chiCaccia) return NESSUNA_MODIFICA;
+                if (!stanza.trovaGiocatore(daCacciare)) return NESSUNA_MODIFICA;
+                const risultato = stanza.eliminaGiocatore(daCacciare);
+                if (risultato === false) return NESSUNA_MODIFICA;
+                stanza.sincronizzaStato();
+                return risultato;
+            });
+            if (!esito) return;
+            if (!esito.risultato) {
+                // non sei (piu) il master o il giocatore non c'e' gia piu: rinfresco la lista
+                inviaListe(esito.stanza);
+                return;
+            }
+
+            console.log("Giocatore cacciato dal master => " + stanzaId);
+            const sockets = await server.in(stanzaId).fetchSockets();
+            const restano = [];
+            for (const socket of sockets) {
+                if (socket.data?.giocatoreId === daCacciare) {
+                    try { socket.emit("cacciato"); } catch { /* ignora */ }
+                    try { socket.leave(stanzaId); } catch { /* ignora */ }
+                } else restano.push(socket);
+            }
+            aggiornaReference(esito.stanza, restano);
+            // stessa cautela di lasciaStanza: in WAIT non si strappa showWinner a nessuno
+            if (esito.stanza.stato !== StatoStanza.WAIT) await emitStatoStanza(esito.stanza, ...restano);
             inviaListe(esito.stanza);
             inviaAttesaRisposte(esito.stanza);
         }));

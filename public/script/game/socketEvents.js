@@ -267,6 +267,12 @@ on("stanzaLasciata", () => {
     lasciaStanza();
 });
 
+on("cacciato", () => {
+    sincronizzazioneAttiva = false;
+    alert("Il master ti ha cacciato dalla stanza");
+    lasciaStanza();
+});
+
 on("stanzaChiusa", () => {
     sincronizzazioneAttiva = false;
     alert("NOOOOOOO, la chiusura della stanza NOOOOOOO");

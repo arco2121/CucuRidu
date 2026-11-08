@@ -324,6 +324,28 @@
     background: var(--accent-color-3-middle);
 }
 
+/* tasto del master per cacciare un giocatore, in fondo alla riga */
+.kick_btn {
+    margin-left: auto;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 100%;
+    border: solid 2px white;
+    background: var(--accent-color-critical);
+    color: white;
+    font-size: 0.8rem;
+    line-height: 1;
+    cursor: pointer;
+}
+.kick_btn:disabled {
+    opacity: 0.5;
+}
+/* fantasmi / disconnessi: si vede subito chi cacciare */
+.pause_players_offline {
+    opacity: 0.45;
+}
+
 .pause_players_list_row {
     display: flex;
     flex-direction: row;
