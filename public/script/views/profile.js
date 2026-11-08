@@ -111,9 +111,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
 
+    // displayPfp.src e' sempre l'URL ASSOLUTO di questo host: mandiamo solo il
+    // percorso, cosi la foto vale su qualsiasi deploy (vedi showWinner.js)
+    const percorsoPfp = () => {
+        try {
+            const u = new URL(displayPfp.src, location.href);
+            return u.pathname.startsWith("/assets/") ? u.pathname : displayPfp.src;
+        } catch { return displayPfp.src; }
+    };
     btn_confirm.addEventListener("click", () => possibleStanzaId !== "" ?
-        navigateWithLoading("/partecipaStanza?pfp=" + encodeURIComponent(displayPfp.src) + "&nome=" + encodeURIComponent(displayName.textContent) + "&stanza=" + encodeURIComponent(possibleStanzaId)) :
-        navigateWithLoading("/creaStanza?pfp=" + encodeURIComponent(displayPfp.src) + "&nome=" + encodeURIComponent(displayName.textContent)));
+        navigateWithLoading("/partecipaStanza?pfp=" + encodeURIComponent(percorsoPfp()) + "&nome=" + encodeURIComponent(displayName.textContent) + "&stanza=" + encodeURIComponent(possibleStanzaId)) :
+        navigateWithLoading("/creaStanza?pfp=" + encodeURIComponent(percorsoPfp()) + "&nome=" + encodeURIComponent(displayName.textContent)));
 
     document.dispatchEvent(unloadScreen);
 });

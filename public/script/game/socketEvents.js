@@ -103,6 +103,13 @@ let referenceStanza = fromBackEnd["stanzaId"] || "";
  * al file).
  */
 let vistaCorrente = null;
+/*
+ * Contatore che sale ad ogni cambio di schermata. Serve a confermaStanza, che
+ * prima di disegnare aspetta una fetch (/saveGameReference, lenta su Render):
+ * se nel frattempo e' arrivato un altro evento (es. fineTurno) quella
+ * schermata e' piu nuova e non va coperta con la lobby.
+ */
+let turnoVista = 0;
 // finita la partita la stanza non esiste piu: da li in poi non ha senso
 // continuare a chiedere "sono in pari?"
 let sincronizzazioneAttiva = true;
@@ -208,10 +215,26 @@ on("confermaStanza", async (data) => {
     const { reference, interroghi, primoRound } = data;
     referenceStanza = data["stanzaId"] || fromBackEnd["stanzaId"];
     referenceGiocatore = new GiocatoreInterface(reference);
+    /*
+     * Se stiamo guardando chi ha vinto, una conferma della stanza in WAIT e'
+     * SEMPRE vecchia: il server considera showWinner valido in WAIT e non ci
+     * riallinea mai apposta. Arriva quando il giro di sincronizzazione parte
+     * con "chooseWinner" un attimo prima che il vincitore venga scelto e il
+     * server lo legge un attimo dopo (stanza gia in WAIT): "chooseWinner non
+     * e' valido, rimandagli la lobby". Era il "salta la schermata del
+     * vincitore e va dritto in lobby" che capitava a caso a qualcuno.
+     * Aggiorniamo il giocatore (ruoli, master) ma non tocchiamo la schermata:
+     * in lobby ci si va col tasto Avanti.
+     */
+    const restaSulVincitore = vistaCorrente === "showWinner" || vistaCorrente === "endGame";
     // segnata subito, prima della fetch qui sotto: se quella ci mette troppo
     // non vogliamo che nel frattempo il giro di sincronizzazione continui a
     // dichiarare la schermata vecchia e a farsi riallineare di nuovo
-    vistaCorrente = "wait";
+    let turno = turnoVista;
+    if (!restaSulVincitore) {
+        vistaCorrente = "wait";
+        turno = ++turnoVista;
+    }
     const result = await (await fetch("/saveGameReference", {
         method: 'POST',
         headers: {
@@ -223,7 +246,7 @@ on("confermaStanza", async (data) => {
             stanzaId: referenceStanza
         })
     })).json();
-    await renderFragment(base, "wait", {
+    if (!restaSulVincitore && turno === turnoVista) await renderFragment(base, "wait", {
         stanzaId: referenceStanza,
         interroghi: interroghi,
         primoRound: primoRound,
@@ -270,6 +293,7 @@ on("roundIniziato", async (data) => {
     if(stanza) referenceStanza = stanza
     ricordaFrase(domanda);
     vistaCorrente = "choosingCards";
+    turnoVista++;
     await renderFragment(base, "choosingCards", {
         domanda: domanda,
         risposte: !referenceGiocatore.interrogationRole ? referenceGiocatore.mazzo : null,
@@ -282,6 +306,7 @@ on("rispostaRegistrata", async (data) => {
     const { stanzaId } = data;
     if(stanzaId) referenceStanza = stanzaId;
     vistaCorrente = "waitWinner";
+    turnoVista++;
     await renderFragment(base, "waitWinner", {
         stanzaId: referenceStanza
     });
@@ -297,6 +322,7 @@ on("sceltaVincitore", async (data) => {
     if(stanza) referenceStanza = stanza
     ricordaFrase(domanda);
     vistaCorrente = "chooseWinner";
+    turnoVista++;
     await renderFragment(base, "chooseWinner", {
         domanda: domanda,
         risposte: risposte,
@@ -311,6 +337,7 @@ on("fineTurno", async (data) => {
     if(reference) referenceGiocatore = new GiocatoreInterface(reference);
     ricordaFrase(domanda);
     vistaCorrente = "showWinner";
+    turnoVista++;
     await renderFragment(base, "showWinner", {
         domanda: domanda,
         risposte: risposte,
@@ -326,6 +353,7 @@ on("partitaTerminata", async (data) => {
     const { classifica } = data;
     const puntiMassimi = classifica[0]?.punti || 0;
     vistaCorrente = "endGame";
+    turnoVista++;
     sincronizzazioneAttiva = false;
     await renderFragment(base, "endGame", {
         classifica: classifica,

@@ -11,12 +11,17 @@ winnerText.textContent = `✦ ${vincitore.username} ha vinto il round ✦`;
 
 domandaAttuale.textContent = fillBlanks(domandaAttuale.textContent, risposte);
 
-vaiAvanti.addEventListener("click", () => renderFragment(base, "wait", {
+vaiAvanti.addEventListener("click", () => {
+    // da qui in poi stiamo guardando la lobby, non piu il vincitore
+    vistaCorrente = "wait";
+    turnoVista++;
+    return renderFragment(base, "wait", {
     stanzaId: referenceStanza,
     interroghi: fromFragments["interroghi"],
     primoRound: false,
     seiMaster: referenceGiocatore.masterRole,
-}));
+    });
+});
 
 /*
  * Immagine riepilogativa del round: tutte le frasi complete, vincitore in
@@ -59,11 +64,29 @@ const righeImmagine = (fromFragments["tutteLeRisposte"] || [])
     // il vincitore va in cima, per il resto l'ordine non conta
     .sort((a, b) => (b.vincitore ? 1 : 0) - (a.vincitore ? 1 : 0));
 
+/*
+ * Le foto profilo arrivano come URL ASSOLUTI del server su cui il giocatore
+ * le ha scelte, e col portale ogni giocatore puo' finire su un host diverso
+ * (gmgv, jean, hf.space...). Un'immagine presa da un altro dominio "sporca"
+ * il canvas e toDataURL esplode con SecurityError: era il motivo per cui il
+ * tasto Screenshot dava "Non sono riuscito a generare l'immagine".
+ * Tutti i deploy servono gli stessi /assets, quindi le prendiamo dal NOSTRO
+ * dominio. Per qualsiasi altra cosa crossOrigin evita di sporcare il canvas
+ * (al massimo l'immagine non carica e si disegna il cerchio grigio).
+ */
+const stessoDominio = (src) => {
+    try {
+        const u = new URL(src, location.href);
+        if (u.origin !== location.origin && u.pathname.startsWith("/assets/")) return u.pathname;
+        return u.href;
+    } catch { return src; }
+};
 const caricaImmagine = (src) => new Promise((resolve) => {
     const img = new Image();
+    img.crossOrigin = "anonymous";
     img.onload = () => resolve(img);
     img.onerror = () => resolve(null);
-    img.src = src;
+    img.src = stessoDominio(src);
 });
 
 const disegnaRoundRect = (ctx, x, y, w, h, r) => {

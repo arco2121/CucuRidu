@@ -114,10 +114,20 @@ const showCompletati = document.getElementById("showCompletati");
 
 if (numeroCompletati && showCompletati) {
     off("aggiornamentoAttesaRisposta");
+    // la lista si ridisegna SOLO se e' cambiata: ridisegnarla svuota il
+    // riquadro e lo riempie di nuovo, e con transition:all il box si
+    // restringe e si riallarga (il "glitch" ogni secondo o due) oltre a
+    // riportare lo scroll in cima
+    let firmaCompletati = null;
+    const firmaDi = (lista) => JSON.stringify((lista || []).map(g => [g?.id, g?.username, g?.pfp]));
+
     on("aggiornamentoAttesaRisposta", (data) => {
         const { numeroGiocatori, totaleAttesi, giocatori } = data || {};
         numeroCompletati.textContent = "Completati: " + (numeroGiocatori ?? 0)
             + (typeof totaleAttesi === "number" ? " / " + totaleAttesi : "");
+        const firma = firmaDi(giocatori);
+        if (firma === firmaCompletati) return;
+        firmaCompletati = firma;
         renderFragment(showCompletati, "components/giocatoreRow", {
             giocatori: giocatori || [],
             animation: false

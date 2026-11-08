@@ -72,11 +72,16 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         server.to(stanza.id).emit("listaGiocatoriAggiornamento", { giocatori: classifica });
     };
 
-    /** Chi ha gia inviato i completamenti: lo vede tutta la stanza, lettore compreso. */
-    const inviaAttesaRisposte = (stanza) => {
+    /**
+     * Chi ha gia inviato i completamenti: lo vede tutta la stanza, lettore compreso.
+     * Con `destinatario` risponde solo a quel socket: il poll ogni 8s di ogni
+     * client prima rimbalzava su TUTTA la stanza, quindi con 7 giocatori ogni
+     * telefono riceveva (e ridisegnava) la lista circa una volta al secondo.
+     */
+    const inviaAttesaRisposte = (stanza, destinatario = null) => {
         if (!stanza?.id || !stanza.round) return;
         const risposte = stanza.round.risposte instanceof Map ? stanza.round.risposte : new Map();
-        server.to(stanza.id).emit("aggiornamentoAttesaRisposta", {
+        (destinatario || server.to(stanza.id)).emit("aggiornamentoAttesaRisposta", {
             numeroGiocatori: risposte.size,
             totaleAttesi: Math.max(0, stanza.giocatori.size - 1),
             giocatori: Array.from(risposte.keys())
@@ -506,7 +511,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             const stanzaId = data?.["stanzaId"] || user.data?.referenceStanza;
             const stanza = await Stanze.get(stanzaId);
             if (!stanza) return;
-            inviaAttesaRisposte(stanza);
+            inviaAttesaRisposte(stanza, user);
         }));
 
         /*
@@ -575,7 +580,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 + " (era su " + (vista || "schermo vuoto") + ") nella stanza " + stanzaId);
             await emitStatoStanza(stanza, user);
             inviaListe(stanza);
-            inviaAttesaRisposte(stanza);
+            inviaAttesaRisposte(stanza, user);
         }));
 
         user.on("aggiornaChat", sicuro("aggiornaChat", async (data) => {
