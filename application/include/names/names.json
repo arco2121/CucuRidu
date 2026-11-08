@@ -1617,6 +1617,22 @@
     {
       "nome": "I Barbapapà",
       "genere": "p"
+    },
+    {
+      "nome": "Monica L'armonica",
+      "genere": "f"
+    },
+    {
+      "nome": "Moreno Morello",
+      "genere": "m"
+    },
+    {
+      "nome": "Fulvio",
+      "genere": "m"
+    },
+    {
+      "nome": "Yara",
+      "genere": "f"
     }
   ],
   "adjectives": [
@@ -3313,6 +3329,20 @@
       "f": "Nana Puttana",
       "p": "Nani Puttani",
       "fp": "Nane Puttane"
+    },
+    {
+      "n": "Canonicamente etero ma apert* al pubblico",
+      "m": "Canonicamente etero ma aperto al pubblico",
+      "f": "Canonicamente etero ma aperta al pubblico",
+      "p": "Canonicamente etero ma aperti al pubblico",
+      "fp": "Canonicamente etero ma aperte al pubblico"
+    },
+    {
+      "n": "Curvy",
+      "m": "Curvy",
+      "f": "Curvy",
+      "p": "Curvy",
+      "fp": "Curvy"
     }
   ]
 }
