@@ -1633,6 +1633,18 @@
     {
       "nome": "Yara",
       "genere": "f"
+    },
+    {
+      "nome": "Marcella Bella",
+      "genere": "f"
+    },
+    {
+      "nome": "Alessio",
+      "genere": "m"
+    },
+    {
+      "nome": "Spacciatore Brasiliano",
+      "genere": "m"
     }
   ],
   "adjectives": [
@@ -3343,6 +3355,20 @@
       "f": "Curvy",
       "p": "Curvy",
       "fp": "Curvy"
+    },
+    {
+      "n": "Princifess*",
+      "m": "Princifesso",
+      "f": "Princifessa",
+      "p": "Princifessi",
+      "fp": "Princifesse"
+    },
+    {
+      "n": "Del Cazzo",
+      "m": "Del Cazzo",
+      "f": "Del Cazzo",
+      "p": "Del Cazzo",
+      "fp": "Del Cazzo"
     }
   ]
 }
