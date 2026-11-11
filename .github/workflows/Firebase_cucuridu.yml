@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'ignore/hosting/cucuridu-portal.web.app/**'
+      - ignore/hosting/cucuridu-portal.web.app/**
   workflow_dispatch:
 
 env:
