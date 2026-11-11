@@ -1,0 +1,20 @@
+{
+  "projects": {
+    "default": "cucuridu-portal"
+  },
+  "targets": {
+    "cucuridu-portal": {
+      "hosting": {
+        "cucuridu-portal": [
+          "cucuridu-portal"
+        ],
+        "riducucu": [
+          "riducucu"
+        ],
+        "cucuriduportal": [
+          "cucuriduportal"
+        ]
+      }
+    }
+  }
+}
