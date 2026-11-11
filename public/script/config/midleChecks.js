@@ -50,8 +50,12 @@ if (fromBackEnd["deleteToken"] === true) {
     localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
 }
 
-const token = settings.savingToken;
+// Tra domini diversi localStorage e i cookie non sono condivisi. Il JWT nella
+// URL e' invece portabile tra gli host del cluster (stessa JWTKEY): usa prima
+// quello della pagina corrente, cosi' anche un failover avvenuto prima del
+// prossimo salvataggio della sessione non perde il giocatore.
 const params = new URLSearchParams(window.location.search);
+const token = params.get("token") || settings.savingToken;
 if (!params.has("token") && token && fromBackEnd["loadToken"] !== false) {
     const newUrl = new URL(window.location.href);
     newUrl.searchParams.set("token", token);
