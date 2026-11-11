@@ -35,7 +35,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         const details = {
             scripts: legacy ? "/dist/script" : "/script",
             styles: pagesOptions.cluster ? "/dist/style/" : "/style",
-            extra: extra - 1 > 0 ? extra : 0,
+            extra: extra - 1 > 0 ? extra : "0",
             legacy,
             allowedOrigins
         };
