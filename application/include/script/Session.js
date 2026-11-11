@@ -187,8 +187,11 @@ class Session {
         if (req?.session?.storeData)
             return req.session.storeData;
         if (token) {
-            if (await this.blackList.has(token)) return {};
             try {
+                // Il token e' il fallback portatile: se e' stato revocato da
+                // un'altra istanza del cluster dobbiamo rifiutarlo per non
+                // far tornare un giocatore prima di essere stato espulso.
+                if (await this.blackList.has(token)) return {};
                 return jwt.verify(token, this.tokenKey);
             } catch {
                 return {};
@@ -227,8 +230,13 @@ class Session {
 
     async _clearBlackList() {
         const now = Date.now();
-        for (const [token, expiry] of await this.blackList.entries()) {
-            if (now > expiry) await this.blackList.delete(token);
+        for (const [token, valore] of await this.blackList.entries()) {
+            const expiry = valore && typeof valore === "object" && "data" in valore
+                ? valore.data
+                : valore;
+            const scadenza = expiry instanceof Date ? expiry.getTime() : Number(expiry);
+            if (Number.isFinite(scadenza) && now > scadenza)
+                await this.blackList.delete(token);
         }
     }
 }
