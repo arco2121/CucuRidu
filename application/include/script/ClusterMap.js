@@ -15,8 +15,9 @@ class ClusterMap {
             .eq(this.keyField, key)
             .maybeSingle();
 
-        if (error || !data) return null;
-        return data[this.valueField].data;
+        if (error) throw error;
+        if (!data) return null;
+        return data[this.valueField]?.data;
     }
 
     async set(key, value) {
@@ -47,6 +48,7 @@ class ClusterMap {
             .eq(this.keyField, key)
             .maybeSingle();
 
+        if (error) throw error;
         return !!data;
     }
 
@@ -64,7 +66,8 @@ class ClusterMap {
             .from(this.table)
             .select(this.keyField);
 
-        if (error || !data) return [];
+        if (error) throw error;
+        if (!data) return [];
 
         return data.map(item => item[this.keyField]);
     }
@@ -78,11 +81,14 @@ class ClusterMap {
             .from(this.table)
             .select(`${this.keyField}, ${this.valueField}`);
 
-        if (error || !data) return [];
+        if (error) throw error;
+        if (!data) return [];
 
-        return data.map( (item) => [
+        // I valori delle mappe sono salvati come JSON { data: valore }.
+        // Restituiamo il valore interno, come fa una Map standard.
+        return data.map(item => [
             item[this.keyField],
-            item[this.valueField]
+            item[this.valueField]?.data
         ]);
     }
 
@@ -91,7 +97,8 @@ class ClusterMap {
             .from(this.table)
             .select('*', { count: 'exact', head: true })
 
-        return error ? 0 : count;
+        if (error) throw error;
+        return count || 0;
     }
 }
 
