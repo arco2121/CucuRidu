@@ -97,8 +97,7 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
 
         server.close(async () => {
             await Stanze.clear();
-            await generationMemory.clear()
-            await sessionsMap.clear();
+            await generationMemory.clear();
             console.error('Chiusura normale');
             process.exit(0);
         });
@@ -106,7 +105,6 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
         setTimeout(async () => {
             await Stanze.clear();
             await generationMemory.clear();
-            await sessionsMap.clear();
             console.error('Chiusura forzata');
             process.exit(1);
         }, 10000);
