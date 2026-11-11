@@ -31,9 +31,11 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         const filter = /MSIE|Trident|webOS|LG Browser|Tizen|SamsungBrowser\/[1-9]\.|Opera Mini|Chrome\/([1-6][0-9])\.|Firefox\/([1-5][0-9])\.|Version\/([1-9]|10|11)(\.[0-9]+)? Safari\/|iPhone OS ([1-9]|10|11|12)_|Android [1-7]\./i;
         const target = req.headers['user-agent'] || "";
         const legacy = filter.test(target);
+        const extra = Math.floor((Math.random() * (3 - 1) + 1))
         const details = {
             scripts: legacy ? "/dist/script" : "/script",
             styles: pagesOptions.cluster ? "/dist/style/" : "/style",
+            extra: extra - 1 > 0 ? extra : 0,
             legacy,
             allowedOrigins
         };
