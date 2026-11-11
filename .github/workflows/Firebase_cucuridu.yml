@@ -25,4 +25,4 @@ jobs:
           firebaseServiceAccount: '${{ secrets.FIREBASE_KEY }}'
           channelId: live
           projectId: cucuridu-portal
-          entryPoint: ./ignore/hosting/cucuridu-portal.web.app/
+          entryPoint: ./ignore/hosting/cucuridu/
