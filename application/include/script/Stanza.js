@@ -174,9 +174,25 @@ class Stanza {
         return [...Array.from(this.giocatori.values() || [])?.sort((a, b) => b.punti - a.punti)];
     }
 
+    /** Carte necessarie per riportare tutti a 13 e carte da mazzo/scarti. */
+    disponibilitaCartePerAvvio() {
+        const necessarie = Array.from(this.giocatori.values()).reduce((totale, giocatore) =>
+            totale + Math.max(0, Stanza.CARTE_IN_MANO - (giocatore.mazzo?.carte?.length ?? 0)), 0);
+        const disponibili = (this.mazzoCompletamenti?.mazzo?.carte?.length ?? 0)
+            + (this.mazzoCompletamenti?.scarto?.carte?.length ?? 0);
+        return { necessarie, disponibili };
+    }
+
     iniziaTurno(chiStaChidedendo) {
         if(this.stato !== StatoStanza.WAIT || this.giocatori.size < this.minimoGiocatori)
             return false;
+        // I giocatori possono essersi aggiunti mentre la stanza era in attesa:
+        // prima di cambiare round o distribuire carte, verifichiamo che il mazzo
+        // e gli scarti possano completare tutte le mani. Mai avviare lasciando
+        // alcuni giocatori senza le carte necessarie per rispondere.
+        const { necessarie, disponibili } = this.disponibilitaCartePerAvvio();
+        if(disponibili < necessarie) return false;
+
         if(this.numeroRound[0] === 0) {
             let maxOccorrenze = 0;
             this.mazzoFrasi.mazzo.carte.map(carta => carta[1]).forEach(occorrenza => {
@@ -420,4 +436,4 @@ class Stanza {
 
 Stanza.CARTE_IN_MANO = 13;
 
-module.exports = { Stanza, StatoStanza };
+module.exports = { Stanza, StatoStanza };
