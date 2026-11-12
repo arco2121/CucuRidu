@@ -191,7 +191,7 @@ class Stanza {
         // e gli scarti possano completare tutte le mani. Mai avviare lasciando
         // alcuni giocatori senza le carte necessarie per rispondere.
         const { necessarie, disponibili } = this.disponibilitaCartePerAvvio();
-        if(disponibili < necessarie) return false;
+        if(disponibili < necessarie) return -1;
 
         if(this.numeroRound[0] === 0) {
             let maxOccorrenze = 0;

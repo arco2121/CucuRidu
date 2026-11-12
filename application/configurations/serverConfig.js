@@ -348,6 +348,13 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             if (!esito) return user.emit("stanzaChiusa");
             const { stanza, risultato } = esito;
 
+            if (risultato === -1) {
+                user.emit("errore", {
+                    message: "Allora come dirtelo... non ci sono abbastanza carte per divertirsi. Muoviti a cambiare mazzo, o aggiungi espansioni."
+                });
+                return;
+            }
+
             if (typeof risultato === "object" && risultato) {
                 server.to(stanzaId).emit("partitaTerminata", {
                     classifica: risultato.map(giocatore => giocatore.toJSON())
