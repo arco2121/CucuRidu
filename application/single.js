@@ -7,7 +7,7 @@ const { Session } = require(path.join(__dirname, "/include/script/Session"));
 const { generateId } = require(path.join(__dirname, "/include/script/generazione"));
 const appConfig = require(path.join(__dirname, "/configurations/appConfig"));
 const serverConfig = require(path.join(__dirname, "/configurations/serverConfig"));
-const { LocalStanze } = require(path.join(__dirname, "/include/script/LocalStanze"));
+const { SingleStanze } = require(path.join(__dirname, "/include/script/SingleStanze"));
 const { SegnalazioniLocali } = require(path.join(__dirname, "/include/script/Segnalazioni"));
 
 const singleApp = async (local, port, allowedOrigins, env = {}, timeout = 3600000) => {
@@ -16,7 +16,7 @@ const singleApp = async (local, port, allowedOrigins, env = {}, timeout = 360000
     const httpServer = createServer(app);
     const serverSession = new Session(timeout, env.JWTKEY || await generateId(64, generationMemory));
 
-    const Stanze = new LocalStanze();
+    const Stanze = new SingleStanze();
     // Con un token casuale a ogni avvio, il primo riavvio del server (Render free
     // si riaddormenta di continuo) rendeva invalido l'handshake di tutti i client
     // gia in partita: INVALID_KEY e fuori tutti. Con JWTKEY il token resta stabile

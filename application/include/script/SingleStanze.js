@@ -6,7 +6,7 @@ const { conLock, NESSUNA_MODIFICA } = require(path.join(__dirname, 'concorrenza'
  * asincrona di ClusterStanze: cosi serverConfig non deve sapere in quale
  * modalita' sta girando il server.
  */
-class LocalStanze extends Map {
+class SingleStanze extends Map {
 
     async setPresenza(giocatoreId, stanzaId, online, socketId, eventTime, expectedSocketId = null) {
         const stanza = super.get(stanzaId);
@@ -42,4 +42,4 @@ class LocalStanze extends Map {
     async checkOld() { /* in RAM ci pensa gia cleanUp in serverConfig */ }
 }
 
-module.exports = { LocalStanze };
+module.exports = { SingleStanze };
