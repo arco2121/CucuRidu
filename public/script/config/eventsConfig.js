@@ -15,6 +15,12 @@ const showOpacity = new Event("showOpacity", {
 const hideOpacity = new Event("hideOpacity", {
     bubbles: true
 });
+const showInOpacity = new Event("showInOpacity", {
+    bubbles: true
+});
+const hideOutOpacity = new Event("hideOutOpacity", {
+    bubbles: true
+});
 const showPanelCond = new Event("showPanelCond", {
     bubbles: true
 });
@@ -72,5 +78,19 @@ const timeOut = 150;
     document.addEventListener("showOpacity", (e) => {
         const panel = e.target;
         panel.classList.replace('disappear', 'appear');
+    });
+    document.addEventListener('hideOutOpacity', (e) => {
+        const section = e.target;
+        section.classList.replace('in', 'out');
+        setTimeout(() => {
+            section.classList.add('instant');
+            section.classList.add('hidden');
+        }, timeOut);
+    });
+    document.addEventListener("showInOpacity", (e) => {
+        const panel = e.target;
+        panel.classList.remove('hidden');
+        panel.classList.remove('instant');
+        panel.classList.replace('out', 'in');
     });
 })();

@@ -13,7 +13,7 @@ document.addEventListener("click", (e) => {
     const img = e.target.closest(".pfp_viewable");
     if (!img || !img.getAttribute("src")) return;
     pfpLightboxImg.src = img.src;
-    pfpLightbox.dispatchEvent(showPanel);
+    pfpLightbox.dispatchEvent(showInOpacity);
 });
 
-pfpLightboxBackdrop?.addEventListener("click", () => pfpLightbox.dispatchEvent(hidePanel));
+pfpLightboxBackdrop?.addEventListener("click", () => pfpLightbox.dispatchEvent(hideOutOpacity));
