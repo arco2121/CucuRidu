@@ -1,6 +1,6 @@
 class ClusterSet {
 
-    constructor(client, setName, table = "memory",) {
+    constructor(client, setName, table = "memory") {
         this.supabase = client;
         this.table = table;
         this.setName = setName;
@@ -24,6 +24,7 @@ class ClusterSet {
             .eq("item_id", String(item))
             .maybeSingle();
 
+        if (error) throw error;
         return !!data;
     }
 
@@ -46,22 +47,30 @@ class ClusterSet {
         if (error) throw error;
     }
 
+    /** Rimuove gli ID scaduti che non sono piu' usati da stanze attive. */
+    async cleanOld() {
+        const { error } = await this.supabase.rpc("delete_old_memory");
+        if (error) throw error;
+    }
+
     async values() {
         const { data, error } = await this.supabase
             .from(this.table)
             .select("item_id")
+            .eq("set_name", this.setName);
 
-        if (error || !data) return [];
-        return data.map(row => row.item_id);
+        if (error) throw error;
+        return (data || []).map(row => row.item_id);
     }
 
     async size() {
         const { count, error } = await this.supabase
             .from(this.table)
-            .select('*', { count: 'exact', head: true })
+            .select("*", { count: "exact", head: true })
             .eq("set_name", this.setName);
 
-        return error ? 0 : count;
+        if (error) throw error;
+        return count || 0;
     }
 }
 
