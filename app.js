@@ -1,6 +1,6 @@
 const envFiles = {};
 require('dotenv').config({
-    path: ['.envXample', '.ENV'],
+    path: ['.envXample', '.ENV', '.env'],
     processEnv: envFiles,
     quiet: true,
     override: true
