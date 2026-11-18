@@ -13,6 +13,7 @@ const attempt = async (operation, fallback) => {
     catch (err) {return await fallback(err);}
 };
 const ENV = {
+    version: '1.5.1',
     ...envFiles,
     ...process.env
 };
@@ -41,6 +42,7 @@ process.on('uncaughtException', (err) => {
 });
 
 const initApp = async () => {
+    if (local) console.log(ENV, '\n');
     if (!cluster) return await singleApp(local, port, allowedOrigins, ENV);
     await attempt(
         () => clusterApp(local, port, allowedOrigins, ENV),
