@@ -17,7 +17,6 @@
     height: 100%;
     align-items: stretch;
     flex-direction: column;
-    overflow-y: scroll;
 }
 
 #landpoint {
@@ -253,11 +252,12 @@
     height: 20%;
     min-width: 100%;
     max-height: 50%;
+    min-height: 300px;
 }
 
 .wait_players_list_2 {
     height: unset;
-    min-height: 35vh;
+    min-height: 200px;
 }
 
 .wait_players_list_hr {
@@ -401,7 +401,7 @@
 @media (max-width: 450px) {
     .game_main_con {
         /* prima 6px, stesso discorso di sopra ma sui telefoni piccoli */
-        padding: 0 12px;
+        padding: 0px 12px;
     }
 
     .wait_players_list {
@@ -437,7 +437,6 @@
     width: 100%;
     display: flex;
     flex-direction: row;
-    overflow: hidden;
 }
 
 .game_side_r {
@@ -452,6 +451,7 @@
 .game_side_l {
     width: 60%;
     margin: 5px;
+    justify-content: center;
 }
 
 .game_cards_list {
@@ -466,6 +466,7 @@
     overflow-y: scroll;
     height: 25rem;
     flex-grow: 1;
+    min-height: 120px;
 }
 
 .game_cards_list .column {
@@ -601,12 +602,10 @@
         justify-content: space-evenly;
         flex-direction: column;
         align-items: center;
-        gap: unset;
     }
 
     .game_main_con_selectCards:has(.game_card_domanda) {
         width: 100%;
-        justify-content: center;
         flex-direction: column;
         align-items: center;
     }
@@ -1132,8 +1131,17 @@
     }
 }
 
-@media (max-height: 700px) {
+@media (max-height: 750px) {
     .game_main_con {
+        justify-content: flex-start;
+        overflow-y: scroll;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+    .game_side_l {
+        justify-content: normal;
+    }
+    .game_main_con:has(.game_side_choice_r) {
         justify-content: flex-start;
     }
 }

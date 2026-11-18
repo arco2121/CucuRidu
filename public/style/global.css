@@ -373,7 +373,7 @@ a {
 
 .btn_mediumText {
     font-size: 20px;
-    /*padding: 10px;*/
+    padding: 10px;
     width: 190px;
     height: 52px;
     margin: 5px;
@@ -610,7 +610,7 @@ input:active {
 
 .visible {
     display: flex;
-    animation: popup 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    animation: popup 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 .hidden {
