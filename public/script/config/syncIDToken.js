@@ -1,5 +1,7 @@
 (() => {
     const STORAGE_KEY = 'cucuRiduToken';
+    const UPDATED_AT_KEY = `${STORAGE_KEY}:updatedAt`;
+    const TOKEN_LIFETIME = 24 * 60 * 60 * 1000;
     const BRIDGE_PATH = '/syncIDToken';
     const SYNC_DOMAINS = [
         'https://cucuridu.onrender.com',
@@ -12,18 +14,37 @@
     const WRITE_TIMEOUT = 800;
     const currentOrigin = window.location.origin;
 
-    const getLocalCode = () => {
+    const getLocalState = () => {
         try {
-            return localStorage.getItem(STORAGE_KEY) || null;
+            const code = localStorage.getItem(STORAGE_KEY) || null;
+            const updatedAt = Number(localStorage.getItem(UPDATED_AT_KEY)) || 0;
+            return code ? { code, updatedAt } : null;
         } catch {
             return null;
         }
     };
 
-    const setLocalCode = (code) => {
+    // La scelta e' deterministica anche in caso di rotazioni simultanee nello
+    // stesso millisecondo, cosi' tutti i domini convergono sullo stesso valore.
+    const preferState = (candidate, current) => {
+        if (!candidate?.code) return current;
+        if (!current?.code) return candidate;
+        if (candidate.updatedAt !== current.updatedAt)
+            return candidate.updatedAt > current.updatedAt ? candidate : current;
+        return candidate.code > current.code ? candidate : current;
+    };
+
+    const setLocalState = (state) => {
+        if (!state?.code) return getLocalState();
         try {
-            localStorage.setItem(STORAGE_KEY, code);
-        } catch {}
+            const current = getLocalState();
+            const preferred = preferState(state, current);
+            localStorage.setItem(STORAGE_KEY, preferred.code);
+            localStorage.setItem(UPDATED_AT_KEY, String(preferred.updatedAt));
+            return preferred;
+        } catch {
+            return state;
+        }
     };
 
     const generateCode = (length = 128) => {
@@ -32,18 +53,17 @@
         crypto.getRandomValues(bytes);
         return Array.from(bytes, (b) => chars[b % chars.length]).join('');
     };
-    
+
     const consumeUrlCode = () => {
         const url = new URL(window.location.href);
         const codeFromUrl = url.searchParams.get(STORAGE_KEY);
 
         if (!codeFromUrl) return null;
 
-        setLocalCode(codeFromUrl);
         url.searchParams.delete(STORAGE_KEY);
         window.history.replaceState({}, '', url.toString());
 
-        return codeFromUrl;
+        return { code: codeFromUrl, updatedAt: Date.now() };
     };
 
     // Apre un iframe nascosto verso un dominio e permette di scambiare messaggi postMessage
@@ -98,10 +118,10 @@
             iframe.contentWindow?.postMessage(JSON.stringify(payload), domain);
         });
 
-    // Condivide un codice specifico con tutti i portali configurati
-    const shareCode = async (code) => {
+    // Condivide il token e la sua data di generazione con tutti i portali configurati
+    const shareCode = async (code, updatedAt = Date.now()) => {
         if (!code) return null;
-        setLocalCode(code);
+        const state = setLocalState({ code, updatedAt });
 
         const remoteDomains = SYNC_DOMAINS.filter((d) => d !== currentOrigin);
         const results = await Promise.allSettled(remoteDomains.map(connectPeer));
@@ -111,24 +131,22 @@
 
         await Promise.all(
             activePeers.map((peer) =>
-                sendRpc(peer, { action: 'SET_CODE', key: STORAGE_KEY, code }, 'CODE_SAVED', WRITE_TIMEOUT)
+                sendRpc(peer, {
+                    action: 'SET_CODE', key: STORAGE_KEY,
+                    code: state.code, updatedAt: state.updatedAt
+                }, 'CODE_SAVED', WRITE_TIMEOUT)
             )
         );
 
         activePeers.forEach((peer) => peer.cleanup());
-        return code;
+        return state.code;
     };
 
-    // Recupera il codice (da URL o consenso tra portali) e lo allinea ovunque
+    // Allinea i domini sul token piu' recente e lo rinnova quando ha almeno 24 ore.
     const syncCode = async () => {
-        // 1. Se arriviamo da un redirect del portale, l'URL ha la priorita
-        const urlCode = consumeUrlCode();
-        if (urlCode) {
-            await shareCode(urlCode);
-            return urlCode;
-        }
+        const urlState = consumeUrlCode();
+        if (urlState) return shareCode(urlState.code, urlState.updatedAt);
 
-        // 2. Altrimenti (accesso diretto al webserver), interroga i portali e calcola la maggioranza
         const remoteDomains = SYNC_DOMAINS.filter((d) => d !== currentOrigin);
         const results = await Promise.allSettled(remoteDomains.map(connectPeer));
         const activePeers = results
@@ -141,41 +159,36 @@
             )
         );
 
-        const samples = [getLocalCode(), ...responses.map((r) => r?.code || null)];
-        const counts = new Map();
-        let bestCode = null;
-        let bestCount = 0;
-
-        for (const c of samples) {
-            if (!c) continue;
-            const next = (counts.get(c) ?? 0) + 1;
-            counts.set(c, next);
-            if (next > bestCount) {
-                bestCount = next;
-                bestCode = c;
-            }
+        let newestState = getLocalState();
+        for (const response of responses) {
+            if (!response?.code) continue;
+            const updatedAt = Number(response.updatedAt) || 0;
+            newestState = preferState({ code: response.code, updatedAt }, newestState);
         }
 
-        const finalCode = bestCode && bestCount > samples.length / 2
-            ? bestCode
-            : generateCode(128);
-
-        setLocalCode(finalCode);
+        const tokenExpired = !newestState || Date.now() - newestState.updatedAt >= TOKEN_LIFETIME;
+        const desiredState = tokenExpired
+            ? { code: generateCode(128), updatedAt: Date.now() }
+            : newestState;
+        const finalState = setLocalState(desiredState);
 
         await Promise.all(
             activePeers.map((peer) =>
-                sendRpc(peer, { action: 'SET_CODE', key: STORAGE_KEY, code: finalCode }, 'CODE_SAVED', WRITE_TIMEOUT)
+                sendRpc(peer, {
+                    action: 'SET_CODE', key: STORAGE_KEY,
+                    code: finalState.code, updatedAt: finalState.updatedAt
+                }, 'CODE_SAVED', WRITE_TIMEOUT)
             )
         );
 
         activePeers.forEach((peer) => peer.cleanup());
-        return finalCode;
+        return finalState.code;
     };
 
     window.CucuriduSync = {
         syncCode,
         shareCode,
-        getCode: getLocalCode
+        getCode: () => getLocalState()?.code || null
     };
 
     if (document.readyState === 'loading') {
