@@ -1,7 +1,7 @@
 (function () {
     var path = window.location.pathname + window.location.search + window.location.hash;
-    var resolvedCode = null;
 
+    // Server di destinazione per il redirect
     var HOSTS = [
         'https://cucuridu.onrender.com',
         'https://cucuridu-gmgv.onrender.com',
@@ -12,10 +12,14 @@
     var SYNC_DOMAINS = [
         'https://cucuridu-portal.web.app',
         'https://riducucu.web.app',
-        'https://cucuriduportal.web.app'
+        'https://cucuriduportal.web.app',
+        'https://cucuridu.onrender.com',
+        'https://cucuridu-gmgv.onrender.com',
+        'https://arco2120-cucuridu.hf.space',
+        'https://cucuridu-jean.onrender.com'
     ];
 
-    var BRIDGE_PATH = '/sync.html';
+    var BRIDGE_PATH = '/sync-storage.html';
     var STORAGE_KEY = 'cucuriduCode';
     var PING_TIMEOUT = 7000;
     var SYNC_READ_TIMEOUT = 4000;
@@ -41,28 +45,6 @@
         } catch (e) {
             return null;
         }
-    }
-
-    function buildRedirectUrl(host, code) {
-        var pathname = window.location.pathname;
-        var search = window.location.search || '';
-        var hash = window.location.hash || '';
-        var param = encodeURIComponent(STORAGE_KEY) + '=' + encodeURIComponent(code);
-
-        if (search.length > 0) {
-            search = search.replace(/([?&])cucuriduCode=[^&]*(&|$)/, function (match, prefix, suffix) {
-                return suffix === '&' ? prefix : '';
-            });
-            if (search === '?' || search === '') {
-                search = '?' + param;
-            } else {
-                search = search + '&' + param;
-            }
-        } else {
-            search = '?' + param;
-        }
-
-        return host + pathname + search + hash;
     }
 
     function setLocalCode(code) {
@@ -101,10 +83,10 @@
     // --- COORDINAMENTO REDIRECT FINALE ---
 
     function tryRedirect() {
-        if (syncFinished && targetHost && resolvedCode && !redirected) {
+        if (syncFinished && targetHost && !redirected) {
             redirected = true;
             cleanupIframes();
-            window.location.replace(buildRedirectUrl(targetHost, resolvedCode));
+            window.location.replace(targetHost + path);
         }
     }
 
@@ -218,10 +200,9 @@
         if (bestCode && bestCount > (samples.length / 2)) {
             finalCode = bestCode;
         } else {
-            finalCode = generateAlphanumericCode(64);
+            finalCode = generateAlphanumericCode(16);
         }
 
-        resolvedCode = finalCode;
         // Salvataggio sul portale corrente
         setLocalCode(finalCode);
 

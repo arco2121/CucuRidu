@@ -61,19 +61,12 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
      */
     const preCheck = async (req, res, next) => {
         req.deleteToken = !!req.query?.token;
-        req.saveIDToken = !!req.query?.cucuriduCode;
         try {
             const { userId, stanzaId } = await serverSession.get(req, req.query?.token);
             const redirecting = req.query?.token ? "?token=" + req.query.token : "";
             if(userId && (await Stanze.get(stanzaId))?.trovaGiocatore(userId)) return res.redirect("/game" + redirecting);
         } catch (e) {
             console.error(`[preCheck] ${req.method} ${req.originalUrl} -> controllo stanza esistente fallito, proseguo:`, e?.stack || e);
-        }
-        if(req.saveIDToken) {
-            const urlObj = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
-            urlObj.searchParams.delete('cucuriduCode');
-            const url = urlObj.toString();
-            return res.redirect(encodeURI("/saveIDToken/?IDtoken=" + req.query?.cucuriduCode + "&redirect=" + url));
         }
         next();
     };
@@ -290,15 +283,9 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         res.status(200).json({nome: generateName(), pfp: generatePfp()});
     });
 
-    app.get("/ping", (req, res) => {
-        res.status(200).end();
-    });
+    app.get("/ping", (req, res) => res.status(200).end());
 
-    app.get("/saveIDToken", (req, res) => renderPage(req, res, "saveIDToken", {
-        simple: false,
-        IDtoken: req.query.IDtoken,
-        redirect: req.query.redirect
-    }));
+    app.get("/syncIDToken", (req, res) => renderPage(req, res, "saveIDToken"));
 
     /*
      * Elenco delle frasi e dei completamenti segnalati come sbagliati.
