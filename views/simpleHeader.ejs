@@ -11,6 +11,14 @@
     <title>Cucu Ridu</title>
     <link rel="manifest" href="/manifest.json">
 
+    <link rel="preload" href="/assets/fonts/SourGummy-VariableFont_wdth,wght.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="/assets/fonts/Nunito-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="stylesheet" href="<%= styles %>/fonts.css">
+
+    <link rel="stylesheet" href="<%= styles %>/animations.css">
+    <link rel="stylesheet" href="<%= styles %>/global.css">
+    <link rel="stylesheet" href="<%= styles %>/<%= page %>.css">
+
     <%- include("components/legacyManager") %>
     <script src="/script/external/ejs.js"></script>
     <script src="<%= scripts %>/config/colorConfig.js"></script>
@@ -19,7 +27,7 @@
     <%- include("components/loadScreen") %>
 
     <script src="<%= scripts %>/config/globalConfig.js"></script>
-    <script src="<%= scripts %>/config/syncCheck.js"></script>
+    <script src="<%= scripts %>/config/syncIDToken.js"></script>
     <script src="<%= scripts %>/config/eventsConfig.js"></script>
 
     <%- include(page, params) %>
