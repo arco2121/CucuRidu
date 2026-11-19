@@ -295,7 +295,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     });
 
     app.get("/saveIDToken", (req, res) => renderPage(req, res, "saveIDToken", {
-        simple: true,
+        simple: false,
         IDtoken: req.query.IDtoken,
         redirect: req.query.redirect
     }));
