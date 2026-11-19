@@ -9,7 +9,7 @@
     'https://cucuridu-jean.onrender.com'
   ]);
 
-  const STORAGE_KEY = 'cucuriduCode';
+  const STORAGE_KEY = 'cucuRiduToken';
 
   window.addEventListener('message', ({ origin, source, data: raw }) => {
     if (!ALLOWED_ORIGINS.has(origin) || !source) return;

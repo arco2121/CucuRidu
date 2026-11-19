@@ -20,7 +20,7 @@
     ];
 
     var BRIDGE_PATH = '/sync-storage.html';
-    var STORAGE_KEY = 'cucuriduCode';
+    var STORAGE_KEY = 'cucuRiduToken';
     var PING_TIMEOUT = 7000;
     var SYNC_READ_TIMEOUT = 4000;
     var SYNC_WRITE_TIMEOUT = 800;
@@ -200,7 +200,7 @@
         if (bestCode && bestCount > (samples.length / 2)) {
             finalCode = bestCode;
         } else {
-            finalCode = generateAlphanumericCode(16);
+            finalCode = generateAlphanumericCode(128);
         }
 
         // Salvataggio sul portale corrente

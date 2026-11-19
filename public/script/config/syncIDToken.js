@@ -1,5 +1,5 @@
 (() => {
-    const STORAGE_KEY = 'cucuriduCode';
+    const STORAGE_KEY = 'cucuRiduToken';
     const BRIDGE_PATH = '/syncIDToken';
     const SYNC_DOMAINS = [
         'https://cucuridu-portal.web.app',
@@ -29,7 +29,7 @@
         } catch {}
     };
 
-    const generateCode = (length = 64) => {
+    const generateCode = (length = 128) => {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         const bytes = new Uint8Array(length);
         crypto.getRandomValues(bytes);
@@ -161,7 +161,7 @@
 
         const finalCode = bestCode && bestCount > samples.length / 2
             ? bestCode
-            : generateCode(64);
+            : generateCode(128);
 
         setLocalCode(finalCode);
 
