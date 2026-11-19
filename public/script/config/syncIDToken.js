@@ -2,9 +2,6 @@
     const STORAGE_KEY = 'cucuRiduToken';
     const BRIDGE_PATH = '/syncIDToken';
     const SYNC_DOMAINS = [
-        'https://cucuridu-portal.web.app',
-        'https://riducucu.web.app',
-        'https://cucuriduportal.web.app',
         'https://cucuridu.onrender.com',
         'https://cucuridu-gmgv.onrender.com',
         'https://arco2120-cucuridu.hf.space',
