@@ -1,0 +1,6 @@
+-- Session mapping for the static portal -> independently hosted cluster nodes.
+-- Safe to run repeatedly; does not drop or rewrite existing application data.
+-- The mapping itself is stored in the existing public.items table through
+-- ClusterMap, so this migration is intentionally informational/no-op.
+-- The host verifies and expires each mapping on lookup; expired mappings are
+-- also eligible for the existing item cleanup policy.

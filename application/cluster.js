@@ -1,5 +1,6 @@
 const { createServer } = require("node:http");
 const path = require("path");
+const crypto = require("node:crypto");
 const { Server } = require("socket.io");
 const express = require("express");
 const { Session } = require(path.join(__dirname, "/include/script/Session"));
@@ -56,6 +57,104 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
     // INVALID_KEY e viene cacciato. Con piu deploy attivi e' obbligatoria.
     const TEMPORARY_TOKEN = env.JWTKEY || await generateId(64, generationMemory);
     if (!env.JWTKEY) console.warn("ATTENZIONE: JWTKEY non impostata. Con piu istanze o dopo un riavvio i giocatori verranno disconnessi.");
+
+    /*
+     * Il portale statico non puo' leggere il localStorage dei domini dei nodi.
+     * Gli passiamo per POST un identificatore casuale (mai il JWT); il database
+     * cluster lo associa alla partita dopo il primo /saveGameReference.
+     */
+    const PORTAL_COOKIE = "cucu_portal_id";
+    const PORTAL_TTL = 30 * 24 * 60 * 60 * 1000;
+    const portalKey = (id) => "portal-session:" + crypto.createHash("sha256").update(id).digest("hex");
+    const readCookie = (req, name) => {
+        const pair = String(req.headers.cookie || "").split(";").map(part => part.trim())
+            .find(part => part.startsWith(name + "="));
+        if (!pair) return null;
+        try { return decodeURIComponent(pair.slice(name.length + 1)); } catch { return null; }
+    };
+    const validePortalId = (id) => typeof id === "string" && /^[a-f0-9-]{36}$/i.test(id);
+    const redirectPath = (value) => {
+        if (typeof value !== "string" || value.length > 2048 || !value.startsWith("/") || value.startsWith("//")) return "/";
+        try {
+            const parsed = new URL(value, "https://portal.invalid");
+            return parsed.origin === "https://portal.invalid" ? parsed.pathname + parsed.search + parsed.hash : "/";
+        } catch { return "/"; }
+    };
+    const cookieHeader = (id) => `${PORTAL_COOKIE}=${encodeURIComponent(id)}; Path=/; Max-Age=${PORTAL_TTL / 1000}; HttpOnly; Secure; SameSite=Lax`;
+    const gameExists = async (data) => {
+        if (!data?.userId || !data?.stanzaId) return false;
+        const stanza = await Stanze.get(data.stanzaId);
+        return !!stanza?.trovaGiocatore(data.userId);
+    };
+    const loadPortalSession = async (portalId) => {
+        const stored = await sessionsMap.get(portalKey(portalId));
+        if (!stored || Number(stored.data) <= Date.now() || !stored.session) {
+            if (stored) await sessionsMap.delete(portalKey(portalId));
+            return null;
+        }
+        if (!(await gameExists(stored.session))) {
+            await sessionsMap.delete(portalKey(portalId));
+            return null;
+        }
+        return stored.session;
+    };
+
+    // I due parser sono qui per rendere disponibili i body ai soli endpoint
+    // cluster aggiunti subito sotto; appConfig aggiunge poi le sue route usuali.
+    app.use(express.urlencoded({ extended: false, limit: "16kb" }));
+    app.use(express.json({ limit: "16kb" }));
+    app.post("/session/portal", async (req, res) => {
+        const portalId = req.body?.portalId;
+        if (!validePortalId(portalId)) return res.status(400).send("Identificativo portale non valido");
+
+        res.setHeader("Cache-Control", "no-store");
+        res.setHeader("Referrer-Policy", "no-referrer");
+        res.setHeader("Set-Cookie", cookieHeader(portalId));
+
+        const nextPath = redirectPath(req.body?.next);
+        try {
+            const saved = await loadPortalSession(portalId);
+            if (!saved) return res.redirect(303, nextPath);
+            const token = serverSession.set(null, saved);
+            return res.redirect(303, "/game?token=" + encodeURIComponent(token));
+        } catch (e) {
+            console.error("[session:portal] ripristino fallito ->", e?.message || e);
+            return res.redirect(303, nextPath);
+        }
+    });
+
+    // La stanza e il giocatore vengono verificati sul database, poi la
+    // corrispondenza anonima viene salvata in modo condiviso fra le istanze.
+    app.post("/saveGameReference", async (req, res, next) => {
+        try {
+            const { userId, stanzaId } = req.body || {};
+            if (!userId || !stanzaId || !(await gameExists({ userId, stanzaId })))
+                return res.status(406).json({ result: false });
+
+            const data = { userId, stanzaId };
+            const token = serverSession.set(req, data);
+            const portalId = readCookie(req, PORTAL_COOKIE);
+            if (validePortalId(portalId)) {
+                await sessionsMap.set(portalKey(portalId), {
+                    data: Date.now() + PORTAL_TTL,
+                    session: data
+                });
+            }
+            return res.status(200).json({ result: true, fallback: token });
+        } catch (e) {
+            next(e);
+        }
+    });
+    app.post("/deleteGameReference", async (req, res, next) => {
+        try {
+            await serverSession.invalidate(req, req.body?.token);
+            const portalId = readCookie(req, PORTAL_COOKIE);
+            if (validePortalId(portalId)) await sessionsMap.delete(portalKey(portalId));
+            return res.status(200).json({ result: true });
+        } catch (e) {
+            next(e);
+        }
+    });
 
     const server = new Server(httpServer, {
         cors: {
