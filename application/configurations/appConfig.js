@@ -61,12 +61,19 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
      */
     const preCheck = async (req, res, next) => {
         req.deleteToken = !!req.query?.token;
+        req.saveIDToken = !!req.query?.cucuriduCode;
         try {
             const { userId, stanzaId } = await serverSession.get(req, req.query?.token);
             const redirecting = req.query?.token ? "?token=" + req.query.token : "";
             if(userId && (await Stanze.get(stanzaId))?.trovaGiocatore(userId)) return res.redirect("/game" + redirecting);
         } catch (e) {
             console.error(`[preCheck] ${req.method} ${req.originalUrl} -> controllo stanza esistente fallito, proseguo:`, e?.stack || e);
+        }
+        if(req.saveIDToken) {
+            const urlObj = new URL(req.protocol + '://' + req.get('host') + req.originalUrl);
+            urlObj.searchParams.delete('cucuriduCode');
+            const url = urlObj.toString();
+            return res.redirect(encodeURI("/saveIDToken/?IDtoken=" + req.query?.cucuriduCode + "&redirect=" + url));
         }
         next();
     };
@@ -104,7 +111,6 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         });
     });
     app.get(['/home', '/index'], (req, res) => res.redirect('/'));
-    app.get("/localStorageSync", (req, res) => renderPage(req, res, "error", { simple: true, error: 100, message: "Non dovresti essere qua :(" }));
 
     app.get("/partecipaStanza/:codiceStanza", preCheck, (req, res) => {
         const stanza = req.params["codiceStanza"];
@@ -287,6 +293,12 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     app.get("/ping", (req, res) => {
         res.status(200).end();
     });
+
+    app.get("/saveIDToken", (req, res) => renderPage(req, res, "saveIDToken", {
+        simple: true,
+        IDtoken: req.query.IDtoken,
+        redirect: req.query.redirect
+    }));
 
     /*
      * Elenco delle frasi e dei completamenti segnalati come sbagliati.

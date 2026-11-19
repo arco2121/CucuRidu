@@ -1,5 +1,6 @@
 (function () {
     var path = window.location.pathname + window.location.search + window.location.hash;
+    var resolvedCode = null;
 
     var HOSTS = [
         'https://cucuridu.onrender.com',
@@ -42,6 +43,28 @@
         }
     }
 
+    function buildRedirectUrl(host, code) {
+        var pathname = window.location.pathname;
+        var search = window.location.search || '';
+        var hash = window.location.hash || '';
+        var param = encodeURIComponent(STORAGE_KEY) + '=' + encodeURIComponent(code);
+
+        if (search.length > 0) {
+            search = search.replace(/([?&])cucuriduCode=[^&]*(&|$)/, function (match, prefix, suffix) {
+                return suffix === '&' ? prefix : '';
+            });
+            if (search === '?' || search === '') {
+                search = '?' + param;
+            } else {
+                search = search + '&' + param;
+            }
+        } else {
+            search = '?' + param;
+        }
+
+        return host + pathname + search + hash;
+    }
+
     function setLocalCode(code) {
         try {
             window.localStorage.setItem(STORAGE_KEY, code);
@@ -78,10 +101,10 @@
     // --- COORDINAMENTO REDIRECT FINALE ---
 
     function tryRedirect() {
-        if (syncFinished && targetHost && !redirected) {
+        if (syncFinished && targetHost && resolvedCode && !redirected) {
             redirected = true;
             cleanupIframes();
-            window.location.replace(targetHost + path);
+            window.location.replace(buildRedirectUrl(targetHost, resolvedCode));
         }
     }
 
@@ -198,6 +221,7 @@
             finalCode = generateAlphanumericCode(64);
         }
 
+        resolvedCode = finalCode;
         // Salvataggio sul portale corrente
         setLocalCode(finalCode);
 
