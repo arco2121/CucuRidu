@@ -94,6 +94,19 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
             maxAge: timeout
         }
     }));
+    app.get("/ping", (req, res) => res.status(200).end());
+    app.use((req, res, next) => {
+        if(manutenzione)
+            return renderPage(req, res, "error", {
+                error: 503,
+                icon: getIcon(),
+                message: "Il server è in manutenzione subumano, torna più tardi",
+                loadToken: false,
+                bgm: "Error-Tough_Decisions"
+            });
+
+        next();
+    });
 
     app.get("/", preCheck, (req, res) => {
         const { openSettings } = req.query;
@@ -283,8 +296,6 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     app.post("/generateInfo", (req, res) => {
         res.status(200).json({nome: generateName(), pfp: generatePfp()});
     });
-
-    app.get("/ping", (req, res) => res.status(200).end());
 
     app.get("/syncIDToken", (req, res) => renderPage(req, res, "saveIDToken"));
 
@@ -504,19 +515,6 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
             success: true,
             packs: JSON.stringify(packs)
         });
-    });
-
-    app.use((req, res, next) => {
-        if(manutenzione)
-            return renderPage(req, res, "error", {
-                error: 503,
-                icon: getIcon(),
-                message: "Il server è in manutenzione subumano, torna più tardi",
-                loadToken: false,
-                bgm: "Error-Tough_Decisions"
-            });
-
-        next();
     });
 
     app.use((req, res) => res.redirect("/error"));
