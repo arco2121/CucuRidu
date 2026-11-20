@@ -8,6 +8,7 @@ const cors = require("cors");
 const { SitemapStream } = require('sitemap');
 const { createGzip } = require('zlib');
 const QRCode = require("qrcode-svg");
+const manutenzione = true;
 
 /**
  * Configura gli endpoint dell' application Express
@@ -505,6 +506,19 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         });
     });
 
+    app.use((req, res, next) => {
+        if(manutenzione)
+            return renderPage(req, res, "error", {
+                error: 503,
+                icon: getIcon(),
+                message: "Il server è in manutenzione subumano, torna più tardi",
+                loadToken: false,
+                bgm: "Error-Tough_Decisions"
+            });
+
+        next();
+    });
+
     app.use((req, res) => res.redirect("/error"));
 
     /*
@@ -519,9 +533,9 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         console.error(`[http] ${req.method} ${req.originalUrl} ->`, err?.stack || err);
         if (res.headersSent) return next(err);
         res.status(500).type("html").send(`<!doctype html><html lang="it"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><title>Cucu Ridu</title>
-<style>body{font-family:system-ui,Arial,sans-serif;display:flex;min-height:100vh;margin:0;align-items:center;justify-content:center;text-align:center;background:#faf7f2;color:#2b2b2b}a{color:#a3560f;font-weight:600}</style>
-</head><body><div><h1>Ops, qualcosa si e' rotto</h1><p>Riprova fra qualche secondo.</p><p><a href="/">Torna alla home</a></p></div></body></html>`);
+        <meta name="viewport" content="width=device-width, initial-scale=1"><title>Cucu Ridu</title>
+        <style>body{font-family:system-ui,Arial,sans-serif;display:flex;min-height:100vh;margin:0;align-items:center;justify-content:center;text-align:center;background:#faf7f2;color:#2b2b2b}a{color:#a3560f;font-weight:600}</style>
+        </head><body><div><h1>Ops, qualcosa si e' rotto</h1><p>Riprova fra qualche secondo.</p><p><a href="/">Torna alla home</a></p></div></body></html>`);
     });
 };
 
