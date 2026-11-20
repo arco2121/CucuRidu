@@ -31,6 +31,7 @@ const allowedOrigins = [
 const cluster = ENV.USE_CLUSTER === "true";
 const local = allowedOrigins[allowedOrigins.length - 1] ?? false;
 const port = !local ? 7860 : 0
+const manutenzione = true;
 
 // Rete di sicurezza: un errore non gestito dentro un handler asincrono non
 // deve piu poter chiudere il processo e buttare fuori tutta la partita.
@@ -42,6 +43,7 @@ process.on('uncaughtException', (err) => {
 });
 
 const initApp = async () => {
+    if (manutenzione) throw new Error("Il server è in manutenzione")
     if (local) console.log(ENV, '\n');
     if (!cluster) return await singleApp(local, port, allowedOrigins, ENV);
     await attempt(
