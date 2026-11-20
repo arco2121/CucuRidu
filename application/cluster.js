@@ -16,7 +16,7 @@ const { cleanUpStanze, cleanUpMemory } = require(path.join(__dirname, "/configur
 const { ClusterMap } = require(path.join(__dirname, "/include/script/ClusterMap"));
 const { SegnalazioniCluster } = require(path.join(__dirname, "/include/script/Segnalazioni"));
 
-const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 3600000) => {
+const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 3600000, manutenzione = false) => {
     const key = env.DATABASE_KEY;
     const url = env.DATABASE_URL;
     const password = env.DATABASE_PASSWORD;
@@ -76,7 +76,7 @@ const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 36000
     appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout, {
         version: env.npm_package_version,
         cluster: true
-    }, segnalazioni, env.SEGNALAZIONI_KEY || null);
+    }, segnalazioni, env.SEGNALAZIONI_KEY || null, manutenzione);
 
     serverConfig(server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout, segnalazioni);
     cleanUpStanze(Stanze, timeout);

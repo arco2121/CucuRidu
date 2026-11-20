@@ -17,6 +17,7 @@ const ENV = {
     ...envFiles,
     ...process.env
 };
+const manutenzione = true;
 
 const allowedOrigins = [
     "https://cucuridu-portal.web.app",
@@ -43,12 +44,12 @@ process.on('uncaughtException', (err) => {
 
 const initApp = async () => {
     if (local) console.log(ENV, '\n');
-    if (!cluster) return await singleApp(local, port, allowedOrigins, ENV);
+    if (!cluster || manutenzione) return await singleApp(local, port, allowedOrigins, ENV, manutenzione);
     await attempt(
-        () => clusterApp(local, port, allowedOrigins, ENV),
+        () => clusterApp(local, port, allowedOrigins, ENV, manutenzione),
         async (err) => {
             console.warn("Cluster failed => " + err.message);
-            await singleApp(local, port, allowedOrigins, ENV);
+            await singleApp(local, port, allowedOrigins, ENV, manutenzione);
         }
     );
 };

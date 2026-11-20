@@ -8,7 +8,6 @@ const cors = require("cors");
 const { SitemapStream } = require('sitemap');
 const { createGzip } = require('zlib');
 const QRCode = require("qrcode-svg");
-const manutenzione = true;
 
 /**
  * Configura gli endpoint dell' application Express
@@ -24,7 +23,7 @@ const manutenzione = true;
 const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout = 3600000, pagesOptions = {
     version: '1.5.1',
     cluster: false
-}, archivioSegnalazioni = null, chiaveSegnalazioni = null) => {
+}, archivioSegnalazioni = null, chiaveSegnalazioni = null, manutenzione = false) => {
 
     const renderPage = (req, res, page, params = {
         simple: false,
@@ -96,6 +95,8 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     }));
 
     app.get("/ping", (req, res) => res.status(200).end());
+
+    app.get("/syncIDToken", (req, res) => renderPage(req, res, "saveIDToken"));
 
     app.get("/offline", (req, res) => renderPage(req, res, "offline", {
         loadToken: false,
@@ -453,8 +454,6 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     app.post("/generateInfo", (req, res) => {
         res.status(200).json({nome: generateName(), pfp: generatePfp()});
     });
-
-    app.get("/syncIDToken", (req, res) => renderPage(req, res, "saveIDToken"));
 
     app.post("/doRoomExists", async (req, res) => {
         try {

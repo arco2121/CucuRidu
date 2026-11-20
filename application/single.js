@@ -10,7 +10,7 @@ const serverConfig = require(path.join(__dirname, "/configurations/serverConfig"
 const { SingleStanze } = require(path.join(__dirname, "/include/script/SingleStanze"));
 const { SegnalazioniLocali } = require(path.join(__dirname, "/include/script/Segnalazioni"));
 
-const singleApp = async (local, port, allowedOrigins, env = {}, timeout = 3600000) => {
+const singleApp = async (local, port, allowedOrigins, env = {}, timeout = 3600000, manutenzione = false) => {
     const generationMemory = new Set();
     const app = express();
     const httpServer = createServer(app);
@@ -42,7 +42,7 @@ const singleApp = async (local, port, allowedOrigins, env = {}, timeout = 360000
 
     //App Config
     appConfig(app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout,
-        { version: env.npm_package_version }, segnalazioni, env.SEGNALAZIONI_KEY || null);
+        { version: env.npm_package_version }, segnalazioni, env.SEGNALAZIONI_KEY || null, manutenzione);
 
     //ServerIO Config
     serverConfig(server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout, segnalazioni);
