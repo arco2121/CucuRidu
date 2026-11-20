@@ -44,7 +44,8 @@ process.on('uncaughtException', (err) => {
 
 const initApp = async () => {
     if (local) console.log(ENV, '\n');
-    if (!cluster || manutenzione) return await singleApp(local, port, allowedOrigins, ENV, manutenzione);
+    if(manutenzione) return await singleApp(true, port, allowedOrigins, ENV, manutenzione);
+    if (!cluster) return await singleApp(local, port, allowedOrigins, ENV, manutenzione);
     await attempt(
         () => clusterApp(local, port, allowedOrigins, ENV, manutenzione),
         async (err) => {
