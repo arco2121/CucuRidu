@@ -94,110 +94,8 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
             maxAge: timeout
         }
     }));
+
     app.get("/ping", (req, res) => res.status(200).end());
-    app.use((req, res, next) => {
-        if(manutenzione)
-            return renderPage(req, res, "error", {
-                error: 503,
-                icon: getIcon(),
-                message: "Il server è in manutenzione subumano, torna più tardi",
-                loadToken: false,
-                bgm: "Error-Tough_Decisions"
-            });
-
-        next();
-    });
-
-    app.get("/", preCheck, (req, res) => {
-        const { openSettings } = req.query;
-        renderPage(req, res, "index", {
-            icon: getIcon(),
-            deleteToken: req.deleteToken,
-            bgm: "MainMenu-City_Stroll",
-            openSettings: openSettings === "true"
-        });
-    });
-    app.get(['/home', '/index'], (req, res) => res.redirect('/'));
-
-    app.get("/partecipaStanza/:codiceStanza", preCheck, (req, res) => {
-        const stanza = req.params["codiceStanza"];
-        if (stanza) renderPage(req, res, "profile", {
-            stanza: stanza,
-            setOfPfp: getAllPfp(),
-            deleteToken: req.deleteToken,
-            bgm: "Choosing_Menu-Feeling_Good"
-        });
-        else res.redirect("/");
-    });
-
-    app.get("/partecipaStanza", preCheck, (req, res) => {
-        const {nome, pfp, stanza} = req.query;
-        if (nome && pfp && stanza) {
-            const token = serverSession.set(req, {
-                nome: nome,
-                pfp: pfp,
-                stanzaId: stanza,
-                deleteToken: req.deleteToken,
-                bgm: "Choosing_Menu-Feeling_Good"
-            });
-            res.redirect("/game?token=" + token);
-        } else if (stanza) renderPage(req, res, "profile", {
-            stanza: stanza,
-            setOfPfp: getAllPfp(),
-            deleteToken: req.deleteToken,
-            bgm: "Choosing_Menu-Feeling_Good"
-        }); else renderPage(req, res, "join", {
-            bgm: "Choosing_Menu-Feeling_Good",
-            deleteToken: req.deleteToken
-        });
-    });
-
-    app.get("/creaStanza", preCheck, (req, res) => {
-        const {nome, pfp} = req.query;
-        if (nome && pfp) {
-            const token = serverSession.set(req, {
-                nome: nome,
-                pfp: pfp,
-                bgm: "Choosing_Menu-Feeling_Good"
-            });
-            res.redirect("/game?token=" + token);
-        } else renderPage(req, res, "profile", {
-            setOfPfp: getAllPfp(),
-            deleteToken: req.deleteToken,
-            bgm: "Choosing_Menu-Feeling_Good"
-        });
-    });
-
-    app.get("/game", async (req, res) => {
-        const check = ["nome", "pfp", "stanzaId", "userId"];
-        const {nome, pfp, stanzaId, userId} = await serverSession.validate(check, req.session.storeData, req.query?.token);
-        if (userId && stanzaId && await Stanze.has(stanzaId) && (await Stanze.get(stanzaId))?.trovaGiocatore(userId))
-            renderPage(req, res, "lobby", {
-                userId: userId,
-                stanzaId: stanzaId,
-                token: TEMPORARY_TOKEN,
-                knownPacks: getknownPacks(),
-                bgm: "GameMusic-Candy_Bazaar"
-            });
-        else if (nome && pfp) {
-            renderPage(req, res, "lobby", {
-                nome: nome,
-                pfp: pfp,
-                stanzaId: stanzaId,
-                token: TEMPORARY_TOKEN,
-                action: !stanzaId ? "Crea" : "Partecipa",
-                knownPacks: getknownPacks(),
-                bgm: "GameMusic-Candy_Bazaar"
-            });
-        } else {
-            await serverSession.invalidate(req, req.query?.token);
-            res.redirect("/");
-        }
-    });
-
-    app.get("/creaMazzo", (req, res) => renderPage(req, res, "createPacks", {
-        loadToken: false,
-    }));
 
     app.get("/offline", (req, res) => renderPage(req, res, "offline", {
         loadToken: false,
@@ -210,94 +108,6 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
 
         res.sendFile(path.resolve(__dirname, '..', '../public/script/config/worker.js'));
     });
-
-    app.get("/error", (req, res) => {
-        let status = 104;
-        let message = "Questa pagina non esiste, brutta sottospecie di spermatozoo di elefante con la disfunzione erettile";
-
-        if (req.query["alreadyConnected"]) {
-            status = 420;
-            message = "Allora signora, si scanti fora e torni alla pagina del gioco";
-        }
-        renderPage(req, res, "error", {
-            error: status,
-            icon: getIcon(),
-            message: message,
-            loadToken: false,
-            bgm: "Error-Tough_Decisions"
-        });
-    });
-
-    app.get('/sitemap', async (req, res) => {
-        res.header('Content-Type', 'application/xml');
-        res.header('Content-Encoding', 'gzip');
-        try {
-            const protocol = req.protocol;
-            const host = req.get('host');
-            const url = `${protocol}://${host}`;
-            const smStream = new SitemapStream({ hostname: url });
-            const pipeline = smStream.pipe(createGzip());
-
-            smStream.write({ url: '/', changefreq: 'daily', priority: 1.0 });
-            smStream.write({ url: '/partecipaStanza', changefreq: 'daily', priority: 0.5 });
-            smStream.write({ url: '/creaStanza', changefreq: 'daily', priority: 0.5 });
-            smStream.write({ url: '/creaMazzo', changefreq: 'daily', priority: 0.5 });
-
-            smStream.end();
-            pipeline.pipe(res).on('error', (e) => { throw e });
-
-        } catch (e) {
-            console.error(e);
-            res.status(500).end();
-        }
-    });
-
-    app.get('/qrCode', async (req, res) => {
-        res.setHeader('Content-Type', 'image/svg+xml');
-        res.setHeader('Content-Disposition', 'inline; filename="qrcode.svg"');
-        res.setHeader('Cache-Control', 'public, max-age=36000');
-        try {
-            const url = req.query.url;
-            const size = parseInt(req.query.size) || 400;
-            const radius = parseFloat(req.query.radius) || 0;
-            const padding = parseFloat(req.query.padding) || 0;
-            const background = req.query.background || "none";
-            const filler = req.query.filler || "#000000";
-            const QR_ECL = {
-                L: '7%',
-                M: '15%',
-                Q: '25%',
-                H: '30%'
-            };
-            let quality = req.query.quality;
-            if(!QR_ECL[quality])
-                quality = "H";
-
-            const qr = new QRCode({
-                content: url,
-                padding: padding,
-                width: size,
-                height: size,
-                color: filler,
-                background: background,
-                ecl: quality,
-            });
-            const svg = qr.svg();
-            const rValue = radius * (size / 40);
-            const roundedSvg = svg.replace(/<rect(?! [^>]*id="bg"| [^>]*class="background")/g, `<rect rx="${rValue}" ry="${rValue}"`);
-
-            res.send(roundedSvg);
-        } catch (err) {
-            console.log(err);
-            res.status(500).send('Errore');
-        }
-    });
-
-    app.post("/generateInfo", (req, res) => {
-        res.status(200).json({nome: generateName(), pfp: generatePfp()});
-    });
-
-    app.get("/syncIDToken", (req, res) => renderPage(req, res, "saveIDToken"));
 
     /*
      * Elenco delle frasi e dei completamenti segnalati come sbagliati.
@@ -451,6 +261,200 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
             res.status(500).json({ ok: false });
         }
     });
+
+    app.use((req, res, next) => {
+        if(manutenzione) {
+            res.status(503);
+            return renderPage(req, res, "error", {
+                error: 503,
+                icon: getIcon(),
+                message: "Il server è in manutenzione subumano, torna più tardi",
+                loadToken: false,
+                bgm: "Error-Tough_Decisions"
+            });
+        }
+
+        next();
+    });
+
+    app.get("/", preCheck, (req, res) => {
+        const { openSettings } = req.query;
+        renderPage(req, res, "index", {
+            icon: getIcon(),
+            deleteToken: req.deleteToken,
+            bgm: "MainMenu-City_Stroll",
+            openSettings: openSettings === "true"
+        });
+    });
+    app.get(['/home', '/index'], (req, res) => res.redirect('/'));
+
+    app.get("/partecipaStanza/:codiceStanza", preCheck, (req, res) => {
+        const stanza = req.params["codiceStanza"];
+        if (stanza) renderPage(req, res, "profile", {
+            stanza: stanza,
+            setOfPfp: getAllPfp(),
+            deleteToken: req.deleteToken,
+            bgm: "Choosing_Menu-Feeling_Good"
+        });
+        else res.redirect("/");
+    });
+
+    app.get("/partecipaStanza", preCheck, (req, res) => {
+        const {nome, pfp, stanza} = req.query;
+        if (nome && pfp && stanza) {
+            const token = serverSession.set(req, {
+                nome: nome,
+                pfp: pfp,
+                stanzaId: stanza,
+                deleteToken: req.deleteToken,
+                bgm: "Choosing_Menu-Feeling_Good"
+            });
+            res.redirect("/game?token=" + token);
+        } else if (stanza) renderPage(req, res, "profile", {
+            stanza: stanza,
+            setOfPfp: getAllPfp(),
+            deleteToken: req.deleteToken,
+            bgm: "Choosing_Menu-Feeling_Good"
+        }); else renderPage(req, res, "join", {
+            bgm: "Choosing_Menu-Feeling_Good",
+            deleteToken: req.deleteToken
+        });
+    });
+
+    app.get("/creaStanza", preCheck, (req, res) => {
+        const {nome, pfp} = req.query;
+        if (nome && pfp) {
+            const token = serverSession.set(req, {
+                nome: nome,
+                pfp: pfp,
+                bgm: "Choosing_Menu-Feeling_Good"
+            });
+            res.redirect("/game?token=" + token);
+        } else renderPage(req, res, "profile", {
+            setOfPfp: getAllPfp(),
+            deleteToken: req.deleteToken,
+            bgm: "Choosing_Menu-Feeling_Good"
+        });
+    });
+
+    app.get("/game", async (req, res) => {
+        const check = ["nome", "pfp", "stanzaId", "userId"];
+        const {nome, pfp, stanzaId, userId} = await serverSession.validate(check, req.session.storeData, req.query?.token);
+        if (userId && stanzaId && await Stanze.has(stanzaId) && (await Stanze.get(stanzaId))?.trovaGiocatore(userId))
+            renderPage(req, res, "lobby", {
+                userId: userId,
+                stanzaId: stanzaId,
+                token: TEMPORARY_TOKEN,
+                knownPacks: getknownPacks(),
+                bgm: "GameMusic-Candy_Bazaar"
+            });
+        else if (nome && pfp) {
+            renderPage(req, res, "lobby", {
+                nome: nome,
+                pfp: pfp,
+                stanzaId: stanzaId,
+                token: TEMPORARY_TOKEN,
+                action: !stanzaId ? "Crea" : "Partecipa",
+                knownPacks: getknownPacks(),
+                bgm: "GameMusic-Candy_Bazaar"
+            });
+        } else {
+            await serverSession.invalidate(req, req.query?.token);
+            res.redirect("/");
+        }
+    });
+
+    app.get("/creaMazzo", (req, res) => renderPage(req, res, "createPacks", {
+        loadToken: false,
+    }));
+
+    app.get("/error", (req, res) => {
+        let status = 104;
+        let message = "Questa pagina non esiste, brutta sottospecie di spermatozoo di elefante con la disfunzione erettile";
+
+        if (req.query["alreadyConnected"]) {
+            status = 420;
+            message = "Allora signora, si scanti fora e torni alla pagina del gioco";
+        }
+        renderPage(req, res, "error", {
+            error: status,
+            icon: getIcon(),
+            message: message,
+            loadToken: false,
+            bgm: "Error-Tough_Decisions"
+        });
+    });
+
+    app.get('/sitemap', async (req, res) => {
+        res.header('Content-Type', 'application/xml');
+        res.header('Content-Encoding', 'gzip');
+        try {
+            const protocol = req.protocol;
+            const host = req.get('host');
+            const url = `${protocol}://${host}`;
+            const smStream = new SitemapStream({ hostname: url });
+            const pipeline = smStream.pipe(createGzip());
+
+            smStream.write({ url: '/', changefreq: 'daily', priority: 1.0 });
+            smStream.write({ url: '/partecipaStanza', changefreq: 'daily', priority: 0.5 });
+            smStream.write({ url: '/creaStanza', changefreq: 'daily', priority: 0.5 });
+            smStream.write({ url: '/creaMazzo', changefreq: 'daily', priority: 0.5 });
+
+            smStream.end();
+            pipeline.pipe(res).on('error', (e) => { throw e });
+
+        } catch (e) {
+            console.error(e);
+            res.status(500).end();
+        }
+    });
+
+    app.get('/qrCode', async (req, res) => {
+        res.setHeader('Content-Type', 'image/svg+xml');
+        res.setHeader('Content-Disposition', 'inline; filename="qrcode.svg"');
+        res.setHeader('Cache-Control', 'public, max-age=36000');
+        try {
+            const url = req.query.url;
+            const size = parseInt(req.query.size) || 400;
+            const radius = parseFloat(req.query.radius) || 0;
+            const padding = parseFloat(req.query.padding) || 0;
+            const background = req.query.background || "none";
+            const filler = req.query.filler || "#000000";
+            const QR_ECL = {
+                L: '7%',
+                M: '15%',
+                Q: '25%',
+                H: '30%'
+            };
+            let quality = req.query.quality;
+            if(!QR_ECL[quality])
+                quality = "H";
+
+            const qr = new QRCode({
+                content: url,
+                padding: padding,
+                width: size,
+                height: size,
+                color: filler,
+                background: background,
+                ecl: quality,
+            });
+            const svg = qr.svg();
+            const rValue = radius * (size / 40);
+            const roundedSvg = svg.replace(/<rect(?! [^>]*id="bg"| [^>]*class="background")/g, `<rect rx="${rValue}" ry="${rValue}"`);
+
+            res.send(roundedSvg);
+        } catch (err) {
+            console.log(err);
+            res.status(500).send('Errore');
+        }
+    });
+
+    app.post("/generateInfo", (req, res) => {
+        res.status(200).json({nome: generateName(), pfp: generatePfp()});
+    });
+
+    app.get("/syncIDToken", (req, res) => renderPage(req, res, "saveIDToken"));
 
     app.post("/doRoomExists", async (req, res) => {
         try {
