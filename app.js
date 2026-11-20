@@ -44,12 +44,12 @@ process.on('uncaughtException', (err) => {
 
 const initApp = async () => {
     if (local) console.log(ENV, '\n');
-    if (!cluster) return await singleApp(local, port, allowedOrigins, ENV, manutenzione);
+    if (!cluster || manutenzione) return await singleApp(local, port, allowedOrigins, ENV, null, manutenzione);
     await attempt(
-        () => clusterApp(local, port, allowedOrigins, ENV, manutenzione),
+        () => clusterApp(local, port, allowedOrigins, ENV, null, manutenzione),
         async (err) => {
             console.warn("Cluster failed => " + err.message);
-            await singleApp(local, port, allowedOrigins, ENV, manutenzione);
+            await singleApp(local, port, allowedOrigins, ENV, null, manutenzione);
         }
     );
 };
