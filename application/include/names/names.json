@@ -1645,6 +1645,58 @@
     {
       "nome": "Spacciatore Brasiliano",
       "genere": "m"
+    },
+    {
+      "nome": "Ricchiardo",
+      "genere": "m"
+    },
+    {
+      "nome": "I Pinguini Tattici Nucleotidi",
+      "genere": "p"
+    },
+    {
+      "nome": "Mikhail Andropov",
+      "genere": "m"
+    },
+    {
+      "nome": "Ostiberio",
+      "genere": "m"
+    },
+    {
+      "nome": "Nunziata",
+      "genere": "f"
+    },
+    {
+      "nome": "Aurelia",
+      "genere": "f"
+    },
+    {
+      "nome": "*Nome Generico Bruttino*",
+      "genere": "n"
+    },
+    {
+      "nome": "Bonnie Blue",
+      "genere": "f"
+    },
+    {
+      "nome": "Gargamella",
+      "genere": "m"
+    },
+    {
+      "nome": "Una tipa",
+      "genere": "f"
+    },
+    {
+      "nome": "La Comunità LGBTQI A C A B",
+      "genere": "f"
+    },
+    {
+      "nome": "Marlena (torna a casa)",
+      "genere": "f"
+    },
+    {
+      "nome": "Matthew (imgravida moto)",
+      "genere": "m"
     }
   ],
   "adjectives": [
@@ -3369,6 +3421,27 @@
       "f": "Del Cazzo",
       "p": "Del Cazzo",
       "fp": "Del Cazzo"
+    },
+    {
+      "n": "Rabbin*",
+      "m": "Rabbino",
+      "f": "Rabbina",
+      "p": "Rabbini",
+      "fp": "Rabbine"
+    },
+    {
+      "n": "*Aggettivo Offensivo*",
+      "m": "*Aggettivo Offensivo*",
+      "f": "*Aggettivo Offensivo*",
+      "p": "*Aggettivo Offensivo*",
+      "fp": "*Aggettivo Offensivo*"
+    },
+    {
+      "n": "Minchiarol*",
+      "m": "Minchiarolo",
+      "f": "Minchiarola",
+      "p": "Minchiaroli",
+      "fp": "Minchiaroli"
     }
   ]
 }
