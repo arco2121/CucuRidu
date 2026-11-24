@@ -1,128 +1,150 @@
-(function () {
-    var STORAGE_KEY = 'cucuRiduToken';
-    var UPDATED_AT_KEY = STORAGE_KEY + ':updatedAt';
-    var LIFETIME = 24 * 60 * 60 * 1000;
+(() => {
+    const CANONICAL_PORTAL = 'https://cucuridu-portal.web.app';
+    const STORAGE_KEY = 'cucuriduCode';
+    const STICKY_KEY = 'cucuridu_last_node';
+    const STICKY_TTL_MS = 25 * 60 * 1000; // 25 minuti
 
-    var HOSTS = [
+    const NODES = [
         'https://cucuridu.onrender.com',
         'https://cucuridu-gmgv.onrender.com',
         'https://arco2120-cucuridu.hf.space',
         'https://cucuridu-jean.onrender.com'
     ];
 
-    function generateCode(length) {
-        var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        var bytes = new Uint8Array(length || 128);
-        crypto.getRandomValues(bytes);
-        return Array.from(bytes, function (b) { return chars[b % chars.length]; }).join('');
+    const statusEl = document.getElementById('status-text');
+    const setStatus = (msg) => { if (statusEl) statusEl.textContent = msg; };
+
+    // 1. Recupera eventuale codice passato via #hash o query
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const queryParams = new URLSearchParams(window.location.search);
+    const incomingCode = hashParams.get(STORAGE_KEY)
+        || hashParams.get('idToken')
+        || queryParams.get(STORAGE_KEY)
+        || queryParams.get('idToken');
+
+    let code = localStorage.getItem(STORAGE_KEY);
+    if (incomingCode) {
+        code = incomingCode;
+        localStorage.setItem(STORAGE_KEY, code);
+    } else if (!code) {
+        code = (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+        localStorage.setItem(STORAGE_KEY, code);
     }
 
-    function preferState(candidate, current) {
-        if (!candidate || !candidate.code) return current;
-        if (!current || !current.code) return candidate;
-        if (candidate.updatedAt !== current.updatedAt)
-            return candidate.updatedAt > current.updatedAt ? candidate : current;
-        return candidate.code > current.code ? candidate : current;
+    // 2. Unifica su un solo dominio portale per non frammentare il localStorage top-level
+    if (window.location.origin !== CANONICAL_PORTAL && window.location.hostname.endsWith('.web.app')) {
+        const target = new URL(window.location.pathname + window.location.search, CANONICAL_PORTAL);
+        target.hash = `${STORAGE_KEY}=${encodeURIComponent(code)}`;
+        window.location.replace(target.toString());
+        return;
     }
 
-    function resolvePortalState(incomingCode, incomingUpdatedAt) {
-        var localState = null;
+    // Estrae eventuale codice stanza dalle rotte reali di Cucu Ridu (/partecipaStanza/XYZ, ?stanza=XYZ, ?room=XYZ)
+    const roomParam = queryParams.get('stanza')
+        || queryParams.get('room')
+        || window.location.pathname.match(/\/(?:partecipaStanza|stanza)\/([a-zA-Z0-9_-]+)/)?.[1]
+        || '';
+
+    const probeNode = async (baseUrl, timeoutMs) => {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
         try {
-            var code = localStorage.getItem(STORAGE_KEY);
-            var updatedAt = Number(localStorage.getItem(UPDATED_AT_KEY)) || 0;
-            if (code) localState = { code: code, updatedAt: updatedAt };
-        } catch (e) {}
+            const url = new URL('/health', baseUrl);
+            if (roomParam) url.searchParams.set('room', roomParam);
 
-        var candidate = incomingCode
-            ? { code: incomingCode, updatedAt: Number(incomingUpdatedAt) || Date.now() }
-            : null;
+            const res = await fetch(url.toString(), {
+                method: 'GET',
+                cache: 'no-store',
+                signal: controller.signal
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-        var merged = preferState(candidate, localState);
-        if (!merged || Date.now() - merged.updatedAt >= LIFETIME) {
-            merged = { code: generateCode(128), updatedAt: Date.now() };
+            const data = await res.json().catch(() => ({ ok: true }));
+            return { baseUrl, hasRoom: Boolean(data.hasRoom) };
+        } finally {
+            clearTimeout(timer);
         }
+    };
 
-        try {
-            localStorage.setItem(STORAGE_KEY, merged.code);
-            localStorage.setItem(UPDATED_AT_KEY, String(merged.updatedAt));
-        } catch (e) {}
+    const redirectToNode = (baseUrl) => {
+        localStorage.setItem(STICKY_KEY, JSON.stringify({ url: baseUrl, ts: Date.now() }));
 
-        return merged;
-    }
+        // Preserva path e query (es. /partecipaStanza/XYZ) senza token in query string
+        queryParams.delete(STORAGE_KEY);
+        queryParams.delete('idToken');
+        const cleanSearch = queryParams.toString();
+        const target = new URL(
+            window.location.pathname + (cleanSearch ? `?${cleanSearch}` : ''),
+            baseUrl
+        );
+        // Il fragment # non viene inviato al server: zero 302 di pulizia!
+        target.hash = `${STORAGE_KEY}=${encodeURIComponent(code)}`;
+        window.location.replace(target.toString());
+    };
 
-    var currentUrl = new URL(window.location.href);
-    var ssoReturn = currentUrl.searchParams.get('ssoReturn');
+    // Race intelligente per inviti stanza: appena un nodo risponde hasRoom: true vince istantaneamente;
+    // se risponde un nodo senza stanza in RAM, aspetta al massimo 450ms gli altri nodi prima di partire.
+    const resolveRoomNode = () => new Promise((resolve, reject) => {
+        let settled = false;
+        let firstAlive = null;
+        let graceTimer = null;
+        let pending = NODES.length;
 
-    // Modalita' SSO: un dominio del cluster ha chiesto il codice condiviso
-    if (ssoReturn) {
-        try {
-            var returnUrl = new URL(ssoReturn);
-            if (HOSTS.indexOf(returnUrl.origin) !== -1) {
-                var state = resolvePortalState(
-                    currentUrl.searchParams.get('code'),
-                    currentUrl.searchParams.get('updatedAt')
-                );
-                returnUrl.searchParams.set('idToken', state.code);
-                returnUrl.searchParams.set('idUpdatedAt', String(state.updatedAt));
-                window.location.replace(returnUrl.toString());
-                return;
-            }
-        } catch (e) {}
-    }
+        const finish = (url) => {
+            if (settled) return;
+            settled = true;
+            if (graceTimer) clearTimeout(graceTimer);
+            resolve(url);
+        };
 
-    // Modalita' portale normale: smista sul primo server attivo portando idToken
-    var portalState = resolvePortalState(currentUrl.searchParams.get('idToken'), 0);
-    currentUrl.searchParams.set('idToken', portalState.code);
-    currentUrl.searchParams.set('idUpdatedAt', String(portalState.updatedAt));
-    var path = currentUrl.pathname + currentUrl.search;
+        NODES.forEach((node) => {
+            probeNode(node, 7000)
+                .then(({ baseUrl, hasRoom }) => {
+                    if (settled) return;
+                    if (hasRoom) return finish(baseUrl);
+                    if (!firstAlive) {
+                        firstAlive = baseUrl;
+                        graceTimer = setTimeout(() => finish(firstAlive), 450);
+                    }
+                })
+                .catch(() => {})
+                .finally(() => {
+                    pending -= 1;
+                    if (pending === 0 && !settled) {
+                        if (firstAlive) finish(firstAlive);
+                        else reject(new Error('Nessun nodo disponibile'));
+                    }
+                });
+        });
+    });
 
-    var completed = 0;
-    var found = false;
-
-    function checkHost(host) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', host + "/ping", true);
-
-        var timeout = setTimeout(function() {
-            xhr.abort();
-        }, 7000);
-
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                clearTimeout(timeout);
-                if (!found && xhr.status >= 200 && xhr.status < 300) {
-                    found = true;
-                    window.location.replace(host + path);
-                } else {
-                    handleFailure();
+    const resolveBestNode = async () => {
+        // 3. Fast-path Sticky Node: se non cerchiamo una stanza specifica, prova prima l'ultimo nodo attivo
+        if (!roomParam) {
+            try {
+                const sticky = JSON.parse(localStorage.getItem(STICKY_KEY) || 'null');
+                if (sticky?.url && NODES.includes(sticky.url) && (Date.now() - sticky.ts) < STICKY_TTL_MS) {
+                    setStatus('Riconnessione rapida al server precedente...');
+                    const fast = await probeNode(sticky.url, 1500);
+                    return fast.baseUrl;
                 }
-            }
-        };
-
-        xhr.onerror = function() {
-            clearTimeout(timeout);
-            handleFailure();
-        };
-
-        try {
-            xhr.send();
-        } catch (e) {
-            handleFailure();
+            } catch { /* fallback al race completo */ }
         }
-    }
 
-    function handleFailure() {
-        completed++;
-        if (completed === HOSTS.length && !found) {
-            var statusElem = document.getElementById('status-text');
-            if (statusElem) {
-                statusElem.textContent = "Nessun server disponibile al momento. Prova a ricaricare la pagina.";
-                statusElem.style.color = "#d9534f";
-            }
-        }
-    }
+        setStatus('Ricerca del nodo più veloce...');
 
-    for (var i = 0; i < HOSTS.length; i++) {
-        checkHost(HOSTS[i]);
-    }
+        // 4. Ricerca stanza con uscita immediata su hasRoom: true
+        if (roomParam) return resolveRoomNode();
+
+        // 5. Race puro: vince il primo nodo che risponde
+        const winner = await Promise.any(NODES.map((n) => probeNode(n, 8000)));
+        return winner.baseUrl;
+    };
+
+    resolveBestNode()
+        .then(redirectToNode)
+        .catch(() => {
+            setStatus('Tutti i server sono in fase di avvio. Riprovo tra 3 secondi...');
+            setTimeout(() => window.location.reload(), 3000);
+        });
 })();

@@ -4,35 +4,35 @@ const MemoryStore = require('memorystore')(session);
 const pgSession = require('connect-pg-simple')(session);
 
 /*
- * ---- PERCHE' ESISTE QUESTO STORE ----
+- ---- PERCHE' ESISTE QUESTO STORE ----
  *
- * 1) connect-pg-simple (v10) con `createTableIfMissing: true` controlla che la
- *    tabella esista alla PRIMA query e si tiene in memoria la promessa di quel
- *    controllo (`#tableCreationPromise`). Se quel primo controllo fallisce (un
- *    timeout del pooler di Supabase durante un deploy e' bastato,
- *    2026-09-20: "ECHECKOUTTIMEOUT ... in Transaction mode"), la promessa
- *    RIFIUTATA resta in memoria per sempre: da quel momento OGNI get/set/touch
- *    sul database delle sessioni fallisce all'istante con lo stesso errore,
- *    anche a Supabase tornato sano, fino al riavvio del processo. Nei log
- *    si vede lo stesso stack ripetuto ogni pochi secondi.
- *    Per questo la tabella qui si controlla per conto nostro (`assicuraTabella`,
- *    con nuovi tentativi) e a connect-pg-simple si passa
- *    `createTableIfMissing: false`.
+- 1) connect-pg-simple (v10) con `createTableIfMissing: true` controlla che la
+-    tabella esista alla PRIMA query e si tiene in memoria la promessa di quel
+-    controllo (`#tableCreationPromise`). Se quel primo controllo fallisce (un
+-    timeout del pooler di Supabase durante un deploy e' bastato,
+-    2026-09-20: "ECHECKOUTTIMEOUT ... in Transaction mode"), la promessa
+-    RIFIUTATA resta in memoria per sempre: da quel momento OGNI get/set/touch
+-    sul database delle sessioni fallisce all'istante con lo stesso errore,
+-    anche a Supabase tornato sano, fino al riavvio del processo. Nei log
+-    si vede lo stesso stack ripetuto ogni pochi secondi.
+-    Per questo la tabella qui si controlla per conto nostro (`assicuraTabella`,
+-    con nuovi tentativi) e a connect-pg-simple si passa
+-    `createTableIfMissing: false`.
  *
- * 2) express-session, quando lo store restituisce un errore in lettura,
- *    risponde 500 a QUALSIASI pagina. Chi arriva senza cookie non tocca lo
- *    store in lettura e vede tutto normale, chi ha gia il cookie (chiunque
- *    abbia aperto la home un secondo prima di cliccare "Crea stanza") prende
- *    "Internal Server Error".
+- 2) express-session, quando lo store restituisce un errore in lettura,
+-    risponde 500 a QUALSIASI pagina. Chi arriva senza cookie non tocca lo
+-    store in lettura e vede tutto normale, chi ha gia il cookie (chiunque
+-    abbia aperto la home un secondo prima di cliccare "Crea stanza") prende
+-    "Internal Server Error".
  *
- * 3) Anche senza errori, un pooler lento fa aspettare la pagina 15 secondi.
+- 3) Anche senza errori, un pooler lento fa aspettare la pagina 15 secondi.
  *
- * StoreTollerante mette Postgres davanti e un MemoryStore dietro: ogni
- * operazione su Postgres ha un tempo massimo; se fallisce o scade, l'errore
- * va nei log, Postgres viene lasciato stare per `pausaMs` (le richieste non
- * ci si accodano) e nel frattempo le sessioni vivono in memoria. Il gioco non
- * dipende comunque dalla sessione lato server: il fallback e' il token JWT
- * nell'URL (?token=). Quando Postgres torna a rispondere si riparte da solo.
+- StoreTollerante mette Postgres davanti e un MemoryStore dietro: ogni
+- operazione su Postgres ha un tempo massimo; se fallisce o scade, l'errore
+- va nei log, Postgres viene lasciato stare per `pausaMs` (le richieste non
+- ci si accodano) e nel frattempo le sessioni vivono in memoria. Il gioco non
+- dipende comunque dalla sessione lato server: il fallback e' il token JWT
+- nell'URL (?token=). Quando Postgres torna a rispondere si riparte da solo.
  */
 class StoreTollerante extends session.Store {
 
@@ -107,9 +107,9 @@ class StoreTollerante extends session.Store {
 }
 
 /**
- * Crea la tabella delle sessioni se manca, riprovando finche' ci riesce (un
- * timeout del pooler non deve lasciare il server senza tabella ne' fermarlo).
- * Stessa definizione di connect-pg-simple.
+ - Crea la tabella delle sessioni se manca, riprovando finche' ci riesce (un
+ - timeout del pooler non deve lasciare il server senza tabella ne' fermarlo).
+ - Stessa definizione di connect-pg-simple.
  */
 const assicuraTabella = async (pool, tabella = "sessions") => {
     const attese = [3000, 6000, 12000, 30000, 60000];
@@ -141,6 +141,10 @@ class Session {
         this.blackList = blacklist;
         this.tokenKey = token;
         this.customRefs = new Map();
+        // Micro-cache in RAM per evitare query ripetute a Supabase durante i redirect ravvicinati
+        this.readCache = new Map();
+        this.readCacheTtlMs = 30000;
+
         const clearBlacklist = async () => {
             try {
                 await this._clearBlackList();
@@ -179,22 +183,30 @@ class Session {
     }
 
     set(req, data = {}, customId = null) {
+        const mergedData = req?.session?.storeData
+            ? { ...req.session.storeData, ...data }
+            : { ...data };
+
         if (req && req.session)
-            req.session.storeData = { ...data };
+            req.session.storeData = mergedData;
 
         const seconds = Math.max(Math.floor(this.timeout / 1000), 60);
-        const token = jwt.sign({ ...data }, this.tokenKey, { expiresIn: seconds });
+        const token = jwt.sign(mergedData, this.tokenKey, { expiresIn: seconds });
 
         if (customId) {
             const key = String(customId);
             const sid = req?.sessionID || null;
-            const expire = Date.now() + this.timeout;
-            this.customRefs.set(key, { sid, jwt: token, data: { ...data }, expire });
+            const now = Date.now();
+            const expire = now + this.timeout;
+            const entry = { sid, jwt: token, data: mergedData, expire, cachedAt: now };
+
+            this.customRefs.set(key, entry);
+            this.readCache.set(key, entry);
 
             if (this.pool) {
                 this.pool.query(
                     "SELECT public.salva_sessione_identificativo($1, $2, $3, $4, $5::jsonb, true)",
-                    [key, sid, token, new Date(expire).toISOString(), JSON.stringify(data)]
+                    [key, sid, token, new Date(expire).toISOString(), JSON.stringify(mergedData)]
                 ).catch(err => console.error("[session:customId] salvataggio fallito ->", err?.message || err));
             }
         }
@@ -226,9 +238,18 @@ class Session {
         // 3. Fallback sulla stringa personalizzata salvata in parallelo
         if (customId) {
             const key = String(customId);
+            const now = Date.now();
             let trovato = null;
 
-            if (this.pool) {
+            // Controlla prima la micro-cache in RAM (evita round-trip inutili verso Supabase)
+            const cached = this.readCache.get(key);
+            if (cached && cached.expire > now && (now - cached.cachedAt) < this.readCacheTtlMs) {
+                trovato = { jwt: cached.jwt, data: cached.data };
+            } else {
+                this.readCache.delete(key);
+            }
+
+            if (!trovato && this.pool) {
                 try {
                     const { rows } = await this.pool.query(
                         "SELECT * FROM public.trova_da_identificativo($1) LIMIT 1",
@@ -239,6 +260,12 @@ class Session {
                             jwt: rows[0].jwt,
                             data: rows[0].session_data?.storeData || rows[0].metadata || {}
                         };
+                        this.readCache.set(key, {
+                            jwt: trovato.jwt,
+                            data: trovato.data,
+                            expire: now + this.timeout,
+                            cachedAt: now
+                        });
                     }
                 } catch (err) {
                     console.error("[session:customId] lettura fallita, uso fallback locale ->", err?.message || err);
@@ -247,7 +274,7 @@ class Session {
 
             if (!trovato) {
                 const locale = this.customRefs.get(key);
-                if (locale && locale.expire > Date.now()) {
+                if (locale && locale.expire > now) {
                     trovato = { jwt: locale.jwt, data: locale.data };
                 } else {
                     this.customRefs.delete(key);
@@ -280,10 +307,11 @@ class Session {
 
         if (customId) {
             const key = String(customId);
-            const locale = this.customRefs.get(key);
+            const locale = this.customRefs.get(key) || this.readCache.get(key);
             if (locale?.jwt)
                 await this.blackList.set(locale.jwt, Date.now() + this.timeout);
             this.customRefs.delete(key);
+            this.readCache.delete(key);
 
             if (this.pool) {
                 this.pool.query(
@@ -291,34 +319,44 @@ class Session {
                     [key]
                 ).catch(err => console.error("[session:customId] eliminazione fallita ->", err?.message || err));
             }
-        } else if (token && this.pool) {
-            this.pool.query(
-                "DELETE FROM public.session_identificativi WHERE jwt = $1",
-                [token]
-            ).catch(() => {});
+        } else if (token) {
+            for (const [k, ref] of this.readCache.entries()) {
+                if (ref.jwt === token) this.readCache.delete(k);
+            }
+            if (this.pool) {
+                this.pool.query(
+                    "DELETE FROM public.session_identificativi WHERE jwt = $1",
+                    [token]
+                ).catch(() => {});
+            }
         }
     }
 
     async validate(keys, ...sources) {
         const result = {};
         const params = Array.isArray(keys) ? keys : Object.keys(keys);
+        let risolti = 0;
+
         const applyData = (data) => {
             if (!data || typeof data !== "object") return;
             for (const key of params) {
-                if (data[key] !== undefined && data[key] !== null) {
-                    if (result[key] === undefined) {
-                        result[key] = data[key];
-                    }
+                if (result[key] === undefined && data[key] !== undefined && data[key] !== null) {
+                    result[key] = data[key];
+                    risolti++;
                 }
             }
         };
 
         for (const source of sources) {
+            // Short-circuit: se abbiamo gia' tutte le chiavi richieste non interroghiamo oltre
+            if (risolti >= params.length) break;
+            if (!source) continue;
+
             if (typeof source === "string") {
                 applyData(await this.get(null, source));
-            } else if (source && typeof source === "object") {
+            } else if (typeof source === "object") {
                 applyData(source.session?.storeData || source);
-                if (source.customId) {
+                if (risolti < params.length && source.customId) {
                     applyData(await this.get(null, null, source.customId));
                 }
             }
@@ -339,6 +377,10 @@ class Session {
         for (const [key, ref] of this.customRefs.entries()) {
             if (now > ref.expire)
                 this.customRefs.delete(key);
+        }
+        for (const [key, ref] of this.readCache.entries()) {
+            if (now > ref.expire || (now - ref.cachedAt) >= this.readCacheTtlMs)
+                this.readCache.delete(key);
         }
         if (this.pool) {
             this.pool.query("SELECT public.delete_old_session_identificativi()").catch(() => {});

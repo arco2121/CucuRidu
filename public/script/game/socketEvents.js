@@ -1,7 +1,73 @@
+const CLUSTER_NODES = [
+    "https://cucuridu.onrender.com",
+    "https://cucuridu-gmgv.onrender.com",
+    "https://arco2120-cucuridu.hf.space",
+    "https://cucuridu-jean.onrender.com"
+];
+
+const resolveAndCleanIdToken = () => {
+    const url = new URL(window.location.href);
+    const hashParams = new URLSearchParams(url.hash.replace(/^#/, ""));
+    const incoming = hashParams.get("idToken")
+        || hashParams.get("cucuriduCode")
+        || url.searchParams.get("idToken")
+        || url.searchParams.get("cucuriduCode");
+
+    let active = localStorage.getItem("cucuRiduToken")
+        || localStorage.getItem("cucuriduCode")
+        || null;
+
+    if (incoming) {
+        active = incoming;
+        localStorage.setItem("cucuRiduToken", active);
+    }
+
+    // Registra il nodo corrente come sticky node per il portale
+    try {
+        localStorage.setItem("cucuRiduLastNode", JSON.stringify({
+            url: window.location.origin,
+            ts: Date.now()
+        }));
+    } catch { /* ignora in modalita' privata */ }
+
+    // Pulisce l'URL in-place senza redirect HTTP 302
+    if (hashParams.has("idToken") || hashParams.has("cucuriduCode") || url.searchParams.has("idToken")) {
+        hashParams.delete("idToken");
+        hashParams.delete("cucuriduCode");
+        url.searchParams.delete("idToken");
+        const cleanHash = hashParams.toString();
+        url.hash = cleanHash ? `#${cleanHash}` : "";
+        window.history.replaceState({}, document.title, url.pathname + url.search + url.hash);
+    }
+
+    return active;
+};
+
+const activeIdToken = resolveAndCleanIdToken();
 const getActiveIdToken = () =>
     localStorage.getItem("cucuRiduToken")
-    || new URLSearchParams(window.location.search).get("idToken")
+    || activeIdToken
     || null;
+
+const failoverToHealthyNode = async () => {
+    const candidates = CLUSTER_NODES.filter(n => n !== window.location.origin);
+    if (!candidates.length) return;
+    try {
+        const winner = await Promise.any(
+            candidates.map(async (baseUrl) => {
+                const res = await fetch(`${baseUrl}/health`, { cache: "no-store" });
+                if (!res.ok) throw new Error("offline");
+                return baseUrl;
+            })
+        );
+        const target = new URL("/game", winner);
+        const token = getActiveIdToken();
+        if (token) target.searchParams.set("idToken", token);
+        window.location.replace(target.toString());
+    } catch {
+        // Nessun nodo alternativo raggiungibile: lascia continuare i retry locali
+    }
+};
 
 const parametri = {
     validation: fromBackEnd["token"],
@@ -35,9 +101,9 @@ const initializeIO = () => {
 };
 
 let controller = (() => {
-    if('Worker' in window)
+    if ('Worker' in window)
         return new Worker(fromBackEnd["scripts"] + '/game/socketController.js');
-    else return initializeIO()
+    else return initializeIO();
 })();
 if (controller instanceof Worker)
     controller.onerror = () => {
@@ -49,50 +115,50 @@ const base = document.getElementById("landpoint");
 
 //Controller
 const on = (event = "default", callback = (data) => {}) => {
-    if(controller instanceof Worker) {
-        if(!receivers[event]) receivers[event] = [];
+    if (controller instanceof Worker) {
+        if (!receivers[event]) receivers[event] = [];
         receivers[event].push(callback);
     }
-    else if(event === "any")
+    else if (event === "any")
         controller.onAny((event, ...args) => callback(args[0]));
     else controller.on(event, callback);
-}
+};
 const emit = (event = "deafult", params = {}) => {
-    if(controller instanceof Worker)
+    if (controller instanceof Worker)
         controller.postMessage({
             type: event,
             params: params
         });
     else controller.emit(event, params);
-}
+};
 const off = (event) => {
-    if(controller instanceof Worker)
+    if (controller instanceof Worker)
         receivers[event] = null;
     else controller.off(event);
-}
+};
 /**
- * Chiede al socket "sei davvero connesso?" invece di fidarsi ciecamente
- * degli eventi online/offline del browser (che sono solo lo stato di rete,
- * non lo stato vero di Socket.IO). Se e' gia connesso rifa scattare
- * doConnected subito; se non lo e' lo spinge a riconnettersi ORA invece di
- * aspettare il ping/pong naturale (fino a ~50s, vedi pingInterval/
- * pingTimeout lato server) — a spegnere davvero il pannello offline ci
- * pensa comunque il vero evento connect/reconnect qui sotto.
+ - Chiede al socket "sei davvero connesso?" invece di fidarsi ciecamente
+ - degli eventi online/offline del browser (che sono solo lo stato di rete,
+ - non lo stato vero di Socket.IO). Se e' gia connesso rifa scattare
+ - doConnected subito; se non lo e' lo spinge a riconnettersi ORA invece di
+ - aspettare il ping/pong naturale (fino a ~50s, vedi pingInterval/
+ - pingTimeout lato server) — a spegnere davvero il pannello offline ci
+ - pensa comunque il vero evento connect/reconnect qui sotto.
  */
 const checkConnection = () => {
-    if(controller instanceof Worker)
+    if (controller instanceof Worker)
         controller.postMessage({ type: "__checkConnection__" });
-    else if(controller) {
-        if(controller.connected) document.dispatchEvent(stateConnected);
+    else if (controller) {
+        if (controller.connected) document.dispatchEvent(stateConnected);
         else try { controller.connect(); } catch (e) {}
     }
-}
+};
 
-if(controller instanceof Worker)
+if (controller instanceof Worker)
     controller.onmessage = (event) => {
         const { event: eventName, params } = event.data;
         if (receivers[eventName])
-            for(const call of receivers[eventName])
+            for (const call of receivers[eventName])
                 call(params);
     };
 
@@ -103,17 +169,17 @@ let referenceGiocatore = new GiocatoreInterface(null);
 // che sia arrivato qualsiasi evento di gioco (vedi sincronizzaVista sotto)
 let referenceStanza = fromBackEnd["stanzaId"] || "";
 /*
- * Che schermata stiamo mostrando in questo momento. Non serve a disegnare
- * niente: serve solo a poterlo dire al server ogni tanto, che controlla se
- * combacia con lo stato vero della stanza (vedi la sincronizzazione in fondo
- * al file).
+- Che schermata stiamo mostrando in questo momento. Non serve a disegnare
+- niente: serve solo a poterlo dire al server ogni tanto, che controlla se
+- combacia con lo stato vero della stanza (vedi la sincronizzazione in fondo
+- al file).
  */
 let vistaCorrente = null;
 /*
- * Contatore che sale ad ogni cambio di schermata. Serve a confermaStanza, che
- * prima di disegnare aspetta una fetch (/saveGameReference, lenta su Render):
- * se nel frattempo e' arrivato un altro evento (es. fineTurno) quella
- * schermata e' piu nuova e non va coperta con la lobby.
+- Contatore che sale ad ogni cambio di schermata. Serve a confermaStanza, che
+- prima di disegnare aspetta una fetch (/saveGameReference, lenta su Render):
+- se nel frattempo e' arrivato un altro evento (es. fineTurno) quella
+- schermata e' piu nuova e non va coperta con la lobby.
  */
 let turnoVista = 0;
 // finita la partita la stanza non esiste piu: da li in poi non ha senso
@@ -121,6 +187,9 @@ let turnoVista = 0;
 let sincronizzazioneAttiva = true;
 // la frase del round in corso, serve al pannello delle segnalazioni
 let fraseCorrente = null;
+// conta i fallimenti consecutivi di trasporto per eventuale failover su altro nodo
+let erroriTrasportoConsecutivi = 0;
+
 const ricordaFrase = (domanda) => {
     const testo = Array.isArray(domanda) ? domanda[0] : domanda;
     if (typeof testo === "string" && testo.trim()) fraseCorrente = testo;
@@ -131,17 +200,21 @@ const lasciaStanza = () => {
     settings["savingToken"] = null;
     localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
 
-    const controller = new AbortController();
-    setTimeout(() => controller.abort(), 5000);
+    const abortController = new AbortController();
+    setTimeout(() => abortController.abort(), 5000);
+
+    const idToken = getActiveIdToken();
+    const headers = { 'Content-Type': 'application/json' };
+    if (idToken) headers['X-Id-Token'] = idToken;
 
     fetch("/deleteGameReference", {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         credentials: "include",
-        signal: controller.signal,
+        signal: abortController.signal,
         body: JSON.stringify({
             token: token || null,
-            idToken: getActiveIdToken()
+            idToken
         })
     }).catch(err => console.error(err))
         .finally(() => navigateWithLoading("/", true));
@@ -149,6 +222,7 @@ const lasciaStanza = () => {
 
 //Listeners
 on("connect", () => {
+    erroriTrasportoConsecutivi = 0;
     emit('socketId');
     document.dispatchEvent(stateConnected);
     switch (fromBackEnd["action"]) {
@@ -172,12 +246,15 @@ on("connect", () => {
 
 on("disconnect", () => document.dispatchEvent(stateDisconnected));
 
-on("reconnect", () => document.dispatchEvent(stateConnected));
+on("reconnect", () => {
+    erroriTrasportoConsecutivi = 0;
+    document.dispatchEvent(stateConnected);
+});
 
 // risposta di checkConnection() quando il worker conferma che il socket
 // era gia connesso (non serve riconnettersi, basta aggiornare la UI)
 on("__connectionCheck__", (data) => {
-    if(data?.connected) document.dispatchEvent(stateConnected);
+    if (data?.connected) document.dispatchEvent(stateConnected);
 });
 
 on("reconnect_attempt", () => document.dispatchEvent(stateDisconnected));
@@ -189,31 +266,36 @@ on("reconnect_failed", () => {
 });
 
 /**
- * Solo due errori sono davvero definitivi: la sessione scaduta e la chiave
- * sbagliata. Tutti gli altri sono problemi di rete temporanei e socket.io sta
- * gia riprovando. Prima il ramo default faceva location.replace("/"), quindi
- * un qualsiasi errore di trasporto passeggero (timeout, transport error,
- * server temporaneamente giu) sbatteva il giocatore fuori dalla partita: era
- * uno dei modi in cui la gente "si disconnetteva dal nulla".
+ - Solo due errori sono davvero definitivi: la sessione scaduta e la chiave
+ - sbagliata. Tutti gli altri sono problemi di rete temporanei e socket.io sta
+ - gia riprovando. Prima il ramo default faceva location.replace("/"), quindi
+ - un qualsiasi errore di trasporto passeggero (timeout, transport error,
+ - server temporaneamente giu) sbatteva il giocatore fuori dalla partita: era
+ - uno dei modi in cui la gente "si disconnetteva dal nulla".
  */
 on("connect_error", (err) => {
     const messaggio = err?.message || String(err || "");
-    switch(messaggio) {
-        case "SESSION_EXPIRED" : {
+    switch (messaggio) {
+        case "SESSION_EXPIRED": {
             alert("La tua sessione è scaduta o la stanza è stata chiusa. Come al solito in ritardo");
             return lasciaStanza();
         }
-        case "INVALID_KEY" : {
+        case "INVALID_KEY": {
             alert("Impossibile riconnettersi al server, STACCA STACCA!");
             return lasciaStanza();
         }
-        case "ALREADY_CONNECTED" : {
+        case "ALREADY_CONNECTED": {
             window.location.replace("/error?alreadyConnected=true");
             break;
         }
         default: {
             console.warn("connect_error =>", messaggio);
             document.dispatchEvent(stateDisconnected);
+            erroriTrasportoConsecutivi++;
+            // Se il nodo corrente e' morto per piu' tentativi consecutivi, prova il failover diretto
+            if (erroriTrasportoConsecutivi === 4 && sincronizzazioneAttiva) {
+                failoverToHealthyNode();
+            }
         }
     }
 });
@@ -223,15 +305,15 @@ on("confermaStanza", async (data) => {
     referenceStanza = data["stanzaId"] || fromBackEnd["stanzaId"];
     referenceGiocatore = new GiocatoreInterface(reference);
     /*
-     * Se stiamo guardando chi ha vinto, una conferma della stanza in WAIT e'
-     * SEMPRE vecchia: il server considera showWinner valido in WAIT e non ci
-     * riallinea mai apposta. Arriva quando il giro di sincronizzazione parte
-     * con "chooseWinner" un attimo prima che il vincitore venga scelto e il
-     * server lo legge un attimo dopo (stanza gia in WAIT): "chooseWinner non
-     * e' valido, rimandagli la lobby". Era il "salta la schermata del
-     * vincitore e va dritto in lobby" che capitava a caso a qualcuno.
-     * Aggiorniamo il giocatore (ruoli, master) ma non tocchiamo la schermata:
-     * in lobby ci si va col tasto Avanti.
+- Se stiamo guardando chi ha vinto, una conferma della stanza in WAIT e'
+- SEMPRE vecchia: il server considera showWinner valido in WAIT e non ci
+- riallinea mai apposta. Arriva quando il giro di sincronizzazione parte
+- con "chooseWinner" un attimo prima che il vincitore venga scelto e il
+- server lo legge un attimo dopo (stanza gia in WAIT): "chooseWinner non
+- e' valido, rimandagli la lobby". Era il "salta la schermata del
+- vincitore e va dritto in lobby" che capitava a caso a qualcuno.
+- Aggiorniamo il giocatore (ruoli, master) ma non tocchiamo la schermata:
+- in lobby ci si va col tasto Avanti.
      */
     const restaSulVincitore = vistaCorrente === "showWinner" || vistaCorrente === "endGame";
     // segnata subito, prima della fetch qui sotto: se quella ci mette troppo
@@ -242,16 +324,19 @@ on("confermaStanza", async (data) => {
         vistaCorrente = "wait";
         turno = ++turnoVista;
     }
+
+    const idToken = getActiveIdToken();
+    const headers = { 'Content-Type': 'application/json' };
+    if (idToken) headers['X-Id-Token'] = idToken;
+
     const result = await (await fetch("/saveGameReference", {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers,
         credentials: "include",
         body: JSON.stringify({
             userId: referenceGiocatore.id,
             stanzaId: referenceStanza,
-            idToken: getActiveIdToken()
+            idToken
         })
     })).json();
     if (!restaSulVincitore && turno === turnoVista) await renderFragment(base, "wait", {
@@ -261,7 +346,7 @@ on("confermaStanza", async (data) => {
         seiMaster: referenceGiocatore.masterRole,
         animation: !isLoadScreen()
     });
-    if(result.fallback) {
+    if (result.fallback) {
         const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
         localStorage.setItem("cucuRiduSettings", JSON.stringify({
             ...settings,
@@ -303,8 +388,8 @@ on("errore", (error) => {
 
 on("roundIniziato", async (data) => {
     const { chiStaInterrogando, stanza, reference, domanda } = data;
-    if(reference) referenceGiocatore = new GiocatoreInterface(reference);
-    if(stanza) referenceStanza = stanza
+    if (reference) referenceGiocatore = new GiocatoreInterface(reference);
+    if (stanza) referenceStanza = stanza;
     ricordaFrase(domanda);
     vistaCorrente = "choosingCards";
     turnoVista++;
@@ -318,7 +403,7 @@ on("roundIniziato", async (data) => {
 
 on("rispostaRegistrata", async (data) => {
     const { stanzaId } = data;
-    if(stanzaId) referenceStanza = stanzaId;
+    if (stanzaId) referenceStanza = stanzaId;
     vistaCorrente = "waitWinner";
     turnoVista++;
     await renderFragment(base, "waitWinner", {
@@ -332,8 +417,8 @@ on("giaRegistrata", (data) => {
 
 on("sceltaVincitore", async (data) => {
     const { reference, stanza, domanda, chiInterroga, risposte } = data;
-    if(reference) referenceGiocatore = new GiocatoreInterface(reference);
-    if(stanza) referenceStanza = stanza
+    if (reference) referenceGiocatore = new GiocatoreInterface(reference);
+    if (stanza) referenceStanza = stanza;
     ricordaFrase(domanda);
     vistaCorrente = "chooseWinner";
     turnoVista++;
@@ -348,7 +433,7 @@ on("sceltaVincitore", async (data) => {
 
 on("fineTurno", async (data) => {
     const { reference, vincitore, domanda, risposte, tutteLeRisposte, giocatori } = data;
-    if(reference) referenceGiocatore = new GiocatoreInterface(reference);
+    if (reference) referenceGiocatore = new GiocatoreInterface(reference);
     ricordaFrase(domanda);
     vistaCorrente = "showWinner";
     turnoVista++;
@@ -378,29 +463,29 @@ on("partitaTerminata", async (data) => {
 });
 
 /* ---------------------------------------------------------------------------
- * Sincronizzazione della schermata
+- Sincronizzazione della schermata
  *
- * Il server manda gli eventi di gioco (roundIniziato, fineTurno...) una volta
- * sola: chi in quel momento aveva il socket morto o in riconnessione non li
- * riceve piu e resta fermo alla schermata di prima - il classico "sono ancora
- * in lobby mentre gli altri stanno gia giocando", che si risolveva solo
- * ricaricando a mano.
+- Il server manda gli eventi di gioco (roundIniziato, fineTurno...) una volta
+- sola: chi in quel momento aveva il socket morto o in riconnessione non li
+- riceve piu e resta fermo alla schermata di prima - il classico "sono ancora
+- in lobby mentre gli altri stanno gia giocando", che si risolveva solo
+- ricaricando a mano.
  *
- * Qui diciamo al server, ogni tanto, che schermata stiamo mostrando. Se non
- * combacia con lo stato vero della stanza ci rimanda lo stato giusto e la
- * pagina si rimette in pari da sola, senza ricaricare. Se combacia il server
- * non risponde nemmeno.
+- Qui diciamo al server, ogni tanto, che schermata stiamo mostrando. Se non
+- combacia con lo stato vero della stanza ci rimanda lo stato giusto e la
+- pagina si rimette in pari da sola, senza ricaricare. Se combacia il server
+- non risponde nemmeno.
  *
- * Non chiediamo niente a scheda nascosta (non serve a nessuno aggiornare una
- * pagina che non si sta guardando, e il telefono la congela comunque): al
- * ritorno pero' chiediamo subito, che e' proprio il momento in cui e' piu
- * probabile essersi persi qualcosa.
- * --------------------------------------------------------------------------- */
+- Non chiediamo niente a scheda nascosta (non serve a nessuno aggiornare una
+- pagina che non si sta guardando, e il telefono la congela comunque): al
+- ritorno pero' chiediamo subito, che e' proprio il momento in cui e' piu
+- probabile essersi persi qualcosa.
+- --------------------------------------------------------------------------- */
 const INTERVALLO_SINCRONIZZAZIONE = 7000;
 
 const sincronizzaVista = () => {
-    if(!sincronizzazioneAttiva) return;
-    if(!referenceStanza) return;
+    if (!sincronizzazioneAttiva) return;
+    if (!referenceStanza) return;
     // vistaCorrente vuoto (pagina appena aperta, nessun evento di gioco
     // ancora arrivato) e' un caso valido da segnalare, non da saltare: e'
     // il client stesso a dover chiedere cosa mostrare, il server non lo fa
@@ -412,25 +497,25 @@ const sincronizzaVista = () => {
 };
 
 setInterval(() => {
-    if(document.hidden) return;
+    if (document.hidden) return;
     sincronizzaVista();
 }, INTERVALLO_SINCRONIZZAZIONE);
 
 document.addEventListener("visibilitychange", () => {
-    if(!document.hidden) sincronizzaVista();
+    if (!document.hidden) sincronizzaVista();
 });
 
 /*
- * Il server non forza piu' una schermata alla cieca quando la stanza e' in
- * WAIT (vedi il connection handler lato server): li' decide il client,
- * dicendo subito cosa ha davvero davanti. Un ritardo piccolo basta solo a
- * lasciar respirare l'handshake appena aperto; niente a che vedere col
- * vecchio "backup dopo un secondo nel caso il server non rispondesse".
+- Il server non forza piu' una schermata alla cieca quando la stanza e' in
+- WAIT (vedi il connection handler lato server): li' decide il client,
+- dicendo subito cosa ha davvero davanti. Un ritardo piccolo basta solo a
+- lasciar respirare l'handshake appena aperto; niente a che vedere col
+- vecchio "backup dopo un secondo nel caso il server non rispondesse".
  */
 on("connect", () => setTimeout(sincronizzaVista, 150));
 on("reconnect", () => setTimeout(sincronizzaVista, 150));
 
-if(controller instanceof Worker)
+if (controller instanceof Worker)
     controller.postMessage({
         type: "init",
         params: parametri

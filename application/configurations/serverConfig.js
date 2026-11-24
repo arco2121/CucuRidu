@@ -6,14 +6,14 @@ const { NESSUNA_MODIFICA } = require(path.join(__dirname, "../include/script/con
 const { normalizzaRighe, TIPI_SUGGERIMENTO } = require(path.join(__dirname, "../include/script/Segnalazioni"));
 
 /**
- * Configura gli endpoint del ServerIO
- * @param server
- * @param serverSession
- * @param TEMPORARY_TOKEN
- * @param Stanze
- * @param generationMemory
- * @param timeout
- * @param archivioSegnalazioni
+ - Configura gli endpoint del ServerIO
+ - @param server
+ - @param serverSession
+ - @param TEMPORARY_TOKEN
+ - @param Stanze
+ - @param generationMemory
+ - @param timeout
+ - @param archivioSegnalazioni
  */
 const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generationMemory, timeout = 3600000, archivioSegnalazioni = null) => {
 
@@ -26,9 +26,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
     const PAUSA_SINCRONIZZA = 2500;
 
     /**
-     * Nessun handler socket deve poter far cadere il processo: prima di questa
-     * modifica una singola eccezione dentro un handler async diventava una
-     * unhandledRejection e Node chiudeva tutto, buttando fuori l'intera partita.
+     - Nessun handler socket deve poter far cadere il processo: prima di questa
+     - modifica una singola eccezione dentro un handler async diventava una
+     - unhandledRejection e Node chiudeva tutto, buttando fuori l'intera partita.
      */
     const sicuro = (nome, handler) => async (...args) => {
         try { await handler(...args); }
@@ -50,9 +50,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
     };
 
     /**
-     * Il giocatore ha ancora un socket vivo nella stanza (magari su un'altra
-     * istanza del cluster)? Se si', il disconnect che stiamo gestendo riguarda
-     * una connessione vecchia e va ignorato.
+     - Il giocatore ha ancora un socket vivo nella stanza (magari su un'altra
+     - istanza del cluster)? Se si', il disconnect che stiamo gestendo riguarda
+     - una connessione vecchia e va ignorato.
      */
     const haAncoraUnSocket = async (stanzaId, giocatoreId, escluso) => {
         try {
@@ -73,10 +73,10 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
     };
 
     /**
-     * Chi ha gia inviato i completamenti: lo vede tutta la stanza, lettore compreso.
-     * Con `destinatario` risponde solo a quel socket: il poll ogni 8s di ogni
-     * client prima rimbalzava su TUTTA la stanza, quindi con 7 giocatori ogni
-     * telefono riceveva (e ridisegnava) la lista circa una volta al secondo.
+     - Chi ha gia inviato i completamenti: lo vede tutta la stanza, lettore compreso.
+     - Con `destinatario` risponde solo a quel socket: il poll ogni 8s di ogni
+     - client prima rimbalzava su TUTTA la stanza, quindi con 7 giocatori ogni
+     - telefono riceveva (e ridisegnava) la lista circa una volta al secondo.
      */
     const inviaAttesaRisposte = (stanza, destinatario = null) => {
         if (!stanza?.id || !stanza.round) return;
@@ -91,15 +91,15 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
     };
 
     /*
-     * Quali schermate hanno senso, per QUESTO giocatore, con la stanza in
-     * questo stato. Serve alla risincronizzazione: il client dice cosa sta
-     * mostrando, e se non e' in questa lista vuol dire che si e' perso un
-     * evento per strada e va rimesso in pari.
+- Quali schermate hanno senso, per QUESTO giocatore, con la stanza in
+- questo stato. Serve alla risincronizzazione: il client dice cosa sta
+- mostrando, e se non e' in questa lista vuol dire che si e' perso un
+- evento per strada e va rimesso in pari.
      *
-     * In WAIT le schermate valide sono tre perche' lo stato della stanza non
-     * distingue "sto aspettando in lobby" da "sto guardando chi ha vinto il
-     * round": sono la stessa cosa per il server, e nessuna delle due e'
-     * bloccata.
+- In WAIT le schermate valide sono tre perche' lo stato della stanza non
+- distingue "sto aspettando in lobby" da "sto guardando chi ha vinto il
+- round": sono la stessa cosa per il server, e nessuna delle due e'
+- bloccata.
      */
     const vistaAttesa = (stanza, giocatore) => {
         switch (stanza?.stato) {
@@ -206,12 +206,21 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
 
     server.use(async (socket, next) => {
         try {
+            const rawCustomId = socket.handshake.auth?.customId
+                || socket.handshake.auth?.idToken
+                || socket.handshake.auth?.cucuriduCode
+                || null;
+            const customId = typeof rawCustomId === "string" && rawCustomId.trim()
+                ? rawCustomId.trim()
+                : null;
+            if (customId) socket.data.customId = customId;
+
             const checks = ["validation", "stanzaId", "userId"];
             const { validation, stanzaId, userId } = await serverSession.validate(
                 checks,
                 socket.handshake.auth,
                 socket.handshake.auth?.token,
-                socket.handshake.auth?.customId ? { customId: socket.handshake.auth.customId } : null
+                customId ? { customId } : null
             );
             if (validation !== TEMPORARY_TOKEN) return next(new Error("INVALID_KEY"));
             if (!stanzaId) return next();
@@ -243,19 +252,19 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 const stanza = await Stanze.get(user.data.referenceStanza);
                 if (!stanza) return user.emit("stanzaChiusa");
                 /*
-                 * In WAIT non possiamo sapere, in questo preciso istante, se chi si
-                 * sta (ri)connettendo ha gia' davanti la schermata giusta (era li' da
-                 * prima, magari e' proprio il vincitore che guarda showWinner, e questa
-                 * connessione e' solo un socket che si e' riallacciato da solo dopo un
-                 * intoppo di rete silenzioso, invisibile a chi gioca) oppure ha lo
-                 * schermo vuoto (prima apertura pagina) e serve davvero qualcosa: da
-                 * qui dentro sono indistinguibili. Decide il client, mandando subito un
-                 * __sincronizza__ con la vista che ha per davvero (vedi socketEvents.js):
-                 * se combacia (wait/showWinner/endGame sono tutte valide in WAIT) non
-                 * succede nulla, altrimenti si riallinea da solo. Forzare qui alla cieca
-                 * strapperebbe a chi era gia' su showWinner la schermata sotto al naso:
-                 * e' il bottone "Avanti" che sembra premersi da solo senza che nessuno
-                 * abbia lasciato la stanza.
+- In WAIT non possiamo sapere, in questo preciso istante, se chi si
+- sta (ri)connettendo ha gia' davanti la schermata giusta (era li' da
+- prima, magari e' proprio il vincitore che guarda showWinner, e questa
+- connessione e' solo un socket che si e' riallacciato da solo dopo un
+- intoppo di rete silenzioso, invisibile a chi gioca) oppure ha lo
+- schermo vuoto (prima apertura pagina) e serve davvero qualcosa: da
+- qui dentro sono indistinguibili. Decide il client, mandando subito un
+- __sincronizza__ con la vista che ha per davvero (vedi socketEvents.js):
+- se combacia (wait/showWinner/endGame sono tutte valide in WAIT) non
+- succede nulla, altrimenti si riallinea da solo. Forzare qui alla cieca
+- strapperebbe a chi era gia' su showWinner la schermata sotto al naso:
+- e' il bottone "Avanti" che sembra premersi da solo senza che nessuno
+- abbia lasciato la stanza.
                  */
                 if (stanza.stato !== StatoStanza.WAIT) await emitStatoStanza(stanza, user);
                 inviaListe(stanza);
@@ -272,6 +281,17 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 user.data.referenceGiocatore = stanza.master;
                 user.data.giocatoreId = stanza.master.id;
                 user.data.referenceStanza = stanza.id;
+
+                // Allinea subito customId su Postgres senza aspettare la fine di /saveGameReference
+                if (user.data.customId) {
+                    serverSession.set(null, {
+                        nome: username,
+                        pfp: pfp,
+                        userId: stanza.master.id,
+                        stanzaId: stanza.id
+                    }, user.data.customId);
+                }
+
                 try { await Stanze.setPresenza(stanza.master.id, stanza.id, true, user.id, Date.now(), null); }
                 catch { /* in RAM basta l'oggetto */ }
                 user.emit("confermaStanza", {
@@ -325,6 +345,17 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             user.data.giocatoreId = giocatore.id;
             user.data.referenceStanza = stanzaId;
             user.join(stanzaId);
+
+            // Allinea subito customId su Postgres senza aspettare la fine di /saveGameReference
+            if (user.data.customId) {
+                serverSession.set(null, {
+                    nome: data["username"],
+                    pfp: data["pfp"],
+                    userId: giocatore.id,
+                    stanzaId: stanzaId
+                }, user.data.customId);
+            }
+
             try { await Stanze.setPresenza(giocatore.id, stanzaId, true, user.id, Date.now(), null); }
             catch { /* in RAM basta l'oggetto */ }
 
@@ -525,23 +556,23 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         }));
 
         /*
-         * Rete di sicurezza contro la schermata rimasta indietro.
+- Rete di sicurezza contro la schermata rimasta indietro.
          *
-         * Capitava (e capitava spesso) che uno restasse fermo in lobby mentre
-         * gli altri erano gia al turno dopo: bastava ricaricare la pagina, ma
-         * e' brutto e non e' colpa di chi gioca. Succede quando un evento
-         * (roundIniziato, fineTurno...) parte mentre quel socket e' morto o
-         * si sta riconnettendo: il server lo manda una volta sola e chi non
-         * c'era in quel momento non lo riceve piu.
+- Capitava (e capitava spesso) che uno restasse fermo in lobby mentre
+- gli altri erano gia al turno dopo: bastava ricaricare la pagina, ma
+- e' brutto e non e' colpa di chi gioca. Succede quando un evento
+- (roundIniziato, fineTurno...) parte mentre quel socket e' morto o
+- si sta riconnettendo: il server lo manda una volta sola e chi non
+- c'era in quel momento non lo riceve piu.
          *
-         * Qui il client dice ogni tanto "sto mostrando questa schermata"; se
-         * non e' una di quelle che ci aspettiamo per lo stato attuale della
-         * stanza, gli ributtiamo addosso lo stato vero e si rimette in pari
-         * da solo. Se invece e' tutto a posto non rispondiamo proprio, cosi
-         * il giro non costa niente.
+- Qui il client dice ogni tanto "sto mostrando questa schermata"; se
+- non e' una di quelle che ci aspettiamo per lo stato attuale della
+- stanza, gli ributtiamo addosso lo stato vero e si rimette in pari
+- da solo. Se invece e' tutto a posto non rispondiamo proprio, cosi
+- il giro non costa niente.
          *
-         * Se la stanza non esiste piu NON mandiamo stanzaChiusa: una lettura
-         * andata storta butterebbe fuori un giocatore che stava benissimo.
+- Se la stanza non esiste piu NON mandiamo stanzaChiusa: una lettura
+- andata storta butterebbe fuori un giocatore che stava benissimo.
          */
         user.on("__sincronizza__", sicuro("__sincronizza__", async (data) => {
             const adesso = Date.now();
@@ -550,12 +581,12 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
 
             const stanzaId = data?.["id"] || user.data?.referenceStanza;
             /*
-             * Vista vuota = il client non aveva NESSUNA schermata da riportare
-             * (prima apertura pagina, oppure una riconnessione dopo un buco
-             * cosi lungo da non aver mai fatto in tempo a renderizzare
-             * niente). Non e' un caso da ignorare: e' il caso che ha piu
-             * bisogno di essere rimesso in pari, quindi non fa match con
-             * nessuna vista valida qui sotto e cade dritto nel riallineamento.
+- Vista vuota = il client non aveva NESSUNA schermata da riportare
+- (prima apertura pagina, oppure una riconnessione dopo un buco
+- cosi lungo da non aver mai fatto in tempo a renderizzare
+- niente). Non e' un caso da ignorare: e' il caso che ha piu
+- bisogno di essere rimesso in pari, quindi non fa match con
+- nessuna vista valida qui sotto e cade dritto nel riallineamento.
              */
             const vista = String(data?.["vista"] || "");
             if (!stanzaId) return;
@@ -564,10 +595,10 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             if (!stanza) return;
 
             /*
-             * Prima di giudicare il client, controlliamo la stanza: se tutti
-             * quelli che dovevano rispondere hanno risposto ma lo stato e'
-             * rimasto a CHOOSING_CARDS, il bloccato non e' il giocatore, e'
-             * la stanza. In quel caso avanza e lo dice a tutti.
+- Prima di giudicare il client, controlliamo la stanza: se tutti
+- quelli che dovevano rispondere hanno risposto ma lo stato e'
+- rimasto a CHOOSING_CARDS, il bloccato non e' il giocatore, e'
+- la stanza. In quel caso avanza e lo dice a tutti.
              */
             if (stanza.stato === StatoStanza.CHOOSING_CARDS
                 && stanza.giocatori.size > 1
@@ -684,10 +715,10 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         }));
 
         /*
-         * Frasi e completamenti NUOVI proposti dai giocatori. Stessa tabella
-         * delle segnalazioni, tipi diversi (suggerimento_*): li' dentro
-         * restano separati e li si spunta allo stesso modo quando entrano
-         * davvero nel gioco.
+- Frasi e completamenti NUOVI proposti dai giocatori. Stessa tabella
+- delle segnalazioni, tipi diversi (suggerimento_*): li' dentro
+- restano separati e li si spunta allo stesso modo quando entrano
+- davvero nel gioco.
          */
         user.on("suggerisci", sicuro("suggerisci", async (data) => {
             if (!archivioSegnalazioni) return user.emit("suggerimentoEsito", { ok: false });
@@ -747,6 +778,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             // si puo' far uscire solo SE STESSI: prima l'id arrivava dal client
             // e chiunque poteva togliere chiunque (per cacciare c'e' cacciaGiocatore)
             const giocatoreId = user.data?.giocatoreId ?? data?.["giocatore"];
+            if (user.data?.customId) {
+                serverSession.invalidate(null, null, user.data.customId).catch(() => {});
+            }
             user.emit("stanzaLasciata");
             if (!stanzaId || !giocatoreId) return;
 
@@ -763,14 +797,14 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             const sockets = await server.in(stanzaId).fetchSockets();
             aggiornaReference(esito.stanza, sockets);
             /*
-             * In WAIT "wait", "showWinner" ed "endGame" sono tutte schermate
-             * valide (vedi vistaAttesa sopra): forzare qui il fragment "wait"
-             * su TUTTI strapperebbe a chi sta ancora guardando chi ha vinto il
-             * round (spesso proprio il vincitore, mentre genera/scarica
-             * l'immagine) la schermata sotto al naso, indistinguibile da un
-             * "Avanti" premuto da solo. Chi se ne va non cambia cosa hanno gia
-             * davanti agli occhi gli altri, quindi qui si forza la vista SOLO
-             * se lo stato e' davvero cambiato in qualcosa di non ambiguo.
+- In WAIT "wait", "showWinner" ed "endGame" sono tutte schermate
+- valide (vedi vistaAttesa sopra): forzare qui il fragment "wait"
+- su TUTTI strapperebbe a chi sta ancora guardando chi ha vinto il
+- round (spesso proprio il vincitore, mentre genera/scarica
+- l'immagine) la schermata sotto al naso, indistinguibile da un
+- "Avanti" premuto da solo. Chi se ne va non cambia cosa hanno gia
+- davanti agli occhi gli altri, quindi qui si forza la vista SOLO
+- se lo stato e' davvero cambiato in qualcosa di non ambiguo.
              */
             if (esito.stanza.stato !== StatoStanza.WAIT) await emitStatoStanza(esito.stanza, ...sockets);
             inviaListe(esito.stanza);
@@ -778,10 +812,10 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         }));
 
         /*
-         * Il master caccia un giocatore (fantasmi rimasti dentro, gente che
-         * non risponde piu...). Solo il master, mai se stesso. Il cacciato
-         * riceve "cacciato" su qualsiasi istanza sia collegato, esce dalla
-         * stanza e torna alla home; per gli altri e' come se avesse lasciato.
+- Il master caccia un giocatore (fantasmi rimasti dentro, gente che
+- non risponde piu...). Solo il master, mai se stesso. Il cacciato
+- riceve "cacciato" su qualsiasi istanza sia collegato, esce dalla
+- stanza e torna alla home; per gli altri e' come se avesse lasciato.
          */
         user.on("cacciaGiocatore", sicuro("cacciaGiocatore", async (data) => {
             const stanzaId = data?.["id"] ?? user.data?.referenceStanza;
@@ -809,6 +843,9 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             const restano = [];
             for (const socket of sockets) {
                 if (socket.data?.giocatoreId === daCacciare) {
+                    if (socket.data?.customId) {
+                        serverSession.invalidate(null, null, socket.data.customId).catch(() => {});
+                    }
                     try { socket.emit("cacciato"); } catch { /* ignora */ }
                     try { socket.leave(stanzaId); } catch { /* ignora */ }
                 } else restano.push(socket);

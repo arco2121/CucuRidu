@@ -10,20 +10,31 @@ const { createGzip } = require('zlib');
 const QRCode = require("qrcode-svg");
 
 /**
- * Configura gli endpoint dell' application Express
- * @param app
- * @param serverSession
- * @param TEMPORARY_TOKEN
- * @param Stanze
- * @param allowedOrigins
- * @param local
- * @param timeout
- * @param pagesOptions
+ - Configura gli endpoint dell' application Express
+ - @param app
+ - @param serverSession
+ - @param TEMPORARY_TOKEN
+ - @param Stanze
+ - @param allowedOrigins
+ - @param local
+ - @param timeout
+ - @param pagesOptions
  */
 const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, local, timeout = 3600000, pagesOptions = {
     version: '1.5.1',
     cluster: false
 }, archivioSegnalazioni = null, chiaveSegnalazioni = null, manutenzione = false) => {
+
+    const getCustomId = (req) => {
+        const raw = req.headers?.["x-id-token"]
+            || req.headers?.["x-cucuridu-code"]
+            || req.query?.idToken
+            || req.query?.cucuriduCode
+            || req.body?.idToken
+            || req.body?.cucuriduCode
+            || null;
+        return typeof raw === "string" && raw.trim() ? raw.trim() : null;
+    };
 
     const renderPage = (req, res, page, params = {
         simple: false,
@@ -49,26 +60,34 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
             cluster: pagesOptions.cluster,
             headerIcon: getIcon(true)
         });
-    }
+    };
 
     /*
-     * Se il giocatore ha gia una stanza aperta lo rimanda in partita, altrimenti
-     * lascia passare. Il controllo e' solo una comodita': se non riesce
-     * (database irraggiungibile, stanza salvata in un formato che non si
-     * legge...) NON deve impedire di aprire "Crea stanza" o "Partecipa", quindi
-     * l'errore si scrive nei log e si prosegue come se la stanza non ci fosse.
-     * Prima qualsiasi eccezione qui dentro diventava un 500 sulla pagina.
+- Se il giocatore ha gia una stanza aperta lo rimanda in partita, altrimenti
+- lascia passare. Il controllo e' solo una comodita': se non riesce
+- (database irraggiungibile, stanza salvata in un formato che non si
+- legge...) NON deve impedire di aprire "Crea stanza" o "Partecipa", quindi
+- l'errore si scrive nei log e si prosegue come se la stanza non ci fosse.
+- Prima qualsiasi eccezione qui dentro diventava un 500 sulla pagina.
      */
     const preCheck = async (req, res, next) => {
         req.deleteToken = !!req.query?.token;
+        const customId = getCustomId(req);
+        const queryToken = req.query?.token || null;
+
+        // Fast-path: visitatore nuovo senza cookie, token o idToken -> zero query DB
+        if (!req.session?.storeData && !queryToken && !customId) return next();
+
         try {
-            const { userId, stanzaId, jwt } = await serverSession.get(req, req.query?.token, req.query?.idToken);
-            const activeToken = req.query?.token || jwt;
+            const { userId, stanzaId, jwt } = await serverSession.get(req, queryToken, customId);
+            const activeToken = queryToken || jwt;
             const queryParams = new URLSearchParams();
             if (activeToken) queryParams.set("token", activeToken);
-            if (req.query?.idToken) queryParams.set("idToken", req.query.idToken);
+            if (customId) queryParams.set("idToken", customId);
             const redirecting = queryParams.toString() ? "?" + queryParams.toString() : "";
-            if(userId && (await Stanze.get(stanzaId))?.trovaGiocatore(userId)) return res.redirect("/game" + redirecting);
+            if (userId && stanzaId && (await Stanze.get(stanzaId))?.trovaGiocatore(userId)) {
+                return res.redirect("/game" + redirecting);
+            }
         } catch (e) {
             console.error(`[preCheck] ${req.method} ${req.originalUrl} -> controllo stanza esistente fallito, proseguo:`, e?.stack || e);
         }
@@ -78,9 +97,26 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     app.use(express.static(path.join(__dirname, "..", "../public")));
     app.set("view engine", "ejs");
     app.set('trust proxy', 1);
-    app.use(express.urlencoded({extended: true}));
+
+    // Health/ping PRIMA del middleware di sessione: zero sessioni vuote su Postgres
+    // e supporto room-aware (?room=XYZ) per il routing diretto dal portale
+    app.get(["/ping", "/health"], async (req, res) => {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        const roomId = typeof req.query?.room === "string" ? req.query.room.trim() : "";
+        let hasRoom = false;
+        if (roomId) {
+            try {
+                hasRoom = Boolean(await Stanze.has(roomId));
+            } catch {
+                hasRoom = false;
+            }
+        }
+        res.status(200).json({ ok: true, hasRoom });
+    });
+
+    app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
-    if(!local)
+    if (!local)
         app.use(cors({
             origin: (origin, callback) => {
                 if (!origin || allowedOrigins.indexOf(origin) !== -1) callback(null, true);
@@ -97,8 +133,6 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
             maxAge: timeout
         }
     }));
-
-    app.get("/ping", (req, res) => res.status(200).end());
 
     app.get("/syncIDToken", (req, res) => renderPage(req, res, "syncIDToken", {
         simple: true,
@@ -120,9 +154,9 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     });
 
     /*
-     * Elenco delle frasi e dei completamenti segnalati come sbagliati.
-     * Protetto dalla chiave in SEGNALAZIONI_KEY: se non e' impostata la pagina
-     * non esiste proprio, cosi non resta aperta per sbaglio.
+- Elenco delle frasi e dei completamenti segnalati come sbagliati.
+- Protetto dalla chiave in SEGNALAZIONI_KEY: se non e' impostata la pagina
+- non esiste proprio, cosi non resta aperta per sbaglio.
      */
     app.get("/segnalazioni", async (req, res) => {
         if (!archivioSegnalazioni || !chiaveSegnalazioni) return res.redirect("/error");
@@ -254,8 +288,8 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     });
 
     /*
-     * Marca (o smarca) una segnalazione come risolta. Stessa chiave della
-     * pagina /segnalazioni, passata nel corpo perche' qui non c'e' un form.
+- Marca (o smarca) una segnalazione come risolta. Stessa chiave della
+- pagina /segnalazioni, passata nel corpo perche' qui non c'e' un form.
      */
     app.post("/segnalazioni/segna", async (req, res) => {
         if (!archivioSegnalazioni || !chiaveSegnalazioni) return res.status(404).end();
@@ -273,7 +307,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     });
 
     app.use((req, res, next) => {
-        if(manutenzione) {
+        if (manutenzione) {
             res.status(503);
             return renderPage(req, res, "error", {
                 error: 503,
@@ -310,7 +344,8 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     });
 
     app.get("/partecipaStanza", preCheck, (req, res) => {
-        const {nome, pfp, stanza, idToken} = req.query;
+        const { nome, pfp, stanza } = req.query;
+        const customId = getCustomId(req);
         if (nome && pfp && stanza) {
             const token = serverSession.set(req, {
                 nome: nome,
@@ -318,8 +353,8 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
                 stanzaId: stanza,
                 deleteToken: req.deleteToken,
                 bgm: "Choosing_Menu-Feeling_Good"
-            }, idToken || null);
-            res.redirect("/game?token=" + token + (idToken ? "&idToken=" + encodeURIComponent(idToken) : ""));
+            }, customId);
+            res.redirect("/game?token=" + token + (customId ? "&idToken=" + encodeURIComponent(customId) : ""));
         } else if (stanza) renderPage(req, res, "profile", {
             stanza: stanza,
             setOfPfp: getAllPfp(),
@@ -332,14 +367,15 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     });
 
     app.get("/creaStanza", preCheck, (req, res) => {
-        const {nome, pfp, idToken} = req.query;
+        const { nome, pfp } = req.query;
+        const customId = getCustomId(req);
         if (nome && pfp) {
             const token = serverSession.set(req, {
                 nome: nome,
                 pfp: pfp,
                 bgm: "Choosing_Menu-Feeling_Good"
-            }, idToken || null);
-            res.redirect("/game?token=" + token + (idToken ? "&idToken=" + encodeURIComponent(idToken) : ""));
+            }, customId);
+            res.redirect("/game?token=" + token + (customId ? "&idToken=" + encodeURIComponent(customId) : ""));
         } else renderPage(req, res, "profile", {
             setOfPfp: getAllPfp(),
             deleteToken: req.deleteToken,
@@ -348,13 +384,21 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     });
 
     app.get("/game", async (req, res) => {
+        const customId = getCustomId(req);
         const check = ["nome", "pfp", "stanzaId", "userId"];
-        const {nome, pfp, stanzaId, userId} = await serverSession.validate(
+        const { nome, pfp, stanzaId, userId } = await serverSession.validate(
             check,
-            req.session.storeData,
+            req.session?.storeData,
             req.query?.token,
-            req.query?.idToken ? { customId: req.query.idToken } : null
+            customId ? { customId } : null
         );
+
+        // Se abbiamo recuperato i dati da token/customId su un nuovo nodo del cluster,
+        // li fissiamo subito in req.session.storeData per evitare altre query al refresh
+        if (req.session && !req.session.storeData && (userId || nome)) {
+            req.session.storeData = { nome, pfp, stanzaId, userId };
+        }
+
         if (userId && stanzaId && await Stanze.has(stanzaId) && (await Stanze.get(stanzaId))?.trovaGiocatore(userId))
             renderPage(req, res, "lobby", {
                 userId: userId,
@@ -374,7 +418,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
                 bgm: "GameMusic-Candy_Bazaar"
             });
         } else {
-            await serverSession.invalidate(req, req.query?.token, req.query?.idToken || null);
+            await serverSession.invalidate(req, req.query?.token, customId);
             res.redirect("/");
         }
     });
@@ -442,7 +486,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
                 H: '30%'
             };
             let quality = req.query.quality;
-            if(!QR_ECL[quality])
+            if (!QR_ECL[quality])
                 quality = "H";
 
             const qr = new QRCode({
@@ -466,25 +510,46 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     });
 
     app.post("/generateInfo", (req, res) => {
-        res.status(200).json({nome: generateName(), pfp: generatePfp()});
+        res.status(200).json({ nome: generateName(), pfp: generatePfp() });
     });
 
     app.post("/doRoomExists", async (req, res) => {
         try {
-            const {roomId} = req.body || {};
+            const { roomId } = req.body || {};
             // mancavano le parentesi: si leggeva .stato su una Promise, quindi
             // il controllo sullo stato non ha mai funzionato
             const stanza = roomId ? await Stanze.get(roomId) : null;
-            res.status(200).json({result: Boolean(stanza && stanza.stato !== StatoStanza.END)});
+            res.status(200).json({ result: Boolean(stanza && stanza.stato !== StatoStanza.END) });
         } catch (e) {
             console.error("[doRoomExists]", e?.message || e);
-            res.status(200).json({result: false});
+            res.status(200).json({ result: false });
         }
-    })
+    });
+
+    app.post("/checkActiveGame", async (req, res) => {
+        try {
+            const customId = getCustomId(req);
+            if (!customId && !req.session?.storeData) return res.status(200).json({ active: false });
+
+            const { userId, stanzaId, jwt } = await serverSession.get(req, null, customId);
+            if (userId && stanzaId && (await Stanze.get(stanzaId))?.trovaGiocatore(userId)) {
+                const params = new URLSearchParams();
+                if (jwt) params.set("token", jwt);
+                if (customId) params.set("idToken", customId);
+                return res.status(200).json({
+                    active: true,
+                    redirectUrl: "/game?" + params.toString()
+                });
+            }
+            res.status(200).json({ active: false });
+        } catch {
+            res.status(200).json({ active: false });
+        }
+    });
 
     app.post("/saveGameReference", async (req, res) => {
-        const {userId, stanzaId, idToken} = req.body || {};
-        const activeIdToken = idToken || req.query?.idToken || null;
+        const { userId, stanzaId } = req.body || {};
+        const activeIdToken = getCustomId(req);
         if (userId && stanzaId) {
             const token = serverSession.set(req, {
                 userId: userId,
@@ -496,24 +561,24 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
             });
         }
         await serverSession.invalidate(req, null, activeIdToken);
-        res.status(406).json({result: false});
+        res.status(406).json({ result: false });
     });
 
     app.post("/deleteGameReference", async (req, res) => {
-        await serverSession.invalidate(req, req.body?.token, req.body?.idToken || req.query?.idToken || null);
-        res.status(200).json({result: true});
+        await serverSession.invalidate(req, req.body?.token, getCustomId(req));
+        res.status(200).json({ result: true });
     });
 
     app.post("/createPack", (req, res) => {
         const packsPair = req.body || "";
         const packs = [];
-        for(const pair of packsPair) {
+        for (const pair of packsPair) {
             const righe = translateToPack(pair);
             // qui il mazzo lo stiamo creando ADESSO: l'hash non esiste ancora,
             // quindi si controlla solo che il contenuto stia in piedi. Prima
             // si chiamava controllaMazzo, che pretende anche la firma: la
             // pagina /creaMazzo rispondeva 400 a qualsiasi mazzo, sempre.
-            if(Mazzo.problemaMazzo(righe) === null) {
+            if (Mazzo.problemaMazzo(righe) === null) {
                 const mazzoFinale = {
                     frasi: righe[0],
                     completamenti: righe[1],
@@ -523,7 +588,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
                 const hash = crypto.createHash('sha256')
                     .update(datiString)
                     .digest('hex');
-                packs.push({...mazzoFinale, hash: hash});
+                packs.push({ ...mazzoFinale, hash: hash });
             } else
                 return res.status(400).json({
                     success: false
@@ -538,12 +603,12 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     app.use((req, res) => res.redirect("/error"));
 
     /*
-     * Ultima rete: qualunque errore non gestito finisce nei log CON lo stack
-     * (prima Express rispondeva "Internal Server Error" e il motivo non si
-     * vedeva da nessuna parte) e il giocatore riceve una pagina che lo
-     * riporta alla home. Niente redirect a /error da qui: se il guasto e'
-     * globale (sessioni, database) anche /error fallirebbe e si girerebbe in
-     * tondo.
+- Ultima rete: qualunque errore non gestito finisce nei log CON lo stack
+- (prima Express rispondeva "Internal Server Error" e il motivo non si
+- vedeva da nessuna parte) e il giocatore riceve una pagina che lo
+- riporta alla home. Niente redirect a /error da qui: se il guasto e'
+- globale (sessioni, database) anche /error fallirebbe e si girerebbe in
+- tondo.
      */
     app.use((err, req, res, next) => {
         console.error(`[http] ${req.method} ${req.originalUrl} ->`, err?.stack || err);
