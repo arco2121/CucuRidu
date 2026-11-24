@@ -17,7 +17,7 @@ const ENV = {
     ...envFiles,
     ...process.env
 };
-const manutenzione = true;
+const manutenzione = false;
 
 const allowedOrigins = [
     "https://cucuridu-portal.web.app",
