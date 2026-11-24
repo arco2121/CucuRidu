@@ -17,6 +17,7 @@ const { ClusterMap } = require(path.join(__dirname, "/include/script/ClusterMap"
 const { SegnalazioniCluster } = require(path.join(__dirname, "/include/script/Segnalazioni"));
 
 const clusterApp = async (local, port, allowedOrigins, env = {}, timeout = 3600000, manutenzione = false) => {
+    timeout = (typeof timeout === "number" && timeout > 0) ? timeout : 3600000;
     const key = env.DATABASE_KEY;
     const url = env.DATABASE_URL;
     const password = env.DATABASE_PASSWORD;
