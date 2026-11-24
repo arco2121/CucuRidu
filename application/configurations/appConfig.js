@@ -96,7 +96,9 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
 
     app.get("/ping", (req, res) => res.status(200).end());
 
-    app.get("/syncIDToken", (req, res) => renderPage(req, res, "saveIDToken"));
+    app.get("/syncIDToken", (req, res) => renderPage(req, res, "syncIDToken", {
+        simple: true
+    }));
 
     app.get("/offline", (req, res) => renderPage(req, res, "offline", {
         loadToken: false,
