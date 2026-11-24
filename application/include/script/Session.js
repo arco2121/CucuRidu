@@ -136,7 +136,7 @@ const assicuraTabella = async (pool, tabella = "sessions") => {
 class Session {
 
     constructor(timeout = 3600000, token, blacklist = new Map(), pool = false) {
-        this.timeout = timeout;
+        this.timeout = (typeof timeout === "number" && timeout > 0) ? timeout : 3600000;
         this.pool = pool;
         this.blackList = blacklist;
         this.tokenKey = token;
@@ -146,7 +146,7 @@ class Session {
                 await this._clearBlackList();
             } catch (error) { console.error(error.message); }
             finally {
-                const t = setTimeout(clearBlacklist, timeout);
+                const t = setTimeout(clearBlacklist, this.timeout);
                 if (t.unref) t.unref();
             }
         };
@@ -182,7 +182,7 @@ class Session {
         if (req && req.session)
             req.session.storeData = { ...data };
 
-        const seconds = Math.floor(this.timeout / 1000);
+        const seconds = Math.max(Math.floor(this.timeout / 1000), 60);
         const token = jwt.sign({ ...data }, this.tokenKey, { expiresIn: seconds });
 
         if (customId) {
