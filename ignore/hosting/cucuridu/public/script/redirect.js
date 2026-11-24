@@ -1,6 +1,6 @@
 (() => {
-    const CANONICAL_PORTAL = 'https://cucuridu-portal.web.app';
-    const STORAGE_KEY = 'cucuriduCode';
+    const CANONICAL_PORTAL = 'https://riducucu.web.app';
+    const STORAGE_KEY = 'cucuriduToken';
     const STICKY_KEY = 'cucuridu_last_node';
     const STICKY_TTL_MS = 25 * 60 * 1000; // 25 minuti
 
@@ -130,8 +130,6 @@
                 }
             } catch { /* fallback al race completo */ }
         }
-
-        setStatus('Ricerca del nodo più veloce...');
 
         // 4. Ricerca stanza con uscita immediata su hasRoom: true
         if (roomParam) return resolveRoomNode();
