@@ -302,22 +302,24 @@ class Session {
     async validate(keys, ...sources) {
         const result = {};
         const params = Array.isArray(keys) ? keys : Object.keys(keys);
-        for (const source of sources) {
-            let data = {};
-            if (typeof source === "string") {
-                data = await this.get(null, source);
-            } else if (source && typeof source === "object") {
-                if (source.customId) {
-                    data = await this.get(null, null, source.customId);
-                } else {
-                    data = source.session?.storeData || source;
-                }
-            }
+        const applyData = (data) => {
+            if (!data || typeof data !== "object") return;
             for (const key of params) {
                 if (data[key] !== undefined && data[key] !== null) {
                     if (result[key] === undefined) {
                         result[key] = data[key];
                     }
+                }
+            }
+        };
+
+        for (const source of sources) {
+            if (typeof source === "string") {
+                applyData(await this.get(null, source));
+            } else if (source && typeof source === "object") {
+                applyData(source.session?.storeData || source);
+                if (source.customId) {
+                    applyData(await this.get(null, null, source.customId));
                 }
             }
         }
