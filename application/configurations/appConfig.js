@@ -63,7 +63,11 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         req.deleteToken = !!req.query?.token;
         try {
             const { userId, stanzaId, jwt } = await serverSession.get(req, req.query?.token, req.query?.idToken);
-            const redirecting = req.query?.token || jwt ? "?token=" + req.query.token ?? jwt : "";
+            const activeToken = req.query?.token || jwt;
+            const queryParams = new URLSearchParams();
+            if (activeToken) queryParams.set("token", activeToken);
+            if (req.query?.idToken) queryParams.set("idToken", req.query.idToken);
+            const redirecting = queryParams.toString() ? "?" + queryParams.toString() : "";
             if(userId && (await Stanze.get(stanzaId))?.trovaGiocatore(userId)) return res.redirect("/game" + redirecting);
         } catch (e) {
             console.error(`[preCheck] ${req.method} ${req.originalUrl} -> controllo stanza esistente fallito, proseguo:`, e?.stack || e);
@@ -306,7 +310,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     });
 
     app.get("/partecipaStanza", preCheck, (req, res) => {
-        const {nome, pfp, stanza} = req.query;
+        const {nome, pfp, stanza, idToken} = req.query;
         if (nome && pfp && stanza) {
             const token = serverSession.set(req, {
                 nome: nome,
@@ -314,8 +318,8 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
                 stanzaId: stanza,
                 deleteToken: req.deleteToken,
                 bgm: "Choosing_Menu-Feeling_Good"
-            });
-            res.redirect("/game?token=" + token);
+            }, idToken || null);
+            res.redirect("/game?token=" + token + (idToken ? "&idToken=" + encodeURIComponent(idToken) : ""));
         } else if (stanza) renderPage(req, res, "profile", {
             stanza: stanza,
             setOfPfp: getAllPfp(),
@@ -328,14 +332,14 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     });
 
     app.get("/creaStanza", preCheck, (req, res) => {
-        const {nome, pfp} = req.query;
+        const {nome, pfp, idToken} = req.query;
         if (nome && pfp) {
             const token = serverSession.set(req, {
                 nome: nome,
                 pfp: pfp,
                 bgm: "Choosing_Menu-Feeling_Good"
-            });
-            res.redirect("/game?token=" + token);
+            }, idToken || null);
+            res.redirect("/game?token=" + token + (idToken ? "&idToken=" + encodeURIComponent(idToken) : ""));
         } else renderPage(req, res, "profile", {
             setOfPfp: getAllPfp(),
             deleteToken: req.deleteToken,
@@ -345,7 +349,12 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
 
     app.get("/game", async (req, res) => {
         const check = ["nome", "pfp", "stanzaId", "userId"];
-        const {nome, pfp, stanzaId, userId} = await serverSession.validate(check, req.session.storeData, req.query?.token);
+        const {nome, pfp, stanzaId, userId} = await serverSession.validate(
+            check,
+            req.session.storeData,
+            req.query?.token,
+            req.query?.idToken ? { customId: req.query.idToken } : null
+        );
         if (userId && stanzaId && await Stanze.has(stanzaId) && (await Stanze.get(stanzaId))?.trovaGiocatore(userId))
             renderPage(req, res, "lobby", {
                 userId: userId,
@@ -365,7 +374,7 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
                 bgm: "GameMusic-Candy_Bazaar"
             });
         } else {
-            await serverSession.invalidate(req, req.query?.token);
+            await serverSession.invalidate(req, req.query?.token, req.query?.idToken || null);
             res.redirect("/");
         }
     });
@@ -474,23 +483,24 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     })
 
     app.post("/saveGameReference", async (req, res) => {
-        const {userId, stanzaId} = req.body || {};
+        const {userId, stanzaId, idToken} = req.body || {};
+        const activeIdToken = idToken || req.query?.idToken || null;
         if (userId && stanzaId) {
             const token = serverSession.set(req, {
                 userId: userId,
                 stanzaId: stanzaId,
-            });
+            }, activeIdToken);
             return res.status(200).json({
                 result: true,
                 fallback: token
             });
         }
-        await serverSession.invalidate(req);
+        await serverSession.invalidate(req, null, activeIdToken);
         res.status(406).json({result: false});
     });
 
     app.post("/deleteGameReference", async (req, res) => {
-        await serverSession.invalidate(req, req.body?.token);
+        await serverSession.invalidate(req, req.body?.token, req.body?.idToken || req.query?.idToken || null);
         res.status(200).json({result: true});
     });
 

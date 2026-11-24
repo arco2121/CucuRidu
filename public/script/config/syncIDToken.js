@@ -1,8 +1,11 @@
 (() => {
     const STORAGE_KEY = 'cucuRiduToken';
     const UPDATED_AT_KEY = `${STORAGE_KEY}:updatedAt`;
+    const SSO_FLAG_KEY = 'cucuRiduSsoSynced';
+    const URL_PARAM_KEY = 'idToken';
+    const URL_UPDATED_KEY = 'idUpdatedAt';
     const TOKEN_LIFETIME = 24 * 60 * 60 * 1000;
-    const BRIDGE_PATH = '/syncIDToken';
+    const PORTAL_SSO_ORIGIN = 'https://cucuridu-portal.web.app';
     const SYNC_DOMAINS = [
         'https://cucuridu.onrender.com',
         'https://cucuridu-gmgv.onrender.com',
@@ -10,8 +13,6 @@
         'https://cucuridu-jean.onrender.com'
     ];
 
-    const READ_TIMEOUT = 4000;
-    const WRITE_TIMEOUT = 2500;
     const currentOrigin = window.location.origin;
 
     const getLocalState = () => {
@@ -24,8 +25,6 @@
         }
     };
 
-    // La scelta e' deterministica anche in caso di rotazioni simultanee nello
-    // stesso millisecondo, cosi' tutti i domini convergono sullo stesso valore.
     const preferState = (candidate, current) => {
         if (!candidate?.code) return current;
         if (!current?.code) return candidate;
@@ -54,146 +53,74 @@
         return Array.from(bytes, (b) => chars[b % chars.length]).join('');
     };
 
-    const consumeUrlCode = () => {
+    const syncUrlParam = (code) => {
+        if (!code) return;
+        try {
+            const url = new URL(window.location.href);
+            url.searchParams.delete(STORAGE_KEY);
+            url.searchParams.delete(URL_UPDATED_KEY);
+            url.searchParams.set(URL_PARAM_KEY, code);
+            if (url.toString() !== window.location.href) {
+                window.history.replaceState({}, '', url.toString());
+            }
+        } catch {}
+    };
+
+    const initSync = () => {
         const url = new URL(window.location.href);
-        const codeFromUrl = url.searchParams.get(STORAGE_KEY);
+        const urlCode = url.searchParams.get(URL_PARAM_KEY) || url.searchParams.get(STORAGE_KEY);
+        const urlUpdatedAt = Number(url.searchParams.get(URL_UPDATED_KEY)) || 0;
+        const alreadySyncedInTab = sessionStorage.getItem(SSO_FLAG_KEY) === '1';
+        const isClusterHost = SYNC_DOMAINS.includes(currentOrigin);
 
-        if (!codeFromUrl) return null;
-
-        url.searchParams.delete(STORAGE_KEY);
-        window.history.replaceState({}, '', url.toString());
-
-        return { code: codeFromUrl, updatedAt: Date.now() };
-    };
-
-    // Apre un iframe nascosto verso un dominio e permette di scambiare messaggi postMessage
-    const connectPeer = (domain) => new Promise((resolve, reject) => {
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.setAttribute('aria-hidden', 'true');
-        iframe.src = `${domain}${BRIDGE_PATH}`;
-
-        const timer = setTimeout(() => {
-            cleanup();
-            reject(new Error(`Timeout: ${domain}`));
-        }, READ_TIMEOUT);
-
-        const cleanup = () => {
-            clearTimeout(timer);
-            iframe.remove();
-        };
-
-        iframe.onload = () => resolve({ domain, iframe, cleanup });
-        iframe.onerror = () => {
-            cleanup();
-            reject(new Error(`Errore caricamento: ${domain}`));
-        };
-
-        document.body.appendChild(iframe);
-    });
-
-    const sendRpc = ({ domain, iframe }, payload, expectedAction, timeoutMs) =>
-        new Promise((resolve) => {
-            const timer = setTimeout(() => {
-                window.removeEventListener('message', onMsg);
-                resolve(null);
-            }, timeoutMs);
-
-            const onMsg = (event) => {
-                if (event.origin !== domain) return;
-                let data;
-                try {
-                    data = JSON.parse(event.data);
-                } catch {
-                    return;
-                }
-                if (data?.action === expectedAction) {
-                    clearTimeout(timer);
-                    window.removeEventListener('message', onMsg);
-                    resolve(data);
-                }
-            };
-
-            window.addEventListener('message', onMsg);
-            iframe.contentWindow?.postMessage(JSON.stringify(payload), domain);
-        });
-
-    // Condivide il token e la sua data di generazione con tutti i portali configurati
-    const shareCode = async (code, updatedAt = Date.now()) => {
-        if (!code) return null;
-        const state = setLocalState({ code, updatedAt });
-
-        const remoteDomains = SYNC_DOMAINS.filter((d) => d !== currentOrigin);
-        const results = await Promise.allSettled(remoteDomains.map(connectPeer));
-        const activePeers = results
-            .filter((r) => r.status === 'fulfilled')
-            .map((r) => r.value);
-
-        await Promise.all(
-            activePeers.map((peer) =>
-                sendRpc(peer, {
-                    action: 'SET_CODE', key: STORAGE_KEY,
-                    code: state.code, updatedAt: state.updatedAt
-                }, 'CODE_SAVED', WRITE_TIMEOUT)
-            )
-        );
-
-        activePeers.forEach((peer) => peer.cleanup());
-        return state.code;
-    };
-
-    // Allinea i domini sul token piu' recente e lo rinnova quando ha almeno 24 ore.
-    const syncCode = async () => {
-        const urlState = consumeUrlCode();
-        if (urlState) return shareCode(urlState.code, urlState.updatedAt);
-
-        const remoteDomains = SYNC_DOMAINS.filter((d) => d !== currentOrigin);
-        const results = await Promise.allSettled(remoteDomains.map(connectPeer));
-        const activePeers = results
-            .filter((r) => r.status === 'fulfilled')
-            .map((r) => r.value);
-
-        const responses = await Promise.all(
-            activePeers.map((peer) =>
-                sendRpc(peer, { action: 'GET_CODE', key: STORAGE_KEY }, 'CODE_RESPONSE', READ_TIMEOUT)
-            )
-        );
-
-        let newestState = getLocalState();
-        for (const response of responses) {
-            if (!response?.code) continue;
-            const updatedAt = Number(response.updatedAt) || 0;
-            newestState = preferState({ code: response.code, updatedAt }, newestState);
+        // Se arriviamo dal portale (urlUpdatedAt presente) o abbiamo gia' sincronizzato
+        // questa scheda, consolidiamo lo stato locale senza altri rimbalzi.
+        if (urlUpdatedAt > 0 || alreadySyncedInTab || !isClusterHost || navigator.onLine === false) {
+            sessionStorage.setItem(SSO_FLAG_KEY, '1');
+            let merged = getLocalState();
+            if (urlCode) {
+                merged = preferState({ code: urlCode, updatedAt: urlUpdatedAt || Date.now() }, merged);
+            }
+            if (!merged || Date.now() - merged.updatedAt >= TOKEN_LIFETIME) {
+                merged = { code: generateCode(128), updatedAt: Date.now() };
+            }
+            const finalState = setLocalState(merged);
+            syncUrlParam(finalState.code);
+            return finalState.code;
         }
 
-        const tokenExpired = !newestState || Date.now() - newestState.updatedAt >= TOKEN_LIFETIME;
-        const desiredState = tokenExpired
-            ? { code: generateCode(128), updatedAt: Date.now() }
-            : newestState;
-        const finalState = setLocalState(desiredState);
+        // Primo accesso manuale su questo dominio in questa scheda:
+        // rimbalza sul portale first-party per allineare il codice tra tutti i domini.
+        sessionStorage.setItem(SSO_FLAG_KEY, '1');
+        const local = getLocalState();
+        const validLocal = local && Date.now() - local.updatedAt < TOKEN_LIFETIME ? local : null;
 
-        await Promise.all(
-            activePeers.map((peer) =>
-                sendRpc(peer, {
-                    action: 'SET_CODE', key: STORAGE_KEY,
-                    code: finalState.code, updatedAt: finalState.updatedAt
-                }, 'CODE_SAVED', WRITE_TIMEOUT)
-            )
-        );
+        const cleanReturnUrl = new URL(window.location.href);
+        cleanReturnUrl.searchParams.delete(URL_PARAM_KEY);
+        cleanReturnUrl.searchParams.delete(URL_UPDATED_KEY);
+        cleanReturnUrl.searchParams.delete(STORAGE_KEY);
 
-        activePeers.forEach((peer) => peer.cleanup());
-        return finalState.code;
+        const ssoUrl = new URL(PORTAL_SSO_ORIGIN + '/');
+        ssoUrl.searchParams.set('ssoReturn', cleanReturnUrl.toString());
+        if (validLocal) {
+            ssoUrl.searchParams.set('code', validLocal.code);
+            ssoUrl.searchParams.set('updatedAt', String(validLocal.updatedAt));
+        }
+
+        window.__cucuRiduSsoRedirecting = true;
+        window.location.replace(ssoUrl.toString());
+        return validLocal?.code || null;
     };
+
+    const currentCode = initSync();
 
     window.CucuriduSync = {
-        syncCode,
-        shareCode,
-        getCode: () => getLocalState()?.code || null
+        syncCode: async () => currentCode,
+        shareCode: async (code, updatedAt = Date.now()) => {
+            const saved = setLocalState({ code, updatedAt });
+            syncUrlParam(saved?.code);
+            return saved?.code || null;
+        },
+        getCode: () => getLocalState()?.code || new URLSearchParams(window.location.search).get(URL_PARAM_KEY) || null
     };
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => syncCode());
-    } else {
-        syncCode();
-    }
 })();

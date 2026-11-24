@@ -3,7 +3,7 @@
  * file spariscano: all'attivazione le cache con un nome diverso vengono
  * cancellate.
  */
-const VERSIONE_CACHE = 'v6';
+const VERSIONE_CACHE = 'v7';
 const CACHE_NAME = 'cucuridu_cache_' + VERSIONE_CACHE;
 const OFFLINE_URL = '/offline';
 const files = [

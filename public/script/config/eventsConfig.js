@@ -27,6 +27,20 @@ const showPanelCond = new Event("showPanelCond", {
 const hidePanelCond = new Event("hidePanelCond", {
     bubbles: true
 });
+const appendIdToken = (targetUrl) => {
+    if (typeof targetUrl !== "string") return targetUrl;
+    try {
+        const idToken = localStorage.getItem("cucuRiduToken")
+            || new URLSearchParams(window.location.search).get("idToken");
+        if (!idToken) return targetUrl;
+        const parsed = new URL(targetUrl, window.location.origin);
+        if (parsed.origin === window.location.origin && !parsed.searchParams.has("idToken")) {
+            parsed.searchParams.set("idToken", idToken);
+            return parsed.pathname + parsed.search + parsed.hash;
+        }
+    } catch {}
+    return targetUrl;
+};
 const navigateWithLoading = (url, forget = false) => {
     document.dispatchEvent(loadScreen);
 
@@ -34,10 +48,11 @@ const navigateWithLoading = (url, forget = false) => {
         if(typeof url === "function")
             return url();
         else {
+            const resolvedUrl = appendIdToken(url);
             if(!forget)
-                window.location.href = url;
+                window.location.href = resolvedUrl;
             else
-                window.location.replace(url)
+                window.location.replace(resolvedUrl)
         }
     }, timing);
 };

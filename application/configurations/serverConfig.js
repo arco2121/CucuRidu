@@ -208,7 +208,10 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
         try {
             const checks = ["validation", "stanzaId", "userId"];
             const { validation, stanzaId, userId } = await serverSession.validate(
-                checks, socket.handshake.auth, socket.handshake.auth?.token
+                checks,
+                socket.handshake.auth,
+                socket.handshake.auth?.token,
+                socket.handshake.auth?.customId ? { customId: socket.handshake.auth.customId } : null
             );
             if (validation !== TEMPORARY_TOKEN) return next(new Error("INVALID_KEY"));
             if (!stanzaId) return next();

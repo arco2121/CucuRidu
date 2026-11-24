@@ -1,8 +1,14 @@
+const getActiveIdToken = () =>
+    localStorage.getItem("cucuRiduToken")
+    || new URLSearchParams(window.location.search).get("idToken")
+    || null;
+
 const parametri = {
     validation: fromBackEnd["token"],
     stanzaId: fromBackEnd["stanzaId"],
     userId: fromBackEnd["userId"],
-    token: JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}")["savingToken"] || null
+    token: JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}")["savingToken"] || null,
+    customId: getActiveIdToken()
 };
 const receivers = {};
 
@@ -134,7 +140,8 @@ const lasciaStanza = () => {
         credentials: "include",
         signal: controller.signal,
         body: JSON.stringify({
-            token: token || null
+            token: token || null,
+            idToken: getActiveIdToken()
         })
     }).catch(err => console.error(err))
         .finally(() => navigateWithLoading("/", true));
@@ -243,7 +250,8 @@ on("confermaStanza", async (data) => {
         credentials: "include",
         body: JSON.stringify({
             userId: referenceGiocatore.id,
-            stanzaId: referenceStanza
+            stanzaId: referenceStanza,
+            idToken: getActiveIdToken()
         })
     })).json();
     if (!restaSulVincitore && turno === turnoVista) await renderFragment(base, "wait", {

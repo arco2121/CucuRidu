@@ -44,6 +44,10 @@ const checkHost = async (hosts) => {
     fallimentiConsecutivi = 0;
 };
 
+
+if (!window.__cucuRiduSsoRedirecting && location.href !== newUrl.href)
+    window.location.replace(newUrl.href);
+
 let notSavedBefore = true;
 const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
 const idToken = localStorage.getItem("cucuRiduToken") || null;
