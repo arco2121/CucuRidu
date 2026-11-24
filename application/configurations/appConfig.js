@@ -62,8 +62,8 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
     const preCheck = async (req, res, next) => {
         req.deleteToken = !!req.query?.token;
         try {
-            const { userId, stanzaId } = await serverSession.get(req, req.query?.token);
-            const redirecting = req.query?.token ? "?token=" + req.query.token : "";
+            const { userId, stanzaId, jwt } = await serverSession.get(req, req.query?.token, req.query?.idToken);
+            const redirecting = req.query?.token || jwt ? "?token=" + req.query.token ?? jwt : "";
             if(userId && (await Stanze.get(stanzaId))?.trovaGiocatore(userId)) return res.redirect("/game" + redirecting);
         } catch (e) {
             console.error(`[preCheck] ${req.method} ${req.originalUrl} -> controllo stanza esistente fallito, proseguo:`, e?.stack || e);

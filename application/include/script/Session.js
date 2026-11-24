@@ -1,6 +1,6 @@
 const session = require('express-session');
 const jwt = require('jsonwebtoken');
-const MemoryStore = require('memorystore')(session)
+const MemoryStore = require('memorystore')(session);
 const pgSession = require('connect-pg-simple')(session);
 
 /*
@@ -118,9 +118,9 @@ const assicuraTabella = async (pool, tabella = "sessions") => {
             const { rows } = await pool.query("SELECT to_regclass($1::text) AS esiste", [`"${tabella}"`]);
             if (rows[0]?.esiste === null) {
                 await pool.query(`CREATE TABLE IF NOT EXISTS "${tabella}" (
-                    "sid" varchar NOT NULL COLLATE "default" PRIMARY KEY,
-                    "sess" json NOT NULL,
-                    "expire" timestamp(6) NOT NULL)`);
+                                                                              "sid" varchar NOT NULL COLLATE "default" PRIMARY KEY,
+                                                                              "sess" json NOT NULL,
+                                                                              "expire" timestamp(6) NOT NULL)`);
                 await pool.query(`CREATE INDEX IF NOT EXISTS "IDX_${tabella}_expire" ON "${tabella}" ("expire")`);
                 console.log(`[session] tabella "${tabella}" creata`);
             }
@@ -140,12 +140,14 @@ class Session {
         this.pool = pool;
         this.blackList = blacklist;
         this.tokenKey = token;
+        this.customRefs = new Map();
         const clearBlacklist = async () => {
             try {
                 await this._clearBlackList();
             } catch (error) { console.error(error.message); }
             finally {
-                setTimeout(clearBlacklist, timeout);
+                const t = setTimeout(clearBlacklist, timeout);
+                if (t.unref) t.unref();
             }
         };
 
@@ -161,11 +163,11 @@ class Session {
                 tableName: 'sessions',
                 // vedi il commento su StoreTollerante: la tabella la controlla assicuraTabella
                 createTableIfMissing: false,
-                pruneSessionInterval: this.timeout/1000
+                pruneSessionInterval: this.timeout / 1000
             }));
         } else {
             store = new MemoryStore({
-                checkPeriod: this.timeout/1000
+                checkPeriod: this.timeout / 1000
             });
         }
 
@@ -176,35 +178,125 @@ class Session {
         });
     }
 
-    set(req, data = {}) {
+    set(req, data = {}, customId = null) {
         if (req && req.session)
             req.session.storeData = { ...data };
+
         const seconds = Math.floor(this.timeout / 1000);
-        return jwt.sign({ ...data }, this.tokenKey, { expiresIn: seconds });
+        const token = jwt.sign({ ...data }, this.tokenKey, { expiresIn: seconds });
+
+        if (customId) {
+            const key = String(customId);
+            const sid = req?.sessionID || null;
+            const expire = Date.now() + this.timeout;
+            this.customRefs.set(key, { sid, jwt: token, data: { ...data }, expire });
+
+            if (this.pool) {
+                this.pool.query(
+                    "SELECT public.salva_sessione_identificativo($1, $2, $3, $4, $5::jsonb, true)",
+                    [key, sid, token, new Date(expire).toISOString(), JSON.stringify(data)]
+                ).catch(err => console.error("[session:customId] salvataggio fallito ->", err?.message || err));
+            }
+        }
+
+        return token;
     }
 
-    async get(req, token = null) {
+    async get(req, token = null, customId = null) {
+        // 1. Priorita' alla sessione Express via cookie
         if (req?.session?.storeData)
             return req.session.storeData;
+
+        // 2. Fallback sul token JWT passato esplicitamente
         if (token) {
             try {
                 // Il token e' il fallback portatile: se e' stato revocato da
                 // un'altra istanza del cluster dobbiamo rifiutarlo per non
                 // far tornare un giocatore prima di essere stato espulso.
-                if (await this.blackList.has(token)) return {};
-                return jwt.verify(token, this.tokenKey);
+                if (!(await this.blackList.has(token))) {
+                    const verificato = jwt.verify(token, this.tokenKey);
+                    Object.defineProperty(verificato, "jwt", { value: token, enumerable: false, configurable: true });
+                    return verificato;
+                }
             } catch {
-                return {};
+                // Token scaduto o invalido: se c'e' customId proviamo quello
             }
         }
+
+        // 3. Fallback sulla stringa personalizzata salvata in parallelo
+        if (customId) {
+            const key = String(customId);
+            let trovato = null;
+
+            if (this.pool) {
+                try {
+                    const { rows } = await this.pool.query(
+                        "SELECT * FROM public.trova_da_identificativo($1) LIMIT 1",
+                        [key]
+                    );
+                    if (rows[0]) {
+                        trovato = {
+                            jwt: rows[0].jwt,
+                            data: rows[0].session_data?.storeData || rows[0].metadata || {}
+                        };
+                    }
+                } catch (err) {
+                    console.error("[session:customId] lettura fallita, uso fallback locale ->", err?.message || err);
+                }
+            }
+
+            if (!trovato) {
+                const locale = this.customRefs.get(key);
+                if (locale && locale.expire > Date.now()) {
+                    trovato = { jwt: locale.jwt, data: locale.data };
+                } else {
+                    this.customRefs.delete(key);
+                }
+            }
+
+            if (trovato) {
+                if (trovato.jwt) {
+                    if (await this.blackList.has(trovato.jwt)) return {};
+                    try {
+                        const verificato = jwt.verify(trovato.jwt, this.tokenKey);
+                        Object.defineProperty(verificato, "jwt", { value: trovato.jwt, enumerable: false, configurable: true });
+                        return verificato;
+                    } catch {
+                        return {};
+                    }
+                }
+                return trovato.data || {};
+            }
+        }
+
         return {};
     }
 
-    async invalidate(req, token) {
+    async invalidate(req, token = null, customId = null) {
         if (req?.session)
             req.session.destroy();
         if (token)
             await this.blackList.set(token, Date.now() + this.timeout);
+
+        if (customId) {
+            const key = String(customId);
+            const locale = this.customRefs.get(key);
+            if (locale?.jwt)
+                await this.blackList.set(locale.jwt, Date.now() + this.timeout);
+            this.customRefs.delete(key);
+
+            if (this.pool) {
+                this.pool.query(
+                    "DELETE FROM public.session_identificativi WHERE custom_id = $1",
+                    [key]
+                ).catch(err => console.error("[session:customId] eliminazione fallita ->", err?.message || err));
+            }
+        } else if (token && this.pool) {
+            this.pool.query(
+                "DELETE FROM public.session_identificativi WHERE jwt = $1",
+                [token]
+            ).catch(() => {});
+        }
     }
 
     async validate(keys, ...sources) {
@@ -215,7 +307,11 @@ class Session {
             if (typeof source === "string") {
                 data = await this.get(null, source);
             } else if (source && typeof source === "object") {
-                data = source.session?.storeData || source;
+                if (source.customId) {
+                    data = await this.get(null, null, source.customId);
+                } else {
+                    data = source.session?.storeData || source;
+                }
             }
             for (const key of params) {
                 if (data[key] !== undefined && data[key] !== null) {
@@ -237,6 +333,13 @@ class Session {
             const scadenza = expiry instanceof Date ? expiry.getTime() : Number(expiry);
             if (Number.isFinite(scadenza) && now > scadenza)
                 await this.blackList.delete(token);
+        }
+        for (const [key, ref] of this.customRefs.entries()) {
+            if (now > ref.expire)
+                this.customRefs.delete(key);
+        }
+        if (this.pool) {
+            this.pool.query("SELECT public.delete_old_session_identificativi()").catch(() => {});
         }
     }
 }

@@ -44,8 +44,11 @@ const checkHost = async (hosts) => {
     fallimentiConsecutivi = 0;
 };
 
+let notSavedBefore = true;
 const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
+const idToken = localStorage.getItem("cucuRiduToken") || null;
 if (fromBackEnd["deleteToken"] === true) {
+    notSavedBefore = false
     settings["savingToken"] = null;
     localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
 }
@@ -56,11 +59,17 @@ if (fromBackEnd["deleteToken"] === true) {
 // prossimo salvataggio della sessione non perde il giocatore.
 const params = new URLSearchParams(window.location.search);
 const token = params.get("token") || settings.savingToken;
-if (!params.has("token") && token && fromBackEnd["loadToken"] !== false) {
-    const newUrl = new URL(window.location.href);
-    newUrl.searchParams.set("token", token);
-    window.location.replace(newUrl.href);
+if(notSavedBefore && token) {
+    settings["savingToken"] = token;
+    localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
 }
+
+const newUrl = new URL(window.location.href);
+if (!params.has("token") && token && fromBackEnd["loadToken"] !== false)
+    newUrl.searchParams.set("token", token);
+if (!params.has("idToken") && idToken)
+    newUrl.searchParams.set("idToken", idToken);
+if (location.href !== newUrl.href) window.location.replace(newUrl.href);
 
 setInterval(() => checkHost(fromBackEnd["allowedOrigins"]), 30000);
 document.addEventListener("visibilitychange", () => {
