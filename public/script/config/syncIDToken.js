@@ -11,7 +11,7 @@
     ];
 
     const READ_TIMEOUT = 4000;
-    const WRITE_TIMEOUT = 800;
+    const WRITE_TIMEOUT = 2500;
     const currentOrigin = window.location.origin;
 
     const getLocalState = () => {
