@@ -50,6 +50,8 @@ const getActiveIdToken = () =>
     || null;
 
 const failoverToHealthyNode = async () => {
+    if (!CLUSTER_NODES.includes(window.location.origin)) return;
+
     const candidates = CLUSTER_NODES.filter(n => n !== window.location.origin);
     if (!candidates.length) return;
     try {
