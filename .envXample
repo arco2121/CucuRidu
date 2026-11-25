@@ -6,6 +6,7 @@ JWTKEY=
 SEGNALAZIONI_KEY=
 USE_CLUSTER=false
 ON_PLATFORM=false
+KEYSTORE_PASSWORD=
 
 #ON_PLATFORM INDICA SE DEVE RUNNARE CON CONFIGURAZIONE PER localhost
 #USE_CLUSTER INDICA SE DEVE RUNNARE CENTRALIZZATO CON UN DATABASE CONDIVISO
@@ -17,3 +18,5 @@ ON_PLATFORM=false
 #SEGNALAZIONI_KEY chiave per aprire /segnalazioni?chiave=... , la pagina con le
 #frasi e i completamenti segnalati come sbagliati durante le partite.
 #Se e' vuota la pagina non esiste proprio
+
+#KEYSTORE_PASSWORD serve a noi per compilare l'apk della versione lan

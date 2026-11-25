@@ -12,7 +12,7 @@ const paths = {
     cssDist: path.join(__dirname, 'public', 'dist', 'style'),
     babelConfig: JSON.parse(fs.readFileSync(path.join(__dirname, '.babelrc'), 'utf8') || "{}")
 };
-const toIgnore = ['external'];
+const toIgnore = ['external', 'lan'];
 
 const babelPlugin = {
     name: 'babel',

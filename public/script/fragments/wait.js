@@ -14,6 +14,19 @@ const idStanza = fromFragments["stanzaId"];
 const waitMenu = document.getElementById("waitMenu");
 const url = "/partecipaStanza/" + idStanza;
 
+const resolveFullShareUrl = async () => {
+    if (window.CucuRiduLan) {
+        const lanOrigin = window.CucuRiduLan.refreshHostUrl
+            ? await window.CucuRiduLan.refreshHostUrl()
+            : window.CucuRiduLan.getHostJoinUrl?.();
+        if (!lanOrigin || !/^https?:\/\/\d+\.\d+\.\d+\.\d+/i.test(lanOrigin)) {
+            return null;
+        }
+        return lanOrigin.replace(/\/$/, "") + url;
+    }
+    return window.location.origin.replace(/\/$/, "") + url;
+};
+
 on("aggiornamentoAttesa", (data) => {
     const {numeroGiocatori, minimoGiocatori, giocatori} = data || {};
     numeroGiocatoriCount.textContent = numeroGiocatoriCount.textContent.split(":")[0] + ": " + numeroGiocatori;
@@ -35,18 +48,42 @@ emit("aggiornaAttesa", {
 
 shareButton.addEventListener("click", async () => {
     const shareText = "Muovi il culo ed entra nella stanza per giocare inconcepibile sgorbio nato dall'errare umano che non sei altro :))";
-    const copytext = "Codice copiato, ora usalo saggiamente scarto umano :))";
-    const failText = "Codice non copiato, fai meno il fannullone e faglielo semplicemente vedere :))";
+    const copytext = "Link copiato, ora usalo saggiamente scarto umano :))";
+    const failText = "Link non copiato, fai meno il fannullone e faglielo semplicemente vedere :))";
+    const fullUrl = await resolveFullShareUrl();
+
+    if (!fullUrl) {
+        alert("Connettiti a un Wi-Fi o attiva l'Hotspot del telefono prima di condividere il link!");
+        return;
+    }
+
     const shareData = {
         title: "Cucu Ridu",
         text: shareText,
-        url: url,
+        url: fullUrl,
     };
-    if (navigator.canShare(shareData)) await navigator.share(shareData).catch(_ => null);
-    else await navigator.clipboard.writeText(idStanza).then(() => alert(copytext)).catch(_ => alert(failText));
+
+    if (typeof navigator.share === "function" && (!navigator.canShare || navigator.canShare(shareData))) {
+        try {
+            await navigator.share(shareData);
+            return;
+        } catch (err) {
+            if (err?.name === "AbortError") return;
+        }
+    }
+
+    await navigator.clipboard.writeText(fullUrl)
+        .then(() => alert(copytext))
+        .catch(() => alert(failText));
 });
 
-showQrcode.addEventListener("click", () => {
+showQrcode.addEventListener("click", async () => {
+    const fullUrl = await resolveFullShareUrl();
+    if (!fullUrl) {
+        alert("Connettiti a un Wi-Fi o attiva l'Hotspot del telefono prima di mostrare il QR Code!");
+        return;
+    }
+
     const qrCode = qrcodeSharing.querySelector("img");
     qrCode.onload = () => {
         waitMenu.dispatchEvent(hidePanel);
@@ -58,7 +95,7 @@ showQrcode.addEventListener("click", () => {
     };
     qrCode.onerror = () => alert("Evitiamo di piangere sul un QrCode rotto 😭");
 
-    qrCode.src = "/qrCode?padding=2&url=" + encodeURIComponent(location.origin + url);
+    qrCode.src = "/qrCode?padding=2&url=" + encodeURIComponent(fullUrl);
 });
 
 qrcodeSharing.addEventListener("click", () => {

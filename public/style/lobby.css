@@ -1131,7 +1131,7 @@
     }
 }
 
-@media (max-height: 750px) {
+@media (max-height: 850px) {
     .game_main_con {
         justify-content: flex-start;
         overflow-y: scroll;

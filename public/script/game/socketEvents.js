@@ -103,7 +103,7 @@ const initializeIO = () => {
 };
 
 let controller = (() => {
-    if ('Worker' in window)
+    if (!fromBackEnd["lanMode"] && 'Worker' in window)
         return new Worker(fromBackEnd["scripts"] + '/game/socketController.js');
     else return initializeIO();
 })();

@@ -9,6 +9,11 @@
                 <h4 class="sour_gummy_bold">Codice Stanza: </h4><h4 id="codiceStanzaPause" class="selectable sour_gummy_bold underlined_text"><%= stanzaId %></h4>
             </div>
 
+            <div data-lan-host-only data-lan-only style="display: none" class="column pause_code_text_pause flex_gap_10">
+                <h4 data-lan-join-url class="sour_gummy_bold">Rilevamento IP...</h4>
+                <button type="button" class="button btn_smallText btn_style_3 sour_gummy_bold" data-lan-refresh-ip>Aggiorna IP</button>
+            </div>
+
             <div class="pause_players_list_con_bg">
                 <div class="wait_code_text_title flex_gap_10">
                     <h4 class="sour_gummy_bold">Giocatori :</h4>
@@ -26,8 +31,8 @@
                 <button class="button btn_mediumText btn_style_critical sour_gummy_bold" id="leaveBtn">Esci</button>
                 <button class="button btn_mediumText btn_style_1 sour_gummy_bold" id="optionsBtn">Opzioni</button>
                 <span class="pause_footer_acapo"></span>
-                <button class="button btn_mediumText btn_style_2 sour_gummy_bold" id="segnalaBtn">Segnala</button>
-                <button class="button btn_mediumText btn_style_1 sour_gummy_bold" id="suggerisciBtn">Suggerisci</button>
+                <button data-web-only class="button btn_mediumText btn_style_2 sour_gummy_bold" id="segnalaBtn">Segnala</button>
+                <button data-web-only class="button btn_mediumText btn_style_1 sour_gummy_bold" id="suggerisciBtn">Suggerisci</button>
             </div>
         </div>
     </div>
