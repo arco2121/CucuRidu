@@ -757,7 +757,8 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
             user.emit("suggerimentoEsito", { ok: true, quante: righe.length });
         }));
 
-        user.on("webrtcOfferta", (data) => {
+        //Deprecated
+        /*user.on("webrtcOfferta", (data) => {
             if (!data?.targetSocketId) return;
             server.to(data['targetSocketId']).emit("webrtcRiceviOfferta", {
                 signal: data.signal,
@@ -771,7 +772,7 @@ const serverConfig = (server, serverSession, TEMPORARY_TOKEN, Stanze, generation
                 signal: data.signal,
                 responderSocketId: user.id
             });
-        });
+        });*/
 
         user.on("lasciaStanza", sicuro("lasciaStanza", async (data) => {
             const stanzaId = data?.["id"] ?? user.data?.referenceStanza;
