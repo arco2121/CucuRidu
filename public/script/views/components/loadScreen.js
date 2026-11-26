@@ -26,16 +26,23 @@ const isLoadScreen = () => document.body.contains(loadingScreen);
     });
 
     window.addEventListener("pageshow", (event) => {
-        if (event.persisted || (document.readyState === "complete" && !window.__cucuInternalNav)) {
+        if (event.persisted) {
             document.dispatchEvent(unloadScreen);
         }
     });
 
-    // Quando si torna da un link esterno (es. GitHub Regole su Android),
+    // Solo su Android/LAN: quando si torna da un link esterno (es. GitHub Regole),
     // la pagina non ricarica ma torna visibile con la loading screen ancora appesa
+    let hadExternalNavigation = false;
+    window.addEventListener("blur", () => {
+        if (window.__cucuExternalNav) hadExternalNavigation = true;
+    });
+
     const nascondiSeBloccata = () => {
-        if (document.hidden) return;
+        if (typeof fromBackEnd === "undefined" || !fromBackEnd.lanMode) return;
+        if (document.hidden || !hadExternalNavigation) return;
         if (document.readyState === "complete" && isLoadScreen() && !window.__cucuInternalNav) {
+            hadExternalNavigation = false;
             document.dispatchEvent(unloadScreen);
         }
     };
