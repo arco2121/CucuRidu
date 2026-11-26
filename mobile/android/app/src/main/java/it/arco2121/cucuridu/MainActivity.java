@@ -13,7 +13,8 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        // registerPlugin(LanServerPlugin.class); <-- lascia le tue registrazioni esistenti
+        // Va registrato PRIMA di super.onCreate, altrimenti il JS non vede il plugin LanServer
+        registerPlugin(LanServerPlugin.class);
         super.onCreate(savedInstanceState);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         getWindow().setStatusBarColor(Color.TRANSPARENT);

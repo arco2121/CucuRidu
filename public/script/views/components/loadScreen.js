@@ -47,7 +47,7 @@ const isLoadScreen = () => document.body.contains(loadingScreen);
             clearInterval(intervalId);
             loadingScreen.style.animation = "disappear " + timing + "ms ease-out forwards";
             setTimeout(() => {
-                try { document.body.removeChild(loadingScreen); window?.Capacitor?.Plugins?.SplashScreen?.hide?.(); }
+                try { document.body.removeChild(loadingScreen); }
                 catch { clearInterval(intervalId); }
             }, timing);
         }, timing);

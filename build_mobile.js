@@ -12,6 +12,7 @@ const CARDS_DIR = path.join(ROOT, 'application', 'include', 'cards');
 const NAMES_FILE = path.join(ROOT, 'application', 'include', 'names', 'names.json');
 const MOBILE_WWW = path.join(ROOT, 'mobile', 'www');
 const ANDROID_RES = path.join(ROOT, 'mobile', 'android', 'app', 'src', 'main', 'res');
+const LAN_VERSION = '1.0.0-Lan';
 
 const FALLBACK_NAMES = {
     names: [
@@ -495,7 +496,7 @@ const renderViews = async (embedded) => {
 
     for (const item of pages) {
         const mergedParams = {
-            version: '1.6.0-Lan',
+            version: LAN_VERSION,
             ...baseDetails,
             ...item.params
         };

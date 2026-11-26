@@ -127,6 +127,21 @@ public class LanServerPlugin extends Plugin {
         return fallbackSiteLocal;
     }
 
+    // Libera le porte quando l'Activity viene chiusa, cosi' alla riapertura il bind non fallisce
+    @Override
+    protected void handleOnDestroy() {
+        stopServers();
+        super.handleOnDestroy();
+    }
+
+    // Piu' basso = preferito. Con Wi-Fi e Hotspot attivi insieme vince l'Hotspot
+    private int interfacePriority(String name) {
+        if (name.startsWith("swlan") || name.startsWith("ap") || name.startsWith("softap")) return 0;
+        if (name.startsWith("wlan")) return name.equals("wlan0") ? 2 : 1;
+        if (name.startsWith("rndis") || name.startsWith("eth")) return 3;
+        return Integer.MAX_VALUE;
+    }
+
     private void stopServers() {
         try {
             if (wsServer != null) {
@@ -146,6 +161,7 @@ public class LanServerPlugin extends Plugin {
     private JSObject getNetworkInfoInternal(int httpPort, int wsPort) {
         String bestIp = null;
         String fallbackSiteLocal = null;
+        int bestPriority = Integer.MAX_VALUE;
 
         try {
             java.util.Enumeration<java.net.NetworkInterface> interfaces =
@@ -163,9 +179,7 @@ public class LanServerPlugin extends Plugin {
                     continue;
                 }
 
-                boolean isWifiOrHotspot = name.startsWith("swlan") || name.startsWith("ap")
-                        || name.startsWith("softap") || name.startsWith("wlan")
-                        || name.startsWith("rndis") || name.startsWith("eth");
+                int priority = interfacePriority(name);
 
                 java.util.Enumeration<java.net.InetAddress> addrs = nif.getInetAddresses();
                 while (addrs.hasMoreElements()) {
@@ -175,19 +189,15 @@ public class LanServerPlugin extends Plugin {
                     String ip = addr.getHostAddress();
                     if (ip == null || ip.startsWith("127.")) continue;
 
-                    if (isWifiOrHotspot) {
-                        if (ip.startsWith("192.168.")) {
+                    if (priority != Integer.MAX_VALUE) {
+                        if (priority < bestPriority) {
                             bestIp = ip;
-                            break;
-                        }
-                        if (bestIp == null) {
-                            bestIp = ip;
+                            bestPriority = priority;
                         }
                     } else if (addr.isSiteLocalAddress() && fallbackSiteLocal == null) {
                         fallbackSiteLocal = ip;
                     }
                 }
-                if (bestIp != null && bestIp.startsWith("192.168.")) break;
             }
         } catch (Exception ignored) {}
 

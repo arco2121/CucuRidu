@@ -1,4 +1,4 @@
-name: Build Android APK
+name: CucuRidu Lan APK
 
 on:
   workflow_dispatch:

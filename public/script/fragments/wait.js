@@ -27,6 +27,29 @@ const resolveFullShareUrl = async () => {
     return window.location.origin.replace(/\/$/, "") + url;
 };
 
+// navigator.clipboard non esiste sulle pagine http:// (gli ospiti in LAN)
+const copyShareUrl = async (text) => {
+    if (navigator.clipboard?.writeText) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch {}
+    }
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.select();
+    let copied = false;
+    try {
+        copied = document.execCommand("copy");
+    } catch {}
+    area.remove();
+    return copied;
+};
+
 on("aggiornamentoAttesa", (data) => {
     const {numeroGiocatori, minimoGiocatori, giocatori} = data || {};
     numeroGiocatoriCount.textContent = numeroGiocatoriCount.textContent.split(":")[0] + ": " + numeroGiocatori;
@@ -72,9 +95,7 @@ shareButton.addEventListener("click", async () => {
         }
     }
 
-    await navigator.clipboard.writeText(fullUrl)
-        .then(() => alert(copytext))
-        .catch(() => alert(failText));
+    alert(await copyShareUrl(fullUrl) ? copytext : failText);
 });
 
 showQrcode.addEventListener("click", async () => {

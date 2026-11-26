@@ -165,6 +165,52 @@
         sessionStorage.removeItem(ROOM_STORAGE_KEY);
     };
 
+    // Sessioni LAN: l'Host e' l'unica autorita'. Rilascia un token per ogni giocatore e l'identita'
+    // di un ospite si ricava SOLO da quel token, mai dallo userId che dichiara lui.
+    const TOKENS_STORAGE_KEY = "cucuRiduLanTokens";
+    const SETTINGS_STORAGE_KEY = "cucuRiduSettings";
+    const readJson = (storage, key) => {
+        try {
+            return JSON.parse(storage.getItem(key) || "{}") || {};
+        } catch {
+            return {};
+        }
+    };
+
+    // Lato Host: vive quanto lo snapshot della stanza (sessionStorage)
+    const lanSessions = {
+        resolve(token) {
+            const all = readJson(sessionStorage, TOKENS_STORAGE_KEY);
+            return typeof token === "string" && Object.prototype.hasOwnProperty.call(all, token) ? all[token] : null;
+        },
+        issue(userId, stanzaId) {
+            const all = readJson(sessionStorage, TOKENS_STORAGE_KEY);
+            const existing = Object.keys(all).find((t) => all[t].userId === userId && all[t].stanzaId === stanzaId);
+            if (existing) return existing;
+            const token = Array.from(window.crypto.getRandomValues(new Uint8Array(32)),
+                (b) => b.toString(16).padStart(2, "0")).join("");
+            all[token] = { userId, stanzaId };
+            sessionStorage.setItem(TOKENS_STORAGE_KEY, JSON.stringify(all));
+            return token;
+        },
+        revoke(token) {
+            const all = readJson(sessionStorage, TOKENS_STORAGE_KEY);
+            if (!this.resolve(token)) return;
+            delete all[token];
+            sessionStorage.setItem(TOKENS_STORAGE_KEY, JSON.stringify(all));
+        }
+    };
+
+    // Lato Ospite: il token sta in settings.savingToken, come nella versione web
+    const getSavingToken = () => {
+        const token = readJson(localStorage, SETTINGS_STORAGE_KEY).savingToken;
+        return typeof token === "string" && token ? token : null;
+    };
+    const setSavingToken = (token) => {
+        const settings = readJson(localStorage, SETTINGS_STORAGE_KEY);
+        localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify({ ...settings, savingToken: token }));
+    };
+
     // 1. Intercetta il redirect da creaStanza / partecipaStanzaProfile con ?nome=...&pfp=...
     const currentUrl = new URL(window.location.href);
     const nomeParam = currentUrl.searchParams.get("nome");
@@ -176,6 +222,7 @@
             nome: nomeParam,
             pfp: pfpParam,
             stanzaId: stanzaParam ? stanzaParam.toUpperCase() : null,
+            userId: null,
             action: stanzaParam ? "Partecipa" : "Crea"
         });
         window.location.replace("/game.html");
@@ -231,7 +278,8 @@
         document.addEventListener("DOMContentLoaded", syncMetaDataFromBackEnd);
     }
 
-    let hostJoinUrl = "";
+    // L'ospite ha caricato la pagina dal server dell'Host: la sua origin e' gia' il link da condividere
+    let hostJoinUrl = isNativeHost ? "" : window.location.origin;
     const isValidLanUrl = (u) => typeof u === "string" && /^https?:\/\/\d+\.\d+\.\d+\.\d+/i.test(u);
 
     const getLanDisplayLabel = () =>
@@ -335,13 +383,22 @@
     const fakeSession = {
         setupSession: () => (req, res, next) => next && next(),
         get: async () => getSavedSession() || {},
-        set: async (req, data) => saveSessionData(data),
+        // sincrona come Session.set: il valore finisce in "fallback" e poi in savingToken
+        set: (req, data) => {
+            const merged = saveSessionData(data);
+            return isNativeHost && merged.userId && merged.stanzaId
+                ? lanSessions.issue(merged.userId, merged.stanzaId)
+                : null;
+        },
         validate: async (checks, auth) => ({
             validation: LAN_TOKEN,
             stanzaId: auth?.stanzaId || null,
             userId: auth?.userId || null
         }),
-        invalidate: async () => clearSessionData()
+        invalidate: async (req, token) => {
+            if (token) lanSessions.revoke(token);
+            clearSessionData();
+        }
     };
 
     // 5. Mini-Socket.IO server in memoria per eseguire il vero serverConfig.js
@@ -602,6 +659,11 @@
             return nativeFetch(input, init);
         }
 
+        const jsonResponse = (payload) => new Response(JSON.stringify(payload), {
+            status: 200,
+            headers: { "Content-Type": "application/json" }
+        });
+
         if (method === "POST" && expressApp?.hasRoute("POST", pathname)) {
             let body = {};
             try {
@@ -624,6 +686,18 @@
                     action: null
                 });
                 await new Promise((r) => setTimeout(r, 120));
+                // il token dell'ospite lo rilascia l'Host (messaggio __session__)
+                if (!isNativeHost) return jsonResponse({ result: true, fallback: getSavingToken() });
+            }
+
+            if (pathname === "/deleteGameReference" && !isNativeHost) {
+                const token = body.token || getSavingToken();
+                if (token && guestWs?.readyState === WebSocket.OPEN) {
+                    guestWs.send(JSON.stringify({ event: "__deleteSession__", data: { token } }));
+                }
+                setSavingToken(null);
+                clearSessionData();
+                return jsonResponse({ result: true });
             }
 
             const result = await expressApp.handle("POST", pathname, { body });
@@ -753,6 +827,32 @@
         }).catch((err) => console.warn("[LAN] sendToClient fallito:", err?.message || err));
     };
 
+    // Identita' di un ospite: null = dice di essere qualcuno ma non ha un token valido
+    const authForGuest = (claimed) => {
+        const requested = String(claimed.stanzaId || "").toUpperCase();
+        const session = lanSessions.resolve(claimed.token);
+        if (session && (!requested || requested === session.stanzaId)) {
+            return { userId: session.userId, stanzaId: session.stanzaId, token: claimed.token };
+        }
+        if (claimed.userId) return null;
+        return { userId: "", stanzaId: requested };
+    };
+
+    // Prima di ogni confermaStanza l'ospite riceve il token del proprio giocatore
+    const deliverToGuest = (clientId) => (ev, args) => {
+        if (ev === "confermaStanza") {
+            const { giocatoreId, referenceStanza } = socketBridge.io.sockets.sockets.get(clientId)?.data || {};
+            if (giocatoreId && referenceStanza) {
+                sendWsToClient(clientId, "__session__", {
+                    token: lanSessions.issue(giocatoreId, referenceStanza),
+                    userId: giocatoreId,
+                    stanzaId: referenceStanza
+                });
+            }
+        }
+        sendWsToClient(clientId, ev, args);
+    };
+
     if (isNativeHost && LanServer?.addListener && socketBridge) {
         (async () => {
             await hostReadyPromise;
@@ -769,15 +869,39 @@
                     if (evName === "__ping__") return;
 
                     if (evName === "__hello__") {
-                        const auth = evData?.auth || {};
-                        const p = socketBridge.attachClientSocket(clientId, auth, (ev, args) => {
-                            sendWsToClient(clientId, ev, args);
+                        const p = restorePromise.then(() => {
+                            const auth = authForGuest(evData?.auth || {});
+                            if (!auth) {
+                                sendWsToClient(clientId, "connect_error", [{ message: "SESSION_EXPIRED" }]);
+                                return null;
+                            }
+                            return socketBridge.attachClientSocket(clientId, auth, deliverToGuest(clientId));
                         });
                         clientAttachPromises.set(clientId, p);
                         const attached = await p;
                         if (attached) {
                             sendWsToClient(clientId, "__helloAck__", { clientId });
                         }
+                        return;
+                    }
+
+                    if (evName === "__checkSession__") {
+                        await restorePromise;
+                        const session = lanSessions.resolve(evData?.token);
+                        const stanza = session ? await Stanze.get(session.stanzaId) : null;
+                        const active = Boolean(stanza && stanza.stato !== Engine.StatoStanza.END
+                            && stanza.trovaGiocatore(session.userId));
+                        sendWsToClient(clientId, "__checkSessionResult__", {
+                            reqId: evData?.reqId || "",
+                            active,
+                            userId: active ? session.userId : null,
+                            stanzaId: active ? session.stanzaId : null
+                        });
+                        return;
+                    }
+
+                    if (evName === "__deleteSession__") {
+                        lanSessions.revoke(evData?.token);
                         return;
                     }
 
@@ -798,6 +922,12 @@
                         }
                         const sock = socketBridge.io.sockets.sockets.get(clientId);
                         const args = Array.isArray(evData) ? evData : (evData !== undefined ? [evData] : []);
+                        // sessione gia' ripristinata: un secondo partecipaStanza creerebbe un doppione
+                        if (sock && evName === "partecipaStanza" && sock.data.giocatoreId
+                            && sock.data.referenceStanza === args[0]?.id) {
+                            await sock._receiveFromClient("__sincronizza__", [{ id: args[0].id, vista: "" }]);
+                            return;
+                        }
                         if (sock) await sock._receiveFromClient(evName, args);
                     }
                 } catch (e) {
@@ -893,6 +1023,31 @@
         else ws.addEventListener("open", send, { once: true });
     });
 
+    // Ospite con una partita ancora aperta: da home/profilo torna direttamente in gioco
+    const resumeGuestSession = () => {
+        const token = getSavingToken();
+        if (isNativeHost || !token || window.location.pathname.endsWith("/game.html")) return;
+        const ws = ensureGuestWs();
+        const reqId = "ses_" + Math.random().toString(36).slice(2, 10);
+        const onResult = (evt) => {
+            let msg;
+            try { msg = JSON.parse(evt.data); } catch { return; }
+            if (msg.event !== "__checkSessionResult__" || msg.data?.reqId !== reqId) return;
+            ws.removeEventListener("message", onResult);
+            if (!msg.data.active) {
+                setSavingToken(null);
+                return;
+            }
+            saveSessionData({ userId: msg.data.userId, stanzaId: msg.data.stanzaId, action: null });
+            window.location.replace("/game.html");
+        };
+        ws.addEventListener("message", onResult);
+        const send = () => ws.send(JSON.stringify({ event: "__checkSession__", data: { reqId, token } }));
+        if (ws.readyState === WebSocket.OPEN) send();
+        else ws.addEventListener("open", send, { once: true });
+    };
+    resumeGuestSession();
+
     // 11. Factory del socket client
     const createSocket = (opts = {}) => {
         const listeners = new Map();
@@ -980,6 +1135,11 @@
                                     flushGuestOutbox(ws);
                                     return;
                                 }
+                                if (evName === "__session__") {
+                                    setSavingToken(evData.token);
+                                    saveSessionData({ userId: evData.userId, stanzaId: evData.stanzaId, action: null });
+                                    return;
+                                }
                                 if (evName && !evName.startsWith("__")) {
                                     const args = Array.isArray(evData) ? evData : (evData !== undefined ? [evData] : []);
                                     dispatchLocal(evName, args);
@@ -1004,7 +1164,8 @@
                         const auth = {
                             ...clientSocket.auth,
                             stanzaId: clientSocket.auth.stanzaId || saved?.stanzaId || "",
-                            userId: clientSocket.auth.userId || saved?.userId || ""
+                            userId: clientSocket.auth.userId || saved?.userId || "",
+                            token: getSavingToken()
                         };
                         ws.send(JSON.stringify({ event: "__hello__", data: { auth } }));
                     };
