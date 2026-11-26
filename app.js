@@ -13,7 +13,7 @@ const attempt = async (operation, fallback) => {
     catch (err) {return await fallback(err);}
 };
 const ENV = {
-    version: '1.6.0',
+    version: '1.7.0',
     ...envFiles,
     ...process.env
 };
