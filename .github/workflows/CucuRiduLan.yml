@@ -1,0 +1,61 @@
+name: CucuRidu Lan APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Modalità build (debug o release)'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - debug
+          - release
+  push:
+    branches:
+      - main
+    paths:
+      - 'mobile/**'
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Installa dipendenze root e Capacitor
+        run: |
+          npm ci
+          cd mobile && npm ci
+
+      - name: Ripristina Keystore Release (se configurato nei Secrets)
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > mobile/cucuridu-release.keystore
+
+      - name: Compila APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ "${{ github.event.inputs.mode }}" = "debug" ]; then
+            npm run apk:debug
+          else
+            npm run apk:release
+          fi
+
+      - name: Carica APK negli Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: CucuRidu-APK
+          path: mobile/out/*.apk

@@ -141,3 +141,18 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 public/dist/**
+
+# Build output e file generati Mobile / Android
+mobile/www/
+mobile/out/
+mobile/node_modules/
+mobile/android/app/src/main/assets/public/
+mobile/android/.gradle/
+mobile/android/build/
+mobile/android/app/build/
+mobile/android/local.properties
+
+# Chiavi di firma private (MAI su GitHub)
+*.keystore
+*.jks
+keystore.properties

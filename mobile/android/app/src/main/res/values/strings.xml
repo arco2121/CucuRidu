@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Cucu Ridu</string>
+    <string name="title_activity_main">Cucu Ridu</string>
+    <string name="package_name">it.arco2121.cucuridu</string>
+    <string name="custom_url_scheme">it.arco2121.cucuridu</string>
+</resources>

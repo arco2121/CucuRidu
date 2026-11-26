@@ -1,6 +1,6 @@
 {
   "name": "cucuridu",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Un gioco di carte irriverente, storto e assolutamente necessario",
   "keywords": [
     "js",
@@ -22,8 +22,12 @@
   "scripts": {
     "build": "npm install",
     "app": "node app.js",
-    "start": "npm run generateAll && node build.js && node app.js",
-    "generateAll": "node ./ignore/scratch/generateAllCards.js && node ./ignore/scratch/generateNames.js && node ./application/include/script/generazione.js"
+    "start": "npm run generateAll && node build_web.js && node app.js",
+    "build:lan": "cd mobile && npx capacitor-assets generate --android --iconBackgroundColor \"#FFA9C5\" --splashBackgroundColor \"#FFA9C5\" && cd .. && node mobile/build_lan_engine.js",
+    "generateAll": "node ./ignore/scratch/generateAllCards.js && node ./ignore/scratch/generateNames.js && node ./application/include/script/generazione.js",
+    "mobile:web": "npm run build:lan && node build_mobile.js",
+    "apk:debug": "npm run build:lan && node mobile/build_apk.js --debug",
+    "apk:release": "npm run build:lan && node mobile/build_apk.js --release"
   },
   "dependencies": {
     "@socket.io/postgres-adapter": "^0.5.0",

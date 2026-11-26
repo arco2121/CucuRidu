@@ -1,0 +1,22 @@
+{
+  "appId": "it.arco2121.cucuridu_lan",
+  "appName": "Cucu Ridu",
+  "webDir": "www",
+  "server": {
+    "cleartext": true,
+    "allowNavigation": ["127.0.0.1", "localhost", "192.168.*"]
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "launchAutoHide": false,
+      "launchFadeOutDuration": 500,
+      "backgroundColor": "#FFA9C5",
+      "androidSplashResourceName": "splash",
+      "showSpinner": false
+    }
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

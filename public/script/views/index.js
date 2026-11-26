@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     document.dispatchEvent(unloadScreen);
+    setTimeout(() => window?.Capacitor?.Plugins?.SplashScreen?.hide?.(), 2000);
 
     const joinRoom = document.getElementById('joinRoom');
     const createRoom = document.getElementById('createRoom');

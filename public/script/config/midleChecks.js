@@ -9,6 +9,7 @@
  * il browser si considera online.
  */
 const FALLIMENTI_PRIMA_DI_CAMBIARE_HOST = 3;
+const newUrl = new URL(window.location.href);
 let fallimentiConsecutivi = 0;
 let cambioHostInCorso = false;
 
@@ -68,7 +69,6 @@ if(notSavedBefore && token) {
     localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
 }
 
-const newUrl = new URL(window.location.href);
 if (!params.has("token") && token && fromBackEnd["loadToken"] !== false)
     newUrl.searchParams.set("token", token);
 if (!params.has("idToken") && idToken)

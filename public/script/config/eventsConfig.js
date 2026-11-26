@@ -27,21 +27,26 @@ const showPanelCond = new Event("showPanelCond", {
 const hidePanelCond = new Event("hidePanelCond", {
     bubbles: true
 });
+
 const appendIdToken = (targetUrl) => {
     if (typeof targetUrl !== "string") return targetUrl;
+    let resolved = window.CucuRiduLan?.normalizeLanRoute
+        ? window.CucuRiduLan.normalizeLanRoute(targetUrl)
+        : targetUrl;
     try {
         const idToken = localStorage.getItem("cucuRiduToken")
             || new URLSearchParams(window.location.search).get("idToken");
-        if (!idToken) return targetUrl;
-        const parsed = new URL(targetUrl, window.location.origin);
+        if (!idToken) return resolved;
+        const parsed = new URL(resolved, window.location.origin);
         if (parsed.origin === window.location.origin && !parsed.searchParams.has("idToken")) {
             parsed.searchParams.set("idToken", idToken);
             return parsed.pathname + parsed.search + parsed.hash;
         }
     } catch {}
-    return targetUrl;
+    return resolved;
 };
 const navigateWithLoading = (url, forget = false) => {
+    window.__cucuInternalNav = true;
     document.dispatchEvent(loadScreen);
 
     setTimeout(() => {
@@ -56,6 +61,7 @@ const navigateWithLoading = (url, forget = false) => {
         }
     }, timing);
 };
+
 const fragmentRendered = new Event("fragmentRendered");
 const timeOut = 150;
 

@@ -9,6 +9,8 @@ on("listaGiocatoriAggiornamento", async (data) => {
 });
 
 const startVoice = async (listaGiocatori) => {
+    if (typeof fromBackEnd !== "undefined" && fromBackEnd["lanMode"]) return;
+    if (!navigator.mediaDevices?.getUserMedia) return;
     try {
         if (!audioStream) audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
@@ -20,7 +22,7 @@ const startVoice = async (listaGiocatori) => {
         console.error("Permesso microfono negato o errore:", err);
         alert("Se vuoi sbraitare a qualcuno teso devi attivare l'accesso al microfono.");
     }
-}
+};
 
 const creaChiamata = (targetSocketId) => {
     const peer = new SimplePeer({
