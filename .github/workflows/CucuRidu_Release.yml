@@ -1,4 +1,4 @@
-name: CucuRidu Lan APK
+name: CucuRidu Release
 
 on:
   workflow_dispatch:
@@ -11,11 +11,6 @@ on:
         options:
           - debug
           - release
-  push:
-    branches:
-      - main
-    paths:
-      - 'mobile/**'
 
 jobs:
   build-apk:

@@ -727,7 +727,6 @@
         if (fixed && fixed !== href) anchor.setAttribute("href", fixed);
     }, true);
 
-    // 8. Integrazione UI nativa in modalità LAN (Menu Pausa + schermata QR, senza Segnala/Suggerisci)
     // 8. Collega gli elementi LAN definiti direttamente nei file .ejs
     const bindLanCustomElements = async () => {
         if (typeof window.navigateWithLoading === "function" && !window.navigateWithLoading.__lanWrapped) {
@@ -740,23 +739,6 @@
         }
 
         if (isNativeHost) await hostReadyPromise;
-
-        const copyJoinUrl = async (el) => {
-            const urlToCopy = await ensureHostServerStarted();
-            if (!isValidLanUrl(urlToCopy)) {
-                alert("Connettiti a un Wi-Fi o attiva l'Hotspot e premi Aggiorna IP.");
-                return;
-            }
-            try {
-                await navigator.clipboard.writeText(urlToCopy);
-                el.dataset.lanCopying = "1";
-                el.textContent = "Copiato!";
-                setTimeout(() => {
-                    delete el.dataset.lanCopying;
-                    el.textContent = getLanDisplayLabel();
-                }, 1400);
-            } catch {}
-        };
 
         let obs = null;
         const syncElements = () => {
@@ -780,15 +762,8 @@
                 // Aggiorna tutti i testi con data-lan-join-url solo se il testo è cambiato
                 const label = getLanDisplayLabel();
                 document.querySelectorAll("[data-lan-join-url]").forEach((el) => {
-                    if (!el.dataset.lanCopying && el.textContent !== label) {
+                    if (el.textContent !== label) {
                         el.textContent = label;
-                    }
-                    if (!el.dataset.lanCopyBound) {
-                        el.dataset.lanCopyBound = "1";
-                        el.addEventListener("click", (e) => {
-                            e.stopPropagation();
-                            copyJoinUrl(el);
-                        });
                     }
                 });
 
@@ -817,6 +792,7 @@
     } else {
         bindLanCustomElements();
     }
+
     // 9. Ponte WebSocket LAN per client remoti connessi all'Hotspot dell'Host
     const clientAttachPromises = new Map();
     const sendWsToClient = (clientId, event, data) => {

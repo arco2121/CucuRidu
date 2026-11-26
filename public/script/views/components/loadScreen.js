@@ -57,7 +57,7 @@ const isLoadScreen = () => document.body.contains(loadingScreen);
                 try { document.body.removeChild(loadingScreen); }
                 catch { clearInterval(intervalId); }
             }, timing);
-        }, timing);
+        }, timing + 1000);
     });
 
     document.addEventListener("loadScreenStart", () => {
