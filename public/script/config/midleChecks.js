@@ -1,106 +1,29 @@
 /**
- * Controllo dell'host corrente e sincronizzazione token cross-cluster.
- * I token viaggiano nell'URL SOLO durante un salto tra domini diversi
- * (portale -> nodo o failover checkHost) e vengono subito rimossi dalla
- * barra degli indirizzi tramite history.replaceState senza ricaricare.
+ * Controllo dell'host corrente.
+ *
+ * Prima bastava UN ping fallito (tab in background, passaggio wifi/4G, server
+ * che ci mette piu di 5 secondi) per fare window.location.replace su un altro
+ * deploy: dal punto di vista del giocatore era una disconnessione dal nulla,
+ * senza aver toccato niente. Ora il salto avviene solo se l'host attuale e'
+ * davvero irraggiungibile per piu controlli di fila, la pagina e' visibile e
+ * il browser si considera online.
  */
 const FALLIMENTI_PRIMA_DI_CAMBIARE_HOST = 3;
+const newUrl = new URL(window.location.href);
 let fallimentiConsecutivi = 0;
 let cambioHostInCorso = false;
-
-const parseJwtPayload = (jwt) => {
-    try {
-        const part = String(jwt || "").split(".")[1];
-        if (!part) return null;
-        const base64 = part.replace(/-/g, "+").replace(/_/g, "/");
-        return JSON.parse(atob(base64));
-    } catch {
-        return null;
-    }
-};
-
-(() => {
-    // In modalità LAN Android i token non vanno sincronizzati su host esterni
-    if (window.__cucuRiduSsoRedirecting || fromBackEnd?.lanMode) return;
-
-    const currentUrl = new URL(window.location.href);
-    const params = currentUrl.searchParams;
-    const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
-
-    if (fromBackEnd["deleteToken"] === true) {
-        settings["savingToken"] = null;
-        localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
-    }
-
-    // 1. Se arriviamo da un altro host (portale o failover), salva i token in
-    //    localStorage e ripulisci subito l'URL senza ricaricare la pagina.
-    const urlToken = params.get("token");
-    const urlIdToken = params.get("idToken");
-    let urlModificato = false;
-
-    if (urlToken && fromBackEnd["deleteToken"] !== true) {
-        settings["savingToken"] = urlToken;
-        localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
-    }
-    if (urlIdToken) {
-        localStorage.setItem("cucuRiduToken", urlIdToken);
-    }
-
-    if (params.has("token")) {
-        params.delete("token");
-        urlModificato = true;
-    }
-    if (params.has("idToken")) {
-        params.delete("idToken");
-        urlModificato = true;
-    }
-    if (urlModificato) {
-        window.history.replaceState(null, "", currentUrl.pathname + currentUrl.search + currentUrl.hash);
-    }
-
-    // 2. Solo sulla Home (loadToken !== false): se in localStorage c'e' una
-    //    partita salvata e non siamo appena arrivati con ?token=, verifica in
-    //    background se la stanza esiste ancora prima di aprire /game.
-    const activeToken = settings.savingToken;
-    if (!urlToken && activeToken && fromBackEnd["loadToken"] !== false && fromBackEnd["deleteToken"] !== true) {
-        const payload = parseJwtPayload(activeToken);
-        if (payload?.stanzaId) {
-            fetch("/doRoomExists", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ roomId: payload.stanzaId })
-            })
-                .then((res) => res.json())
-                .then((data) => {
-                    if (data?.result) {
-                        const gameUrl = new URL("/game", window.location.origin);
-                        gameUrl.searchParams.set("token", activeToken);
-                        window.location.replace(gameUrl.href);
-                    } else {
-                        const latest = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
-                        latest["savingToken"] = null;
-                        localStorage.setItem("cucuRiduSettings", JSON.stringify(latest));
-                    }
-                })
-                .catch(() => {});
-        }
-    }
-})();
 
 const raggiungibile = async (origine, ms) => {
     try {
         await fetch(origine + '/ping', { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(ms) });
         return true;
-    } catch {
-        return false;
-    }
+    } catch (e) { return false; }
 };
 
 const checkHost = async (hosts) => {
-    if (window.__cucuRiduSsoRedirecting || fromBackEnd?.lanMode) return;
     if (cambioHostInCorso) return;
-    if (document.hidden) return;
-    if (navigator.onLine === false) return;
+    if (document.hidden) return;               // in background i fetch vengono strozzati
+    if (navigator.onLine === false) return;    // e' caduta la rete del giocatore, non il server
 
     if (await raggiungibile(window.location.origin, 8000)) {
         fallimentiConsecutivi = 0;
@@ -110,22 +33,47 @@ const checkHost = async (hosts) => {
     fallimentiConsecutivi++;
     if (fallimentiConsecutivi < FALLIMENTI_PRIMA_DI_CAMBIARE_HOST) return;
 
-    const currentSettings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
-    const currentToken = currentSettings.savingToken;
-    const currentIdToken = localStorage.getItem("cucuRiduToken");
-
     for (const host of hosts || []) {
         if (!host || host === window.location.origin) continue;
         if (!(await raggiungibile(host, 4000))) continue;
         cambioHostInCorso = true;
-        const targetUrl = new URL(host + location.pathname + location.search);
-        if (currentToken) targetUrl.searchParams.set("token", currentToken);
-        if (currentIdToken) targetUrl.searchParams.set("idToken", currentIdToken);
-        window.location.replace(targetUrl.href);
+        const newUrl = new URL(host + location.pathname + location.search);
+        if (token) newUrl.searchParams.set("token", token);
+        window.location.replace(newUrl.href);
         return;
     }
     fallimentiConsecutivi = 0;
 };
+
+
+if (!window.__cucuRiduSsoRedirecting && location.href !== newUrl.href)
+    window.location.replace(newUrl.href);
+
+let notSavedBefore = true;
+const settings = JSON.parse(localStorage.getItem("cucuRiduSettings") || "{}");
+const idToken = localStorage.getItem("cucuRiduToken") || null;
+if (fromBackEnd["deleteToken"] === true) {
+    notSavedBefore = false
+    settings["savingToken"] = null;
+    localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
+}
+
+// Tra domini diversi localStorage e i cookie non sono condivisi. Il JWT nella
+// URL e' invece portabile tra gli host del cluster (stessa JWTKEY): usa prima
+// quello della pagina corrente, cosi' anche un failover avvenuto prima del
+// prossimo salvataggio della sessione non perde il giocatore.
+const params = new URLSearchParams(window.location.search);
+const token = params.get("token") || settings.savingToken;
+if(notSavedBefore && token) {
+    settings["savingToken"] = token;
+    localStorage.setItem("cucuRiduSettings", JSON.stringify(settings));
+}
+
+if (!params.has("token") && token && fromBackEnd["loadToken"] !== false)
+    newUrl.searchParams.set("token", token);
+if (!params.has("idToken") && idToken)
+    newUrl.searchParams.set("idToken", idToken);
+if (location.href !== newUrl.href) window.location.replace(newUrl.href);
 
 setInterval(() => checkHost(fromBackEnd["allowedOrigins"]), 30000);
 document.addEventListener("visibilitychange", () => {

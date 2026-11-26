@@ -134,6 +134,13 @@ const appConfig = (app, serverSession, TEMPORARY_TOKEN, Stanze, allowedOrigins, 
         }
     }));
 
+    app.get("/syncIDToken", (req, res) => renderPage(req, res, "syncIDToken", {
+        simple: true,
+        error: 500,
+        icon: getIcon(),
+        message: "Non dovresti essere qui",
+    }));
+
     app.get("/offline", (req, res) => renderPage(req, res, "offline", {
         loadToken: false,
     }));
