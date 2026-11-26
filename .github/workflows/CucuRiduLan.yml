@@ -61,7 +61,7 @@ jobs:
       - name: Carica APK negli Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: CucuRidu Lan
+          name: CucuRidu
           path: mobile/out/*.apk
 
       - name: Leggi versione da package.json
@@ -72,7 +72,7 @@ jobs:
         if: github.event.inputs.mode != 'debug'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.pkg.outputs.version }}-lan
-          name: CucuRidu LAN v${{ steps.pkg.outputs.version }}
+          tag_name: v${{ steps.pkg.outputs.version }}
+          name: CucuRidu v${{ steps.pkg.outputs.version }}
           files: mobile/out/*.apk
           make_latest: true
