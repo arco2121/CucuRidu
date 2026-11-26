@@ -39,8 +39,10 @@ jobs:
           cd mobile && npm ci
 
       - name: Ripristina Keystore Release (se configurato nei Secrets)
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
-        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > mobile/cucuridu-release.keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        if: env.ANDROID_KEYSTORE_BASE64 != ''
+        run: echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > mobile/cucuridu-release.keystore
 
       - name: Compila APK
         env:
