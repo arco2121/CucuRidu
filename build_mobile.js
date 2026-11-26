@@ -12,7 +12,7 @@ const CARDS_DIR = path.join(ROOT, 'application', 'include', 'cards');
 const NAMES_FILE = path.join(ROOT, 'application', 'include', 'names', 'names.json');
 const MOBILE_WWW = path.join(ROOT, 'mobile', 'www');
 const ANDROID_RES = path.join(ROOT, 'mobile', 'android', 'app', 'src', 'main', 'res');
-const LAN_VERSION = '1.0.0-Lan';
+const LAN_VERSION = '1.7.0-Lan';
 
 const FALLBACK_NAMES = {
     names: [
