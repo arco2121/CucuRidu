@@ -124,7 +124,6 @@
             try {
                 const sticky = JSON.parse(localStorage.getItem(STICKY_KEY) || 'null');
                 if (sticky?.url && NODES.includes(sticky.url) && (Date.now() - sticky.ts) < STICKY_TTL_MS) {
-                    setStatus('Riconnessione rapida al server precedente...');
                     const fast = await probeNode(sticky.url, 1500);
                     return fast.baseUrl;
                 }
